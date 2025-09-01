@@ -13,4 +13,6 @@
     define('BASE_PATH', $base_path);
     define('BASE_INCLUDE', $base_include);
     require_once $base_include.'/lib/connect_sqli.php';
+
+    
 ?>
