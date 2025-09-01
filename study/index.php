@@ -38,6 +38,14 @@
         case '/classroom/study/profile':
             require __DIR__.'/views/profile.php';
         break;
+         case '/classroom/study/edit_profile/':
+        case '/classroom/study/edit_profile':
+            require __DIR__.'/views/edit_profile.php';
+        break;
+        case '/classroom/study/privacy_settings/':
+        case '/classroom/study/privacy_settings':
+            require __DIR__.'/views/privacy_settings.php';
+        break;
         case '/classroom/study/setting/':
         case '/classroom/study/setting':
             require __DIR__.'/views/setting.php';
