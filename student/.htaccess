@@ -1,0 +1,6 @@
+RewriteEngine On
+RewriteBase /classroom/student
+RewriteRule ^/classroom/student/index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /classroom/student/index.php [L]
