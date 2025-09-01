@@ -321,13 +321,12 @@ body {
 </style>
 </head>
 <body>
-    <?php require_once("../../include_header.php"); ?>
     <div class="page-container main-container">
        
         
         <div class="profile-card">
              <div class="settings-button-container">
-            <a href="m_profile_preview1.php" class="settings-button" title="ตั้งค่าโปรไฟล์">
+            <a href="setting" class="settings-button" title="ตั้งค่าโปรไฟล์">
                 <i class="fas fa-cog"></i>
             </a>
         </div>
