@@ -671,11 +671,17 @@ body {
         <div class="tab-content">
             
             
-                <br>
-                <form action="m_profile.php" method="POST" enctype="multipart/form-data">
+                
                     <div class="edit-profile-card">
+                         
                         <div class="section-header-icon">
+                             <a href="setting" style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+        <button class="btn btn-warning" style="border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+            <i class="fas fa-arrow-left" style="color: #fff; font-size: 1.2em;"></i>
+        </button>
+    </a>
                             <i class="fas fa-edit" style="font-size: 25px;"></i>
+                            
                             <h3 class="section-title" style="padding-left:10px;">แก้ไขข้อมูลโปรไฟล์</h3>
                         </div>
                         <hr>
