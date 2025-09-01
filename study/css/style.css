@@ -1,0 +1,8 @@
+html,body {
+    color:#555555;
+    font-family: 'Roboto', 'Kanit' !important;
+    font-size: 13px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    min-width: 375px;
+}
