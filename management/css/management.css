@@ -1,0 +1,6 @@
+tr.tr-orange>td:first-child{
+    border-left: 5px solid #FF9900;
+}
+tr.tr-green>td:first-child{
+    border-left: 5px solid #5cb85c;
+}
