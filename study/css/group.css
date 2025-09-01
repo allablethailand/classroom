@@ -1,0 +1,387 @@
+/* Start of the kanit font import */
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-ExtraLightItalic.ttf') format('truetype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('../../fonts/Kanit/Kanit-ThinItalic.ttf') format('truetype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+/* End of the font import */
+
+html, body {
+  font-family: 'Kanit', sans-serif  !important;
+}
+
+/* Custom theme colors */
+:root {
+  --bs-primary: #EF8A1F;
+  --bs-primary-rgb: 239, 138, 31;
+  --bs-secondary: #FFF7F0;
+  --bs-secondary-rgb: 255, 247, 240;
+  --bs-success: #198754;
+  --bs-info: #0dcaf0;
+  --bs-warning: #ffc107;
+  --bs-danger: #dc3545;
+  --bs-light: #f8f9fa;
+  --bs-dark: #212529;
+  
+  /* Custom orange variations */
+  --orange-primary: #EF8A1F;
+  --orange-light: #FFF7F0;
+  --orange-lighter: rgba(239, 138, 31, 0.1);
+  --orange-border: rgba(239, 138, 31, 0.2);
+  --white-bg: #FFF;
+
+  /* Origami Theme */
+  /* --ori-gray1: #FAFAFA;
+   */
+  --ori-gray: #ECECEC;
+
+}
+
+.bg-white{
+  background-color: var(--white-bg);
+}
+
+.bg-ori-gray{
+  background-color: var(--ori-gray);
+}
+
+/* Override Bootstrap primary color */
+.btn-primary {
+  background-color: var(--orange-primary);
+  border-color: var(--orange-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #d67619;
+  border-color: #d67619;
+}
+
+.btn-outline-primary {
+  color: var(--orange-primary);
+  border-color: var(--orange-primary);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: var(--orange-primary);
+  border-color: var(--orange-primary);
+}
+
+.text-primary {
+  color: var(--orange-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--orange-primary) !important;
+}
+
+.border-primary {
+  border-color: var(--orange-primary) !important;
+}
+
+/* Custom styles for the application */
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+.group-card {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.group-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.member-card {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.member-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-online {
+  background-color: #28a745;
+}
+
+.status-away {
+  background-color: #ffc107;
+}
+
+.status-offline {
+  background-color: #6c757d;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+}
+
+.avatar-md {
+  width: 48px;
+  height: 48px;
+}
+
+.avatar-lg {
+  width: 96px;
+  height: 96px;
+}
+
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  position: relative;
+}
+
+.progress-element {
+  height: 8px;
+}
+
+.element-fire {
+  color: #FF4444;
+}
+
+.element-water {
+  color: #4444FF;
+}
+
+.element-earth {
+  color: #44AA44;
+}
+
+.element-wind {
+  color: #AAAAAA;
+}
+
+.bg-element-fire {
+  background-color: rgba(255, 68, 68, 0.1);
+}
+
+.bg-element-fire-two {
+  background: linear-gradient(135deg, #ff6b6b, #ff4444);
+  color: white;
+}
+
+.bg-element-water {
+  background-color: rgba(68, 68, 255, 0.1);
+}
+
+.bg-element-water-two  {
+  background: linear-gradient(135deg, #74b9ff, #4444ff);
+  color: white;
+}
+
+.bg-element-earth {
+  background-color: rgba(68, 170, 68, 0.1);
+}
+
+.bg-element-earth-two {
+  background: linear-gradient(135deg, #6bcf7f, #44aa44);
+  color: white;
+}
+
+.bg-element-wind {
+  background-color: rgba(170, 170, 170, 0.1);
+}
+
+.bg-element-wind-two {
+  background: linear-gradient(135deg, #c7c7c7, #aaaaaa);
+  color: white;
+}
+
+.border-element-fire {
+  border-color: rgba(255, 68, 68, 0.2) !important;
+}
+
+.border-element-water {
+  border-color: rgba(68, 68, 255, 0.2) !important;
+}
+
+.border-element-earth {
+  border-color: rgba(68, 170, 68, 0.2) !important;
+}
+
+.border-element-wind {
+  border-color: rgba(170, 170, 170, 0.2) !important;
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+.rounded-small {
+  border-radius: 10px; /* Customize as needed */
+}
+
+.d-flex-bs{
+  display: flex;
+}
+
+.flex-grow-bs-1 {
+  flex-grow: 1;
+}
+
+/* Large group icon styles */
+.group-icon-large {
+  font-size: 6rem;
+  line-height: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  width: 80px;
+  height: 80px;
+}
+
+.mb-bs-2  { margin-bottom: 1rem  !important; }
+
+.mb-bs-3 { margin-bottom: 1.5rem  !important; }
+
+.mb-bs-5  { margin-bottom: 3rem  !important; }
