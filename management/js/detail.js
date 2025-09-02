@@ -14,6 +14,8 @@ function initializeClassroomManagement() {
         $(".edit-mode").addClass("hidden");
     }
     $(".get-management").on("click", function() {
+        $(".get-management").removeClass("active");
+        $(this).addClass("active");
         const page = $(this).attr("data-page");
         if (page) {
             buildPage(page);
@@ -25,6 +27,12 @@ function buildPage(page) {
     switch(page) {
         case 'management':
             buildManagementPage();
+            break;
+        case 'course':
+            buildCoursePage();
+            break;
+        case 'group':
+            buildGroupPage();
             break;
         default:
             console.warn('Unknown page type:', page);
