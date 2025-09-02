@@ -34,6 +34,9 @@ function buildPage(page) {
         case 'group':
             buildGroupPage();
             break;
+        case 'student':
+            buildStudentPage();
+            break;
         default:
             console.warn('Unknown page type:', page);
     }

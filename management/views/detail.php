@@ -48,6 +48,8 @@
 <script src="/dist/editor/js/plugins/char_counter.min.js"></script>
 <script src="/dist/editor/js/plugins/entities.min.js"></script>
 <script src="/dist/editor/js/plugins/urls.min.js"></script>
+<script src="/js/clipboard.min.js"></script>
+<script src="/node_modules/clipboard/dist/clipboard.min.js"></script>
 <script src="/classroom/management/js/detail.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/course.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/group.js?v=<?php echo time(); ?>" type="text/javascript"></script>
@@ -72,10 +74,10 @@
                 <i class="fas fa-cubes"></i>
                 <span lang="en">Group</span>
             </a>
-            <a href=".management_tab" class="get-management edit-mode" data-page="student" data-toggle="tab">
+            <!-- <a href=".management_tab" class="get-management edit-mode" data-page="evaluate" data-toggle="tab">
                 <i class="fas fa-question"></i>
                 <span lang="en">Evaluate</span>
-            </a>
+            </a> -->
             <a href=".management_tab" class="get-management edit-mode" data-page="student" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Student</span>

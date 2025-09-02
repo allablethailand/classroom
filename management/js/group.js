@@ -9,6 +9,7 @@ function getGroupTemplate() {
                 <tr>
                     <th style="width: 100px;"></th>
                     <th lang="en">Group</th>
+                    <th lang="en">Color</th>
                     <th lang="en">Create Date</th>
                     <th lang="en">Create By</th>
                     <th></th>
@@ -66,12 +67,20 @@ function buildGroup() {
                 }
             },{ 
                 "targets": 2,
-                "data": "date_create",
+                "data": "group_color",
+                "render": function (data,type,row,meta) {	
+					return `
+                        <i class="fas fa-square fa-2x" style="color: ${data};"></i>
+                    `;
+                }
             },{ 
                 "targets": 3,
-                "data": "emp_create",
+                "data": "date_create",
             },{ 
                 "targets": 4,
+                "data": "emp_create",
+            },{ 
+                "targets": 5,
                 "data": "group_id",
                 "render": function (data,type,row,meta) {	
 					return `
@@ -135,6 +144,8 @@ function manageGroup(group_id) {
             </p>
             <p><span lang="en">Group Name</span> <code>*</code></p>
             <input type="text" id="group_name" name="group_name" class="form-control require_obj" autocomplete="off">
+            <p style="margin: 10px auto;"><span lang="en">Group Color</span> <code>*</code></p>
+            <input type="color" id="group_color" name="group_color" value="#FF9900">
             <p style="margin: 10px auto;"><i class="fas fa-align-left"></i> <span lang="en">Description</span></p>
             <textarea class="form-control" id="group_description" name="group_description" oninput="autoResize(this)" style="overflow: hidden; min-height: 75px; font-size: 12px !important;"></textarea>
         </div>
@@ -154,6 +165,7 @@ function manageGroup(group_id) {
                     const data = result.group_data;
                     $('#group_name').val(data.group_name);
                     $('#group_description').val(data.group_description);
+                    $('#group_color').val(data.group_color);
                     if (data.group_logo) {
                         $('#AvatarFileUpload img').attr('src', data.group_logo);
                     }
