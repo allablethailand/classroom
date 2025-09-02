@@ -299,11 +299,7 @@
     
     <div class="settings-container">
           
-                 <a href="profile" style=" left: 0px; z-index: 1000;">
-      <button class="btn btn-warning" style="border-radius: 12px;width: 45px;height: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-            <i class="fas fa-arrow-left" style="color: #fff; font-size: 1.2em;"></i>
-        </button>
-    </a>
+                
         <div class="settings-card" style="margin-top: 10px;">
             
             
