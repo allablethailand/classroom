@@ -29,61 +29,18 @@
             $filter .= " and template.classroom_type = '{$filter_mode}' ";
         }
         $table = "SELECT 
-            template.classroom_id,
-            template.classroom_name,
-            concat(date_format(template.classroom_start, '%Y/%m/%d %H:%i'),' - ',date_format(template.classroom_end, '%Y/%m/%d %H:%i')) as classroom_date,
-            classroom_student,
-            classroom_type as classroom_mode,
-            count(student.join_id) as classroom_register,
-            date_format(template.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
-            CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
-            template.classroom_poster
+            template.classroom_id
         FROM 
             classroom_template template
-        LEFT JOIN 
-            classroom_student_join student on student.classroom_id = template.classroom_id and student.status = 0
-        LEFT JOIN 
-            m_employee_info i on i.emp_id = template.emp_create
         WHERE 
-            template.comp_id = '{$_SESSION['comp_id']}' and template.status = 0 $filter
-        GROUP BY 
-            template.classroom_id";
+            template.comp_id = '{$_SESSION['comp_id']}' and template.status = 0 $filter";
         $primaryKey = 'classroom_id';
         $columns = array(
             array('db' => 'classroom_id', 'dt' => 'classroom_id'),
-            array('db' => 'classroom_name', 'dt' => 'classroom_name'),
-            array('db' => 'classroom_date', 'dt' => 'classroom_date'),
-            array('db' => 'classroom_student', 'dt' => 'classroom_student','formatter' => function ($d, $row) {
-                return number_format($d);
-            }),
-            array('db' => 'classroom_mode', 'dt' => 'classroom_mode'),
-            array('db' => 'classroom_register', 'dt' => 'classroom_register','formatter' => function ($d, $row) {
-                return number_format($d);
-            }),
-            array('db' => 'date_create', 'dt' => 'date_create'),
-            array('db' => 'emp_create', 'dt' => 'emp_create'),
-            array('db' => 'classroom_poster', 'dt' => 'classroom_poster','formatter' => function ($d, $row) {
-                if ($d) {
-                    $info = pathinfo($d);
-                    return $info['filename'] . '_thumbnail.' . $info['extension'];
-                }
-                return '/images/training.jpg';
-            }),
         );
         $sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db'   => $db_name,'host' => $db_host);
 		require($base_include.'/lib/ssp-subquery.class.php');
 		echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
 		exit();
-    }
-    if(isset($_POST) && $_POST['action'] == 'delClassroom') {
-        $classroom_id = $_POST['classroom_id'];
-        update_data(
-            "classroom_template",
-            "status = 1, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
-            "classroom_id = '{$classroom_id}'"
-        );
-        echo json_encode([
-            'status' => true
-        ]);
     }
 ?>

@@ -1,6 +1,11 @@
 <?php
     session_start();
     $url = $_SERVER['REQUEST_URI'];
+    
+    $condition_student_info = '/classroom/study/student/studentinfo.php?' . $_SERVER['QUERY_STRING'];
+    // print_r($_SERVER);
+    // print_r($url);
+    // exit;
     switch($url) {
         case '/classroom/study/':
         case '/classroom/study':
@@ -30,10 +35,21 @@
         case '/classroom/study/student':
             require __DIR__.'/views/student.php';
         break;
+        // case '/classroom/study/studentinfo/':
+        // case '/classroom/study/studentinfo':
+        //     require __DIR__.'/views/studentinfo.php';
+        // break;
         case '/classroom/study/studentinfo/':
         case '/classroom/study/studentinfo':
-            require __DIR__.'/views/studentinfo.php';
+        case $condition_student_info:
+            // print_r('Goooo'); exit;
+            // print_r(__DIR__);
+            // print_r("Gooo"); exit;
+            // require 'origami.local/
+             header('Location: /classroom/study/views/studentinfo.php?' . $_SERVER['QUERY_STRING']);
         break;
+        
+
         case '/classroom/study/profile/':
         case '/classroom/study/profile':
             require __DIR__.'/views/profile.php';
@@ -59,6 +75,6 @@
             require __DIR__.'/views/logout.php';
         break;
         default: 
-            header('Location: /classroom/study/');
+           header('Location: /classroom/study/');
     }
-?>
+?> 
