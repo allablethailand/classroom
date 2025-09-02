@@ -2,7 +2,7 @@
     session_start();
     $url = $_SERVER['REQUEST_URI'];
     
-    $condition_student_info = '/classroom/study/student/studentinfo.php?' . $_SERVER['QUERY_STRING'];
+    $condition_student_info = '/classroom/study/studentinfo.php?' . $_SERVER['QUERY_STRING'];
     // print_r($_SERVER);
     // print_r($url);
     // exit;
