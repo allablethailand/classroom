@@ -3,6 +3,7 @@
     $url = $_SERVER['REQUEST_URI'];
     
     $condition_student_info = '/classroom/study/studentinfo.php?' . $_SERVER['QUERY_STRING'];
+    $condition_student_info_extra = '/classroom/study/student/studentinfo.php?' . $_SERVER['QUERY_STRING'];
     // print_r($_SERVER);
     // print_r($url);
     // exit;
@@ -39,9 +40,10 @@
         // case '/classroom/study/studentinfo':
         //     require __DIR__.'/views/studentinfo.php';
         // break;
-        case '/classroom/study/studentinfo/':
-        case '/classroom/study/studentinfo':
+        // case '/classroom/study/studentinfo/':
+        // case '/classroom/study/studentinfo':
         case $condition_student_info:
+        case $condition_student_info_extra:
             // print_r('Goooo'); exit;
             // print_r(__DIR__);
             // print_r("Gooo"); exit;
