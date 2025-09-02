@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="/dist/editor/css/froala_editor.min.css">
 <link rel="stylesheet" href="/dist/editor/css/froala_style.min.css">
 <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
-<link rel="stylesheet" href="/classroom/management/css/detail.css?v=<?php echo time(); ?>">
+<link rel="stylesheet" href="/classroom/management/css/management.css?v=<?php echo time(); ?>">
 <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
 <script src="/bootstrap/3.3.6/js/jquery-2.2.3.min.js" type="text/javascript"></script>
 <script src="/dist/js/sweetalert.min.js"></script>
