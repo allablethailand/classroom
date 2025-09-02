@@ -31,13 +31,13 @@
 </head>
 
 <body>
-    <?php require_once '../component/header.php'; ?>
+    <?php require_once 'component/header.php'; ?>
     <div class="main-content" style="margin-top: 10px;">
         <!-- <h2 class="menu-section-title">เมนู</h2> -->
         <div class="container-fluid">
             <div class="row">
                 <div class="actions-grid">
-                    <a class="action-card" href="./schedule.php">
+                    <a class="action-card" href="schedule">
                         <div class="action-icon purple">
                             <svg fill="#FFF" width="24" height="24" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 365.473 365.473" xml:space="preserve">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -50,7 +50,7 @@
                         <h4>SCHEDULE</h4>
                     </a>
 
-                    <a class="action-card" href="./class.php">
+                    <a class="action-card" href="student">
                         <div class="action-icon green">
                             <svg fill="#FFF" width="24" height="24" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.001 512.001" xml:space="preserve">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -166,7 +166,7 @@
         </div>
     </div>
 
-    <?php require_once '../component/footer.php'; ?>
+    <?php require_once 'component/footer.php'; ?>
 </body>
 
 </html>
