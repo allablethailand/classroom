@@ -3,78 +3,16 @@
     require_once("../../lib/connect_sqli.php");
     include_once("../../login_history.php");
     global $mysqli;
-    if (isset($_POST['save_thumbnail'])) {
-        $this_date_time = date("Y-m-d H:i:s");
-        $x1 = ($_POST['x1']) ? $_POST['x1'] : 1;
-        $y1 = ($_POST['y1']) ? $_POST['y1'] : 1;
-        $w = ($_POST['w_head']) ? $_POST['w_head'] : 1;
-        $h = ($_POST['h_head']) ? $_POST['h_head'] : 1;
-        $emp_pic = explode("?", $_SESSION["emp_pic"]);
-        if ($_SESSION["emp_pic"] != '' && $x1 != '') {
-            $sql = "update m_employee_info set emp_pic='" . $emp_pic[0] . "?" . $x1 . "&" . $y1 . "&" . $w . "&" . $h . "', last_update='" . $this_date_time . "' where emp_id='" . $_SESSION["emp_id"] . "'  ";
-            $result = $mysqli -> query($sql);
-            $_SESSION["emp_pic"] = $emp_pic[0] . "?" . $x1 . "&" . $y1 . "&" . $w . "&" . $h;
-        } else {
-            $_SESSION["emp_pic"] = $emp_pic[0];
-        }
-    }
-    if (isset($_POST['submit_info'])) {
-        $sql = "UPDATE m_employee_info SET signature='" . $_POST['signature'] . "', signature_drawing='" . $_POST['signature_drawing'] . "',last_update = NOW() where emp_id='" . $_POST['hid_id2'] . "'";
-        $result = $mysqli -> query($sql);
-        $hid_id2 = $_POST['hid_id2'];
-        $home_location = $_POST['home_location_input'];
-        $home_code = "UPDATE m_employee_info SET home_location = '{$home_location}' WHERE emp_id = '{$hid_id2}' AND (home_location is null OR home_location = '')";
-        $home_query = $mysqli -> query($home_code);
-        if ($result) {
-            redirect("m_profile.php");
-        }
-    }
-    if (isset($_POST['upload_avatar'])) {
-        $image_name = $_FILES['image_name']['name'];
-        $image_tmp = $_FILES['image_name']['tmp_name'];
-        if($image_name) {
-            $ext = pathinfo($image_name, PATHINFO_EXTENSION);
-            $unique_id = substr(base_convert(time(),10,36).md5(microtime()),0,16).'.'.$ext;
-            $dir = 'uploads/employee/'.$_SESSION['comp_id'];
-            $path_save = $dir.$unique_id;
-            move_uploaded_file($image_tmp,$path_save);
-            $sql = "update m_employee_info set emp_pic = '{$path_save}' where emp_id = '{$_SESSION['emp_id']}'";
-            $result = $mysqli -> query($sql);
-            $_SESSION["emp_pic"] = $path_save;
-        }
-        echo "<script language=\"javascript\">alert('Upload success.');</script>";
-        redirect("../../m_profile.php");
-    }
-    $fsData = getBucketMaster();
-    $filesystem_user = $fsData['fs_access_user'];
-    $filesystem_pass = $fsData['fs_access_pass'];
-    $filesystem_host = $fsData['fs_host'];
-    $filesystem_path = $fsData['fs_access_path'];
-    $filesystem_type = $fsData['fs_type'];
-    $fs_id = $fsData['fs_id'];
-    setBucket($fsData);
-    $sql_check_goal_menu = $mysqli -> query("SELECT acc.status AS status_goal FROM ac_company acc LEFT JOIN ac_menu acm ON acc.acm_id = acm.acm_id AND acm.status = 'Y' WHERE acc.comp_id = '{$_SESSION['comp_id']}' AND acm.path = 'performance/goal.php' ");
-    $check_goal_menu = mysqli_fetch_assoc($sql_check_goal_menu);
-    $sql_all = $mysqli -> query("select * from m_employee left join employee_payroll on m_employee.emp_id = employee_payroll.emp_id inner join m_employee_info on m_employee.emp_id=m_employee_info.emp_id where m_employee.emp_id = '{$_SESSION["emp_id"]}' ");
-    $row_all = mysqli_fetch_array($sql_all);
-    $columnDNA = "dna_name,dna_logo,dna_color";
-    $tableDNA = "m_dna";
-    $whereDNA = "where dna_id = '{$row_all["dna"]}'";
-    $DNA = select_data($columnDNA,$tableDNA,$whereDNA);
-    $dna_name = $DNA[0]['dna_name'];
-    $dna_logo = GetUrl($DNA[0]['dna_logo']);
-    $dna_color = ($DNA[0]['dna_color']) ? $DNA[0]['dna_color'] : '#FFFFFF';
-    function _avatar($picname){
-        if ($picname == "images/default.png") {
-            $img = "<img width=\"150\" title=\"" . $_SESSION["user"] . "\"  src=\"";
-            $img .= "images/default.png\"/>";
-        } else {
-            $img = "<img width=\"150\" id=\"avatar\" title=\"" . $_SESSION["user"] . "\"  src=\"";
-            $img .= $picname . "\"/>";
-        }
-        return $img;
-    }
-    $this_day = date("Y-m-d");
+
+    // แก้ไข: ดึงข้อมูลจากตาราง classroom_student แทน
+    $sql_student = "SELECT * FROM classroom_student WHERE student_id = 1";
+    $result_student = $mysqli->query($sql_student);
+    $row_student = mysqli_fetch_array($result_student);
+    
+    // ตั้งค่า session สำหรับรูปโปรไฟล์และชื่อ
+    $_SESSION["user"] = $row_student["student_firstname_th"] . " " . $row_student["student_lastname_th"];
+    $_SESSION["emp_pic"] = $row_student["student_image_profile"];
+    
 ?>
 <!doctype html>
 <html>
@@ -665,7 +603,7 @@ body {
 		</li>
 	</ul>
 </div> -->
-      <?php
+       <?php
     require_once ("component/header.php")
     ?>
 
@@ -687,7 +625,7 @@ body {
                         <hr>
                         <div class="row">
                             <div class="col-md-6 col-md-offset-3 text-center">
-                                <img src="<?= $_SESSION["emp_pic"]; ?>" onerror="this.src='../../../images/default.png'" alt="Profile Picture" class="profile-img-preview">
+                                <img src="<?= $row_student["student_image_profile"]; ?>" onerror="this.src='../../../images/default.png'" alt="Profile Picture" class="profile-img-preview">
                                 <div class="form-group">
                                     <label for="image_name">รูปโปรไฟล์</label>
                                     <input type="file" name="image_name" id="image_name" class="form-control-file" accept="image/*">
@@ -700,13 +638,13 @@ body {
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="firstname">ชื่อ</label>
-                                    <input type="text" id="firstname" class="form-control-edit" value="<?= $row_all["firstname"]; ?>" disabled>
+                                    <input type="text" id="firstname" class="form-control-edit" value="<?= $row_student["student_firstname_th"]; ?>" disabled>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="lastname">นามสกุล</label>
-                                    <input type="text" id="lastname" class="form-control-edit" value="<?= $row_all["lastname"]; ?>" disabled>
+                                    <input type="text" id="lastname" class="form-control-edit" value="<?= $row_student["student_lastname_th"]; ?>" disabled>
                                 </div>
                             </div>
                         </div>
@@ -714,7 +652,7 @@ body {
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="bio">Bio</label>
-                                    <textarea name="bio" id="bio" class="form-control-edit" rows="3"><?= $row_all["bio"]; ?></textarea>
+                                    <textarea name="bio" id="bio" class="form-control-edit" rows="3"><?= $row_student["student_bio"]; ?></textarea>
                                 </div>
                             </div>
                         </div>
@@ -726,35 +664,35 @@ body {
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="mobile">เบอร์โทรศัพท์</label>
-                                    <input type="text" name="mobile" id="mobile" class="form-control-edit" value="<?= $row_all['mobile']; ?>">
+                                    <input type="text" name="mobile" id="mobile" class="form-control-edit" value="<?= $row_student['student_mobile']; ?>">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">อีเมล</label>
-                                    <input type="email" name="email" id="email" class="form-control-edit" value="<?= $row_all['email']; ?>">
+                                    <input type="email" name="email" id="email" class="form-control-edit" value="<?= $row_student['student_email']; ?>">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="mobile">Line</label>
-                                    <input type="text" name="mobile" id="mobile" class="form-control-edit" value="<?= $row_all['mobile']; ?>">
+                                    <label for="line">Line</label>
+                                    <input type="text" name="line" id="line" class="form-control-edit" value="<?= $row_student['student_line']; ?>">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="email">ig</label>
-                                    <input type="email" name="email" id="email" class="form-control-edit" value="<?= $row_all['email']; ?>">
+                                    <label for="ig">ig</label>
+                                    <input type="text" name="ig" id="ig" class="form-control-edit" value="<?= $row_student['student_ig']; ?>">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="mobile">facebook</label>
-                                    <input type="text" name="mobile" id="mobile" class="form-control-edit" value="<?= $row_all['mobile']; ?>">
+                                    <label for="facebook">facebook</label>
+                                    <input type="text" name="facebook" id="facebook" class="form-control-edit" value="<?= $row_student['student_facebook']; ?>">
                                 </div>
                             </div>
                         </div>
@@ -766,13 +704,13 @@ body {
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="hobby">งานอดิเรก</label>
-                                    <input type="text" name="hobby" id="hobby" class="form-control-edit" value="<?= $row_all["hobby"]; ?>">
+                                    <input type="text" name="hobby" id="hobby" class="form-control-edit" value="<?= $row_student["student_hobby"]; ?>">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="favorite_music">ดนตรีที่ชอบ</label>
-                                    <input type="text" name="favorite_music" id="favorite_music" class="form-control-edit" value="<?= $row_all["favorite_music"]; ?>">
+                                    <input type="text" name="favorite_music" id="favorite_music" class="form-control-edit" value="<?= $row_student["student_music"]; ?>">
                                 </div>
                             </div>
                         </div>
@@ -780,13 +718,13 @@ body {
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="favorite_movie">หนังที่ชอบ</label>
-                                    <input type="text" name="favorite_movie" id="favorite_movie" class="form-control-edit" value="<?= $row_all["favorite_movie"]; ?>">
+                                    <input type="text" name="favorite_movie" id="favorite_movie" class="form-control-edit" value="<?= $row_student["student_movie"]; ?>">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="goal">เป้าหมาย</label>
-                                    <input type="text" name="goal" id="goal" class="form-control-edit" value="<?= $row_all["goal"]; ?>">
+                                    <input type="text" name="goal" id="goal" class="form-control-edit" value="<?= $row_student["student_goal"]; ?>">
                                 </div>
                             </div>
                         </div>
@@ -808,8 +746,7 @@ body {
 
 		</div>
 	</div>
-	<!--  -->
-</body>
+	</body>
 </html>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzxc7D9o3CcmSyLWVo6h4rCxS0yL_wB2k&libraries=places"></script>
 

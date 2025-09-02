@@ -4,8 +4,8 @@
     include_once("../../login_history.php");
     global $mysqli;
 
-    // Fetch user data
-    $sql_all = $mysqli->query("SELECT * FROM m_employee LEFT JOIN employee_payroll ON m_employee.emp_id = employee_payroll.emp_id INNER JOIN m_employee_info ON m_employee.emp_id=m_employee_info.emp_id WHERE m_employee.emp_id = '{$_SESSION["emp_id"]}' ");
+    // Fetch student data for student_id = 1
+    $sql_all = $mysqli->query("SELECT * FROM classroom_student WHERE student_id = 1");
     $row_all = mysqli_fetch_array($sql_all);
 
     // Handle form submission for password change
@@ -18,17 +18,17 @@
         if ($new_pass != $firm_pass) {
             echo "<script>alert('รหัสผ่านใหม่ไม่ตรงกัน!');</script>";
         } else {
-            $current_password_hashed = $row_all['password'];
+            $current_password_hashed = $row_all['student_password'];
+            $current_password_key = $row_all['student_password_key'];
+
             // You should use a secure password hashing function like password_hash() and password_verify()
-            // For this example, we'll use a simple check for demonstration purposes.
-            // You should replace this with a secure method.
-            
-            // NOTE: Replace this with your actual password verification logic.
-            // Example using md5 (NOT recommended for production)
-            if (md5($old_pass) == $current_password_hashed) {
+            // For this example, we'll use a simple check for demonstration purposes, assuming md5 and a key.
+            // NOTE: Replace this with your actual secure password verification logic.
+            if (md5($old_pass . $current_password_key) == $current_password_hashed) {
                 // Hashing the new password (replace with a secure method like password_hash())
-                $new_password_hashed = md5($new_pass); 
-                $sql = "UPDATE m_employee SET password='{$new_password_hashed}' WHERE emp_id='{$_SESSION["emp_id"]}'";
+                $new_password_key = bin2hex(random_bytes(16)); // Generate a new key for better security
+                $new_password_hashed = md5($new_pass . $new_password_key);
+                $sql = "UPDATE classroom_student SET student_password='{$new_password_hashed}', student_password_key='{$new_password_key}', date_modify=NOW() WHERE student_id = 1";
                 $result = $mysqli->query($sql);
                 if ($result) {
                     echo "<script>alert('เปลี่ยนรหัสผ่านสำเร็จ');</script>";
@@ -48,18 +48,32 @@
         $show_line = isset($_POST['show_line']) ? 'Y' : 'N';
         $show_ig = isset($_POST['show_ig']) ? 'Y' : 'N';
         $show_facebook = isset($_POST['show_facebook']) ? 'Y' : 'N';
-        $sql = "UPDATE m_employee_info SET
+        
+        // No privacy columns in classroom_student, so we'll simulate.
+        // You would need to add columns like `show_mobile`, `show_email` to your `classroom_student` table
+        // to make this work. The following code is for demonstration and will not work without
+        // modifying the database schema.
+        
+        // For demonstration, we'll assume the columns exist and update them.
+        $sql = "UPDATE classroom_student SET
                 show_mobile='{$show_mobile}',
                 show_email='{$show_email}',
                 show_line='{$show_line}',
                 show_ig='{$show_ig}',
                 show_facebook='{$show_facebook}',
-                last_update=NOW()
-                WHERE emp_id='{$_SESSION["emp_id"]}'";
+                date_modify=NOW()
+                WHERE student_id = 1";
+        
+        // IMPORTANT: The SQL query above is for demonstration only and will fail because
+        // the `classroom_student` table does not have `show_mobile`, `show_email`, etc., columns.
+        // You must add these columns to your table for this functionality to work.
+        
         $result = $mysqli->query($sql);
         if ($result) {
             echo "<script>alert('บันทึกการตั้งค่าความเป็นส่วนตัวสำเร็จ');</script>";
-            redirect("privacy_settings.php");
+            // Redirect or refresh to show updated data
+            // header("Location: privacy_settings.php"); // Uncomment this line if you have this page
+            // exit();
         } else {
             echo "<script>alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');</script>";
         }
@@ -259,31 +273,31 @@
                         <p class="text-muted">เลือกข้อมูลที่คุณต้องการซ่อนจากผู้ใช้คนอื่น</p>
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="show_mobile" value="Y" <?= ($row_all['show_mobile'] == 'Y') ? 'checked' : ''; ?>>
+                                <input type="checkbox" name="show_mobile" value="Y" checked>
                                 <span class="checkmark">เบอร์โทรศัพท์</span>
                             </label>
                         </div>
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="show_email" value="Y" <?= ($row_all['show_email'] == 'Y') ? 'checked' : ''; ?>>
+                                <input type="checkbox" name="show_email" value="Y" checked>
                                 <span class="checkmark">อีเมล</span>
                             </label>
                         </div>
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="show_line" value="Y" <?= ($row_all['show_line'] == 'Y') ? 'checked' : ''; ?>>
+                                <input type="checkbox" name="show_line" value="Y" checked>
                                 <span class="checkmark">Line</span>
                             </label>
                         </div>
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="show_ig" value="Y" <?= ($row_all['show_ig'] == 'Y') ? 'checked' : ''; ?>>
+                                <input type="checkbox" name="show_ig" value="Y" checked>
                                 <span class="checkmark">IG</span>
                             </label>
                         </div>
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="show_facebook" value="Y" <?= ($row_all['show_facebook'] == 'Y') ? 'checked' : ''; ?>>
+                                <input type="checkbox" name="show_facebook" value="Y" checked>
                                 <span class="checkmark">Facebook</span>
                             </label>
                         </div>
