@@ -281,6 +281,9 @@
     </style>
 </head>
 <body>
+     <?php
+    require_once ("component/header.php")
+    ?>
     
     <!-- <div class="top-nav-container">
         <ul class="top-nav">
@@ -295,17 +298,20 @@
     </div> -->
     
     <div class="settings-container">
-        
-        <div class="settings-card">
-            
-            <div class="settings-header">
-                
-                  <div class="profile-card" style="margin-top: 100px;">
-                     <a href="profile" style="position: absolute; top: -60px; left: 0px; z-index: 1000;">
-        <button class="btn btn-warning" style="border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+          
+                 <a href="profile" style=" left: 0px; z-index: 1000;">
+      <button class="btn btn-warning" style="border-radius: 12px;width: 45px;height: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
             <i class="fas fa-arrow-left" style="color: #fff; font-size: 1.2em;"></i>
         </button>
     </a>
+        <div class="settings-card" style="margin-top: 10px;">
+            
+            
+            <div class="settings-header">
+              
+                  <div class="profile-card" style="margin-top: 50px;">
+                    
+                    
                     <div class="profile-avatar-square">
                         <img src="<?php echo $_SESSION["emp_pic"]; ?>" onerror="this.src='../../../images/default.png'" alt="Profile Picture">
                     </div>
@@ -439,5 +445,8 @@
             });
         });
     </script>
+    <?php
+    require_once ("component/footer.php")
+    ?>
 </body>
 </html>
