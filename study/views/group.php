@@ -32,7 +32,8 @@
 </head>
 
 <body>
-    <?php require_once '../component/header.php'; ?>
+    <?php 
+    // require_once 'component/header.php'; ?>
 
     <!-- work ON mobile screen ONLY -->
     <div class="min-vh-100 bg-ori-gray">
@@ -100,7 +101,7 @@
                     <div class="card group-card h-100 ">
                         <div class="panel-heading border-0">
                             <div class="d-flex-bs align-items-center gap-3">
-                                <a onclick="view_group(1)">
+                                <a href="student">
 
                                     <!-- {group.icon} -->
                                     <i class="fas fa-leaf" style="width: 50px;"></i>
@@ -164,7 +165,7 @@
         </div>
 
 
-        <?php require_once '../component/footer.php'; ?>
+        <?php require_once 'component/footer.php'; ?>
     </div>
 
 
