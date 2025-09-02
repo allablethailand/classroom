@@ -321,7 +321,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         border-radius: 10px;
         padding: 15px;
         margin-bottom: 15px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        box-shadow: 8px 8px 10px rgba(0,0,0,0.1);
         border-left: 5px solid;
         cursor: pointer;
     }
@@ -480,10 +480,11 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     #studentInfoModal .close-btn {
         background: none;
         border: none;
-        font-size: 3.5em;
+        font-size: 40px;
         position: absolute;
         top: 5px;
         right: 30px;
+        opacity: .7;
     }
     /* เพิ่มสไตล์สำหรับส่วนข้อมูลติดต่อในป๊อปอัป */
 .student-contact-section-card {
@@ -730,7 +731,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
   <div class="modal-dialog modal-fullscreen" role="document">
     <div class="modal-content modal-fullscreen">
       <div class="modal-header modal-fullscreen">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="modal" style="font-size: 40px; opacity: .7;" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title-full" id="allMonthScheduleModalLabel"></h4>
       </div>
       <div class="modal-body modal-body-full" id="allMonthScheduleModalBody">
@@ -743,7 +744,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" style="font-size: 40px; opacity: .7;" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="classDetailModalLabel"></h4>
       </div>
       <div class="modal-body" id="classDetailModalBody">
@@ -756,7 +757,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" style="font-size: 40px; opacity: .7;" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="cameraModalLabel">ยืนยันตัวตน</h4>
       </div>
       <div class="modal-body" style="text-align: center;">
