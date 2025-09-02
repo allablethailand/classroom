@@ -191,6 +191,8 @@ function populateFormData(data) {
         setRadioValue("auto_password", data.auto_password);
         const isEnabled = data.classroom_allow_register === '0';
         $('.for-open-register').toggleClass('hidden', !isEnabled);
+        const isEnabledLineOA = data.line_oa === '0';
+        $('.for-lineconnect').toggleClass('hidden', !isEnabledLineOA);
         if (data.classroom_type === 'online' && data.platforms_id) {
             $('#classroom_plateform').append($('<option>', { 
                 value: data.platforms_id, 
@@ -236,6 +238,7 @@ function populateFormData(data) {
         if (data.case_sensitivity === 'Y') {
             $("#password_sensitivity_case").prop("checked", true);
         }
+        $("#emp_group").val(data.staff_groups);
     } catch (error) {
         console.error('Error populating form data:', error);
     }
@@ -750,6 +753,7 @@ function handleClickOutside() {
 function getManagementTemplate() {
     return `
         <form id="form_classroom">
+            <input type="hidden" name="classroom_id" value="${classroom_id}">
             <div class="form-group row">							
                 <div class="col-sm-12">
                     <div class="form-group">
@@ -767,9 +771,7 @@ function getManagementTemplate() {
                             <label lang="en" class="control-label" for="classroom_poster">Poster</label>
                         </div>
                         <div class="col-sm-9">
-                            <input name="classroom_poster" id="classroom_poster" type="file" class="dropify" 
-                                   data-allowed-file-extensions='["jpg", "jpeg", "png"]' 
-                                   data-max-file-size="25M" data-height="155" data-default-file="">
+                            <input name="classroom_poster" id="classroom_poster" type="file" class="dropify" data-allowed-file-extensions='["jpg", "jpeg", "png"]' data-max-file-size="25M" data-height="155" data-default-file="">
                             <input name="ex_classroom_poster" id="ex_classroom_poster" type="hidden">
                         </div>
                     </div>
@@ -866,7 +868,7 @@ function getManagementTemplate() {
                             </div>
                             <div class="col-sm-9">
                                 <div class="input-group getLatLong" style="cursor:pointer;">
-                                    <input type="text" class="form-control getLatLong" name="classroom_location" id="classroom_location" autocomplete="off" placeholder="Latitude,Longitude">
+                                    <input type="text" class="form-control getLatLong" name="classroom_plateform" id="classroom_plateform" autocomplete="off" placeholder="Latitude,Longitude">
                                     <span class="input-group-addon"><i class="fas fa-map-marker-alt"></i></span>
                                 </div>
                             </div>
@@ -876,7 +878,7 @@ function getManagementTemplate() {
                                 <label lang="en" class="control-label">Location Name</label>
                             </div>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" name="classroom_location_name" id="classroom_location_name" autocomplete="off">
+                                <input type="text" class="form-control" name="classroom_source" id="classroom_source" autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -1148,15 +1150,15 @@ function getManagementTemplate() {
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group row">
-                            <div class="col-sm-3">
-                                <label lang="en" class="control-label">&nbsp;</label>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="checkbox checkbox-danger" style="margin-left:16px;">
-                                    <input class="styled" id="password_sensitivity_case" name="password_sensitivity_case" type="checkbox" value="1" checked>
-                                    <label for="password_sensitivity_case" lang="en">Disable case sensitivity</label>
-                                </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-3">
+                            <label lang="en" class="control-label">&nbsp;</label>
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="checkbox checkbox-danger" style="margin-left:16px;">
+                                <input class="styled" id="password_sensitivity_case" name="password_sensitivity_case" type="checkbox" value="1" checked>
+                                <label for="password_sensitivity_case" lang="en">Disable case sensitivity</label>
                             </div>
                         </div>
                     </div>
@@ -1336,4 +1338,74 @@ function getDate(type) {
             }
         }
     }
+}
+function saveManagement() {
+    var err = 0;
+    $.each($(".require_obj"), function(){    
+        if($(this).is(':visible') && !$(this).val()) {
+            ++err;
+        }              
+    });
+	if(err > 0) {
+		swal({
+			type: 'warning',
+			title: "Warning",
+			text: "Please input all item completely.",
+			timer: 2500,
+			showConfirmButton: false,
+			allowOutsideClick: true
+		});
+		return;
+	}
+    $(".loader").addClass("active");
+    var fd = new FormData();
+    $("#form_classroom").find("input, select, textarea").each(function() {
+        var $element = $(this);
+        if ($element.is(':visible')) {
+            var name = $element.attr('name');
+            var type = $element.attr('type');
+            if (name) {
+                if (type === 'file') {
+                    var files = $element[0].files;
+                    if (files.length > 0) {
+                        fd.append(name, files[0]);
+                    }
+                } else if (type === 'checkbox' || type === 'radio') {
+                    if ($element.is(':checked')) {
+                        fd.append(name, $element.val());
+                    }
+                } else {
+                    fd.append(name, $element.val() || '');
+                }
+            }
+        }
+    });
+    if (classroom_id) {
+        fd.append('classroom_id', classroom_id);
+    }
+    fd.append('emp_group', $("#emp_group").val());
+    fd.append('classroom_information', $("#classroom_information").val());
+    $.ajax({
+		url: "/classroom/management/actions/detail.php?action=saveManagement",
+		type: "POST",
+		data: fd,
+		processData: false,
+		contentType: false,
+		dataType: "JSON",
+		success: function(result){
+			$(".loader").removeClass("active");
+            if(result.status == false) {
+                swal({type: 'warning', title: "Something went wrong", text: (result.message) ? result.message : "Please try again later", showConfirmButton: false, timer: 1500});
+                return;
+            }
+			swal({type: 'success', title: "Successfully", text: "", showConfirmButton: false, timer: 1500});
+			localStorage.removeItem('reloadManagement');
+			localStorage.setItem('reloadManagement', 'true');
+			if(!classroom_id) {
+				setTimeout(function() {
+					$.redirect("detail",{classroom_id: result.classroom_id}, 'post');
+				}, 1500);
+			}
+		}
+	});
 }

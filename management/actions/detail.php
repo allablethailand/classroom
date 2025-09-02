@@ -53,7 +53,6 @@
                 template.auto_username,
                 template.auto_username_type,
                 template.auto_username_length,
-                template.auto_username_custom,
                 template.auto_password,
                 template.password_type,
                 template.auto_password_type,
@@ -68,7 +67,16 @@
                 where template.classroom_id = '{$classroom_id}'
             "
         );
-        $classroom = $$classrooms[0];
+        $classroom = $classrooms[0];
+        $staffs = select_data(
+            "group_concat(emp_id) as staff_group",
+            "classroom_staff",
+            "where classroom_id = '{$classroom_id}' and status = 0"
+        );
+        $staff_groups = '';
+        if(isset($staffs)) {
+            $staff_groups = $staffs[0]['staff_group'];
+        }
         echo json_encode([
             'status' => true,
             'classroom_data' => [
@@ -97,12 +105,12 @@
                 'auto_username' => $classroom['auto_username'],
                 'auto_username_type' => $classroom['auto_username_type'],
                 'auto_username_length' => $classroom['auto_username_length'],
-                'auto_username_custom' => $classroom['auto_username_custom'],
                 'auto_password' => $classroom['auto_password'],
                 'auto_password_type' => $classroom['auto_password_type'],
                 'auto_password_length' => $classroom['auto_password_length'],
                 'auto_password_custom' => $classroom['auto_password_custom'],
                 'password_sensitivity_case' => $classroom['password_sensitivity_case'],
+                'staff_groups' => $staff_groups,
             ]
         ]);
     }
@@ -365,8 +373,6 @@
         }
         echo json_encode($Data);
     }
-<<<<<<< HEAD
-=======
     if(isset($_GET) && $_GET['action'] == 'saveManagement') {
         $classroom_id = $_POST['classroom_id'];
         $classroom_name = initVal($_POST['classroom_name']);
@@ -628,5 +634,4 @@
         $datetime = DateTime::createFromFormat('Y/m/d H:i', $datetime_string);
         return ($datetime !== false) ? $datetime->format('Y-m-d H:i:s') : null;
     }
->>>>>>> c82db78991ceb63babbe6f0d1ecc2be69f040a54
 ?>
