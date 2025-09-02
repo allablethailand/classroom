@@ -591,7 +591,7 @@
             }
             $classroom_poster = $classroom_poster_dir . $strname . '.' . $classroom_poster_ext;
             $classroom_poster_thumb = $classroom_poster_dir . $strname . '_thumbnail.' . $classroom_poster_ext;
-            $classroom_poster_save = "{$$classroom_poster}";
+            $classroom_poster_save = "{$classroom_poster}";
             if (SaveFile($classroom_poster_tmp, $classroom_poster)) {
                 if (!createThumbnail($classroom_poster, $classroom_poster_thumb, 300, 300, 80)) {
                     echo json_encode([

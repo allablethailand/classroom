@@ -110,14 +110,16 @@ function buildClassroom() {
 			"columns": [{ 
                 "targets": 0,
                 "data": "classroom_poster",
+                "className": "dt-click",
                 "render": function (data,type,row,meta) {	
 					return `
-                        <img src="${data}" style="width: 100px;">
+                        <img src="${data}" style="width: 100px; border-radius: 5px; border: 3px solid #FFFFFF; box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.16);">
                     `;
                 }
             },{ 
                 "targets": 1,
                 "data": "classroom_name",
+                "className": "dt-click",
                 "render": function (data,type,row,meta) {	
 					return `
                         <b>${data}</b>
@@ -125,27 +127,31 @@ function buildClassroom() {
                 }
             },{ 
                 "targets": 2,
-                "data": "classroom_date"
+                "data": "classroom_date",
+                "className": "dt-click"
             },{ 
                 "targets": 3,
                 "data": "classroom_student",
-                "className": "text-right"
+                "className": "text-right dt-click"
             },{ 
                 "targets": 4,
                 "data": "classroom_mode",
+                "className": "dt-click",
                 "render": function (data,type,row,meta) {	
 					return (data == 'online') ? `<span class="label label-success">Online</span>` : `<span class="label label-warning">Onsite</span>`;
                 }
             },{ 
                 "targets": 5,
                 "data": "classroom_register",
-                "className": "text-right"
+                "className": "text-right dt-click"
             },{ 
                 "targets": 6,
-                "data": "date_create"
+                "data": "date_create",
+                "className": "dt-click"
             },{ 
                 "targets": 7,
-                "data": "emp_create"
+                "data": "emp_create",
+                "className": "dt-click"
             },{ 
                 "targets": 8,
                 "data": "classroom_id",
@@ -168,7 +174,7 @@ function buildClassroom() {
         $('div#tb_classroom_filter.dataTables_filter label span').remove();
         var template = `
             <input type="search" class="form-control input-sm search-datatable" placeholder="" autocomplete="off" style="margin-bottom:0px !important;"> 
-            <button type="button" class="btn btn-green" style="font-size:12px;" onclick="manageClassroom('')"><i class="fas fa-plus"></i> <span lang="en">New classroom</span></button>
+            <button type="button" class="btn btn-green" style="font-size:12px;" onclick="manageClassroom('')"><i class="fas fa-plus"></i> <span lang="en">Classroom</span></button>
         `;
         $('div#tb_classroom_filter.dataTables_filter input').hide();
         $('div#tb_classroom_filter.dataTables_filter label').append(template);
