@@ -1,54 +1,25 @@
 <?php
     session_start();
-    // In a real application, you would connect to the database here.
-    // require_once("../../lib/connect_sqli.php");
-    // global $mysqli;
+    require_once("../../lib/connect_sqli.php");
+    // require_once("../../component/header.php");
+    include_once("../../login_history.php");
+    global $mysqli;
 
-    // --- Start of Mock Data ---
-    // This array simulates the data that would be returned from your SQL query.
-    $mock_students = [
-        [
-            "emp_id" => "101",
-            "firstname" => "สมชาย",
-            "lastname" => "รักเรียน",
-            "emp_pic" => "https://randomuser.me/api/portraits/men/32.jpg",
-            "bio" => "รักการเขียนโค้ดและชอบฟังเพลง",
-            "course" => "หลักสูตรพัฒนาเว็บ",
-            "division_name" => "ฝ่ายพัฒนาโปรแกรม"
-        ],
-        [
-            "emp_id" => "102",
-            "firstname" => "มาลี",
-            "lastname" => "ใจดี",
-            "emp_pic" => "https://randomuser.me/api/portraits/women/44.jpg",
-            "bio" => "มีความสุขกับการวาดรูปและท่องเที่ยว",
-            "course" => "หลักสูตรการออกแบบกราฟิก",
-            "division_name" => "ฝ่ายออกแบบสื่อ"
-        ],
-        [
-            "emp_id" => "103",
-            "firstname" => "วิชัย",
-            "lastname" => "เก่งกาจ",
-            "emp_pic" => "https://randomuser.me/api/portraits/men/50.jpg",
-            "bio" => "ชอบเล่นกีฬาบาสเกตบอลและเรียนรู้สิ่งใหม่ๆ",
-            "course" => "หลักสูตรการตลาดออนไลน์",
-            "division_name" => "ฝ่ายการตลาด"
-        ],
-        [
-            "emp_id" => "104",
-            "firstname" => "อารี",
-            "lastname" => "มีชัย",
-            "emp_pic" => "https://randomuser.me/api/portraits/women/62.jpg",
-            "bio" => "ผู้ที่ชื่นชอบการทำอาหารและรักสัตว์",
-            "course" => "หลักสูตรผู้ดูแลระบบ",
-            "division_name" => "ฝ่ายไอที"
-        ],
-    ];
-
-    // Simulates checking if there are any results
-    $num_rows = count($mock_students);
-
-    // End of Mock Data. You would replace this section with your original SQL query.
+    // Query to fetch all students from the classroom_student table
+    // ดึงข้อมูลที่จำเป็นจากตาราง classroom_student
+    $query = "SELECT student_id, student_firstname_th, student_lastname_th, student_nickname_th, student_image_profile, student_bio FROM classroom_student ORDER BY student_id ASC";
+    $result = $mysqli->query($query);
+    
+    // Check if the query was successful
+    if ($result) {
+        $students = $result->fetch_all(MYSQLI_ASSOC);
+        $num_rows = count($students);
+    } else {
+        $num_rows = 0;
+        $students = [];
+        // Optional: Add error handling here
+        // die("Query failed: " . $mysqli->error);
+    }
 ?>
 <!doctype html>
 <html>
@@ -164,9 +135,12 @@
 </style>
 </head>
 <body>
+     <?php
+    require_once ("component/header.php")
+    ?>
     <div class="main-container">
         <div class="header-bar">
-            <a href="profile" style="color: inherit;"><i class="fas fa-arrow-left"></i></a>
+            <a href="group"></a>
             <h2>รายชื่อนักเรียน</h2>
             <div style="width: 20px;"></div>
         </div>
@@ -178,19 +152,22 @@
         <div class="student-list">
             <?php
                 if ($num_rows > 0) {
-                    foreach ($mock_students as $row_student) {
-                        $student_pic = !empty($row_student['emp_pic']) ? $row_student['emp_pic'] : '../../../images/default.png';
+                    foreach ($students as $row) {
+                        $student_pic = !empty($row['student_image_profile']) ? $row['student_image_profile'] : 'https://i.stack.imgur.com/34AD4.jpg';
             ?>
-            <a href="studentinfo" class="student-card">
+            <a href="studentinfo.php?id=<?= htmlspecialchars($row['student_id']); ?>" class="student-card">
                 <div class="student-avatar">
-                    <img src="<?= htmlspecialchars($student_pic); ?>" alt="Student Avatar" onerror="this.src='../../../images/default.png'">
+                    <img src="<?= htmlspecialchars($student_pic); ?>" alt="Student Avatar" onerror="this.src='https://i.stack.imgur.com/34AD4.jpg'">
                 </div>
                 <div class="student-info">
                     <h4 class="student-name">
-                        <?= htmlspecialchars($row_student['firstname'] . " " . $row_student['lastname']); ?>
+                        <?= htmlspecialchars($row['student_firstname_th'] . " " . $row['student_lastname_th']); ?>
                     </h4>
                     <p class="student-details">
-                        <i class="fas fa-briefcase"></i> <?= htmlspecialchars($row_student['division_name']); ?>
+                        <i class="fas fa-user-circle"></i> <?= htmlspecialchars($row['student_nickname_th']); ?>
+                    </p>
+                    <p class="student-details">
+                        <i class="fas fa-briefcase"></i> <?= htmlspecialchars($row['student_bio']); ?>
                     </p>
                 </div>
             </a>
@@ -221,5 +198,8 @@
             }
         }
     </script>
+    <?php
+    require_once ("component/footer.php")
+    ?>
 </body>
 </html>

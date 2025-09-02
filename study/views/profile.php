@@ -315,12 +315,15 @@ body {
 /* เพิ่ม Media Query สำหรับอุปกรณ์มือถือโดยเฉพาะ */
 @media (max-width: 380px) {
     .page-container {
-    padding-top: 140px;
+    /* padding-top: 140px; */
 }
 }
 </style>
 </head>
 <body>
+    <?php
+    require_once ("component/header.php")
+    ?>
     <div class="page-container main-container">
        
         
@@ -457,5 +460,8 @@ body {
             </div>
         </div>
     </div>
+    <?php
+    require_once ("component/footer.php")
+    ?>
 </body>
 </html>

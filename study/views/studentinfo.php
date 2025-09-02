@@ -1,45 +1,54 @@
 <?php
+//  print_r("Info"); exit;
     session_start();
+    require_once("../../../lib/connect_sqli.php");
+    // require_once("../../component/header.php");
+    include_once("../../login_history.php");
+    global $mysqli;
 
-    // ส่วนนี้จะจำลองการดึงข้อมูลนักเรียนจากฐานข้อมูล
-    // เราจะใช้ข้อมูล "สมชาย รักเรียน" เช่นเดิม
-    $row_student = [
-        "emp_id" => "101",
-        "firstname" => "สมชาย",
-        "lastname" => "รักเรียน",
-        "emp_pic" => "https://randomuser.me/api/portraits/men/32.jpg",
-        "bio" => "รักการเขียนโค้ดและชอบฟังเพลง",
-        "course" => "หลักสูตรพัฒนาเว็บ",
-        "division_name" => "ฝ่ายพัฒนาโปรแกรม",
-        "mobile" => "081-123-4567",
-        "email" => "somchai.r@example.com",
-        "line_id" => "somchai_dev",
-        "instagram" => "somchai_coding",
-        "facebook" => "somchai.rocks",
-        "birthday" => "1995-05-15",
-        "religion" => "พุทธ",
-        "blood_type" => "O",
-        "hobby" => "เล่นเกม, อ่านหนังสือ",
-        "favorite_music" => "Pop Rock",
-        "favorite_movie" => "The Matrix",
-        "goal" => "เป็น Full-Stack Developer ที่เก่งที่สุด"
-    ];
+    // Get the student ID from the URL. Using query parameter is more reliable if URL rewriting is not configured.
+    // Example URL: http://origami.local/classroom/study/studentinfo.php?id=1
+    // or if URL rewriting is setup: http://origami.local/classroom/study/studentinfo/1
+    
+    // Method 1: Get ID from URL path (requires server routing/htaccess)
+    $url = $_SERVER['REQUEST_URI'];
+    $parts = explode('/', $url);
+    $student_id = end($parts);
 
-    $has_contact = !empty($row_student['mobile']) || !empty($row_student['email']) || !empty($row_student['line_id']) || !empty($row_student['instagram']) || !empty($row_student['facebook']);
+    if (empty($student_id) || !is_numeric($student_id)) {
+        // Fallback to query parameter if URL path doesn't have an ID
+        $student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    }
+    
+    // Check if a valid ID is provided
+    if ($student_id > 0) {
+        // Use a prepared statement to prevent SQL injection
+        $stmt = $mysqli->prepare("SELECT * FROM classroom_student WHERE student_id = ? AND status = 1");
+        $stmt->bind_param("i", $student_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    // --- ส่วนเพิ่มโค้ดใหม่: จำลองสถานะความเป็นเพื่อน ---
-    // ในแอปพลิเคชันจริง คุณจะใช้ตัวแปร Session ของผู้ใช้ที่ล็อกอินอยู่
-    // และทำการ Query ฐานข้อมูลเพื่อตรวจสอบสถานะความเป็นเพื่อนกับ emp_id ที่กำลังดูอยู่
-    // $loggedInUser = $_SESSION['user_id'];
-    // $profileUserId = $row_student['emp_id'];
+        if ($result->num_rows > 0) {
+            $row_student = $result->fetch_assoc();
+        } else {
+            $row_student = null;
+        }
+        $stmt->close();
+    } else {
+        $row_student = null;
+    }
 
-    // สถานะ:
-    // 1 = ยังไม่ได้เป็นเพื่อนกัน (สามารถส่งคำขอเพิ่มเพื่อนได้)
-    // 2 = เป็นเพื่อนกันแล้ว (สามารถส่งข้อความได้)
-    // 3 = รอการตอบรับคำขอ (เคยส่งคำขอไปแล้ว)
-    $friendship_status = 1; // สมมติว่ายังไม่ได้เป็นเพื่อนกัน
-    // ถ้าคุณอยากลองเปลี่ยนสถานะ ให้เปลี่ยนค่า $friendship_status เป็น 2 หรือ 3
-    // เช่น $friendship_status = 2;
+    // Redirect if no valid student is found
+    if ($row_student === null) {
+        header("Location: /classroom/study/student/");
+        exit();
+    }
+
+    // Now, map the database fields to the variables used in your HTML, using the correct column names
+    $has_contact = !empty($row_student['student_mobile']) || !empty($row_student['student_email']) || !empty($row_student['student_line']) || !empty($row_student['student_ig']) || !empty($row_student['student_facebook']);
+    
+    // Assume friendship status for demonstration (in a real app, this would be dynamic)
+    $friendship_status = 1; // Example: 1=Not friends, 2=Friends, 3=Pending request
 ?>
 <!doctype html>
 <html>
@@ -379,15 +388,15 @@ body {
 </head>
 <body>
     <div class="page-container main-container">
-       
+        
         
         <div class="profile-card">
-                <a href="student" style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+            <a href="javascript:history.back()" style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
         <button class="btn btn-warning" style="border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
             <i class="fas fa-arrow-left" style="color: #fff; font-size: 1.2em;"></i>
         </button>
     </a>
-             <div class="settings-button-container">
+            <div class="settings-button-container">
             <?php if ($friendship_status === 1) : ?>
                 <a href="#" class="settings-button add-friend-button" title="เพิ่มเพื่อน">
                     <i class="fas fa-user-plus"></i>
@@ -403,20 +412,20 @@ body {
             <?php endif; ?>
         </div>
             <div class="profile-avatar-square">
-                <img src="<?= htmlspecialchars($row_student["emp_pic"]); ?>" 
-                     onerror="this.src='../../../images/default.png'" 
-                     alt="Profile Picture">
+                <img src="<?= htmlspecialchars($row_student["student_image_profile"]); ?>" 
+                    onerror="this.src='../../../images/default.png'" 
+                    alt="Profile Picture">
             </div>
             <h2 class="profile-name">
-                <?= htmlspecialchars($row_student["firstname"] . " " . $row_student["lastname"]); ?>
+                <?= htmlspecialchars($row_student["student_firstname_th"] . " " . $row_student["student_lastname_th"]); ?>
             </h2>
             <p class="profile-bio">
-                <?= !empty($row_student["bio"]) ? htmlspecialchars($row_student["bio"]) : "ยังไม่ได้เขียน Bio"; ?>
+                <?= !empty($row_student["student_bio"]) ? htmlspecialchars($row_student["student_bio"]) : "ยังไม่ได้เขียน Bio"; ?>
             </p>
             <div class="profile-course-container">
                 <p class="profile-course" style="margin: 0px;">
                     <i class="fas fa-graduation-cap"></i>
-                    หลักสูตร: <span><?= !empty($row_student["course"]) ? htmlspecialchars($row_student["course"]) : "ยังไม่ได้ระบุ"; ?></span>
+                    หลักสูตร: <span><?= !empty($row_student["student_education"]) ? htmlspecialchars($row_student["student_education"]) : "ยังไม่ได้ระบุ"; ?></span>
                 </p>
             </div>
         </div>
@@ -428,41 +437,41 @@ body {
                 <h3 class="section-title" style="padding-left:10px;">ช่องทางการติดต่อ</h3>
             </div>
             <div class="contact-grid">
-    <?php if (!empty($row_student['mobile'])) : ?>
+    <?php if (!empty($row_student['student_mobile'])) : ?>
     <div class="contact-item">
-        <a href="tel:<?= htmlspecialchars($row_student['mobile']); ?>">
+        <a href="tel:<?= htmlspecialchars($row_student['student_mobile']); ?>">
             <div class="contact-icon-circle phone"><i class="fas fa-phone"></i></div>
             <span>โทรศัพท์</span>
         </a>
     </div>
     <?php endif; ?>
-    <?php if (!empty($row_student['email'])) : ?>
+    <?php if (!empty($row_student['student_email'])) : ?>
     <div class="contact-item">
-        <a href="mailto:<?= htmlspecialchars($row_student['email']); ?>">
+        <a href="mailto:<?= htmlspecialchars($row_student['student_email']); ?>">
             <div class="contact-icon-circle mail"><i class="fas fa-envelope"></i></div>
             <span>อีเมล</span>
         </a>
     </div>
     <?php endif; ?>
-    <?php if (!empty($row_student['line_id'])) : ?>
+    <?php if (!empty($row_student['student_line'])) : ?>
     <div class="contact-item">
-        <a href="https://line.me/ti/p/~<?= htmlspecialchars($row_student['line_id']); ?>" target="_blank">
+        <a href="https://line.me/ti/p/~<?= htmlspecialchars($row_student['student_line']); ?>" target="_blank">
             <div class="contact-icon-circle line"><i class="fab fa-line"></i></div>
             <span>Line</span>
         </a>
     </div>
     <?php endif; ?>
-    <?php if (!empty($row_student['instagram'])) : ?>
+    <?php if (!empty($row_student['student_ig'])) : ?>
     <div class="contact-item">
-        <a href="https://www.instagram.com/<?= htmlspecialchars($row_student['instagram']); ?>" target="_blank">
+        <a href="https://www.instagram.com/<?= htmlspecialchars($row_student['student_ig']); ?>" target="_blank">
             <div class="contact-icon-circle ig"><i class="fab fa-instagram"></i></div>
             <span>Instagram</span>
         </a>
     </div>
     <?php endif; ?>
-    <?php if (!empty($row_student['facebook'])) : ?>
+    <?php if (!empty($row_student['student_facebook'])) : ?>
     <div class="contact-item">
-        <a href="https://www.facebook.com/<?= htmlspecialchars($row_student['facebook']); ?>" target="_blank">
+        <a href="https://www.facebook.com/<?= htmlspecialchars($row_student['student_facebook']); ?>" target="_blank">
             <div class="contact-icon-circle fb"><i class="fab fa-facebook-f"></i></div>
             <span>Facebook</span>
         </a>
@@ -482,21 +491,21 @@ body {
                     <i class="fas fa-birthday-cake" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">วันเกิด</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_student["birthday"]) ? date("j F Y", strtotime($row_student["birthday"])) : "-"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_student["student_birth_date"]) ? date("j F Y", strtotime($row_student["student_birth_date"])) : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-church" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">ศาสนา</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_student["religion"]) ? htmlspecialchars($row_student["religion"]) : "-"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_student["student_religion"]) ? htmlspecialchars($row_student["student_religion"]) : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-tint" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">กรุ๊ปเลือด</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_student["blood_type"]) ? htmlspecialchars($row_student["blood_type"]) : "-"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_student["student_bloodgroup"]) ? htmlspecialchars($row_student["student_bloodgroup"]) : "-"; ?></span>
                     </div>
                 </div>
             </div>
@@ -512,32 +521,33 @@ body {
                     <i class="fas fa-star" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">งานอดิเรก</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_student["hobby"]) ? htmlspecialchars($row_student["hobby"]) : "ยังไม่ได้ระบุ"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_student["student_hobby"]) ? htmlspecialchars($row_student["student_hobby"]) : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-music" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_student["favorite_music"]) ? htmlspecialchars($row_student["favorite_music"]) : "ยังไม่ได้ระบุ"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_student["student_music"]) ? htmlspecialchars($row_student["student_music"]) : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-film" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">หนังที่ชอบ</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_student["favorite_movie"]) ? htmlspecialchars($row_student["favorite_movie"]) : "ยังไม่ได้ระบุ"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_student["student_movie"]) ? htmlspecialchars($row_student["student_movie"]) : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-bullseye" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">เป้าหมาย</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_student["goal"]) ? htmlspecialchars($row_student["goal"]) : "ยังไม่ได้ระบุ"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_student["student_goal"]) ? htmlspecialchars($row_student["student_goal"]) : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
 </body>
 </html>
