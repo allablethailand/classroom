@@ -32,7 +32,12 @@
 
 <body>
     <?php require_once 'component/header.php'; ?>
-    <div class="main-content" style="margin-top: 10px;">
+    <?php
+$segments = ['complete', 'complete', 'complete', 'complete', 'complete', 'upcoming', 'upcoming', 'upcoming',];
+$segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming',];
+
+?>
+    <div class="main-content" style="margin-top: 10px; min-height: 80vh">
         <!-- <h2 class="menu-section-title">เมนู</h2> -->
         <div class="container-fluid">
             <div class="row">
@@ -162,11 +167,77 @@
                     </a>
                 </div>
             </div>
-            <div class="row">Recent Update</div>
-        </div>
-    </div>
+            <div class="row">Course Progress</div>
+            <div class="row">
+                <div class="container-menu" style="margin-top: 10px;">
+                    <div class="header-menu">
+                        <span class="title-menu">101 - Applied Physics </span>
+                        <span class="subtitle-menu">3 weeks left</span>
+                    </div>
 
-    <?php require_once 'component/footer.php'; ?>
+                    <div class="usage-menu">
+                        <div class="progress-section">
+                            <div class="progress-header-flex">
+                                <!-- <h3 class="progress-title">test</h3> -->
+                                <span class="progress-text">
+                                    Your Progress:  
+                                </span>
+                                <span class="progress-text">
+                                     70 / 100
+                                </span>
+                                
+                            </div>
+
+                            <div class="progress-container">
+                                <div class="progress-bar-new">
+                                   <?php foreach ($segments as $index => $segmentType): ?>
+                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="container-menu" style="margin-top: 10px;">
+                    <div class="header-menu">
+                        <span class="title-menu">505 - Advance English </span>
+                        <span class="subtitle-menu">9 weeks left</span>
+                    </div>
+
+                    <div class="usage-menu">
+                        <div class="progress-section">
+                            <div class="progress-header-flex">
+                                <!-- <h3 class="progress-title">test</h3> -->
+                                <span class="progress-text">
+                                    Your Progress:  
+                                </span>
+                                <span class="progress-text">
+                                     20 / 100
+                                </span>
+                                
+                            </div>
+
+                            <div class="progress-container">
+                                <div class="progress-bar-new">
+                                   <?php foreach ($segments_two as $index => $segmentType): ?>
+                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <?php require_once 'component/footer.php'; ?>
 </body>
 
 </html>
