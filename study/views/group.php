@@ -33,7 +33,7 @@
 
 <body>
     <?php 
-    // require_once 'component/header.php'; ?>
+    require_once 'component/header.php'; ?>
 
     <!-- work ON mobile screen ONLY -->
     <div class="min-vh-100 bg-ori-gray">
