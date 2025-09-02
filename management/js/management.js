@@ -92,8 +92,8 @@ function buildClassroom() {
 			"searchDelay": 1000,
 			"deferRender": false,
             "createdRow": function(row,data,dataIndex,meta) {
-                var classroom_type = data['classroom_type'];
-                if(classroom_type == 'online') {
+                var classroom_mode = data['classroom_mode'];
+                if(classroom_mode == 'online') {
                     $(row).addClass('tr-green');
                 } else {
                     $(row).addClass('tr-orange');
@@ -106,51 +106,57 @@ function buildClassroom() {
 					defaultLang: 'en'
 				});
 			},
-			"order": [[6,'desc']],
+			"order": [[8,'desc']],
 			"columns": [{ 
                 "targets": 0,
+                "data": "classroom_poster",
                 "render": function (data,type,row,meta) {	
-					return ``;
+					return `
+                        <img src="${data}" style="width: 100px;">
+                    `;
                 }
             },{ 
                 "targets": 1,
+                "data": "classroom_name",
                 "render": function (data,type,row,meta) {	
-					return ``;
+					return `
+                        <b>${data}</b>
+                    `;
                 }
             },{ 
                 "targets": 2,
-                "render": function (data,type,row,meta) {	
-					return ``;
-                }
+                "data": "classroom_date"
             },{ 
                 "targets": 3,
-                "render": function (data,type,row,meta) {	
-					return ``;
-                }
+                "data": "classroom_student",
+                "className": "text-right"
             },{ 
                 "targets": 4,
+                "data": "classroom_mode",
                 "render": function (data,type,row,meta) {	
-					return ``;
+					return (data == 'online') ? `<span class="label label-success">Online</span>` : `<span class="label label-warning">Onsite</span>`;
                 }
             },{ 
                 "targets": 5,
-                "render": function (data,type,row,meta) {	
-					return ``;
-                }
+                "data": "classroom_register",
+                "className": "text-right"
             },{ 
                 "targets": 6,
-                "render": function (data,type,row,meta) {	
-					return ``;
-                }
+                "data": "date_create"
             },{ 
                 "targets": 7,
-                "render": function (data,type,row,meta) {	
-					return ``;
-                }
+                "data": "emp_create"
             },{ 
                 "targets": 8,
+                "data": "classroom_id",
+                "className": "text-center",
                 "render": function (data,type,row,meta) {	
-					return ``;
+					return `
+                        <div class="nowarp">
+                            <button type="button" class="btn btn-orange btn-circle" onclick="manageClassroom(${data})"><i class="fas fa-pencil-alt"></i></button>
+                            <button type="button" class="btn btn-red btn-circle" onclick="delClassroom(${data})"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    `;
                 }
             }]
         });
@@ -187,3 +193,48 @@ function buildClassroom() {
 function manageClassroom(classroom_id) {
     $.redirect("detail",{classroom_id: classroom_id},'post','_blank');
 }
+function delClassroom(classroom_id) {
+    event.stopPropagation();
+    swal({
+        html:true,
+        title: window.lang.translate("Are you sure?"),
+        text: 'Do you really want to delete these records? </br> This process cannot be undone.',
+        type: "error",
+        showCancelButton: true,
+        closeOnConfirm: false,
+        confirmButtonText: window.lang.translate("Delete"),
+        cancelButtonText: window.lang.translate("Cancel"),	
+        confirmButtonColor: '#FF6666',
+        cancelButtonColor: '#CCCCCC',
+        showLoaderOnConfirm: true,
+    },
+    function(isConfirm){
+        if (isConfirm) {
+            $.ajax({
+                url: "/classroom/management/actions/management.php",
+                type: "POST",
+                data: {
+                    action:'delClassroom',
+                    classroom_id: classroom_id
+                },
+                dataType: "JSON",
+                type: 'POST',
+                success: function(result){
+                    if(result.status === true){			
+                        swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});							
+                        buildClassroom();
+                    }else{
+                        swal({type: 'error',title: "Sorry...",text: "Something went wrong!",timer: 2000});
+                    }
+                }
+            });
+        } else {
+            swal.close();
+        }
+    }); 
+}
+$(window).on('storage', function(e) {
+	if (e.originalEvent.key === 'reloadManagement') {
+		buildClassroom();
+	}
+});
