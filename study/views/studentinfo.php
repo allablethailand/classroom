@@ -19,7 +19,7 @@
         // Fallback to query parameter if URL path doesn't have an ID
         $student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
     }
-    
+
     // Check if a valid ID is provided
     if ($student_id > 0) {
         // Use a prepared statement to prevent SQL injection
@@ -37,13 +37,13 @@
     } else {
         $row_student = null;
     }
-
+    
     // Redirect if no valid student is found
     if ($row_student === null) {
         header("Location: /classroom/study/student/");
         exit();
     }
-
+    
     // Now, map the database fields to the variables used in your HTML, using the correct column names
     $has_contact = !empty($row_student['student_mobile']) || !empty($row_student['student_email']) || !empty($row_student['student_line']) || !empty($row_student['student_ig']) || !empty($row_student['student_facebook']);
     
@@ -381,21 +381,20 @@ body {
 /* เพิ่ม Media Query สำหรับอุปกรณ์มือถือโดยเฉพาะ */
 @media (max-width: 380px) {
     .page-container {
-    padding-top: 140px;
+    /* padding-top: 140px; */
 }
 }
 </style>
 </head>
 <body>
-    <div class="page-container main-container">
+      <?php
+    require_once ("../component/header.php")
+    ?>
+    <div class="page-container main-container" style="margin-bottom: 110px;">
         
         
         <div class="profile-card">
-            <a href="javascript:history.back()" style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
-        <button class="btn btn-warning" style="border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-            <i class="fas fa-arrow-left" style="color: #fff; font-size: 1.2em;"></i>
-        </button>
-    </a>
+           
             <div class="settings-button-container">
             <?php if ($friendship_status === 1) : ?>
                 <a href="#" class="settings-button add-friend-button" title="เพิ่มเพื่อน">
@@ -548,6 +547,8 @@ body {
             </div>
         </div>
     </div>
-    
+   <?php
+    require_once ("../component/footer.php")
+    ?>
 </body>
 </html>

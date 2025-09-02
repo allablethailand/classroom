@@ -1,3 +1,22 @@
+<?php
+    session_start();
+    require_once("../../lib/connect_sqli.php");
+    // require_once("../../component/header.php");
+    include_once("../../login_history.php");
+    global $mysqli;
+
+    // แก้ไขการดึงข้อมูลจากตาราง classroom_student โดยใช้ student_id = 1
+    $student_id = 1;
+    $sql_profile = "SELECT * FROM `classroom_student` WHERE `student_id` = ?";
+    $stmt = $mysqli->prepare($sql_profile);
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result_profile = $stmt->get_result();
+    $row_all = $result_profile->fetch_assoc();
+    $stmt->close();
+    
+    $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_email']) || !empty($row_all['student_line']) || !empty($row_all['student_ig']) || !empty($row_all['student_facebook']);
+?>
 <!doctype html>
 <html>
 <head>
@@ -29,7 +48,7 @@
 <script src="/classroom/study/js/profile.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 
-  <style>
+<style>
 /* --- New Style for a modern, flat UI --- */
 body {
     background-color: #f0f2f5; /* Light gray background */
@@ -325,7 +344,7 @@ body {
     require_once ("component/header.php")
     ?>
     <div class="page-container main-container">
-       
+        
         
         <div class="profile-card">
              <div class="settings-button-container">
@@ -334,20 +353,20 @@ body {
             </a>
         </div>
             <div class="profile-avatar-square">
-                <img src="<?= $row_all["emp_pic"]; ?>" 
+                <img src="<?= $row_all["student_image_profile"]; ?>" 
                      onerror="this.src='../../../images/default.png'" 
                      alt="Profile Picture">
             </div>
             <h2 class="profile-name">
-                <?= $row_all["firstname"] . " " . $row_all["lastname"]; ?>
+                <?= $row_all["student_firstname_th"] . " " . $row_all["student_lastname_th"]; ?>
             </h2>
             <p class="profile-bio">
-                <?= !empty($row_all["bio"]) ? $row_all["bio"] : "ยังไม่ได้เขียน Bio"; ?>
+                <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
             </p>
             <div class="profile-course-container">
                 <p class="profile-course" style="margin: 0px;">
                     <i class="fas fa-graduation-cap"></i>
-                    หลักสูตร: <span><?= !empty($row_all["course"]) ? $row_all["course"] : "ยังไม่ได้ระบุ"; ?></span>
+                    หลักสูตร: <span><?= !empty($row_all["student_education"]) ? $row_all["student_education"] : "ยังไม่ได้ระบุ"; ?></span>
                 </p>
             </div>
         </div>
@@ -360,31 +379,31 @@ body {
             </div>
             <div class="contact-grid">
     <div class="contact-item">
-        <a href="tel:<?= $row_all['mobile']; ?>">
+        <a href="tel:<?= $row_all['student_mobile']; ?>">
             <div class="contact-icon-circle phone"><i class="fas fa-phone"></i></div>
             <span>โทรศัพท์</span>
         </a>
     </div>
     <div class="contact-item">
-        <a href="mailto:<?= $row_all['email']; ?>">
+        <a href="mailto:<?= $row_all['student_email']; ?>">
             <div class="contact-icon-circle mail"><i class="fas fa-envelope"></i></div>
             <span>อีเมล</span>
         </a>
     </div>
     <div class="contact-item">
-        <a href="https://line.me/ti/p/~<?= $row_all['line_id']; ?>" target="_blank">
+        <a href="https://line.me/ti/p/~<?= $row_all['student_line']; ?>" target="_blank">
             <div class="contact-icon-circle line"><i class="fab fa-line"></i></div>
             <span>Line</span>
         </a>
     </div>
     <div class="contact-item">
-        <a href="https://www.instagram.com/<?= $row_all['instagram']; ?>" target="_blank">
+        <a href="https://www.instagram.com/<?= $row_all['student_ig']; ?>" target="_blank">
             <div class="contact-icon-circle ig"><i class="fab fa-instagram"></i></div>
             <span>Instagram</span>
         </a>
     </div>
     <div class="contact-item">
-        <a href="https://www.facebook.com/<?= $row_all['facebook']; ?>" target="_blank">
+        <a href="https://www.facebook.com/<?= $row_all['student_facebook']; ?>" target="_blank">
             <div class="contact-icon-circle fb"><i class="fab fa-facebook-f"></i></div>
             <span>Facebook</span>
         </a>
@@ -403,21 +422,21 @@ body {
                     <i class="fas fa-birthday-cake" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">วันเกิด</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_all["birthday"]) ? date("j F Y", strtotime($row_all["birthday"])) : "-"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_all["student_birth_date"]) ? date("j F Y", strtotime($row_all["student_birth_date"])) : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-church" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">ศาสนา</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_all["religion"]) ? $row_all["religion"] : "-"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_all["student_religion"]) ? $row_all["student_religion"] : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-tint" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">กรุ๊ปเลือด</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_all["blood_type"]) ? $row_all["blood_type"] : "-"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_all["student_bloodgroup"]) ? $row_all["student_bloodgroup"] : "-"; ?></span>
                     </div>
                 </div>
             </div>
@@ -433,28 +452,28 @@ body {
                     <i class="fas fa-star" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">งานอดิเรก</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_all["hobby"]) ? $row_all["hobby"] : "ยังไม่ได้ระบุ"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-music" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_all["favorite_music"]) ? $row_all["favorite_music"] : "ยังไม่ได้ระบุ"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-film" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">หนังที่ชอบ</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_all["favorite_movie"]) ? $row_all["favorite_movie"] : "ยังไม่ได้ระบุ"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
                     <i class="fas fa-bullseye" style="font-size: 25px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">เป้าหมาย</strong>
-                        <span style="padding-left:10px;"><?= !empty($row_all["goal"]) ? $row_all["goal"] : "ยังไม่ได้ระบุ"; ?></span>
+                        <span style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
             </div>

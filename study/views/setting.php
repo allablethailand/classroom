@@ -3,73 +3,72 @@
     require_once("../../lib/connect_sqli.php");
     include_once("../../login_history.php");
     global $mysqli;
+
     if (isset($_POST['save_thumbnail'])) {
         $this_date_time = date("Y-m-d H:i:s");
         $x1 = ($_POST['x1']) ? $_POST['x1'] : 1;
         $y1 = ($_POST['y1']) ? $_POST['y1'] : 1;
         $w = ($_POST['w_head']) ? $_POST['w_head'] : 1;
         $h = ($_POST['h_head']) ? $_POST['h_head'] : 1;
-        $emp_pic = explode("?", $_SESSION["emp_pic"]);
-        if ($_SESSION["emp_pic"] != '' && $x1 != '') {
-            $sql = "update m_employee_info set emp_pic='" . $emp_pic[0] . "?" . $x1 . "&" . $y1 . "&" . $w . "&" . $h . "', last_update='" . $this_date_time . "' where emp_id='" . $_SESSION["emp_id"] . "'  ";
+        // เปลี่ยนการอ้างอิงจาก emp_pic เป็น student_image_profile
+        $student_pic = explode("?", $_SESSION["student_image_profile"]);
+        if ($_SESSION["student_image_profile"] != '' && $x1 != '') {
+            $sql = "update classroom_student set student_image_profile='" . $student_pic[0] . "?" . $x1 . "&" . $y1 . "&" . $w . "&" . $h . "', date_modify='" . $this_date_time . "' where student_id='" . $_SESSION["student_id"] . "'  ";
             $result = $mysqli -> query($sql);
-            $_SESSION["emp_pic"] = $emp_pic[0] . "?" . $x1 . "&" . $y1 . "&" . $w . "&" . $h;
+            $_SESSION["student_image_profile"] = $student_pic[0] . "?" . $x1 . "&" . $y1 . "&" . $w . "&" . $h;
         } else {
-            $_SESSION["emp_pic"] = $emp_pic[0];
+            $_SESSION["student_image_profile"] = $student_pic[0];
         }
     }
-    if (isset($_POST['submit_info'])) {
-        $sql = "UPDATE m_employee_info SET signature='" . $_POST['signature'] . "', signature_drawing='" . $_POST['signature_drawing'] . "',last_update = NOW() where emp_id='" . $_POST['hid_id2'] . "'";
-        $result = $mysqli -> query($sql);
-        $hid_id2 = $_POST['hid_id2'];
-        $home_location = $_POST['home_location_input'];
-        $home_code = "UPDATE m_employee_info SET home_location = '{$home_location}' WHERE emp_id = '{$hid_id2}' AND (home_location is null OR home_location = '')";
-        $home_query = $mysqli -> query($home_code);
-        if ($result) {
-            redirect("m_profile.php");
-        }
-    }
-    if (isset($_POST['upload_avatar'])) {
-        $image_name = $_FILES['image_name']['name'];
-        $image_tmp = $_FILES['image_name']['tmp_name'];
-        if($image_name) {
-            $ext = pathinfo($image_name, PATHINFO_EXTENSION);
-            $unique_id = substr(base_convert(time(),10,36).md5(microtime()),0,16).'.'.$ext;
-            $dir = 'uploads/employee/'.$_SESSION['comp_id'];
-            $path_save = $dir.$unique_id;
-            move_uploaded_file($image_tmp,$path_save);
-            $sql = "update m_employee_info set emp_pic = '{$path_save}' where emp_id = '{$_SESSION['emp_id']}'";
-            $result = $mysqli -> query($sql);
-            $_SESSION["emp_pic"] = $path_save;
-        }
-        echo "<script language=\"javascript\">alert('Upload success.');</script>";
-        redirect("../../m_profile.php");
-    }
-    $fsData = getBucketMaster();
-    $filesystem_user = $fsData['fs_access_user'];
-    $filesystem_pass = $fsData['fs_access_pass'];
-    $filesystem_host = $fsData['fs_host'];
-    $filesystem_path = $fsData['fs_access_path'];
-    $filesystem_type = $fsData['fs_type'];
-    $fs_id = $fsData['fs_id'];
-    setBucket($fsData);
-    $sql_check_goal_menu = $mysqli -> query("SELECT acc.status AS status_goal FROM ac_company acc LEFT JOIN ac_menu acm ON acc.acm_id = acm.acm_id AND acm.status = 'Y' WHERE acc.comp_id = '{$_SESSION['comp_id']}' AND acm.path = 'performance/goal.php' ");
-    $check_goal_menu = mysqli_fetch_assoc($sql_check_goal_menu);
-    $sql_all = $mysqli -> query("select * from m_employee left join employee_payroll on m_employee.emp_id = employee_payroll.emp_id inner join m_employee_info on m_employee.emp_id=m_employee_info.emp_id where m_employee.emp_id = '{$_SESSION["emp_id"]}' ");
+    
+    // ส่วนนี้ถูกคอมเมนต์ออกเพราะไม่เกี่ยวข้องกับข้อมูลนักเรียน
+    // if (isset($_POST['submit_info'])) {
+    //     $sql = "UPDATE m_employee_info SET signature='" . $_POST['signature'] . "', signature_drawing='" . $_POST['signature_drawing'] . "',last_update = NOW() where emp_id='" . $_POST['hid_id2'] . "'";
+    //     $result = $mysqli -> query($sql);
+    //     $hid_id2 = $_POST['hid_id2'];
+    //     $home_location = $_POST['home_location_input'];
+    //     $home_code = "UPDATE m_employee_info SET home_location = '{$home_location}' WHERE emp_id = '{$hid_id2}' AND (home_location is null OR home_location = '')";
+    //     $home_query = $mysqli -> query($home_code);
+    //     if ($result) {
+    //         redirect("m_profile.php");
+    //     }
+    // }
+    
+    // ส่วนนี้ถูกคอมเมนต์ออกเพราะไม่เกี่ยวข้องกับข้อมูลนักเรียน
+    // if (isset($_POST['upload_avatar'])) {
+    //     $image_name = $_FILES['image_name']['name'];
+    //     $image_tmp = $_FILES['image_name']['tmp_name'];
+    //     if($image_name) {
+    //         $ext = pathinfo($image_name, PATHINFO_EXTENSION);
+    //         $unique_id = substr(base_convert(time(),10,36).md5(microtime()),0,16).'.'.$ext;
+    //         $dir = 'uploads/student/'.$_SESSION['comp_id'];
+    //         $path_save = $dir.$unique_id;
+    //         move_uploaded_file($image_tmp,$path_save);
+    //         $sql = "update classroom_student set student_image_profile = '{$path_save}' where student_id = '{$_SESSION['student_id']}'";
+    //         $result = $mysqli -> query($sql);
+    //         $_SESSION["student_image_profile"] = $path_save;
+    //     }
+    //     echo "<script language=\"javascript\">alert('Upload success.');</script>";
+    //     redirect("../../m_profile.php");
+    // }
+    
+    // เปลี่ยนมาดึงข้อมูลจากตาราง classroom_student
+    $sql_all = $mysqli->query("select * from classroom_student where student_id = 1");
     $row_all = mysqli_fetch_array($sql_all);
-    $columnDNA = "dna_name,dna_logo,dna_color";
-    $tableDNA = "m_dna";
-    $whereDNA = "where dna_id = '{$row_all["dna"]}'";
-    $DNA = select_data($columnDNA,$tableDNA,$whereDNA);
-    $dna_name = $DNA[0]['dna_name'];
-    $dna_logo = GetUrl($DNA[0]['dna_logo']);
-    $dna_color = ($DNA[0]['dna_color']) ? $DNA[0]['dna_color'] : '#FFFFFF';
-    function _avatar($picname){
-        if ($picname == "images/default.png") {
-            $img = "<img width=\"150\" title=\"" . $_SESSION["user"] . "\"  src=\"";
-            $img .= "images/default.png\"/>";
+
+    // ดึงข้อมูลเข้า session เพื่อนำไปใช้ต่อ
+    $_SESSION["student_id"] = $row_all["student_id"];
+    $_SESSION["student_image_profile"] = $row_all["student_image_profile"];
+    $_SESSION["student_firstname_th"] = $row_all["student_firstname_th"];
+    $_SESSION["student_lastname_th"] = $row_all["student_lastname_th"];
+    $_SESSION["student_bio"] = $row_all["student_bio"];
+
+    function _avatar($picname) {
+        if ($picname == "images/default.png" || empty($picname)) {
+            $img = "<img width=\"150\" title=\"" . $_SESSION["student_firstname_th"] . "\" src=\"";
+            $img .= "../../images/default.png\"/>";
         } else {
-            $img = "<img width=\"150\" id=\"avatar\" title=\"" . $_SESSION["user"] . "\"  src=\"";
+            $img = "<img width=\"150\" id=\"avatar\" title=\"" . $_SESSION["student_firstname_th"] . "\"  src=\"";
             $img .= $picname . "\"/>";
         }
         return $img;
@@ -244,169 +243,145 @@
             }
         }
         .profile-card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    /* margin-bottom: 30px; */
-    padding: 40px;
-    text-align: center;
-    position: relative;
-    top: -50px;
-}
-.profile-avatar-square {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%; /* Square with rounded corners */
-    border: 5px solid #ff8c00; /* Orange border */
-    overflow: hidden;
-    margin: 0 auto 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-.profile-avatar-square img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.profile-name {
-    font-size: 2.2em;
-    font-weight: 800;
-    color: #2c3e50; /* Dark blue-gray */
-    margin-bottom: 8px;
-}
-.profile-bio {
-    font-size: 1.1em;
-    color: #7f8c8d; /* Grayish blue */
-    margin-bottom: 25px;
-}
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            top: -50px;
+        }
+        .profile-avatar-square {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%; /* Square with rounded corners */
+            border: 5px solid #ff8c00; /* Orange border */
+            overflow: hidden;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .profile-avatar-square img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-name {
+            font-size: 2.2em;
+            font-weight: 800;
+            color: #2c3e50; /* Dark blue-gray */
+            margin-bottom: 8px;
+        }
+        .profile-bio {
+            font-size: 1.1em;
+            color: #7f8c8d; /* Grayish blue */
+            margin-bottom: 25px;
+        }
     </style>
 </head>
 <body>
-     <?php
-    require_once ("component/header.php")
+    <?php
+        require_once ("component/header.php")
     ?>
     
-    <!-- <div class="top-nav-container">
-        <ul class="top-nav">
-            <li><a href="#"><i class="fa fa-user"></i></a></li>
-            <li><a href="#" class="active"><i class="fas fa-cog"></i></a></li>
-            <li><a href="#"><i class="fa fa-calendar-alt"></i></a></li>
-            <li><a href="#"><i class="fa fa-chalkboard"></i></a></li>
-            <li><a href="#"><i class="fa fa-image"></i></a></li>
-            <li><a href="#"><i class="fa fa-file-alt"></i></a></li>
-            <li><a href="#"><i class="fa fa-heart" style="color:red;"></i></a></li>
-        </ul>
-    </div> -->
-    
     <div class="settings-container">
-          
-                 <a href="profile" style=" left: 0px; z-index: 1000;">
-      <button class="btn btn-warning" style="border-radius: 12px;width: 45px;height: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-            <i class="fas fa-arrow-left" style="color: #fff; font-size: 1.2em;"></i>
-        </button>
-    </a>
         <div class="settings-card" style="margin-top: 10px;">
-            
-            
             <div class="settings-header">
-              
-                  <div class="profile-card" style="margin-top: 50px;">
-                    
-                    
+                <div class="profile-card" style="margin-top: 50px;">
                     <div class="profile-avatar-square">
-                        <img src="<?php echo $_SESSION["emp_pic"]; ?>" onerror="this.src='../../../images/default.png'" alt="Profile Picture">
+                        <img src="<?php echo $_SESSION["student_image_profile"]; ?>" onerror="this.src='../../../images/default.png'" alt="Profile Picture">
                     </div>
                     <h2 class="profile-name">
-                        <?= $row_all["firstname"] . " " . $row_all["lastname"]; ?>
+                        <?= $row_all["student_firstname_th"] . " " . $row_all["student_lastname_th"]; ?>
                     </h2>
                     <p class="profile-bio">
-                        <?= !empty($row_all["bio"]) ? $row_all["bio"] : "ยังไม่ได้เขียน Bio"; ?>
+                        <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
                     </p>
-                     <div class="profile-course-container">
-                <p class="profile-course" style="margin: 0px;">
-                    <i class="fas fa-graduation-cap"></i>
-                    หลักสูตร: <span><?= !empty($row_all["course"]) ? $row_all["course"] : "ยังไม่ได้ระบุ"; ?></span>
-                </p>
-            </div>
+                    <div class="profile-course-container">
+                        <p class="profile-course" style="margin: 0px;">
+                            <i class="fas fa-graduation-cap"></i>
+                            หลักสูตร: <span><?= !empty($row_all["student_education"]) ? $row_all["student_education"] : "ยังไม่ได้ระบุ"; ?></span>
+                        </p>
                     </div>
-            
-            <div class="settings-list">
-                <a href="edit_profile" class="setting-item">
-                    <div class="setting-icon">
-                        <i class="fas fa-user-cog"></i>
-                    </div>
-                    <div class="setting-text">
-                        <h4 class="title">ตั้งค่าโปรไฟล์</h4>
-                        <p class="description">อัปเดตข้อมูลส่วนตัวและรูปภาพ</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
+                </div>
                 
-                <a href="privacy_settings" class="setting-item">
-                    <div class="setting-icon">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                    <div class="setting-text">
-                        <h4 class="title">ตั้งค่าความเป็นส่วนตัว</h4>
-                        <p class="description">จัดการสิทธิ์การเข้าถึงข้อมูลของคุณ</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
+                <div class="settings-list">
+                    <a href="edit_profile" class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div class="setting-text">
+                            <h4 class="title">ตั้งค่าโปรไฟล์</h4>
+                            <p class="description">อัปเดตข้อมูลส่วนตัวและรูปภาพ</p>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    
+                    <a href="privacy_settings" class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="setting-text">
+                            <h4 class="title">ตั้งค่าความเป็นส่วนตัว</h4>
+                            <p class="description">จัดการสิทธิ์การเข้าถึงข้อมูลของคุณ</p>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
 
-                <a href="#" class="setting-item">
-                    <div class="setting-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <div class="setting-text">
-                        <h4 class="title">ตั้งค่าการแจ้งเตือน</h4>
-                        <p class="description">เลือกรับการแจ้งเตือนที่คุณสนใจ</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
+                    <a href="#" class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="setting-text">
+                            <h4 class="title">ตั้งค่าการแจ้งเตือน</h4>
+                            <p class="description">เลือกรับการแจ้งเตือนที่คุณสนใจ</p>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
 
-                <a href="#" class="setting-item">
-                    <div class="setting-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div class="setting-text">
-                        <h4 class="title">ตั้งค่าการใช้งานโดยรวม</h4>
-                        <p class="description">ปรับแต่งการทำงานของแอปพลิเคชัน</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
+                    <a href="#" class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="setting-text">
+                            <h4 class="title">ตั้งค่าการใช้งานโดยรวม</h4>
+                            <p class="description">ปรับแต่งการทำงานของแอปพลิเคชัน</p>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
 
-                <a href="#" class="setting-item">
-                    <div class="setting-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <div class="setting-text">
-                        <h4 class="title">ภาษา</h4>
-                        <p class="description">เลือกภาษาที่ใช้แสดงผล</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-                
-                <a href="#" class="setting-item">
-                    <div class="setting-icon">
-                        <i class="fas fa-print"></i>
-                    </div>
-                    <div class="setting-text">
-                        <h4 class="title">พิมพ์หนังสือรุ่น</h4>
-                        <p class="description">จัดทำหนังสือรุ่นเพื่อเก็บเป็นที่ระลึก</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
+                    <a href="#" class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="setting-text">
+                            <h4 class="title">ภาษา</h4>
+                            <p class="description">เลือกภาษาที่ใช้แสดงผล</p>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    
+                    <a href="#" class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-print"></i>
+                        </div>
+                        <div class="setting-text">
+                            <h4 class="title">พิมพ์หนังสือรุ่น</h4>
+                            <p class="description">จัดทำหนังสือรุ่นเพื่อเก็บเป็นที่ระลึก</p>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
 
-                <a href="#" class="setting-item">
-                    <div class="setting-icon">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </div>
-                    <div class="setting-text">
-                        <h4 class="title">ออกจากระบบ</h4>
-                        <p class="description">ลงชื่อออกจากบัญชีผู้ใช้งาน</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-
+                    <a href="#" class="setting-item">
+                        <div class="setting-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <div class="setting-text">
+                            <h4 class="title">ออกจากระบบ</h4>
+                            <p class="description">ลงชื่อออกจากบัญชีผู้ใช้งาน</p>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -415,16 +390,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
-            // ส่วนนี้จะจัดการ active class เมื่อคลิกที่เมนู
             $('.top-nav a').on('click', function (e) {
                 $('.top-nav a').removeClass('active');
                 $(this).addClass('active');
             });
             
-            // กำหนดให้เมนูแรกเป็น active ตั้งแต่แรกที่โหลดหน้า
             $('.top-nav a[href="#B"]').addClass('active');
 
-            // เพิ่ม SweetAlert เมื่อคลิกเมนูออกจากระบบ
             $('.setting-item .fa-sign-out-alt').closest('.setting-item').on('click', function(e) {
                 e.preventDefault();
                 swal({
@@ -437,7 +409,6 @@
                     cancelButtonText: "ยกเลิก",
                     closeOnConfirm: false
                 }, function() {
-                    // ทำงานเมื่อผู้ใช้ยืนยันการออกจากระบบ
                     swal("ออกจากระบบแล้ว!", "คุณได้ออกจากระบบเรียบร้อยแล้ว", "success");
                     // สามารถใส่โค้ดสำหรับนำทางไปยังหน้า login หรือทำการ logout ที่นี่
                     // เช่น window.location.href = '/logout';
@@ -446,7 +417,7 @@
         });
     </script>
     <?php
-    require_once ("component/footer.php")
+        require_once ("component/footer.php")
     ?>
 </body>
 </html>

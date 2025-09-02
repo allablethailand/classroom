@@ -22,7 +22,8 @@
             g.group_logo,
             g.group_description,
             date_format(g.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
-            CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create
+            CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
+            g.group_color
         FROM 
             classroom_group g 
         LEFT JOIN 
@@ -43,6 +44,7 @@
 			}),
             array('db' => 'date_create', 'dt' => 'date_create'),
             array('db' => 'emp_create', 'dt' => 'emp_create'),
+            array('db' => 'group_color', 'dt' => 'group_color'),
 		);
 		$sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db'   => $db_name,'host' => $db_host);
 		require($base_include.'/lib/ssp-subquery.class.php');
@@ -66,7 +68,8 @@
             "
                 g.group_name,
                 g.group_logo,
-                g.group_description
+                g.group_description,
+                g.group_color
             ",
             "classroom_group g",
             "where g.group_id = '{$group_id}'"
@@ -78,6 +81,7 @@
                 'group_name' => $group['group_name'],
                 'group_logo' => ($group['group_logo']) ? GetUrl($group['group_logo']) : '',
                 'group_description' => $group['group_description'],
+                'group_color' => $group['group_color'],
             ]
         ]);
     }
@@ -86,10 +90,11 @@
         $group_id = $_POST['group_id'];
         $group_name = initVal($_POST['group_name']);
         $group_description = initVal($_POST['group_description']);
+        $group_color = initVal($_POST['group_color']);
         if($group_id) {
             update_data(
                 "classroom_group",
-                "group_name = $group_name, group_description = $group_description, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
+                "group_name = $group_name, group_description = $group_description, group_color = $group_color, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
                 "group_id = '{$group_id}'"
             );
         } else {
@@ -99,6 +104,7 @@
                     classroom_id,
                     group_name,
                     group_description,
+                    group_color,
                     comp_id,
                     status,
                     emp_create,
@@ -110,6 +116,7 @@
                     '{$classroom_id}',
                     $group_name,
                     $group_description,
+                    $group_color,
                     '{$_SESSION['comp_id']}',
                     0,
                     '{$_SESSION['emp_id']}',
