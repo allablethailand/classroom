@@ -365,4 +365,268 @@
         }
         echo json_encode($Data);
     }
+<<<<<<< HEAD
+=======
+    if(isset($_GET) && $_GET['action'] == 'saveManagement') {
+        $classroom_id = $_POST['classroom_id'];
+        $classroom_name = initVal($_POST['classroom_name']);
+        $classroom_start_date = $_POST['classroom_start_date'];
+        $classroom_start_time = $_POST['classroom_start_time'];
+        $classroom_end_date = $_POST['classroom_end_date'];
+        $classroom_end_time = $_POST['classroom_end_time'];
+        $sql_classroom_start = convertDateTime($classroom_start_date, $classroom_start_time);
+        $sql_classroom_end = convertDateTime($classroom_end_date, $classroom_end_time);
+        $classroom_start = initVal($sql_classroom_start);
+        $classroom_end = initVal($sql_classroom_end);
+        $classroom_type = initVal($_POST['classroom_type']);
+        $classroom_plateform = initVal($_POST['classroom_plateform']);
+        $classroom_source = initVal($_POST['classroom_source']);
+        $classroom_student = $_POST['classroom_student'];
+        $classroom_allow_register = $_POST['classroom_allow_register'];
+        $classroom_open_register_date = $_POST['classroom_open_register_date'];
+        $classroom_open_register_time = $_POST['classroom_open_register_time'];
+        $classroom_close_register_date = $_POST['classroom_close_register_date'];
+        $classroom_close_register_time = $_POST['classroom_close_register_time'];
+        $classroom_open_register = '';
+        $classroom_close_register = '';
+        $sql_classroom_open_register = convertDateTime($classroom_open_register_date, $classroom_open_register_time);
+        $sql_classroom_close_register = convertDateTime($classroom_close_register_date, $classroom_close_register_time);
+        $classroom_open_register = initVal($sql_classroom_open_register);
+        $classroom_close_register = initVal($sql_classroom_close_register);
+        $close_register_message = initVal($_POST['close_register_message']);
+        $line_oa = $_POST['line_oa'];
+        $line_oa_link = initVal($_POST['line_oa_link']);
+        $auto_approve = $_POST['auto_approve'];
+        $auto_username = $_POST['auto_username'];
+        $auto_username_type = ($_POST['auto_username_type']) ? "'" . implode(',', $_POST['auto_username_type']) . "'" : "null";
+        $auto_username_length = initVal($_POST['auto_username_length']);
+        $auto_password = $_POST['auto_password'];
+        $password_type = initVal($_POST['password_type']);
+        $auto_password_custom = initVal($_POST['auto_password_custom']);
+        $auto_password_type = ($_POST['auto_password_type']) ? "'" . implode(',', $_POST['auto_password_type']) . "'" : "null";
+        $auto_password_length = initVal($_POST['auto_password_length']);
+        $password_sensitivity_case = $_POST['password_sensitivity_case'];
+        $classroom_information = initVal($_POST['classroom_information']);
+        if($classroom_id) {
+            update_data(
+                "classroom_template",
+                "
+                    classroom_name = $classroom_name,
+                    classroom_information = $classroom_information,
+                    classroom_start = $classroom_start,
+                    classroom_end = $classroom_end,
+                    classroom_student = $classroom_student,
+                    classroom_allow_register = $classroom_allow_register,
+                    classroom_open_register = $classroom_open_register,
+                    classroom_close_register = $classroom_close_register,
+                    close_register_message = $close_register_message,
+                    classroom_type = $classroom_type,
+                    classroom_plateform = $classroom_plateform,
+                    classroom_source = $classroom_source,
+                    line_oa = $line_oa,
+                    line_oa_link = $line_oa_link,
+                    auto_approve = $auto_approve,
+                    auto_username = $auto_username,
+                    auto_username_type = $auto_username_type,
+                    auto_username_length = $auto_username_length,
+                    auto_password = $auto_password,
+                    password_type = $password_type,
+                    auto_password_type = $auto_password_type,
+                    auto_password_length = $auto_password_length,
+                    auto_password_custom = $auto_password_custom,
+                    password_sensitivity_case = $password_sensitivity_case,
+                    emp_modify = '{$_SESSION['emp_id']}',
+                    date_modify = NOW()
+                ",
+                "classroom_id = '{$classroom_id}'"
+            );
+        } else {
+            $classroom_id = insert_data(
+                "classroom_template",
+                "(
+                    classroom_name,
+                    classroom_information,
+                    classroom_start,
+                    classroom_end,
+                    classroom_student,
+                    classroom_allow_register,
+                    classroom_open_register,
+                    classroom_close_register,
+                    close_register_message,
+                    classroom_type,
+                    classroom_plateform,
+                    classroom_source,
+                    line_oa,
+                    line_oa_link,
+                    auto_approve,
+                    auto_username,
+                    auto_username_type,
+                    auto_username_length,
+                    auto_password,
+                    password_type,
+                    auto_password_type,
+                    auto_password_length,
+                    auto_password_custom,
+                    password_sensitivity_case,
+                    comp_id,
+                    status,
+                    emp_create,
+                    date_create,
+                    emp_modify,
+                    date_modify
+                )",
+                "(
+                    $classroom_name,
+                    $classroom_information,
+                    $classroom_start,
+                    $classroom_end,
+                    $classroom_student,
+                    $classroom_allow_register,
+                    $classroom_open_register,
+                    $classroom_close_register,
+                    $close_register_message,
+                    $classroom_type,
+                    $classroom_plateform,
+                    $classroom_source,
+                    $line_oa,
+                    $line_oa_link,
+                    $auto_approve,
+                    $auto_username,
+                    $auto_username_type,
+                    $auto_username_length,
+                    $auto_password,
+                    $password_type,
+                    $auto_password_type,
+                    $auto_password_length,
+                    $auto_password_custom,
+                    $password_sensitivity_case,
+                    '{$_SESSION['comp_id']}',
+                    0,
+                    '{$_SESSION['emp_id']}',
+                    NOW(),
+                    '{$_SESSION['emp_id']}',
+                    NOW()
+                )"
+            );
+        }
+        if(!$classroom_id) {
+            echo json_encode([
+                'status' => false
+            ]);
+            exit;
+        }
+        $emp_group = $_POST['emp_group'];
+        update_data(
+            "classroom_staff", 
+            "status = 1, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()", 
+            "classroom_id = '{$classroom_id}'"
+        );
+        if($emp_group) {
+            $groups = explode(',' ,$emp_group);
+            foreach($groups as $emp_id) {
+                $exists = select_data(
+                    "staff_id",
+                    "classroom_staff",
+                    "where emp_id = '{$emp_id}' and classroom_id = '{$classroom_id}'"
+                );
+                if(count($exists) > 0) {
+                    update_data(
+                        "classroom_staff", 
+                        "status = 0, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()", 
+                        "classroom_id = '{$classroom_id}' and emp_id = '{$emp_id}'"
+                    );
+                } else {
+                    insert_data(
+                        "classroom_staff",
+                        "(
+                            classroom_id,
+                            emp_id,
+                            comp_id,
+                            status,
+                            emp_create,
+                            date_create,
+                            emp_modify,
+                            date_modify
+                        )",
+                        "(
+                            '{$classroom_id}',
+                            '{$emp_id}',
+                            '{$_SESSION['comp_id']}',
+                            0,
+                            '{$_SESSION['emp_id']}',
+                            NOW(),
+                            '{$_SESSION['emp_id']}',
+                            NOW()
+                        )"
+                    );
+                }
+            }
+        }
+        $ex_classroom_poster = initVal($_POST['ex_classroom_poster']);
+        if(empty($ex_classroom_poster)) {
+            update_data("classroom_template", "classroom_poster = null", "classroom_id = '{$classroom_id}'");
+        }
+        $classroom_poster_name = $_FILES['classroom_poster']['name'];
+        $classroom_poster_tmp = $_FILES['classroom_poster']['tmp_name'];
+        $classroom_poster = null;
+        $classroom_poster_thumb = null;
+        if ($classroom_poster_name && $classroom_poster_tmp) {
+            $strname = md5($classroom_id);
+            $classroom_poster_dir = 'uploads/classroom/' . $_SESSION['comp_id'] . '/';
+            $path_info = pathinfo($classroom_poster_name);
+            $classroom_poster_ext = strtolower($path_info['extension']);
+            $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif');
+            if (!in_array($classroom_poster_ext, $allowed_extensions)) {
+                echo json_encode([
+                    'status' => false,
+                    'message' => "Error: Invalid file type. Only JPG, PNG, GIF allowed."
+                ]);
+                exit;
+            }
+            $classroom_poster = $classroom_poster_dir . $strname . '.' . $classroom_poster_ext;
+            $classroom_poster_thumb = $classroom_poster_dir . $strname . '_thumbnail.' . $classroom_poster_ext;
+            $classroom_poster_save = "{$classroom_poster}";
+            if (SaveFile($classroom_poster_tmp, $classroom_poster)) {
+                if (!createThumbnail($classroom_poster, $classroom_poster_thumb, 300, 300, 80)) {
+                    echo json_encode([
+                        'status' => false,
+                        'message' => "Warning: Could not create thumbnail"
+                    ]);
+                    exit;
+                }
+            } else {
+                echo "Error: Could not save original file";
+                echo json_encode([
+                    'status' => false,
+                    'message' => "Error: Could not save original file"
+                ]);
+                exit;
+                $classroom_poster = null;
+                $classroom_poster_thumb = null;
+                $classroom_poster_save = "null";
+            }
+        }
+        update_data("classroom_template", "classroom_poster = $classroom_poster_save", "classroom_id = '{$classroom_id}'");
+        echo json_encode([
+            'status' => true,
+            'classroom_id' => $classroom_id
+        ]);
+    }
+    function initVal($val) {
+        global $mysqli;
+        if($val) {
+            return "'" . mysqli_real_escape_string($mysqli, $val) . "'";
+        } else {
+            return "null";
+        }
+    }
+    function convertDateTime($date, $time) {
+        if (empty($date) || empty($time)) {
+            return null;
+        }
+        $datetime_string = $date . ' ' . $time;
+        $datetime = DateTime::createFromFormat('Y/m/d H:i', $datetime_string);
+        return ($datetime !== false) ? $datetime->format('Y-m-d H:i:s') : null;
+    }
+>>>>>>> c82db78991ceb63babbe6f0d1ecc2be69f040a54
 ?>
