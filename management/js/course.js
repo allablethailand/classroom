@@ -76,6 +76,7 @@ function buildCourse() {
                 "render": function (data,type,row,meta) {	
 					return `
                         <div class="nowarp">
+                            <button type="button" class="btn btn-orange btn-circle" onclick="editCourse(${data}, '${row['course_type']}')"><i class="fas fa-pencil-alt"></i></button> 
                             <button type="button" class="btn btn-red btn-circle" onclick="delCourse(${data})"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     `;
@@ -311,4 +312,17 @@ function delCourse(course_id) {
             swal.close();
         }
     }); 
+}
+function editCourse(data_id, data_type) {
+    if(data_type == 'course') {
+        $.redirect("/ot_course_detail.php", {
+            action: 'edit',
+            trn_id: data_id
+        }, 'post', '_blank');
+    } else {
+        $.redirect("/learning_map_detail.php", {
+            action: 'edit',
+            learning_map_id: data_id
+        }, 'post', '_blank');
+    }
 }

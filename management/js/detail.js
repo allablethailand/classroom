@@ -780,7 +780,7 @@ function getManagementTemplate() {
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-3">
-                            <label lang="en" class="control-label required-field" for="classroom_name">Classroom Name</label>
+                            <label lang="en" class="control-label required-field" for="classroom_name">Academy Name</label>
                         </div>
                         <div class="col-sm-9">
                             <input type="text" class="form-control require_obj" id="classroom_name" name="classroom_name" required>
