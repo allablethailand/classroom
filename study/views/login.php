@@ -44,7 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน";
     } else {
         // เตรียมคำสั่ง SQL ด้วย Prepared Statement เพื่อป้องกัน SQL Injection
-        $sql = "SELECT `student_id`, `student_password`, student_password_key FROM `classroom_student` WHERE `student_username` = ?";
+
+        $sql = "SELECT `student_id`, `student_password`, student_password_key, comp_id FROM `classroom_student` WHERE `student_username` = ?";
+
         $stmt = $mysqli->prepare($sql);
 
         if ($stmt === false) {
@@ -57,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
+
                 $student_password = $row['student_password'];
                 $student_password_key = $row['student_password_key'];
                 $stored_password_hash = decryptToken($student_password, $student_password_key);
@@ -64,8 +67,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // ตรวจสอบรหัสผ่าน
                 if ($password == $stored_password_hash) {
+
                     // ล็อกอินสำเร็จ: บันทึกข้อมูลที่จำเป็นลงใน Session
                     $_SESSION['student_id'] = $student_id;
+                    $_SESSION['comp_id'] = $row["comp_id"];
 
                     // ดึงข้อมูลจากตาราง classroom_student_join และตรวจสอบ consent_accept
                     $join_sql = "SELECT `join_id`, `student_id`, `classroom_id`, `group_id`, `consent_accept` FROM `classroom_student_join` WHERE `student_id` = ? AND `status` = 0";
@@ -89,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         // ตรวจสอบค่า consent_accept
                         if ($consent_accept == 1) {
                             // ยอมรับแล้ว: Redirect ไปหน้าหลัก
-                            header("Location: http://origami.local/classroom/study/menu");
+                            header("Location: /classroom/study/menu");
                             exit();
                         } else {
                             // ยังไม่ยอมรับ: ดึงเนื้อหา Consent จาก classroom_template
@@ -109,13 +114,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 $show_consent_form = true;
                             } else {
                                 // ไม่พบข้อมูล Consent ให้ Redirect ไปเลย
-                                header("Location: http://origami.local/classroom/study/menu");
+                                header("Location: /classroom/study/menu");
                                 exit();
                             }
                         }
                     } else {
                         // ไม่พบข้อมูลใน classroom_student_join ก็ให้ Redirect ไปหน้าหลัก
-                        header("Location: http://origami.local/classroom/study/menu");
+                        header("Location: /classroom/study/menu");
                         exit();
                     }
                 } else {
@@ -401,7 +406,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php if (isset($show_consent_form) && $show_consent_form): ?>
             <?php else: ?>
             <div class="logo-container">
-                <img src="	https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="VON BUNDIT Logo">
+                <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="VON BUNDIT Logo">
                 <h2>เข้าสู่ระบบ</h2>
             </div>
             <p class="welcome-text">
@@ -425,7 +430,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <!-- <p class="forgot-password"><a href="#">ลืมรหัสผ่าน ?</a></p> -->
                 <button type="submit" class="login-button">เข้าสู่ระบบ</button>
             </form>
-            <p class="register-link">ยังไม่มีบัญชี? <a href=" http://origami.local/classroom/study/register">ลงทะเบียนใช้งาน</a></p>
+            <p class="register-link">ยังไม่มีบัญชี? <a href="/classroom/study/register">ลงทะเบียนใช้งาน</a></p>
             <?php endif; ?>
         </div>
     </div>

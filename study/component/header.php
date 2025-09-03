@@ -13,6 +13,11 @@ if (strpos($uriPath, $basePath) === 0) {
 
 $segments = explode('/', $relativePath);
 $currentScreen = isset($segments[0]) && $segments[0] !== '' ? $segments[0] : 'menu';
+
+if (!isset($_SESSION['student_id'])) {
+    header("Location: /classroom/study/login");
+    exit();
+}
 ?>
 
 <head>
@@ -28,11 +33,15 @@ $currentScreen = isset($segments[0]) && $segments[0] !== '' ? $segments[0] : 'me
             <div class="header-topnav">
                 <div class="title-group-topnav">
                     <span>
-                        <div style="width: 20px; height: 20px; background-color: white; color: green; font-weight: bold; 
+                        <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"   alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+
+
+
+                        <!-- <div style="width: 20px; height: 20px; background-color: white; color: green; font-weight: bold; 
                                     font-size: 30px; width: 54px; height: 54px; display: flex; justify-content: center; 
                                     align-items: center; border-radius: 50%; user-select: none;">
                             G
-                        </div>
+                        </div> -->
                     </span>
                     <div class="">
                         <h1>Green Tech</h1>
