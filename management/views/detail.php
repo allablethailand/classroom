@@ -83,12 +83,10 @@
                 <i class="fas fa-users"></i>
                 <span lang="en">Registration</span>
             </a>
-            
-            
-            <!-- <a href=".management_tab" class="get-management edit-mode" data-page="student" data-toggle="tab">
+            <a href=".management_tab" class="get-management edit-mode" data-page="student" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Student</span>
-            </a> -->
+            </a>
             <!-- <a href=".management_tab" class="get-management edit-mode" data-page="teacher" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Teacher</span>

@@ -14,6 +14,14 @@
     define('BASE_INCLUDE', $base_include);
     require_once $base_include.'/lib/connect_sqli.php';
     require_once $base_include.'/actions/func.php';
+    $fsData = getBucketMaster();
+    $filesystem_user = $fsData['fs_access_user'];
+    $filesystem_pass = $fsData['fs_access_pass'];
+    $filesystem_host = $fsData['fs_host'];
+    $filesystem_path = $fsData['fs_access_path'];
+    $filesystem_type = $fsData['fs_type'];
+    $fs_id = $fsData['fs_id'];
+	setBucket($fsData);
     if(isset($_POST) && $_POST['action'] == 'buildMenagementData') {
         $classroom_id = $_POST['classroom_id'];
         $classrooms = select_data(
@@ -405,12 +413,12 @@
         $auto_approve = $_POST['auto_approve'];
         $auto_username = $_POST['auto_username'];
         $auto_username_type = ($_POST['auto_username_type']) ? "'" . implode(',', $_POST['auto_username_type']) . "'" : "null";
-        $auto_username_length = initVal($_POST['auto_username_length']);
+        $auto_username_length = ($_POST['auto_username_length']) ? initVal($_POST['auto_username_length']) : 4;
         $auto_password = $_POST['auto_password'];
         $password_type = initVal($_POST['password_type']);
         $auto_password_custom = initVal($_POST['auto_password_custom']);
         $auto_password_type = ($_POST['auto_password_type']) ? "'" . implode(',', $_POST['auto_password_type']) . "'" : "null";
-        $auto_password_length = initVal($_POST['auto_password_length']);
+        $auto_password_length = ($_POST['auto_password_length']) ? initVal($_POST['auto_password_length']) : 4;
         $password_sensitivity_case = $_POST['password_sensitivity_case'];
         $classroom_information = initVal($_POST['classroom_information']);
         if($classroom_id) {
@@ -591,9 +599,15 @@
             }
             $classroom_poster = $classroom_poster_dir . $strname . '.' . $classroom_poster_ext;
             $classroom_poster_thumb = $classroom_poster_dir . $strname . '_thumbnail.' . $classroom_poster_ext;
-            $classroom_poster_save = "{$classroom_poster}";
+            $classroom_poster_save = "'{$classroom_poster}'";
             if (SaveFile($classroom_poster_tmp, $classroom_poster)) {
-                if (!createThumbnail($classroom_poster, $classroom_poster_thumb, 300, 300, 80)) {
+                $thumb_local = sys_get_temp_dir() . '/' . uniqid('thumb_') . '.' . $classroom_poster_ext;
+                if (createThumbnail($classroom_poster_tmp, $thumb_local, 300, 300, 80)) {
+                    SaveFile($classroom_poster_tmp, $classroom_poster);
+                    SaveFile($thumb_local, $classroom_poster_thumb);
+                    unlink($thumb_local);
+                    update_data("classroom_template", "classroom_poster = $classroom_poster_save", "classroom_id = '{$classroom_id}'");
+                } else {
                     echo json_encode([
                         'status' => false,
                         'message' => "Warning: Could not create thumbnail"
@@ -601,18 +615,13 @@
                     exit;
                 }
             } else {
-                echo "Error: Could not save original file";
                 echo json_encode([
                     'status' => false,
                     'message' => "Error: Could not save original file"
                 ]);
                 exit;
-                $classroom_poster = null;
-                $classroom_poster_thumb = null;
-                $classroom_poster_save = "null";
             }
         }
-        update_data("classroom_template", "classroom_poster = $classroom_poster_save", "classroom_id = '{$classroom_id}'");
         echo json_encode([
             'status' => true,
             'classroom_id' => $classroom_id
