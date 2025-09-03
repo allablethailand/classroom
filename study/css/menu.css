@@ -21,6 +21,11 @@ body {
   margin-bottom: 1.5rem; /* mb-6 */
 }
 
+.title-group-topnav {
+  display: flex;
+  column-gap: 20px;
+}
+
 .title-group-topnav h1 {
   color: white;
   font-size: 1.125rem; /* text-lg */
@@ -67,7 +72,7 @@ body {
   background-color: rgba(255, 255, 255, 0.1); /* bg-white/10 */
   backdrop-filter: blur(4px); /* backdrop-blur-sm */
   border-radius: 1rem; /* rounded-2xl */
-  padding: 1rem; /* p-4 */
+  padding: 0.3rem; /* p-4 */
   color: rgba(255, 255, 255, 0.8);
 }
 

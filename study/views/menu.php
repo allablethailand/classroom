@@ -60,22 +60,86 @@ $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'up
 ?>
     <div class="main-content" style="margin-top: 10px; min-height: 100vh;">
         <!-- <h2 class="menu-section-title">เมนู</h2> -->
-        <div class="container-fluid">
+       <div class="container-fluid">
+            <div class="row">Upcoming Class</div>
             <div class="row">
+                <div class="container-menu" style="margin-top: 10px;">
+                    <div class="header-menu">
+                        <span class="title-menu">101 - Applied Physics </span>
+                        <span class="subtitle-menu">3 weeks left</span>
+                    </div>
+
+                    <div class="usage-menu">
+                        <div class="progress-section">
+                            <div class="progress-header-flex">
+                                <!-- <h3 class="progress-title">test</h3> -->
+                                <span class="progress-text">
+                                    Your Progress:  
+                                </span>
+                                <span class="progress-text">
+                                     70 / 100
+                                </span>
+                                
+                            </div>
+
+                            <div class="progress-container">
+                                <div class="progress-bar-new">
+                                   <?php foreach ($segments as $index => $segmentType): ?>
+                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="container-menu" style="margin-top: 10px;">
+                    <div class="header-menu">
+                        <span class="title-menu">505 - Advance English </span>
+                        <span class="subtitle-menu">9 weeks left</span>
+                    </div>
+
+                    <div class="usage-menu">
+                        <div class="progress-section">
+                            <div class="progress-header-flex">
+                                <!-- <h3 class="progress-title">test</h3> -->
+                                <span class="progress-text">
+                                    Your Progress:  
+                                </span>
+                                <span class="progress-text">
+                                     20 / 100
+                                </span>
+                                
+                            </div>
+
+                            <div class="progress-container">
+                                <div class="progress-bar-new">
+                                   <?php foreach ($segments_two as $index => $segmentType): ?>
+                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1rem;">
                 <div class="actions-grid">
+
+                    <!-- schedule -->
                     <a class="action-card" href="schedule">
                         <div class="action-icon purple">
-                            <svg fill="#FFF" width="24" height="24" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 365.473 365.473" xml:space="preserve">
-                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                <g id="SVGRepo_iconCarrier">
-                                    <path d="M4.029,46.205V24.266c0-4.971,4.114-8.705,9.085-8.705h69.915V9c0-4.971,4.029-9,9-9s9,4.029,9,9v6.561h140V9 c0-4.971,4.029-9,9-9s9,4.029,9,9v6.561h70.27c4.971,0,8.73,3.734,8.73,8.705v21.939c0,4.971-4.029,9-9,9s-9-4.029-9-9V33.561h-61 v5.967c0,4.971-4.029,9-9,9s-9-4.029-9-9v-5.967h-140v5.967c0,4.971-4.029,9-9,9s-9-4.029-9-9v-5.967h-61v12.644 c0,4.971-4.029,9-9,9S4.029,51.176,4.029,46.205z M361.444,284.249c0,44.789-36.439,81.224-81.228,81.224 c-44.79,0-81.228-36.445-81.228-81.234c0-34.795,21.994-64.565,52.807-76.112c-1.168-1.519-1.864-3.448-1.864-5.512 c0-4.971,4.029-9.054,9-9.054h42.57c4.971,0,9,4.083,9,9.054c0,2.064-0.695,4.02-1.864,5.539c7.485,2.805,14.451,6.684,20.707,11.45 l4.445-4.445c3.515-3.515,9.214-3.513,12.728,0c3.515,3.515,3.514,9.213,0,12.728l-4.136,4.135 C354.273,246.154,361.444,264.377,361.444,284.249z M343.444,284.252c0-34.864-28.364-63.229-63.228-63.229 c-34.864,0-63.228,28.364-63.228,63.229c0,34.864,28.364,63.228,63.228,63.228C315.08,347.479,343.444,319.116,343.444,284.252z M292.394,262.017l-3.365,3.272v-13.921c0-4.971-4.029-9-9-9s-9,4.029-9,9v35.65c0,1.225,0.338,2.392,0.781,3.456 c0.439,1.058,1.135,2.048,1.995,2.908c0.881,0.881,1.923,1.542,3.01,1.98c0.002,0.001,0.015,0.001,0.017,0.002 c0.004,0.002,0.014-0.222,0.019-0.22c0.949,0.382,1.984,0.417,3.061,0.417c0.006,0,0.011,0,0.019,0c0.095,0,0.19,0.004,0.286,0.004 s0.19-0.004,0.285-0.004c0.006,0,0.013,0,0.019,0c1.096,0,2.142-0.043,3.104-0.437c1.076-0.439,2.084-0.983,2.957-1.856 l18.636-18.58c3.515-3.515,3.467-9.185-0.047-12.7C301.654,258.473,295.909,258.502,292.394,262.017z M196.534,231.561 c0,4.971-4.029,9-9,9h-7.505v66.138c0,4.971-3.941,8.966-8.912,8.966c-0.303,0-0.514-0.05-0.809-0.078 c-0.295,0.029-0.595-0.025-0.897-0.025H13.114c-4.971,0-9.085-3.892-9.085-8.862V80.369v-0.002c0-4.971,4.114-8.806,9.085-8.806 h316.185c4.971,0,8.73,3.835,8.73,8.806v97.588c0,4.971-4.029,9-9,9s-9-4.029-9-9v-13.394h-61v0.769c0,4.971-4.029,9-9,9 s-9-4.029-9-9v-0.769h-61v58h7.505C192.505,222.561,196.534,226.59,196.534,231.561z M83.029,240.561h-61v57h61V240.561z M83.029,164.561h-61v58h61V164.561z M162.029,240.561h-61v57h61V240.561z M162.029,164.561h-61v58h61V164.561z M180.029,109.228 v37.333h61v-37.333c0-4.971,4.029-9,9-9s9,4.029,9,9v37.333h61v-57h-298v57h61v-37.333c0-4.971,4.029-9,9-9s9,4.029,9,9v37.333h61 v-37.333c0-4.971,4.029-9,9-9S180.029,104.257,180.029,109.228z"></path>
-                                </g>
-                            </svg>
+                            <svg width="24" height="24" fill="#FFF" viewBox="0 0 24 24" id="time-alert-square" data-name="Line Color" xmlns="http://www.w3.org/2000/svg" class="icon line-color"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><polyline id="secondary" points="8 12 12 12 12 7" style="fill: none; stroke: #FFF; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></polyline><line id="secondary-2" data-name="secondary" x1="17" y1="13" x2="17" y2="16" style="fill: none; stroke: #FFF; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></line><line id="secondary-upstroke" x1="16.95" y1="20.5" x2="17.05" y2="20.5" style="fill: none; stroke: #FFF; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></line><path id="primary" d="M12,21H4a1,1,0,0,1-1-1V4A1,1,0,0,1,4,3H20a1,1,0,0,1,1,1v8" style="fill: none; stroke: #FFF; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path></g></svg>
+                            
                         </div>
                         <h4>SCHEDULE</h4>
                     </a>
 
+                    <!-- Classroom -->
                     <a class="action-card" href="class">
                         <div class="action-icon green">
                             <svg fill="#FFF" width="24" height="24" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.001 512.001" xml:space="preserve">
@@ -149,23 +213,23 @@ $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'up
                                     </g>
                                 </g>
                             </svg>
+
                         </div>
                         <h4>CLASSROOM</h4>
                     </a>
 
-                    <a class="action-card" href="myphoto">
+                    <!-- Calendar -->
+                    <a class="action-card" href="calendar">
                         <div class="action-icon orange">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                           <svg fill="#FFF" width="24" height="24" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 365.473 365.473" xml:space="preserve">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                                 <g id="SVGRepo_iconCarrier">
-                                    <path d="M8 11C9.10457 11 10 10.1046 10 9C10 7.89543 9.10457 7 8 7C6.89543 7 6 7.89543 6 9C6 10.1046 6.89543 11 8 11Z" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <path d="M6.56055 21C12.1305 8.89998 16.7605 6.77998 22.0005 14.63" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <path d="M18 3H6C3.79086 3 2 4.79086 2 7V17C2 19.2091 3.79086 21 6 21H18C20.2091 21 22 19.2091 22 17V7C22 4.79086 20.2091 3 18 3Z" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M4.029,46.205V24.266c0-4.971,4.114-8.705,9.085-8.705h69.915V9c0-4.971,4.029-9,9-9s9,4.029,9,9v6.561h140V9 c0-4.971,4.029-9,9-9s9,4.029,9,9v6.561h70.27c4.971,0,8.73,3.734,8.73,8.705v21.939c0,4.971-4.029,9-9,9s-9-4.029-9-9V33.561h-61 v5.967c0,4.971-4.029,9-9,9s-9-4.029-9-9v-5.967h-140v5.967c0,4.971-4.029,9-9,9s-9-4.029-9-9v-5.967h-61v12.644 c0,4.971-4.029,9-9,9S4.029,51.176,4.029,46.205z M361.444,284.249c0,44.789-36.439,81.224-81.228,81.224 c-44.79,0-81.228-36.445-81.228-81.234c0-34.795,21.994-64.565,52.807-76.112c-1.168-1.519-1.864-3.448-1.864-5.512 c0-4.971,4.029-9.054,9-9.054h42.57c4.971,0,9,4.083,9,9.054c0,2.064-0.695,4.02-1.864,5.539c7.485,2.805,14.451,6.684,20.707,11.45 l4.445-4.445c3.515-3.515,9.214-3.513,12.728,0c3.515,3.515,3.514,9.213,0,12.728l-4.136,4.135 C354.273,246.154,361.444,264.377,361.444,284.249z M343.444,284.252c0-34.864-28.364-63.229-63.228-63.229 c-34.864,0-63.228,28.364-63.228,63.229c0,34.864,28.364,63.228,63.228,63.228C315.08,347.479,343.444,319.116,343.444,284.252z M292.394,262.017l-3.365,3.272v-13.921c0-4.971-4.029-9-9-9s-9,4.029-9,9v35.65c0,1.225,0.338,2.392,0.781,3.456 c0.439,1.058,1.135,2.048,1.995,2.908c0.881,0.881,1.923,1.542,3.01,1.98c0.002,0.001,0.015,0.001,0.017,0.002 c0.004,0.002,0.014-0.222,0.019-0.22c0.949,0.382,1.984,0.417,3.061,0.417c0.006,0,0.011,0,0.019,0c0.095,0,0.19,0.004,0.286,0.004 s0.19-0.004,0.285-0.004c0.006,0,0.013,0,0.019,0c1.096,0,2.142-0.043,3.104-0.437c1.076-0.439,2.084-0.983,2.957-1.856 l18.636-18.58c3.515-3.515,3.467-9.185-0.047-12.7C301.654,258.473,295.909,258.502,292.394,262.017z M196.534,231.561 c0,4.971-4.029,9-9,9h-7.505v66.138c0,4.971-3.941,8.966-8.912,8.966c-0.303,0-0.514-0.05-0.809-0.078 c-0.295,0.029-0.595-0.025-0.897-0.025H13.114c-4.971,0-9.085-3.892-9.085-8.862V80.369v-0.002c0-4.971,4.114-8.806,9.085-8.806 h316.185c4.971,0,8.73,3.835,8.73,8.806v97.588c0,4.971-4.029,9-9,9s-9-4.029-9-9v-13.394h-61v0.769c0,4.971-4.029,9-9,9 s-9-4.029-9-9v-0.769h-61v58h7.505C192.505,222.561,196.534,226.59,196.534,231.561z M83.029,240.561h-61v57h61V240.561z M83.029,164.561h-61v58h61V164.561z M162.029,240.561h-61v57h61V240.561z M162.029,164.561h-61v58h61V164.561z M180.029,109.228 v37.333h61v-37.333c0-4.971,4.029-9,9-9s9,4.029,9,9v37.333h61v-57h-298v57h61v-37.333c0-4.971,4.029-9,9-9s9,4.029,9,9v37.333h61 v-37.333c0-4.971,4.029-9,9-9S180.029,104.257,180.029,109.228z"></path>
                                 </g>
                             </svg>
                         </div>
-                        <h4>MY PHOTO</h4>
+                        <h4>CALENDAR</h4>
                     </a>
 
                     <a class="action-card" href="document">
@@ -180,84 +244,12 @@ $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'up
                                     <path opacity="0.8" d="M8 17H16" stroke="#FFF" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
                                 </g>
                             </svg>
-                            <!-- <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" strokeWidth="2" />
-                            </svg> -->
                         </div>
                         <h4>MY DOC</h4>
                     </a>
                 </div>
             </div>
-            <div class="row">Course Progress</div>
-            <div class="row">
-                <div class="container-menu" style="margin-top: 10px;">
-                    <div class="header-menu">
-                        <span class="title-menu">101 - Applied Physics </span>
-                        <span class="subtitle-menu">3 weeks left</span>
-                    </div>
-
-                    <div class="usage-menu">
-                        <div class="progress-section">
-                            <div class="progress-header-flex">
-                                <!-- <h3 class="progress-title">test</h3> -->
-                                <span class="progress-text">
-                                    Your Progress:  
-                                </span>
-                                <span class="progress-text">
-                                     70 / 100
-                                </span>
-                                
-                            </div>
-
-                            <div class="progress-container">
-                                <div class="progress-bar-new">
-                                   <?php foreach ($segments as $index => $segmentType): ?>
-                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="container-menu" style="margin-top: 10px;">
-                    <div class="header-menu">
-                        <span class="title-menu">505 - Advance English </span>
-                        <span class="subtitle-menu">9 weeks left</span>
-                    </div>
-
-                    <div class="usage-menu">
-                        <div class="progress-section">
-                            <div class="progress-header-flex">
-                                <!-- <h3 class="progress-title">test</h3> -->
-                                <span class="progress-text">
-                                    Your Progress:  
-                                </span>
-                                <span class="progress-text">
-                                     20 / 100
-                                </span>
-                                
-                            </div>
-
-                            <div class="progress-container">
-                                <div class="progress-bar-new">
-                                   <?php foreach ($segments_two as $index => $segmentType): ?>
-                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
+           
         <?php require_once 'component/footer.php'; ?>
 </body>
 
