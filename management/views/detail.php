@@ -54,6 +54,7 @@
 <script src="/classroom/management/js/course.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/group.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/registration.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="/classroom/management/js/consent.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/student.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 <body>
@@ -74,14 +75,18 @@
                 <i class="fas fa-cubes"></i>
                 <span lang="en">Group</span>
             </a>
+            <a href=".management_tab" class="get-management edit-mode" data-page="consent" data-toggle="tab">
+                <i class="fas fa-user-shield"></i>
+                <span lang="en">Consent</span>
+            </a>
             <a href=".management_tab" class="get-management edit-mode" data-page="registration" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Registration</span>
             </a>
-            <!-- <a href=".management_tab" class="get-management edit-mode" data-page="student" data-toggle="tab">
+            <a href=".management_tab" class="get-management edit-mode" data-page="student" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Student</span>
-            </a> -->
+            </a>
             <!-- <a href=".management_tab" class="get-management edit-mode" data-page="teacher" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Teacher</span>
@@ -93,6 +98,34 @@
             </div>
         </div>
     </div>
+</div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzxc7D9o3CcmSyLWVo6h4rCxS0yL_wB2k&libraries=places"></script>
+<div class="locationModal modal" role="dialog">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="btn-close close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"><i class="fas fa-map-marker-alt"></i> <span lang="en">Location</span></h4>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-xs-6">
+                    <input type="text" class="form-control" id="location-lat" readonly placeholder="Latitude">
+                </div>
+                <div class="col-xs-6">
+                    <input type="text" class="form-control" id="location-lng" readonly placeholder="Longitude">
+                </div>
+            </div>
+            <div class="map-box" style="height: calc(60vh - 100px)">
+                <div class="map-container" style="height: 100%;"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-orange btn-save-location">Save Location</button>
+            <button type="button" class="btn btn-white btn-close" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
 </div>
 </body>
 </html>

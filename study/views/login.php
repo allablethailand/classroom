@@ -7,7 +7,6 @@ include_once($base_include."/login_history.php");
 session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
 global $mysqli;
 
-
 // สมมติว่ามีการตั้งค่าการเชื่อมต่อฐานข้อมูล ($mysqli) ไว้แล้ว
 // เช่น: $mysqli = new mysqli("localhost", "your_user", "your_password", "your_db");
 
@@ -16,8 +15,26 @@ if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
 
+// ตรวจสอบการส่งค่าจากฟอร์ม Consent
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accept_consent'])) {
+    $student_id = $_SESSION['student_id'] ? $_SESSION['student_id'] : null ;
+    $classroom_id = $_SESSION['join_info']['classroom_id'] ? $_SESSION['join_info']['classroom_id'] : null;
+
+    if ($student_id && $classroom_id) {
+        // อัปเดตค่า consent_accept เป็น 1
+        $update_sql = "UPDATE `classroom_student_join` SET `consent_accept` = 1 WHERE `student_id` = ? AND `classroom_id` = ?";
+        $update_stmt = $mysqli->prepare($update_sql);
+        $update_stmt->bind_param("ii", $student_id, $classroom_id);
+        $update_stmt->execute();
+        $update_stmt->close();
+
+        // Redirect ไปหน้าหลักหลังจากยอมรับ
+        header("Location: /classroom/study/menu");
+        exit();
+    }
+}
+
 // ตรวจสอบว่ามีข้อมูลถูกส่งมาผ่านเมธอด POST หรือไม่
-// / ตรวจสอบว่ามีข้อมูลถูกส่งมาผ่านเมธอด POST หรือไม่
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'] ? $_POST['username'] : ''; // ใช้ null coalescing operator เพื่อความกระชับ
     $password = $_POST['password'] ? $_POST['password'] : '';
@@ -27,8 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน";
     } else {
         // เตรียมคำสั่ง SQL ด้วย Prepared Statement เพื่อป้องกัน SQL Injection
-        // แก้ไข: นำเงื่อนไข AND `status` = 1 ออก เพื่อให้สามารถล็อกอินได้
-        $sql = "SELECT `student_id`, `student_password`, `student_password_key` FROM `classroom_student` WHERE `student_username` = ?";
+        $sql = "SELECT `student_id`, `student_password`, student_password_key, comp_id FROM `classroom_student` WHERE `student_username` = ?";
         $stmt = $mysqli->prepare($sql);
 
         if ($stmt === false) {
@@ -41,38 +57,68 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
-                $stored_password_hash = $row['student_password'];
-                $stored_hass_pass = decryptToken($row['student_password'], $row['student_password_key']);
+                $student_password = $row['student_password'];
+                $student_password_key = $row['student_password_key'];
+                $stored_password_hash = decryptToken($student_password, $student_password_key);
                 $student_id = $row['student_id'];
 
-                // ตรวจสอบรหัสผ่านที่ส่งมากับรหัสผ่านที่ถูก hash ในฐานข้อมูล
-                if ($stored_hass_pass == $password) {
+                // ตรวจสอบรหัสผ่าน
+                if ($password == $stored_password_hash) {
                     // ล็อกอินสำเร็จ: บันทึกข้อมูลที่จำเป็นลงใน Session
                     $_SESSION['student_id'] = $student_id;
-                    
+                    $_SESSION['comp_id'] = $row["comp_id"];
 
-                    // ดึงข้อมูลจากตาราง classroom_student_join
-                    $join_sql = "SELECT `join_id`, `student_id`, `classroom_id`, `group_id` FROM `classroom_student_join` WHERE `student_id` = ? AND `status` = 0";
+                    // ดึงข้อมูลจากตาราง classroom_student_join และตรวจสอบ consent_accept
+                    $join_sql = "SELECT `join_id`, `student_id`, `classroom_id`, `group_id`, `consent_accept` FROM `classroom_student_join` WHERE `student_id` = ? AND `status` = 0";
                     $join_stmt = $mysqli->prepare($join_sql);
                     $join_stmt->bind_param("i", $student_id);
                     $join_stmt->execute();
                     $join_result = $join_stmt->get_result();
-                    
+
                     if ($join_result && $join_result->num_rows > 0) {
                         $join_data = $join_result->fetch_assoc();
-                        
-                        // เก็บค่า join_id, student_id, classroom_id, group_id ไว้ใน Session
+
+                        // เก็บข้อมูล join ไว้ใน session
                         $_SESSION['join_info'] = [
                             'join_id' => $join_data['join_id'],
                             'student_id' => $join_data['student_id'],
                             'classroom_id' => $join_data['classroom_id'],
                             'group_id' => $join_data['group_id']
                         ];
-                    }
+                        $consent_accept = $join_data['consent_accept'];
 
-                    // Redirect ไปที่หน้าต่อไป
-                    header("Location: http://origami.local/classroom/study/menu");
-                    exit();
+                        // ตรวจสอบค่า consent_accept
+                        if ($consent_accept == 1) {
+                            // ยอมรับแล้ว: Redirect ไปหน้าหลัก
+                            header("Location: /classroom/study/menu");
+                            exit();
+                        } else {
+                            // ยังไม่ยอมรับ: ดึงเนื้อหา Consent จาก classroom_template
+                            $classroom_id = $join_data['classroom_id'];
+                            $template_sql = "SELECT `classroom_consent` FROM `classroom_template` WHERE `classroom_id` = ?";
+                            $template_stmt = $mysqli->prepare($template_sql);
+                            $template_stmt->bind_param("i", $classroom_id);
+                            $template_stmt->execute();
+                            $template_result = $template_stmt->get_result();
+
+                            if ($template_result && $template_result->num_rows > 0) {
+                                $template_data = $template_result->fetch_assoc();
+                                $classroom_consent_content = $template_data['classroom_consent'];
+                                // เก็บเนื้อหา Consent ไว้ใน Session หรือตัวแปรเพื่อให้ HTML แสดงผล
+                                $_SESSION['classroom_consent'] = $classroom_consent_content;
+                                // ตั้งค่าสถานะเพื่อแสดงหน้า Consent
+                                $show_consent_form = true;
+                            } else {
+                                // ไม่พบข้อมูล Consent ให้ Redirect ไปเลย
+                                header("Location: /classroom/study/menu");
+                                exit();
+                            }
+                        }
+                    } else {
+                        // ไม่พบข้อมูลใน classroom_student_join ก็ให้ Redirect ไปหน้าหลัก
+                        header("Location: /classroom/study/menu");
+                        exit();
+                    }
                 } else {
                     // รหัสผ่านไม่ถูกต้อง
                     $error_message = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
@@ -85,11 +131,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
-// หากมี Session อยู่แล้ว ให้ Redirect ไปหน้าหลักเลย
-// if (isset($_SESSION['student_id']) && $_SESSION['student_id']) {
-//     header("Location: http://origami.local/classroom/study/");
-//     exit();
-// }
 ?>
 
 <!doctype html>
@@ -121,173 +162,289 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
 <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
 <script src="/classroom/study/js/login.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+
 <style>
+    /* New modern design styles */
+    :root {
+        --orange-main: #FF6B00;
+        --orange-light: #FF9800;
+        --orange-dark: #E65A00;
+        --gray-text: #555;
+        --white-bg: #F5F7FA;
+    }
+
     body {
         font-family: 'Kanit', sans-serif;
-        background-color: #f7f7f7;
+        background-color: var(--white-bg);
         margin: 0;
         display: flex;
         justify-content: center;
-        align-items: flex-start;
+        align-items: center;
         min-height: 100vh;
-        padding-top: 0; /* Adjusted to start from top */
+        overflow: hidden;
     }
+
     .top-bg {
-        width: 100%;
-        height: 150px;
-        background-color: #00ceff; /* สีน้ำเงินตามภาพ */
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 1;
+        /* Removed as it's not needed for the new design */
+        display: none;
     }
+
     .login-wrapper {
         position: relative;
         width: 100%;
-        max-width: 400px; /* ปรับขนาดให้พอดีกับมือถือ */
+        max-width: 420px;
         z-index: 2;
-        margin-top: 80px; /* เลื่อนลงมาให้เห็นพื้นหลังด้านบน */
+        padding: 20px;
+        box-sizing: border-box;
     }
+    
+    .login-card {
+        background-color: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .login-card:hover {
+        transform: translateY(-5px);
+    }
+
     .logo-container {
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        margin-bottom: 20px;
-        color: white;
+        margin-bottom: 30px;
     }
+
     .logo-container img {
-        width: 60px; /* ปรับขนาดโลโก้ */
-        height: 60px;
-        border-radius: 50%;
-        /* border: 2px solid white; */
-        margin-bottom: 10px;
+        width: 40%;
+        height: 40%;
+        border-radius: 25%;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+        padding: 10px;
     }
+
     .logo-container h2 {
-        font-size: 18px;
+        font-size: 24px;
         margin: 0;
-        font-weight: bold;
+        font-weight: 600;
+        color: var(--orange-dark);
+        letter-spacing: 1px;
     }
-    .login-container {
-        background-color: white;
-        padding: 30px 25px; /* ลด padding ลงเล็กน้อย */
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        text-align: center;
-    }
-    .login-container h2 {
-        font-size: 20px;
-        color: #333;
-        font-weight: bold;
-        margin-top: 0;
-    }
+
     .welcome-text {
-        font-size: 14px;
-        color: #666;
+        font-size: 16px;
+        color: var(--gray-text);
         margin-bottom: 20px;
-        line-height: 1.5;
+        line-height: 1.6;
     }
+
     .form-group {
         text-align: left;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
+
     label {
         display: block;
-        margin-bottom: 5px;
-        color: #555;
-        font-weight: normal;
+        margin-bottom: 8px;
+        color: var(--gray-text);
+        font-weight: 500;
         font-size: 14px;
     }
+
     input[type="text"],
     input[type="password"] {
         width: 100%;
-        padding: 10px 15px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
+        padding: 12px 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
         box-sizing: border-box;
         font-size: 16px;
         color: #333;
+        transition: all 0.3s ease;
     }
+
     input[type="text"]:focus,
     input[type="password"]:focus {
-        border-color: #ff9800;
+        border-color: var(--orange-main);
+        box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.1);
         outline: none;
     }
+
     .forgot-password {
         text-align: right;
-        margin-top: 5px;
-        margin-bottom: 20px;
+        margin-top: -10px;
+        margin-bottom: 25px;
     }
+
     .forgot-password a {
-        color: #007bff; /* สีเดียวกับพื้นหลังด้านบน */
+        color: var(--orange-main);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.3s;
     }
+
+    .forgot-password a:hover {
+        color: var(--orange-dark);
+    }
+
     .login-button {
         width: 100%;
-        padding: 12px;
-        background-color: #ff9800; /* โทนสีส้ม */
+        padding: 15px;
+        background-color: var(--orange-main);
         color: white;
         border: none;
-        border-radius: 6px;
-        font-size: 16px;
+        border-radius: 10px;
+        font-size: 18px;
         font-weight: bold;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s, transform 0.2s;
     }
+
     .login-button:hover {
-        background-color: #fb8c00; /* โทนสีส้มเข้มขึ้นเมื่อชี้ */
+        background-color: var(--orange-dark);
+        transform: translateY(-2px);
     }
+    
+    .login-button:active {
+        transform: translateY(0);
+    }
+
     .register-link {
-        margin-top: 20px;
-        font-size: 13px;
+        margin-top: 25px;
+        font-size: 14px;
+        color: #888;
     }
+
     .register-link a {
-        color: #007bff; /* สีเดียวกับพื้นหลังด้านบน */
+        color: var(--orange-main);
         text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
     }
+    
+    .register-link a:hover {
+        color: var(--orange-dark);
+    }
+
     .error-message {
-        color: red;
-        margin-bottom: 15px;
+        color: #d9534f;
+        background-color: #fcebeb;
+        border: 1px solid #f2c7c7;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    /* Consent Modal Styles */
+    .consent-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+
+    .consent-content-container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        max-width: 800px;
+        width: 90%;
+        max-height: 90%;
+        display: flex;
+        flex-direction: column;
+        animation: fadeIn 0.5s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .consent-content {
+        flex-grow: 1;
+        overflow-y: auto;
+        text-align: left;
+        padding-right: 15px;
+        line-height: 1.8;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .consent-content h3 {
+        color: var(--orange-dark);
+    }
+
+    .consent-content p, .consent-content li {
+        margin-bottom: 10px;
     }
 </style>
 </head>
 <body>
-    <div class="container-fluid">
-    <div class="top-bg"></div>
+    <!-- <div class="container-fluid"> -->
     <div class="login-wrapper">
-        <div class="logo-container">
-            <img src="https://www.origami.life/uploads/app/2_20180425103337.ico" alt="VON BUNDIT Logo">
-            <h2 style="color:black;">login</h2>
-        </div>
-        <div class="login-container">
-            <h2>login</h2>
+        <div class="login-card">
+            <?php if (isset($show_consent_form) && $show_consent_form): ?>
+            <?php else: ?>
+            <div class="logo-container">
+                <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="VON BUNDIT Logo">
+                <h2>เข้าสู่ระบบ</h2>
+            </div>
             <p class="welcome-text">
-                ยินดีต้อนรับ<br>
-                กรุณากรอกข้อมูลด้านล่างให้ครบ เพื่อเริ่มต้นการใช้งาน
+                ยินดีต้อนรับสู่ระบบ ORIGAMI
+                </p>
+                 <p class="welcome-text">
+                กรุณาเข้าสู่ระบบเพื่อเริ่มต้นการใช้งาน
             </p>
-
             <?php if (isset($error_message)): ?>
                 <p class="error-message"><?php echo $error_message; ?></p>
             <?php endif; ?>
-
-            <form action="login" method="POST">
+            <form action="" method="POST">
                 <div class="form-group">
-                    <label for="username">ชื่อผู้ใช้งาน (User ID)</label>
+                    <label for="username">ชื่อผู้ใช้งาน (Username)</label>
                     <input type="text" id="username" name="username" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">รหัสผ่าน</label>
+                    <label for="password">รหัสผ่าน (password)</label>
                     <input type="password" id="password" name="password" required>
-                    </div>
-                <p class="forgot-password"><a href="#">ลืมรหัสผ่าน ?</a></p>
+                </div>
+                <!-- <p class="forgot-password"><a href="#">ลืมรหัสผ่าน ?</a></p> -->
                 <button type="submit" class="login-button">เข้าสู่ระบบ</button>
             </form>
-
-            <p class="register-link"><a href=" http://origami.local/classroom/study/register">ลงทะเบียนใช้งาน</a></p>
+            <p class="register-link">ยังไม่มีบัญชี? <a href=" /classroom/study/register">ลงทะเบียนใช้งาน</a></p>
+            <?php endif; ?>
         </div>
     </div>
+    <!-- </div> -->
+
+    <?php if (isset($show_consent_form) && $show_consent_form): ?>
+    <div class="consent-modal">
+        <div class="consent-content-container">
+            <h2 style="text-align: center;">ข้อตกลงและเงื่อนไข</h2>
+            <div class="consent-content">
+                <?php echo html_entity_decode($_SESSION['classroom_consent']); ?>
+            </div>
+            <form action="" method="POST" style="margin-top: 20px;">
+                <input type="hidden" name="accept_consent" value="1">
+                <button type="submit" class="login-button">ฉันยอมรับข้อตกลงและเงื่อนไข</button>
+            </form>
+        </div>
     </div>
+    <?php endif; ?>
 </body>
 </html>

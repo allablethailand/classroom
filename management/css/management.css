@@ -118,9 +118,6 @@ div#Avatar > .avatar-selector > .avatar-selector-btn>img{
     overflow-x: hidden !important;
     overflow-y: hidden !important;
 }
-#tb_student {
-    font-size: 11px;
-}
 .profile {
     width: 220px;
     background-color: #FFFFFF;
