@@ -40,6 +40,9 @@ function buildPage(page) {
         case 'consent':
             buildConsentPage();
             break;
+        case 'student':
+            buildStudentPage();
+            break;
         default:
             console.warn('Unknown page type:', page);
     }
@@ -180,7 +183,7 @@ function buildManagementData() {
 function populateFormData(data) {
     try {
         if (data.classroom_poster) {
-            $("#ex_classroom_poster").attr("data-default-file", data.classroom_poster);
+            $("#classroom_poster").attr("data-default-file", data.classroom_poster);
             $("#ex_classroom_poster").val(data.classroom_poster);
         }
         $("#classroom_name").val(data.classroom_name || '');
@@ -199,6 +202,9 @@ function populateFormData(data) {
         $('.for-open-register').toggleClass('hidden', !isEnabled);
         const isEnabledLineOA = data.line_oa === '0';
         $('.for-lineconnect').toggleClass('hidden', !isEnabledLineOA);
+        const isOnline = data.classroom_type === 'online';
+        $('.for-online').toggleClass('hidden', !isOnline);
+        $('.for-onsite').toggleClass('hidden', isOnline);
         if (data.classroom_type === 'online' && data.platforms_id) {
             $('#classroom_plateform').append($('<option>', { 
                 value: data.platforms_id, 
