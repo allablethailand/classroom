@@ -3,4 +3,4 @@ RewriteBase /classroom/study
 RewriteRule ^/classroom/study/index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /classroom/study/index.php [L]
+RewriteRule . /classroom/study/index.php [L,QSA]
