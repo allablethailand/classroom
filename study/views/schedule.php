@@ -146,163 +146,163 @@ $evening_session_time15 = '18:00';
 $evening_session_details15 = 'หลักสูตรเป็นเจ้าภาพจัดเลี้ยง, theme กาล่าดินเนอร์ เดินพรมแดง';
 
 $arrayData = [
-    [
-        'date' => '2025-10-01',
-        'event_location' => 'พัทยา/ชลบุรี',
-        'morning_session_time' => '09:30-12:00',
-        'morning_session_details' => 'ลงทะเบียนผู้เข้าอบรม, รายงานตัว, ตัดสูท, ถ่ายรูป, แจกเสื้อโปโล หมวก, ป้ายชื่อ, สแกน QR เข้ากลุ่ม 3 กลุ่ม, sign PDPA, สมุดโทรศัพท์',
-        'morning_session_speaker' => null,
-        'afternoon_session_time' => '13:00-17:00',
-        'afternoon_session_details' => 'พิธีเปิด ประธานกล่าวเปิดหลักสูตร, ผอ.หลักสูตร อธิบายรายละเอียดหลักสูตร, กิจกรรมละลายพฤติกรรม',
-        'afternoon_session_speaker' => null,
-        'evening_session_time' => '18:00',
-        'evening_session_details' => 'แต่ละกลุ่มคุยเรื่องการแสดงโชว์ในช่วงกินเลี้ยง, กินเลี้ยง, แสดงโชว์แต่ละกลุ่ม ("หลักสูตร เป็นเจ้าภาพจัดเลี้ยง")',
-        'event_details' => null,
-    ],
-    [
-        'date' => '2025-10-02',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-12.00',
-        'morning_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Deep drive in AI',
-        'morning_session_speaker' => 'พี่กฤษ',
-        'afternoon_session_time' => '13.00-16.00',
-        'afternoon_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Knowledge Base and Business AI in Organization',
-        'afternoon_session_speaker' => 'พี่กฤษ',
-        'evening_session_time' => null,
-        'evening_session_details' => null,
-        'event_details' => null,
-    ],
-    [
-        'date' => '2025-10-03',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-12.00',
-        'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: Green : Shift & Sustainability Landscape',
-        'morning_session_speaker' => 'พี่เบนซ์',
-        'afternoon_session_time' => '13.00-16.30',
-        'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: กลยุทธ์และธรรมมาภิบาล ESG',
-        'afternoon_session_speaker' => 'พี่เบนซ์',
-        'evening_session_time' => '18:00',
-        'evening_session_details' => 'กลุ่มดิน เป็นเจ้าภาพจัดเลี้ยง',
-        'event_details' => null,
-    ],
-    [
-        'date' => '2025-10-04',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-12.00',
-        'morning_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: AWS Deep AI Technology',
-        'morning_session_speaker' => 'พี่กฤษ',
-        'afternoon_session_time' => '13.00-16.30',
-        'afternoon_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Transform your organization by Huawei cloud',
-        'afternoon_session_speaker' => 'พี่กฤษ',
-        'evening_session_time' => '18:00',
-        'evening_session_details' => 'กลุ่มน้ำ เป็นเจ้าภาพจัดเลี้ยง',
-        'event_details' => null,
-    ],
-    [
-        'date' => '2025-10-05 to 2025-10-08',
-        'event_location' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน',
-        'morning_session_time' => null,
-        'morning_session_details' => null,
-        'morning_session_speaker' => null,
-        'afternoon_session_time' => null,
-        'afternoon_session_details' => null,
-        'afternoon_session_speaker' => null,
-        'evening_session_time' => null,
-        'evening_session_details' => null,
-        'event_details' => 'เยี่ยมชมองค์กร และโครงการต้นแบบ',
-    ],
-    [
-        'date' => '2025-10-09',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-12.00',
-        'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: การเงินสีเขียว & ความเสี่ยงสภาพภูมิอากาศ',
-        'morning_session_speaker' => 'พี่เบนซ์',
-        'afternoon_session_time' => '13.00-16.30',
-        'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: Green Innovation & Cirular Models',
-        'afternoon_session_speaker' => 'พี่เบนซ์',
-        'evening_session_time' => '18:00',
-        'evening_session_details' => 'กลุ่มลม เป็นเจ้าภาพจัดเลี้ยง',
-        'event_details' => null,
-    ],
-    [
-        'date' => '2025-10-10',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-12.00',
-        'morning_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Digital Transformation by AI in Organization',
-        'morning_session_speaker' => 'พี่กฤษ',
-        'afternoon_session_time' => '13.00-16.30',
-        'afternoon_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Organization Digital Technology',
-        'afternoon_session_speaker' => 'พี่กฤษ',
-        'evening_session_time' => '18:00',
-        'evening_session_details' => 'กลุ่มไฟ เป็นเจ้าภาพจัดเลี้ยง',
-        'event_details' => null,
-    ],
-    [
-        'date' => '2025-10-11',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-12.00',
-        'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: Sector Deep Dive (เลือกตามกลุ่มเป้าหมาย)',
-        'morning_session_speaker' => 'พี่เบนซ์',
-        'afternoon_session_time' => '13.00-16.30',
-        'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: ผู้นำ องค์กร และอนาคต',
-        'afternoon_session_speaker' => 'พี่เบนซ์',
-        'evening_session_time' => '18:00',
-        'evening_session_details' => 'กลุ่มหลักสูตร เป็นเจ้าภาพจัดเลี้ยง',
-        'event_details' => null,
-    ],
-    [
-        'date' => '2025-10-12',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-12.00',
-        'morning_session_details' => null,
-        'morning_session_speaker' => null,
-        'afternoon_session_time' => '14.30-16.00',
-        'afternoon_session_details' => null,
-        'afternoon_session_speaker' => null,
-        'evening_session_time' => null,
-        'evening_session_details' => null,
-        'event_details' => 'เยี่ยมชม โรงงาน',
-    ],
-    [
-        'date' => '2025-10-13',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-12.00',
-        'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: การพัฒนาอุตสหกรรมสู่สังคมคาร์บอนเครดิตต่ำ ในสถานประกอบการ',
-        'morning_session_speaker' => 'เจ้อัง',
-        'afternoon_session_time' => '13.00-16.30',
-        'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: การส่งเสริมยกระดับมาตรฐานสถานประกอบการสู่อุตสาหกรรมสีเขียว',
-        'afternoon_session_speaker' => 'เจ้อัง',
-        'evening_session_time' => '18:00',
-        'evening_session_details' => '**กลุ่มดิน+น้ำ เป็นเจ้าภาพจัดเลี้ยง',
-        'event_details' => null,
-    ],
-    [
-        'date' => '2025-10-14',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-12.00',
-        'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: แนวการจัดการกากอุตสาหกรรมตามหลักกฎหมาย',
-        'morning_session_speaker' => 'เจ้อัง',
-        'afternoon_session_time' => '13.00-16.30',
-        'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: โอกาสทองของอุตสาหกรรมกับพื้นที่ EEC',
-        'afternoon_session_speaker' => 'อ.จุฬา (เจ้อัง)',
-        'evening_session_time' => '18:00',
-        'evening_session_details' => '**กลุ่มลม+ไฟ เป็นเจ้าภาพจัดเลี้ยง',
-        'event_details' => null,
-    ],
-    [
-        'date' => '2025-10-15',
-        'event_location' => 'พัทยา',
-        'morning_session_time' => '9.30-16.00',
-         'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: แนวการจัดการกากอุตสาหกรรมตามหลักกฎหมาย',
-        'morning_session_speaker' => 'เจ้อัง',
-        'afternoon_session_time' => '13.00-16.30',
-        'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: โอกาสทองของอุตสาหกรรมกับพื้นที่ EEC',
-        'afternoon_session_speaker' => 'อ.จุฬา (เจ้อัง)',
-        'evening_session_time' => '18:00',
-        'evening_session_details' => '**กลุ่มลม+ไฟ เป็นเจ้าภาพจัดเลี้ยง',
-        'event_details' => null,
-    ]
-    ];
+  [
+    'date' => '2025-10-01',
+    'event_location' => 'พัทยา/ชลบุรี',
+    'morning_session_time' => '09:30-12:00',
+    'morning_session_details' => 'ลงทะเบียนผู้เข้าอบรม, รายงานตัว, ตัดสูท, ถ่ายรูป, แจกเสื้อโปโล หมวก, ป้ายชื่อ, สแกน QR เข้ากลุ่ม 3 กลุ่ม, sign PDPA, สมุดโทรศัพท์',
+    'morning_session_speaker' => null,
+    'afternoon_session_time' => '13:00-17:00',
+    'afternoon_session_details' => 'พิธีเปิด ประธานกล่าวเปิดหลักสูตร, ผอ.หลักสูตร อธิบายรายละเอียดหลักสูตร, กิจกรรมละลายพฤติกรรม',
+    'afternoon_session_speaker' => null,
+    'evening_session_time' => '18:00',
+    'evening_session_details' => 'แต่ละกลุ่มคุยเรื่องการแสดงโชว์ในช่วงกินเลี้ยง, กินเลี้ยง, แสดงโชว์แต่ละกลุ่ม ("หลักสูตร เป็นเจ้าภาพจัดเลี้ยง")',
+    'event_details' => null,
+  ],
+  [
+    'date' => '2025-10-02',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-12.00',
+    'morning_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Deep drive in AI',
+    'morning_session_speaker' => 'พี่กฤษ',
+    'afternoon_session_time' => '13.00-16.00',
+    'afternoon_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Knowledge Base and Business AI in Organization',
+    'afternoon_session_speaker' => 'พี่กฤษ',
+    'evening_session_time' => null,
+    'evening_session_details' => null,
+    'event_details' => null,
+  ],
+  [
+    'date' => '2025-10-03',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-12.00',
+    'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: Green : Shift & Sustainability Landscape',
+    'morning_session_speaker' => 'พี่เบนซ์',
+    'afternoon_session_time' => '13.00-16.30',
+    'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: กลยุทธ์และธรรมมาภิบาล ESG',
+    'afternoon_session_speaker' => 'พี่เบนซ์',
+    'evening_session_time' => '18:00',
+    'evening_session_details' => 'กลุ่มดิน เป็นเจ้าภาพจัดเลี้ยง',
+    'event_details' => null,
+  ],
+  [
+    'date' => '2025-10-04',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-12.00',
+    'morning_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: AWS Deep AI Technology',
+    'morning_session_speaker' => 'พี่กฤษ',
+    'afternoon_session_time' => '13.00-16.30',
+    'afternoon_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Transform your organization by Huawei cloud',
+    'afternoon_session_speaker' => 'พี่กฤษ',
+    'evening_session_time' => '18:00',
+    'evening_session_details' => 'กลุ่มน้ำ เป็นเจ้าภาพจัดเลี้ยง',
+    'event_details' => null,
+  ],
+  [
+    'date' => '2025-10-05 to 2025-10-08',
+    'event_location' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน',
+    'morning_session_time' => null,
+    'morning_session_details' => null,
+    'morning_session_speaker' => null,
+    'afternoon_session_time' => null,
+    'afternoon_session_details' => null,
+    'afternoon_session_speaker' => null,
+    'evening_session_time' => null,
+    'evening_session_details' => null,
+    'event_details' => 'เยี่ยมชมองค์กร และโครงการต้นแบบ',
+  ],
+  [
+    'date' => '2025-10-09',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-12.00',
+    'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: การเงินสีเขียว & ความเสี่ยงสภาพภูมิอากาศ',
+    'morning_session_speaker' => 'พี่เบนซ์',
+    'afternoon_session_time' => '13.00-16.30',
+    'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: Green Innovation & Cirular Models',
+    'afternoon_session_speaker' => 'พี่เบนซ์',
+    'evening_session_time' => '18:00',
+    'evening_session_details' => 'กลุ่มลม เป็นเจ้าภาพจัดเลี้ยง',
+    'event_details' => null,
+  ],
+  [
+    'date' => '2025-10-10',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-12.00',
+    'morning_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Digital Transformation by AI in Organization',
+    'morning_session_speaker' => 'พี่กฤษ',
+    'afternoon_session_time' => '13.00-16.30',
+    'afternoon_session_details' => 'รับฟังการบรรยาย AI, หัวข้อ: Organization Digital Technology',
+    'afternoon_session_speaker' => 'พี่กฤษ',
+    'evening_session_time' => '18:00',
+    'evening_session_details' => 'กลุ่มไฟ เป็นเจ้าภาพจัดเลี้ยง',
+    'event_details' => null,
+  ],
+  [
+    'date' => '2025-10-11',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-12.00',
+    'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: Sector Deep Dive (เลือกตามกลุ่มเป้าหมาย)',
+    'morning_session_speaker' => 'พี่เบนซ์',
+    'afternoon_session_time' => '13.00-16.30',
+    'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: ผู้นำ องค์กร และอนาคต',
+    'afternoon_session_speaker' => 'พี่เบนซ์',
+    'evening_session_time' => '18:00',
+    'evening_session_details' => 'กลุ่มหลักสูตร เป็นเจ้าภาพจัดเลี้ยง',
+    'event_details' => null,
+  ],
+  [
+    'date' => '2025-10-12',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-12.00',
+    'morning_session_details' => null,
+    'morning_session_speaker' => null,
+    'afternoon_session_time' => '14.30-16.00',
+    'afternoon_session_details' => null,
+    'afternoon_session_speaker' => null,
+    'evening_session_time' => null,
+    'evening_session_details' => null,
+    'event_details' => 'เยี่ยมชม โรงงาน',
+  ],
+  [
+    'date' => '2025-10-13',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-12.00',
+    'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: การพัฒนาอุตสหกรรมสู่สังคมคาร์บอนเครดิตต่ำ ในสถานประกอบการ',
+    'morning_session_speaker' => 'เจ้อัง',
+    'afternoon_session_time' => '13.00-16.30',
+    'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: การส่งเสริมยกระดับมาตรฐานสถานประกอบการสู่อุตสาหกรรมสีเขียว',
+    'afternoon_session_speaker' => 'เจ้อัง',
+    'evening_session_time' => '18:00',
+    'evening_session_details' => '**กลุ่มดิน+น้ำ เป็นเจ้าภาพจัดเลี้ยง',
+    'event_details' => null,
+  ],
+  [
+    'date' => '2025-10-14',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-12.00',
+    'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: แนวการจัดการกากอุตสาหกรรมตามหลักกฎหมาย',
+    'morning_session_speaker' => 'เจ้อัง',
+    'afternoon_session_time' => '13.00-16.30',
+    'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: โอกาสทองของอุตสาหกรรมกับพื้นที่ EEC',
+    'afternoon_session_speaker' => 'อ.จุฬา (เจ้อัง)',
+    'evening_session_time' => '18:00',
+    'evening_session_details' => '**กลุ่มลม+ไฟ เป็นเจ้าภาพจัดเลี้ยง',
+    'event_details' => null,
+  ],
+  [
+    'date' => '2025-10-15',
+    'event_location' => 'พัทยา',
+    'morning_session_time' => '9.30-16.00',
+    'morning_session_details' => 'รับฟังการบรรยาย, หัวข้อ: แนวการจัดการกากอุตสาหกรรมตามหลักกฎหมาย',
+    'morning_session_speaker' => 'เจ้อัง',
+    'afternoon_session_time' => '13.00-16.30',
+    'afternoon_session_details' => 'รับฟังการบรรยาย, หัวข้อ: โอกาสทองของอุตสาหกรรมกับพื้นที่ EEC',
+    'afternoon_session_speaker' => 'อ.จุฬา (เจ้อัง)',
+    'evening_session_time' => '18:00',
+    'evening_session_details' => '**กลุ่มลม+ไฟ เป็นเจ้าภาพจัดเลี้ยง',
+    'event_details' => null,
+  ]
+];
 
 
 ?>
@@ -335,52 +335,23 @@ $arrayData = [
 
 <body>
   <?php require_once("component/header.php"); ?>
-  <div class="" style="min-height:140vh;">
-    <div class="container-fluid" style="margin-top: 2rem;">
-      <div class="">
-        
-      <div class="featured-class">
-        <div class="featured-header">
-          <div>
-            <h2 class="featured-title"><?php echo $program_name; ?></h2>
-            <p class="featured-time"><?php echo $program_slogan; ?></p>
-            <p><?php echo "01/10/2025 - 15/10/2025" ?></p>
-          </div>
-          <!-- <svg class="featured-more-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zM12 13a1 1 0 110-2 1 1 0 010 2zM12 20a1 1 0 110-2 1 1 0 010 2z" />
-          </svg> -->
-        </div>
 
-        <!-- <div class="featured-professor">
-          <div class="professor-avatar-container">
-            <div class="professor-avatar">
-              <span style="font-size: 20px;">👨‍🏫</span>
-            </div>
-          </div>
-          <div>
-            <p class="professor-name">Mr. Cody Fisher</p>
-            <p class="professor-title">Professor</p>
-          </div> -->
-        </div>
+<div style="min-height:140vh;">
+  <div class="container-fluid" style="margin-top: 2rem;">
 
-        <div class="featured-decoration-1"></div>
-        <div class="featured-decoration-2"></div>
+    <div class="featured-class">
+      <div class="featured-header">
+        <div>
+          <h2 class="featured-title"><?php echo $program_name; ?></h2>
+          <p class="featured-time"><?php echo $program_slogan; ?></p>
+          <p><?php echo "01/10/2025 - 15/10/2025"; ?></p>
+        </div>
       </div>
-      <?php foreach($arrayData as $item) { 
+      <div class="featured-decoration-1"></div>
+      <div class="featured-decoration-2"></div>
+    </div>
 
-      // 'date' => '2025-10-01',
-      //   'event_location' => 'พัทยา/ชลบุรี',
-      //   'morning_session_time' => '09:30-12:00',
-      //   'morning_session_details' => 'ลงทะเบียนผู้เข้าอบรม, รายงานตัว, ตัดสูท, ถ่ายรูป, แจกเสื้อโปโล หมวก, ป้ายชื่อ, สแกน QR เข้ากลุ่ม 3 กลุ่ม, sign PDPA, สมุดโทรศัพท์',
-      //   'morning_session_speaker' => null,
-      //   'afternoon_session_time' => '13:00-17:00',
-      //   'afternoon_session_details' => 'พิธีเปิด ประธานกล่าวเปิดหลักสูตร, ผอ.หลักสูตร อธิบายรายละเอียดหลักสูตร, กิจกรรมละลายพฤติกรรม',
-      //   'afternoon_session_speaker' => null,
-      //   'evening_session_time' => '18:00',
-      //   'evening_session_details' => 'แต่ละกลุ่มคุยเรื่องการแสดงโชว์ในช่วงกินเลี้ยง, กินเลี้ยง, แสดงโชว์แต่ละกลุ่ม ("หลักสูตร เป็นเจ้าภาพจัดเลี้ยง")',
-      //   'event_details' => null,
-      
-      ?>
+    <?php foreach ($arrayData as $item) { ?>
       <div class="schedule-container">
         <div class="schedule-item">
           <div class="schedule-time">
@@ -395,110 +366,38 @@ $arrayData = [
           <div class="schedule-content schedule-content-purple">
             <div class="schedule-header">
               <div>
-                <h3 class="schedule-title" style=" display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;  
-  overflow: hidden;"><?php echo $item['morning_session_details']; ?></h3>
-                <p class="schedule-duration"><?php echo isset($item['morning_sesstion_time']) ? $item['morning_sesstion_time'] : $item['evening_sesstion_time']; ?></p>
+                <h3 class="schedule-title" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  <?php echo $item['morning_session_details']; ?>
+                </h3>
+                <p class="schedule-duration">
+                  <?php 
+                  // Fixing typo keys: should be morning_session_time and evening_session_time
+                  echo isset($item['morning_session_time']) ? $item['morning_session_time'] : $item['evening_session_time']; 
+                  ?>
+                </p>
               </div>
               <span class="schedule-badge badge-class">Class</span>
             </div>
 
             <div class="schedule-footer">
               <div class="member-avatars">
-                <div class="member-avatar avatar-purple">
-                  <span>👤</span>
-                </div>
-                <div class="member-avatar avatar-teal">
-                  <span>👤</span>
-                </div>
-                <div class="member-avatar avatar-orange">
-                  <span>👤</span>
-                </div>
+                <div class="member-avatar avatar-purple"><span>👤</span></div>
+                <div class="member-avatar avatar-teal"><span>👤</span></div>
+                <div class="member-avatar avatar-orange"><span>👤</span></div>
               </div>
               <span class="member-count"><?php echo $item['morning_session_speaker']; ?></span>
             </div>
           </div>
+
         </div>
-      <?php }?>
-
-        <!-- <div class="schedule-item">
-          <div class="schedule-time">
-            <span class="schedule-time-text">13 pm</span>
-          </div>
-
-          <div class="schedule-timeline">
-            <div class="timeline-dot timeline-dot-teal"></div>
-            <div class="timeline-line"></div>
-          </div>
-
-          <div class="schedule-content schedule-content-teal">
-            <div class="schedule-header">
-              <div>
-                <h3 class="schedule-title">Geometry</h3>
-                <p class="schedule-duration">14 pm - 16 pm</p>
-              </div>
-              <span class="schedule-badge badge-consultation">Consultation</span>
-            </div>
-
-            <div class="schedule-footer">
-              <div class="member-avatars">
-                <div class="member-avatar avatar-purple">
-                  <span>👤</span>
-                </div>
-                <div class="member-avatar avatar-teal">
-                  <span>👤</span>
-                </div>
-                <div class="member-avatar avatar-orange">
-                  <span>👤</span>
-                </div>
-              </div>
-              <span class="member-count">+ 7 members</span>
-            </div>
-          </div>
-        </div> -->
       </div>
-    
-      
-      <!-- <div class="schedule-item">
-        <div class="schedule-time">
-          <span class="schedule-time-text"><?php echo $item['date']; ?></span>
-        </div>
+    <?php } ?>
 
-        <div class="schedule-timeline">
-          <div class="timeline-dot timeline-dot-orange"></div>
-        </div>
+  </div>
+  <?php require_once("component/footer.php"); ?>
 
-        <div class="schedule-content schedule-content-orange">
-          <div class="schedule-header">
-            <div>
-              <h3 class="schedule-title"></h3>
-              <p class="schedule-duration"></p>
-            </div>
-            <span class="schedule-badge badge-class">Class</span>
-          </div>
+</div>
 
-          <div class="schedule-footer">
-            <div class="member-avatars">
-              <div class="member-avatar avatar-purple">
-                <span>👤</span>
-              </div>
-              <div class="member-avatar avatar-teal">
-                <span>👤</span>
-              </div>
-              <div class="member-avatar avatar-orange">
-                <span>👤</span>
-              </div>
-            </div>
-            <span class="member-count">+ 7 members</span>
-          </div>
-        </div>
-      </div> -->
-
-
-
-      <?php require_once("component/footer.php"); ?>
-    </div>
 
 
 </body>
