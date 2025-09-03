@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         // ตรวจสอบค่า consent_accept
                         if ($consent_accept == 1) {
                             // ยอมรับแล้ว: Redirect ไปหน้าหลัก
-                            header("Location: http://origami.local/classroom/study/menu");
+                            header("Location: /classroom/study/menu");
                             exit();
                         } else {
                             // ยังไม่ยอมรับ: ดึงเนื้อหา Consent จาก classroom_template
@@ -114,13 +114,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 $show_consent_form = true;
                             } else {
                                 // ไม่พบข้อมูล Consent ให้ Redirect ไปเลย
-                                header("Location: http://origami.local/classroom/study/menu");
+                                header("Location: /classroom/study/menu");
                                 exit();
                             }
                         }
                     } else {
                         // ไม่พบข้อมูลใน classroom_student_join ก็ให้ Redirect ไปหน้าหลัก
-                        header("Location: http://origami.local/classroom/study/menu");
+                        header("Location: /classroom/study/menu");
                         exit();
                     }
                 } else {
@@ -406,7 +406,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php if (isset($show_consent_form) && $show_consent_form): ?>
             <?php else: ?>
             <div class="logo-container">
-                <img src="	https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="VON BUNDIT Logo">
+                <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="VON BUNDIT Logo">
                 <h2>เข้าสู่ระบบ</h2>
             </div>
             <p class="welcome-text">
@@ -430,7 +430,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <!-- <p class="forgot-password"><a href="#">ลืมรหัสผ่าน ?</a></p> -->
                 <button type="submit" class="login-button">เข้าสู่ระบบ</button>
             </form>
-            <p class="register-link">ยังไม่มีบัญชี? <a href=" http://origami.local/classroom/study/register">ลงทะเบียนใช้งาน</a></p>
+            <p class="register-link">ยังไม่มีบัญชี? <a href="/classroom/study/register">ลงทะเบียนใช้งาน</a></p>
             <?php endif; ?>
         </div>
     </div>

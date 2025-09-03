@@ -33,7 +33,7 @@ if (!isset($_SESSION['student_id'])) {
             <div class="header-topnav">
                 <div class="title-group-topnav">
                     <span>
-                        <img src="/images/greentech_logo.jpg"   alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                        <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"   alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
 
 
 
