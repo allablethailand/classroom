@@ -1,3 +1,4 @@
+
 <?php
     session_start();
     require_once("../../lib/connect_sqli.php");
@@ -142,7 +143,9 @@
         <div class="header-bar">
             <a href="group"></a>
             <h2>รายชื่อนักเรียน</h2>
-            <div style="width: 20px;"></div>
+
+
+<div style="width: 20px;"></div>
         </div>
 
         <div class="search-container">
@@ -153,11 +156,11 @@
             <?php
                 if ($num_rows > 0) {
                     foreach ($students as $row) {
-                        $student_pic = !empty($row['student_image_profile']) ? $row['student_image_profile'] : 'https://i.stack.imgur.com/34AD4.jpg';
+                        $student_pic = !empty($row['student_image_profile']) ? $row['student_image_profile'] : '../../../images/default.png';
             ?>
-            <a href="studentinfo.php?id=<?= htmlspecialchars($row['student_id']); ?>" class="student-card">
+            <a href="studentinfo?id=<?= htmlspecialchars($row['student_id']); ?>" class="student-card">
                 <div class="student-avatar">
-                    <img src="<?= htmlspecialchars($student_pic); ?>" alt="Student Avatar" onerror="this.src='https://i.stack.imgur.com/34AD4.jpg'">
+                    <img src="<?= htmlspecialchars($student_pic); ?>" alt="Student Avatar" onerror="this.src='../../../images/default.png'">
                 </div>
                 <div class="student-info">
                     <h4 class="student-name">
