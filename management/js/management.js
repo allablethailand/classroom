@@ -174,7 +174,7 @@ function buildClassroom() {
         $('div#tb_classroom_filter.dataTables_filter label span').remove();
         var template = `
             <input type="search" class="form-control input-sm search-datatable" placeholder="" autocomplete="off" style="margin-bottom:0px !important;"> 
-            <button type="button" class="btn btn-green" style="font-size:12px;" onclick="manageClassroom('')"><i class="fas fa-plus"></i> <span lang="en">Classroom</span></button>
+            <button type="button" class="btn btn-green" style="font-size:12px;" onclick="manageClassroom('')"><i class="fas fa-plus"></i> <span lang="en">Academy</span></button>
         `;
         $('div#tb_classroom_filter.dataTables_filter input').hide();
         $('div#tb_classroom_filter.dataTables_filter label').append(template);

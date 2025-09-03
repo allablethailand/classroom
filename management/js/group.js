@@ -82,6 +82,7 @@ function buildGroup() {
             },{ 
                 "targets": 5,
                 "data": "group_id",
+                "className": "text-center",
                 "render": function (data,type,row,meta) {	
 					return `
                         <div class="nowarp">

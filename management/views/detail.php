@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
-<title>Classroom • ORIGAMI SYSTEM</title>
+<title>Academy • ORIGAMI SYSTEM</title>
 <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="/dist/css/dataTables.bootstrap.min.css">
 <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
@@ -64,7 +64,7 @@
         <div class="row-overflow">
             <a href=".management_tab" class="active get-management" data-page="management" data-toggle="tab">
                 <i class="fas fa-chalkboard-teacher"></i>
-                <span lang="en">Classroom</span>
+                <span lang="en">Academy</span>
             </a>
             <a href=".management_tab" class="get-management edit-mode" data-page="course" data-toggle="tab">
                 <i class="fas fa-book"></i>
@@ -78,14 +78,14 @@
                 <i class="fas fa-users"></i>
                 <span lang="en">Registration</span>
             </a>
-            <a href=".management_tab" class="get-management edit-mode" data-page="student" data-toggle="tab">
+            <!-- <a href=".management_tab" class="get-management edit-mode" data-page="student" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Student</span>
-            </a>
-            <a href=".management_tab" class="get-management edit-mode" data-page="teacher" data-toggle="tab">
+            </a> -->
+            <!-- <a href=".management_tab" class="get-management edit-mode" data-page="teacher" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Teacher</span>
-            </a>
+            </a> -->
         </div>
         <div class="tab-content">	
             <div class="management_tab tab-pane fade in active">
