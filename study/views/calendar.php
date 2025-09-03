@@ -82,7 +82,7 @@ $sql = "SELECT
     student_line,
     student_ig,
     student_facebook
-    FROM `classroom_student` WHERE status = 1"; // เพิ่มเงื่อนไข status = 1 ด้วย
+    FROM `classroom_student` WHERE status = 0"; // เพิ่มเงื่อนไข status = 1 ด้วย
 
 $result = $mysqli->query($sql);
 
@@ -885,27 +885,27 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
                 dayElement.appendChild(eventContainer);
             }
 
+            // เพิ่ม Event Listener สำหรับแต่ละวัน
+            dayElement.addEventListener('click', () => {
+                showDailySchedule(dateStr);
+            });
+
             calendarGrid.appendChild(dayElement);
         }
     }
 
-    // New function to show all monthly events in a modal
-    function showAllMonthlySchedule() {
-        allMonthScheduleModalLabel.textContent = `1 กันยายน 2568`; // Hardcoded as per the image
+    // New function to show daily events in a modal
+    function showDailySchedule(dateStr) {
+        const classes = allMonthScheduleData.filter(cls => cls.date === dateStr);
+        
+        allMonthScheduleModalLabel.textContent = formatDateThai(dateStr);
         allMonthScheduleModalBody.innerHTML = '';
-
-        if (allMonthScheduleData && allMonthScheduleData.length > 0) {
-            allMonthScheduleData.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        if (classes && classes.length > 0) {
             const dailyScheduleList = document.createElement('div');
             dailyScheduleList.className = 'daily-schedule-list';
 
-            // Filter for September 2025 as per the image
-            const filteredData = allMonthScheduleData.filter(cls => {
-                const classDate = new Date(cls.date);
-                return classDate.getMonth() === 8 && classDate.getFullYear() === 2025;
-            });
-
-            filteredData.forEach(cls => {
+            classes.forEach(cls => {
                 const item = document.createElement('div');
                 item.className = `daily-schedule-item ${cls.status === 'checked_in' ? 'checked-in' : 'not-checked-in'}`;
                 item.innerHTML = `
@@ -921,7 +921,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
             });
             allMonthScheduleModalBody.appendChild(dailyScheduleList);
         } else {
-            allMonthScheduleModalBody.innerHTML = `<p class="no-events-message">ไม่มีตารางเรียนสำหรับเดือนนี้ครับ 🙂</p>`;
+            allMonthScheduleModalBody.innerHTML = `<p class="no-events-message">ไม่มีตารางเรียนในวันนี้ครับ 🙂</p>`;
         }
         
         allMonthScheduleModal.modal('show');
@@ -1178,7 +1178,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
                 // Update UI by re-rendering
                 cameraModal.modal('hide');
                 renderCalendar();
-                showAllMonthlySchedule(); // Re-open the monthly schedule modal
+                showDailySchedule(classToUpdate.date); // Re-open the daily schedule modal
                 Swal.fire({
                     title: "สำเร็จ!",
                     text: "เช็คอินเรียบร้อยแล้ว",
@@ -1220,14 +1220,11 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         currentDate.setMonth(currentDate.getMonth() + 1);
         renderCalendar();
     });
-    
-    calendarGrid.addEventListener('click', () => {
-        showAllMonthlySchedule();
-    });
 
     // Initial render
     renderCalendar();
 </script>
+
  <?php
     require_once ("component/footer.php")
     ?>
