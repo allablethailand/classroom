@@ -34,8 +34,8 @@ function buildPage(page) {
         case 'group':
             buildGroupPage();
             break;
-        case 'student':
-            buildStudentPage();
+        case 'registration':
+            buildRegistrationPage();
             break;
         default:
             console.warn('Unknown page type:', page);
@@ -771,7 +771,7 @@ function getManagementTemplate() {
                 <div class="col-sm-6">
                     <div class="form-group row">
                         <div class="col-sm-3">
-                            <label lang="en" class="control-label" for="classroom_poster">Poster</label>
+                            <label lang="en" class="control-label" for="classroom_poster">Logo</label>
                         </div>
                         <div class="col-sm-9">
                             <input name="classroom_poster" id="classroom_poster" type="file" class="dropify" data-allowed-file-extensions='["jpg", "jpeg", "png"]' data-max-file-size="25M" data-height="155" data-default-file="">
