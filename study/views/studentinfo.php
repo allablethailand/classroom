@@ -1,5 +1,6 @@
 <?php
 //  print_r("Info"); exit;
+
     session_start();
     $base_include = $_SERVER['DOCUMENT_ROOT'];
     $base_path = '';
@@ -14,8 +15,8 @@
     define('BASE_PATH', $base_path);
     define('BASE_INCLUDE', $base_include);
     require_once $base_include . '/lib/connect_sqli.php';
-    require_once $base_include . '/actions/func.php';
-    require_once $base_include . '/login_history.php';
+    // require_once $base_include . '/actions/func.php';
+    // require_once $base_include . '/login_history.php';
 
     global $mysqli;
 
@@ -26,17 +27,17 @@
 // Method 1: Get ID from URL path (requires server routing/htaccess)
 $url = $_SERVER['REQUEST_URI'];
 $parts = explode('/', $url);
-$student_id = end($parts);
+$student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-if (empty($student_id) || !is_numeric($student_id)) {
-    // Fallback to query parameter if URL path doesn't have an ID
-    $student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-}
-
+// if (!isset($student_id)  && is_numeric($student_id)) {
+//     // Fallback to query parameter if URL path doesn't have an ID
+//     $student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+// }
+// echo  $student_id ;
 // Check if a valid ID is provided
 if ($student_id > 0) {
     // Use a prepared statement to prevent SQL injection
-    $stmt = $mysqli->prepare("SELECT * FROM classroom_student WHERE student_id = ? AND status = 1");
+    $stmt = $mysqli->prepare("SELECT * FROM classroom_student WHERE student_id = ? AND status = 0");
     $stmt->bind_param("i", $student_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -53,20 +54,23 @@ if ($student_id > 0) {
 
 // Redirect if no valid student is found
 if ($row_student === null) {
-    header("Location: /classroom/study/student/");
+    // header("Location: /classroom/study/student/");
     exit();
 }
 
+// var_dump($row_student);
 // Now, map the database fields to the variables used in your HTML, using the correct column names
-$has_contact = !empty($row_student['student_mobile']) || !empty($row_student['student_email']) || !empty($row_student['student_line']) || !empty($row_student['student_ig']) || !empty($row_student['student_facebook']);
+$has_contact = !empty($row_student['student_mobile'])  ||empty($row_student['student_email'])  ||empty($row_student['student_line'])  ||empty($row_student['student_ig']) || !empty($row_student['student_facebook']);
 
 // Assume friendship status for demonstration (in a real app, this would be dynamic)
 $friendship_status = 1; // Example: 1=Not friends, 2=Friends, 3=Pending request
+
+// var_dump($has_contact);
+
 ?>
 <!doctype html>
 <html>
-
-<head>
+    <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
@@ -172,7 +176,6 @@ $friendship_status = 1; // Example: 1=Not friends, 2=Friends, 3=Pending request
         flex-basis: 100px;
         flex-grow: 1;
     }
-
     .contact-item a {
         display: flex;
         flex-direction: column;
@@ -364,7 +367,6 @@ $friendship_status = 1; // Example: 1=Not friends, 2=Friends, 3=Pending request
         color: #ff8c00;
         margin-right: 15px;
     }
-
     .info-text strong {
         display: block;
         font-size: 1.1em;
@@ -468,14 +470,13 @@ $friendship_status = 1; // Example: 1=Not friends, 2=Friends, 3=Pending request
 
 <body>
     <?php
-    require_once("../component/header.php")
+    require_once("component/header.php")
     ?>
     <div class="page-container main-container" style="margin-bottom: 110px;">
 
 
         <div class="profile-card">
-
-            <div class="settings-button-container">
+        <div class="settings-button-container">
                 <?php if ($friendship_status === 1) : ?>
                     <a href="#" class="settings-button add-friend-button" title="เพิ่มเพื่อน">
                         <i class="fas fa-user-plus"></i>
@@ -589,7 +590,6 @@ $friendship_status = 1; // Example: 1=Not friends, 2=Friends, 3=Pending request
                 </div>
             </div>
         </div>
-
         <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-heartbeat" style="font-size: 25px;"></i>
@@ -627,8 +627,9 @@ $friendship_status = 1; // Example: 1=Not friends, 2=Friends, 3=Pending request
             </div>
         </div>
     </div>
+    </div>
     <?php
-    require_once("../component/footer.php")
+    require_once("component/footer.php")
     ?>
 </body>
 

@@ -1,8 +1,11 @@
 <?php
-    session_start();
-    require_once("../../lib/connect_sqli.php");
-    include_once("../../login_history.php");
-    global $mysqli;
+    // login.php
+require_once("actions/login.php");
+// ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
+require_once($base_include."/lib/connect_sqli.php");
+include_once($base_include."/login_history.php");
+session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
+global $mysqli;
 
     if (isset($_POST['save_thumbnail'])) {
         $this_date_time = date("Y-m-d H:i:s");

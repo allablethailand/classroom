@@ -11,6 +11,10 @@
         case '/classroom/study/schedule':
             require __DIR__.'/views/schedule.php';
         break;
+        case '/classroom/study/calendar/':
+        case '/classroom/study/calendar':
+            require __DIR__.'/views/calendar.php';
+        break;
         case '/classroom/study/myphoto/':
         case '/classroom/study/myphoto':
             require __DIR__.'/views/myphoto.php';
@@ -51,6 +55,11 @@
         case '/classroom/study/setting':
             require __DIR__.'/views/setting.php';
         break;
+        case '/classroom/study/register/':
+        case '/classroom/study/register':
+            require __DIR__.'/views/register.php';
+        break;
+
         case '/classroom/study/login/':
         case '/classroom/study/login':
             require __DIR__.'/views/login.php';

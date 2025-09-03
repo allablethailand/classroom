@@ -1,4 +1,23 @@
 <?php
+// บรรทัดแรกสุดของไฟล์
+// login.php
+require_once("actions/login.php");
+// ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
+require_once($base_include."/lib/connect_sqli.php");
+include_once($base_include."/login_history.php");
+session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
+global $mysqli;
+
+// ตรวจสอบว่ามีค่า student_id หรือ join_info ใน Session หรือไม่
+// ถ้าไม่มี แสดงว่ายังไม่ได้ล็อกอิน ให้ Redirect กลับไปหน้า login.php ทันที
+if (!isset($_SESSION['student_id']) || !isset($_SESSION['join_info'])) {
+    header("Location: http://origami.local/classroom/study/login.php");
+    exit();
+}
+
+// โค้ดส่วนอื่นๆ ของหน้าจะเริ่มที่นี่
+?>
+<?php
 session_start();
 
 // --- ส่วน PHP จำลองข้อมูลตารางเรียน (เหมือนเดิม) ---
