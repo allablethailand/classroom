@@ -66,9 +66,9 @@
                     <div class="nav-indicator"></div>
                 </div>
 
-                <!-- Cart - Main Logo -->
+                <!-- Main Logo -->
                 <div class="nav-item-wrapper nav-main-item">
-                    <a href="chat">
+                    <a href="menu">
                         <label for="home" class="nav-button nav-main-button">
                             <svg class="nav-icon nav-main-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -94,9 +94,9 @@
                     <div class="nav-indicator"></div>
                 </div>
 
-                <!-- Profile -->
+                <!-- ASK AI -->
                 <div class="nav-item-wrapper">
-                    <a href="profile" class="nav-button">
+                    <a href="chat" class="nav-button">
                     <label for="profile" class="nav-button">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
