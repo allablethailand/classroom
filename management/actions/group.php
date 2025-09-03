@@ -14,6 +14,14 @@
     define('BASE_INCLUDE', $base_include);
     require_once $base_include.'/lib/connect_sqli.php';
     require_once $base_include.'/actions/func.php';
+    $fsData = getBucketMaster();
+    $filesystem_user = $fsData['fs_access_user'];
+    $filesystem_pass = $fsData['fs_access_pass'];
+    $filesystem_host = $fsData['fs_host'];
+    $filesystem_path = $fsData['fs_access_path'];
+    $filesystem_type = $fsData['fs_type'];
+    $fs_id = $fsData['fs_id'];
+	setBucket($fsData);
     if(isset($_POST) && $_POST['action'] == 'buildGroup') {
         $classroom_id = $_POST['classroom_id'];
         $table = "SELECT 

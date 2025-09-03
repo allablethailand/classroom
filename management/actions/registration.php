@@ -13,6 +13,14 @@
     define('BASE_PATH', $base_path);
     define('BASE_INCLUDE', $base_include);
     require_once $base_include.'/lib/connect_sqli.php';
+    $fsData = getBucketMaster();
+    $filesystem_user = $fsData['fs_access_user'];
+    $filesystem_pass = $fsData['fs_access_pass'];
+    $filesystem_host = $fsData['fs_host'];
+    $filesystem_path = $fsData['fs_access_path'];
+    $filesystem_type = $fsData['fs_type'];
+    $fs_id = $fsData['fs_id'];
+	setBucket($fsData);
     if(isset($_POST) && $_POST['action'] == 'buildRegistration') {
         $classroom_id = $_POST['classroom_id'];
         $filter_status = $_POST['filter_status'];
@@ -37,7 +45,7 @@
                 $filter .= " and cjoin.invite_status = 1 and cjoin.approve_status = 0 ";
             break;
             case 'approve':
-                $filter .= " and cjoin.invite_status = 1 and cjoin.approve_status = 1 ";
+                $filter .= " and cjoin.invite_status = 1 and cjoin.approve_status = 1 and cjoin.payment_status = 0 ";
             break;
             case 'payment':
                 $filter .= " and cjoin.invite_status = 1 and cjoin.approve_status = 1 and cjoin.payment_status = 1 ";
@@ -470,7 +478,7 @@
             'lead'       => "invite_status = 0",
             'register'   => "1=1",
             'waiting'    => "invite_status = 1 AND approve_status = 0",
-            'approve'    => "invite_status = 1 AND approve_status = 1",
+            'approve'    => "invite_status = 1 AND approve_status = 1 AND payment_status = 0",
             'payment'    => "invite_status = 1 AND approve_status = 1 AND payment_status = 1",
             'notapprove' => "invite_status = 1 AND approve_status = 2",
             'notpayment' => "invite_status = 1 AND approve_status = 1 AND payment_status = 2",

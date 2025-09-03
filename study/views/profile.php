@@ -124,8 +124,8 @@
             justify-content: center;
             margin: 0 auto;
             padding: 20px;
-            max-width: fit-content;
-            min-width: 300px;
+            /* max-width: fit-content;*/
+            max-width: 600px; 
             text-align: center;
             background: #fff;
             border-radius: 20px;
@@ -443,7 +443,7 @@
     
     <div class="page-container main-content-container">
         
-        <div class="profile-card">
+        <div class="profile-card" style="padding: 10px;">
             <div class="profile-course-container">
                  <?php if (!empty($row_all["student_education"])) : ?>
                 <p class="profile-company">
