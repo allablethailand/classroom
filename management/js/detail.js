@@ -3,8 +3,117 @@ let management_template;
 let join_template;
 let tb_staff;
 let table_join_user;
+function mapInit(lat,lng) {
+	lat = (lat) ? lat : '13.736717';
+	lng = (lng) ? lng : '100.523186';
+	var user_location = [lat,lng];
+    user_location = new google.maps.LatLng(user_location[0],user_location[1]);
+    var map = new google.maps.Map(document.querySelector('.map-container'), {
+        center: user_location,
+        zoom: 10
+    });
+    gmarkers = new google.maps.Marker({
+        position: user_location,
+        map: map,
+    });
+    var input = document.createElement("input");
+    input.setAttribute("type", "text");
+    input.setAttribute("id", "pac-input");
+    input.setAttribute("class", "controls form-control");
+    input.setAttribute("style", "width:400px;margin-top: 13px;");
+    var searchBox = new google.maps.places.SearchBox(input);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    map.addListener('bounds_changed', function() {
+        searchBox.setBounds(map.getBounds());
+    });
+    google.maps.event.addListener(map, 'click', function(e) {
+        var lat = e.latLng.lat();
+        var lng = e.latLng.lng();
+        var myLatLng = {
+            lat,
+            lng
+        };
+        if (gmarkers) {
+            gmarkers.setMap(null);
+        }
+        var marker = new google.maps.Marker({
+            position: myLatLng,
+            map: map,
+        });
+        gmarkers = marker;
+        document.querySelector('#location-lat').value = lat;
+        document.querySelector('#location-lng').value = lng;
+        if(lat && lng){
+            last_location = `${lat},${lng}`;
+        }
+    });
+    searchBox.addListener('places_changed', function() {
+        var places = searchBox.getPlaces();
+        if (places.length == 0) {
+            return;
+        }
+        var bounds = new google.maps.LatLngBounds();
+        places.forEach(function(place) {
+            if (!place.geometry) {
+                console.log("Returned place contains no geometry");
+                return;
+            }
+            var icon = {
+                url: place.icon,
+                size: new google.maps.Size(71, 71),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(17, 34),
+                scaledSize: new google.maps.Size(25, 25)
+            };
+            if (place.geometry.viewport) {
+                bounds.union(place.geometry.viewport);
+            } else {
+                bounds.extend(place.geometry.location);
+            }
+        });
+        map.fitBounds(bounds);
+		var lng = bounds.Fh.hi;
+		var lat = bounds.ci.hi;
+		var myLatLng = {
+            lat,
+            lng
+        };
+        if (gmarkers) {
+            gmarkers.setMap(null);
+        }
+        var marker = new google.maps.Marker({
+            position: myLatLng,
+            map: map,
+        });
+		gmarkers = marker;
+        document.querySelector('#location-lat').value = lat;
+        document.querySelector('#location-lng').value = lng;
+        if(lat && lng){
+            last_location = `${lat},${lng}`;
+        }
+    });
+} 
 $(document).ready(function() {
     initializeClassroomManagement();
+    $('.getLatLong').click(function(e) {
+		var lng = $(this).attr("lng");
+		var lat = $(this).attr("lat");
+        $('.locationModal').modal();
+        $("#location-lat").val(lat);
+        $("#location-lng").val(lng);
+		mapInit(lat,lng);
+    });
+    $(".btn-save-location").click(function(){
+        var lat = $("#location-lat").val();
+        var lng = $("#location-lng").val();
+		if(lat && lng) {
+			var val = lat+','+lng;
+			$(".getLatLong").val(val);
+			$('.locationModal').modal("hide");
+		} else {
+			swal({type: 'warning',title: "Warning...",text: 'Please select a location.',showConfirmButton: false,timer: 3000});
+		}
+    });
 });
 function initializeClassroomManagement() {
     classroom_id = $("#classroom_id").val();
@@ -211,7 +320,9 @@ function populateFormData(data) {
                 text: data.platforms_name 
             }));
         } else if (data.platforms_name) {
-            $("#classroom_plateform").val(data.platforms_name);
+            $(".getLatLong").val(data.platforms_name);
+            const [lat, lng] = data.platforms_name.split(",");
+            $(".getLatLong").attr({ lat, lng });
         }
         $("#classroom_source").val(data.classroom_source || '');
         setDatePickerValue("#classroom_open_register_date", data.classroom_open_register_date);
