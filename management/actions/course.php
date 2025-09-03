@@ -14,6 +14,14 @@
     define('BASE_INCLUDE', $base_include);
     require_once $base_include.'/lib/connect_sqli.php';
     require_once $base_include.'/actions/func.php';
+    $fsData = getBucketMaster();
+    $filesystem_user = $fsData['fs_access_user'];
+    $filesystem_pass = $fsData['fs_access_pass'];
+    $filesystem_host = $fsData['fs_host'];
+    $filesystem_path = $fsData['fs_access_path'];
+    $filesystem_type = $fsData['fs_type'];
+    $fs_id = $fsData['fs_id'];
+	setBucket($fsData);
     if(isset($_POST) && $_POST['action'] == 'buildCourse') {
         $classroom_id = $_POST['classroom_id'];
         $table = "SELECT 
@@ -32,7 +40,8 @@
                 END
             ) as course_cover,
             date_format(course.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
-            CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create
+            CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
+            course.course_ref_id
         FROM 
             classroom_course course
         LEFT JOIN 
@@ -62,6 +71,7 @@
 			}),
             array('db' => 'date_create', 'dt' => 'date_create'),
             array('db' => 'emp_create', 'dt' => 'emp_create'),
+            array('db' => 'course_ref_id', 'dt' => 'course_ref_id'),
 		);
 		$sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db'   => $db_name,'host' => $db_host);
 		require($base_include.'/lib/ssp-subquery.class.php');

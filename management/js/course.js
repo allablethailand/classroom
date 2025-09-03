@@ -74,10 +74,11 @@ function buildCourse() {
                 "targets": 4,
                 "data": "course_id",
                 "render": function (data,type,row,meta) {	
+                    let course_ref_id = row['course_ref_id'];
 					return `
                         <div class="nowarp">
-                            <button type="button" class="btn btn-orange btn-circle" onclick="editCourse(${data}, '${row['course_type']}')"><i class="fas fa-pencil-alt"></i></button> 
-                            <button type="button" class="btn btn-red btn-circle" onclick="delCourse(${data})"><i class="fas fa-trash-alt"></i></button>
+                            <button type="button" class="btn btn-orange btn-circle" onclick="editCourse(${course_ref_id}, '${row['course_type']}')"><i class="fas fa-pencil-alt"></i></button> 
+                            <button type="button" class="btn btn-red btn-circle" onclick="delCourse(${course_ref_id})"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     `;
                 }

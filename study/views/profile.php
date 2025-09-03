@@ -57,7 +57,7 @@
         }
         
         .profile-header-container {
-            background: url('https://images.unsplash.com/photo-1549880338-65ddcdfd017b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MDcxMzJ8MHwxfHNlYXJjaHwyfHxtb3VudGFpbiUyMHNjZW5lJTIwZGVmYXVsdHxlbnwwfHx8fDE3MjU0MjY0MzJ8MA&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center;
+            background: url('https://www.trandar.com//public/news_img/photo_2025-09-03_17-51-32.jpg') no-repeat center center;
             background-size: cover;
             height: 300px;
             position: relative;
@@ -117,8 +117,8 @@
             justify-content: center;
             margin: 0 auto;
             padding: 20px;
-            max-width: fit-content;
-            min-width: 300px;
+            /* max-width: fit-content;*/
+            max-width: 600px; 
             text-align: center;
             background: #fff;
             border-radius: 20px;
@@ -420,23 +420,44 @@
                 onerror="this.src='../../../images/default.png'" 
                 alt="Profile Picture">
         </div>
-        <h2 class="profile-name">
+        <h2 class="profile-name" style="
+     background-color: rgba(0, 0, 0, 0.1); 
+    
+    backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์เบลอ */
+    padding: 8px;
+    border-radius: 15px; /* มุมโค้งมน */
+    text-align: center;
+    ">
             <?= $row_all["student_firstname_th"] . " " . $row_all["student_lastname_th"]; ?>
         </h2>
         <?php if (!empty($row_all["student_address"])) : ?>
-        <p class="profile-location">
+        <p class="profile-location" style="
+     background-color: rgba(0, 0, 0, 0.1); 
+    
+    backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์เบลอ */
+    padding: 2px;
+    border-radius: 15px; /* มุมโค้งมน */
+    text-align: center;
+    ">
             <i class="fas fa-map-marker-alt"></i>
             <span><?= $row_all["student_address"]; ?></span>
         </p>
         <?php endif; ?>
-        <p class="profile-bio">
+        <p class="profile-bio" style="
+     background-color: rgba(0, 0, 0, 0.1); 
+    
+    backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์เบลอ */
+    padding: 4px;
+    border-radius: 15px; /* มุมโค้งมน */
+    text-align: center;
+    ">
             <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
         </p>
     </div>
     
     <div class="page-container main-content-container">
         
-        <div class="profile-card">
+        <div class="profile-card" style="padding: 10px;">
             <div class="profile-course-container">
                  <?php if (!empty($row_all["student_education"])) : ?>
                 <p class="profile-company">
