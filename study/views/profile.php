@@ -1,7 +1,6 @@
 <?php
     session_start();
     require_once("../../lib/connect_sqli.php");
-    include_once("../../login_history.php");
     global $mysqli;
 
     // Check if the student_id is set in the session
