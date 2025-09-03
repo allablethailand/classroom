@@ -68,6 +68,14 @@
         case '/classroom/study/logout':
             require __DIR__.'/views/logout.php';
         break;
+        case '/classroom/study/chat/':
+        case '/classroom/study/chat':
+            require __DIR__.'/views/chat.php';
+        break;
+        case '/classroom/study/class/':
+        case '/classroom/study/class':
+            require __DIR__.'/views/class.php';
+        break;
         default: 
            header('Location: /classroom/study/');
     }

@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         // เตรียมคำสั่ง SQL ด้วย Prepared Statement เพื่อป้องกัน SQL Injection
         // แก้ไข: นำเงื่อนไข AND `status` = 1 ออก เพื่อให้สามารถล็อกอินได้
-        $sql = "SELECT `student_id`, `student_password`, student_password_key FROM `classroom_student` WHERE `student_username` = ?";
+        $sql = "SELECT `student_id`, `student_password`, `student_password_key` FROM `classroom_student` WHERE `student_username` = ?";
         $stmt = $mysqli->prepare($sql);
 
         if ($stmt === false) {
@@ -41,14 +41,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
-                $student_password = $row['student_password'];
-                $student_password_key = $row['student_password_key'];
-                $stored_password_hash = decryptToken($student_password, $student_password_key) ;
+                $stored_password_hash = $row['student_password'];
+                $stored_hass_pass = decryptToken($row['student_password'], $row['student_password_key']);
                 $student_id = $row['student_id'];
 
                 // ตรวจสอบรหัสผ่านที่ส่งมากับรหัสผ่านที่ถูก hash ในฐานข้อมูล
-                // password_verify($password, $stored_password_hash)
-                if ($password == $stored_password_hash) {
+                if ($stored_hass_pass == $password) {
                     // ล็อกอินสำเร็จ: บันทึกข้อมูลที่จำเป็นลงใน Session
                     $_SESSION['student_id'] = $student_id;
                     

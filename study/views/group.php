@@ -1,5 +1,5 @@
 <?php
-    $class_id = isset($_GET['id']) ? $_GET['id'] :  null;
+    // $class_id = isset($_GET['id']) ? $_GET['id'] :  null;
 
     // var_dump($class_id);
 // // $classroom_group = $_POST['classroom_group'];
@@ -19,13 +19,45 @@
         require_once $base_include.'/lib/connect_sqli.php';
         require_once $base_include.'/actions/func.php';
 
+        $std_id = $_SESSION['student_id'];
+
+        $columnStudent  = "classroom_id";
+        $tableStudent= "classroom_student_join";
+        $whereStudent = "where student_id = '{$std_id}'";
+
+        $student_class = select_data($columnStudent, $tableStudent, $whereStudent);
+        
+        $our_class = $student_class[0]["classroom_id"];
+
+        // var_dump($our_class);
+
+
+        //  $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
+        // $tableGroup = "classroom_template";
+        // $whereGroup = "where classroom_id = '{$std_id}'";
+
         // $class_generation_id = $_POST['class_gen_id'];
-        $columnGroup  = "group_id, classroom_id, group_name,group_color, group_logo,group_description";
-        $tableGroup = "classroom_group";
-        $whereGroup = "where classroom_id = '{$class_id}' AND status = 0";
+        // $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
+        // $tableGroup = "classroom_template";
+        // $whereGroup = "where classroom_id = '{$our_class}'";
         // $whereGroup = "where classroom_id = '1' AND status = 0";
 
-        $classroom_group = select_data($columnGroup, $tableGroup, $whereGroup);
+        $columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
+        $tableCourseGroup = "classroom_template";
+        $whereCourseGroup = "where classroom_id = '{$our_class}'";
+
+        $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
+
+        // var_dump($course);
+
+
+        // $classroom_group = select_data($columnGroup, $tableGroup, $whereGroup);
+
+        // var_dump($classroom_group["classroom_id"]);
+
+        // $class_id = $classroom_group['classroom_id'];
+        // var_dump($class_id);
+
 
         // var_dump($userGroup);
 ?>
@@ -80,7 +112,7 @@
         <div class="container-fluid px-4 py-2">
             <div class="text-center mb-4">
                 <h1 class="display-4 fw-bold text-dark mb-bs-5 text-center">
-                    Elemental Group
+                    <!-- Elemental Group -->
                     <!-- Element Group -->
                 </h1>
             </div>
@@ -121,6 +153,7 @@
             <?php
                 }
             endforeach; ?>
+            
 
             <!-- <div class="g-4 justify-content-center bg-element-fire-two mx-3 mb-bs-3 rounded-small">
                 <div class="col-12 col-md-6 col-lg-3">
@@ -231,8 +264,6 @@
                 </div>
             </div> -->
         </div>
-
-
         <?php require_once 'component/footer.php'; ?>
     </div>
 

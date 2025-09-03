@@ -3,13 +3,6 @@
     require_once("../../lib/connect_sqli.php");
     global $mysqli;
 
-    // Check if the student_id is set in the session
-    if (!isset($_SESSION['student_id'])) {
-        // Handle the case where the user is not logged in, for example, redirect to the login page
-        header("Location: /login.php");
-        exit;
-    }
-
     // Get the student_id from the session
     $student_id = $_SESSION['student_id'];
     
