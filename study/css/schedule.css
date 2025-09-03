@@ -246,7 +246,7 @@ html {
 .featured-class {
   background: linear-gradient(90deg, #f9a8d4 0%, #fb7185 100%);
   border-radius: 1rem;
-  padding: 1.5rem;
+  padding: 1rem;
   color: white;
   margin-bottom: 1.5rem;
   position: relative;
