@@ -154,9 +154,18 @@
                 }
                 $group_logo = $group_logo_dir . $strname . '.' . $group_logo_ext;
                 $group_logo_thumb = $group_logo_dir . $strname . '_thumbnail.' . $group_logo_ext;
-                $group_logo_save = "{$group_logo}";
+                $group_logo_save = "'{$group_logo}'";
                 if (SaveFile($group_logo_tmp, $group_logo)) {
-                    if (!createThumbnail($group_logo, $group_logo_thumb, 300, 300, 80)) {
+                    $thumb_local = sys_get_temp_dir() . '/' . uniqid('thumb_') . '.' . $group_logo_ext;
+                    if (createThumbnail($group_logo_tmp, $thumb_local, 300, 300, 80)) {
+                        SaveFile($thumb_local, $group_logo_thumb);
+                        unlink($thumb_local);
+                        update_data(
+                            "classroom_group",
+                            "group_logo = $group_logo_save",
+                            "group_id = '{$group_id}'"
+                        );
+                    } else {
                         echo json_encode([
                             'status' => false,
                             'message' => "Warning: Could not create thumbnail"
@@ -164,23 +173,14 @@
                         exit;
                     }
                 } else {
-                    echo "Error: Could not save original file";
                     echo json_encode([
                         'status' => false,
                         'message' => "Error: Could not save original file"
                     ]);
                     exit;
-                    $group_logo = null;
-                    $group_logo_thumb = null;
-                    $group_logo_save = "null";
                 }
             }
         } 
-        update_data(
-            "classroom_group",
-            "group_logo = $group_logo_save",
-            "group_id = '{$group_id}'"
-        );
         echo json_encode(['status' => true]);
     }
     function initVal($val) {
