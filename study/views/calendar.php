@@ -720,9 +720,22 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         font-size: 24px;
     }
 }
+/* New style for 'no events' message */
+.no-events-message {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 1.3em;
+    font-weight: 600;
+    padding: 40px 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    margin-top: 20px;
+    border: 1px dashed #ccc;
+}
 </style>
 <body>
-     <?php
+    <?php
     require_once ("component/header.php")
     ?>
 <div class="schedule-container">
@@ -746,95 +759,45 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     </div>
 </div>
 
-<div class="modal fade" id="allMonthScheduleModal" tabindex="-1" role="dialog" aria-labelledby="allMonthScheduleModalLabel" style="padding-left: 0px; background-color: #fff;">
-  <div class="modal-dialog modal-fullscreen" role="document">
-    <div class="modal-content modal-fullscreen">
-      <div class="modal-header modal-fullscreen">
-        <button type="button" class="close" data-dismiss="modal" style="font-size: 40px; opacity: .7;" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title-full" id="allMonthScheduleModalLabel"></h4>
-      </div>
-      <div class="modal-body modal-body-full" id="allMonthScheduleModalBody">
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="classDetailModal" tabindex="-1" role="dialog" aria-labelledby="classDetailModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" style="font-size: 40px; opacity: .7;" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="classDetailModalLabel"></h4>
-      </div>
-      <div class="modal-body" id="classDetailModalBody">
-      </div>
-    </div>
-  </div>
-</div>
+<div id="dailyScheduleDisplay" class="daily-schedule-display-container" style="width: 100%;max-width: 900px;margin: auto; padding: 20px; padding-bottom: 80px; padding-top: 0px;"></div>
 
 <div class="modal fade" id="cameraModal" tabindex="-1" role="dialog" aria-labelledby="cameraModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" style="font-size: 40px; opacity: .7;" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="cameraModalLabel">ยืนยันตัวตน</h4>
-      </div>
-      <div class="modal-body" style="text-align: center;">
-        <p>เปิดกล้องเพื่อถ่ายรูปยืนยันการเช็คอิน</p>
-        <video id="webcam" width="320" height="240" autoplay></video>
-        <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" id="takePhotoBtn">ถ่ายรูป</button>
-        <button type="button" class="btn btn-primary" id="confirmCheckinBtn" style="display:none;">ยืนยัน</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="studentInfoModal" tabindex="-1" role="dialog" aria-labelledby="studentInfoModalLabel" style="overflow-y: auto;padding-left: 0px;">
     <div class="modal-dialog" role="document">
-        <div class="modal-content" style="border-radius: 20px; padding: 20px;">
-            <button type="button" class="close-btn" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <div class="student-info-card" id="studentInfoModalBody">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" style="font-size: 40px; opacity: .7;" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="cameraModalLabel">ยืนยันตัวตน</h4>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <p>เปิดกล้องเพื่อถ่ายรูปยืนยันการเช็คอิน</p>
+                <video id="webcam" width="320" height="240" autoplay></video>
+                <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="takePhotoBtn">ถ่ายรูป</button>
+                <button type="button" class="btn btn-primary" id="confirmCheckinBtn" style="display:none;">ยืนยัน</button>
             </div>
         </div>
     </div>
 </div>
 
+
+
 <script>
     const scheduleData = <?= $json_schedule; ?>;
     const allMonthScheduleData = <?= $json_all_month_schedule; ?>;
-    const studentsData = <?= $json_students; ?>; // ใช้ตัวแปรใหม่
-
-    const classmatesData = {
-        1: ['จอห์น โด', 'เจน สมิธ', 'สมชาย ไชยบุญ'], // อัปเดตรายชื่อให้ตรงกับข้อมูลในตาราง
-        2: ['จอห์น โด', 'เจน สมิธ'],
-        3: ['สมชาย ไชยบุญ'],
-        4: ['เจน สมิธ', 'จอห์น โด'],
-        5: ['สมชาย ไชยบุญ'],
-        6: ['จอห์น โด', 'เจน สมิธ', 'สมชาย ไชยบุญ'],
-        7: ['เจน สมิธ', 'สมชาย ไชยบุญ']
-    };
+    const studentsData = <?= $json_students; ?>;
 
     const calendarGrid = document.getElementById('calendarGrid');
     const currentMonthYear = document.getElementById('currentMonthYear');
     const prevMonthBtn = document.getElementById('prevMonth');
     const nextMonthBtn = document.getElementById('nextMonth');
-
-    const allMonthScheduleModal = $('#allMonthScheduleModal');
-    const allMonthScheduleModalLabel = document.getElementById('allMonthScheduleModalLabel');
-    const allMonthScheduleModalBody = document.getElementById('allMonthScheduleModalBody');
-    const classDetailModal = $('#classDetailModal');
-    const classDetailModalLabel = document.getElementById('classDetailModalLabel');
-    const classDetailModalBody = document.getElementById('classDetailModalBody');
+    const dailyScheduleDisplay = document.getElementById('dailyScheduleDisplay');
     const cameraModal = $('#cameraModal');
     const webcamElement = document.getElementById('webcam');
     const canvasElement = document.getElementById('canvas');
     const takePhotoBtn = document.getElementById('takePhotoBtn');
     const confirmCheckinBtn = document.getElementById('confirmCheckinBtn');
-    const studentInfoModal = $('#studentInfoModal');
-    const studentInfoModalBody = document.getElementById('studentInfoModalBody');
 
     let currentDate = new Date();
     let stream;
@@ -852,8 +815,9 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
 
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
+
         const today = new Date();
-        const isMobile = window.innerWidth < 768;
+        const todayDateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
         for (let i = 0; i < firstDay; i++) {
             const dayElement = document.createElement('div');
@@ -879,13 +843,12 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
                 classes.forEach(cls => {
                     const eventElement = document.createElement('div');
                     eventElement.className = `event-item ${cls.status === 'checked_in' ? 'event-checked-in' : 'event-not-checked-in'}`;
-                    eventElement.textContent = cls.subject; // ข้อความจะถูกซ่อนด้วย CSS บน mobile
+                    eventElement.textContent = cls.subject;
                     eventContainer.appendChild(eventElement);
                 });
                 dayElement.appendChild(eventContainer);
             }
 
-            // เพิ่ม Event Listener สำหรับแต่ละวัน
             dayElement.addEventListener('click', () => {
                 showDailySchedule(dateStr);
             });
@@ -894,252 +857,42 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         }
     }
 
-    // New function to show daily events in a modal
     function showDailySchedule(dateStr) {
         const classes = allMonthScheduleData.filter(cls => cls.date === dateStr);
         
-        allMonthScheduleModalLabel.textContent = formatDateThai(dateStr);
-        allMonthScheduleModalBody.innerHTML = '';
-        
+        let htmlContent = `<div class="schedule-header-inline"><h3>ตารางเรียนวันที่ ${formatDateThai(dateStr)}</h3></div>`;
+
         if (classes && classes.length > 0) {
-            const dailyScheduleList = document.createElement('div');
-            dailyScheduleList.className = 'daily-schedule-list';
-
+            htmlContent += `<div class="daily-schedule-list">`;
             classes.forEach(cls => {
-                const item = document.createElement('div');
-                item.className = `daily-schedule-item ${cls.status === 'checked_in' ? 'checked-in' : 'not-checked-in'}`;
-                item.innerHTML = `
-                    <div class="subject">${cls.subject}</div>
-                    <div class="date-time">${formatDateThai(cls.date)} • ${cls.time}</div>
-                    ${cls.status === 'checked_in' ? 
-                        `<span class="status-text"><i class="fas fa-check-circle"></i> เช็คอินแล้ว</span>` :
-                        `<div class="btn-checkin-container"><button class="btn-checkin">เช็คอิน</button></div>`
-                    }
+                const statusText = cls.status === 'checked_in' ? 
+                    `<span class="status-text"><i class="fas fa-check-circle"></i> เช็คอินแล้ว</span>` :
+                    `<span class="status-text-not-checked-in"></span>`;
+
+                const checkinButtonHtml = cls.status === 'checked_in'
+                    ? ``
+                    : `<div class="btn-checkin-container" style="padding-top:5px;"><button class="btn-checkin" >ยังไม่เช็คอิน</button></div>`;
+
+                htmlContent += `
+                    <div class="daily-schedule-item ${cls.status === 'checked_in' ? 'checked-in' : 'not-checked-in'}">
+                        <div class="subject">${cls.subject}</div>
+                        <div class="date-time">${formatDateThai(cls.date)} • ${cls.time}</div>
+                        ${statusText}
+                        ${checkinButtonHtml}
+                    </div>
                 `;
-                item.addEventListener('click', () => showClassDetail(cls));
-                dailyScheduleList.appendChild(item);
             });
-            allMonthScheduleModalBody.appendChild(dailyScheduleList);
+            htmlContent += `</div>`;
         } else {
-            allMonthScheduleModalBody.innerHTML = `<p class="no-events-message">ไม่มีตารางเรียนในวันนี้ครับ 🙂</p>`;
+            // แก้ไขตรงนี้
+            htmlContent += `<p class="no-events-message">ไม่มีตารางเรียนในวันนี้ครับ 🙂</p>`;
         }
         
-        allMonthScheduleModal.modal('show');
+        dailyScheduleDisplay.innerHTML = htmlContent;
     }
 
-    // New function to show a single class detail with check-in button and student avatars
-    function showClassDetail(cls) {
-        classDetailModalLabel.textContent = cls.subject;
-        
-        let classmatesHtml = '';
-        if (classmatesData[cls.id]) {
-            classmatesHtml = `
-                <div class="friends-list">
-                    <h5>รายชื่อเพื่อนร่วมชั้น</h5>
-                    ${classmatesData[cls.id].map(name => {
-                        const student = studentsData[name]; // ดึงข้อมูลจากตัวแปรใหม่
-                        const studentPic = student ? student.student_pic : '../../../images/default.png';
-                        return `
-                            <div class="friend-item">
-                                <a href="#" onclick="showStudentInfo('${name}'); return false;">
-                                    <div class="friend-avatar">
-                                        <img src="${studentPic}" alt="${name}" onerror="this.src='https://randomuser.me/api/portraits/men/32.jpg'">
-                                    </div>
-                                </a>
-                                <span>${name}</span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-        }
-
-        const checkinButtonHtml = cls.status === 'checked_in'
-            ? `<span class="status-text" style="text-align: center; display: block; color: #2ecc71; font-size: 1.2em;"><i class="fas fa-check-circle"></i> เช็คอินแล้ว</span>`
-            : `<button class="checkin-button" data-id="${cls.id}" onclick="initiateCheckIn(${cls.id})">เช็คอิน</button>`;
-
-        classDetailModalBody.innerHTML = `
-            <div class="class-detail-info">
-                <div>
-                    <p><strong>วันที่:</strong> ${formatDateThai(cls.date)}</p>
-                    <p><strong>เวลา:</strong> ${cls.time}</p>
-                </div>
-            </div>
-            ${classmatesHtml}
-            ${checkinButtonHtml}
-        `;
-        
-        allMonthScheduleModal.modal('hide');
-        classDetailModal.modal('show');
-    }
-
-    // New function to show student detail in a new modal
-    function showStudentInfo(studentName) {
-    const student = studentsData[studentName];
-    if (!student) {
-        Swal.fire("ไม่พบข้อมูล", "ไม่พบข้อมูลนักเรียนคนนี้", "error");
-        return;
-    }
-
-    // ฟังก์ชันช่วยจัดรูปแบบวันที่
-    function formatDate(dateString) {
-        if (!dateString) return "-";
-        const date = new Date(dateString);
-        const options = { day: 'numeric', month: 'long', year: 'numeric' };
-        return date.toLocaleDateString('th-TH', options);
-    }
-    
-    // ตรวจสอบว่ามีข้อมูลติดต่ออย่างน้อยหนึ่งอย่างหรือไม่
-    const hasContact = student.mobile || student.email || student.line || student.ig || student.facebook;
-
-    // สร้าง HTML สำหรับช่องทางการติดต่อ
-    let contactSectionHtml = '';
-    if (hasContact) {
-        contactSectionHtml = `
-            <div class="contact-section-card">
-                <div class="section-header-icon">
-                    <i class="fas fa-address-book" style="font-size: 25px;"></i>
-                    <h3 class="section-title" style="padding-left:10px;">ช่องทางการติดต่อ</h3>
-                </div>
-                <div class="contact-grid">
-                    ${student.mobile ? `<div class="contact-item">
-                        <a href="tel:${student.mobile}">
-                            <div class="contact-icon-circle phone"><i class="fas fa-phone"></i></div>
-                            <span>โทรศัพท์</span>
-                        </a>
-                    </div>` : ''}
-                    ${student.email ? `<div class="contact-item">
-                        <a href="mailto:${student.email}">
-                            <div class="contact-icon-circle mail"><i class="fas fa-envelope"></i></div>
-                            <span>อีเมล</span>
-                        </a>
-                    </div>` : ''}
-                    ${student.line ? `<div class="contact-item">
-                        <a href="https://line.me/ti/p/~${student.line}" target="_blank">
-                            <div class="contact-icon-circle line"><i class="fab fa-line"></i></div>
-                            <span>Line</span>
-                        </a>
-                    </div>` : ''}
-                    ${student.ig ? `<div class="contact-item">
-                        <a href="https://www.instagram.com/${student.ig}" target="_blank">
-                            <div class="contact-icon-circle ig"><i class="fab fa-instagram"></i></div>
-                            <span>Instagram</span>
-                        </a>
-                    </div>` : ''}
-                    ${student.facebook ? `<div class="contact-item">
-                        <a href="https://www.facebook.com/${student.facebook}" target="_blank">
-                            <div class="contact-icon-circle fb"><i class="fab fa-facebook-f"></i></div>
-                            <span>Facebook</span>
-                        </a>
-                    </div>` : ''}
-                </div>
-            </div>
-        `;
-    }
-
-    // สร้าง HTML สำหรับข้อมูลส่วนตัวและไลฟ์สไตล์ทั้งหมด
-    const infoSectionsHtml = `
-        <div class="info-grid-section">
-            <div class="section-header-icon">
-                <i class="fas fa-user-circle" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;">ข้อมูลส่วนตัว</h3>
-            </div>
-            <div class="info-grid">
-                <div class="info-item-box">
-                    <i class="fas fa-birthday-cake" style="font-size: 25px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;">วันเกิด</strong>
-                        <span style="padding-left:10px;">${formatDate(student.birth_date)}</span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-church" style="font-size: 25px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;">ศาสนา</strong>
-                        <span style="padding-left:10px;">${student.religion || "-"}</span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-tint" style="font-size: 25px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;">กรุ๊ปเลือด</strong>
-                        <span style="padding-left:10px;">${student.bloodgroup || "-"}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="info-grid-section">
-            <div class="section-header-icon">
-                <i class="fas fa-heartbeat" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;">ไลฟ์สไตล์</h3>
-            </div>
-            <div class="info-grid">
-                <div class="info-item-box">
-                    <i class="fas fa-star" style="font-size: 25px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;">งานอดิเรก</strong>
-                        <span style="padding-left:10px;">${student.hobby || "ยังไม่ได้ระบุ"}</span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-music" style="font-size: 25px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
-                        <span style="padding-left:10px;">${student.music || "ยังไม่ได้ระบุ"}</span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-film" style="font-size: 25px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;">หนังที่ชอบ</strong>
-                        <span style="padding-left:10px;">${student.movie || "ยังไม่ได้ระบุ"}</span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-bullseye" style="font-size: 25px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;">เป้าหมาย</strong>
-                        <span style="padding-left:10px;">${student.goal || "ยังไม่ได้ระบุ"}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // ประกอบร่าง HTML ทั้งหมด
-    studentInfoModalBody.innerHTML = `
-        <div class="profile-card">
-            <div class="profile-avatar-square">
-                <img src="${student.student_pic || '../../../images/default.png'}" 
-                    onerror="this.src='../../../images/default.png'" 
-                    alt="Profile Picture">
-            </div>
-            <h2 class="profile-name">
-                ${student.firstname} ${student.lastname}
-            </h2>
-            <p class="profile-bio">
-                ${student.bio || "ยังไม่ได้เขียน Bio"}
-            </p>
-            <div class="profile-course-container">
-                <p class="profile-course" style="margin: 0px;">
-                    <i class="fas fa-graduation-cap"></i>
-                    หลักสูตร: <span>${student.education || "ยังไม่ได้ระบุ"}</span>
-                </p>
-            </div>
-        </div>
-        ${contactSectionHtml}
-        ${infoSectionsHtml}
-    `;
-
-    // ซ่อน modal เก่าและเปิด modal ใหม่
-    classDetailModal.modal('hide');
-    studentInfoModal.modal('show');
-}
-    
-    // Check-in process
     function initiateCheckIn(classId) {
         currentClassId = classId;
-        classDetailModal.modal('hide'); // Hide detail modal immediately
         cameraModal.modal('show');
         
         takePhotoBtn.style.display = 'block';
@@ -1175,10 +928,9 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
             if (classToUpdate) {
                 classToUpdate.status = 'checked_in';
                 
-                // Update UI by re-rendering
                 cameraModal.modal('hide');
                 renderCalendar();
-                showDailySchedule(classToUpdate.date); // Re-open the daily schedule modal
+                showDailySchedule(classToUpdate.date);
                 Swal.fire({
                     title: "สำเร็จ!",
                     text: "เช็คอินเรียบร้อยแล้ว",
@@ -1187,7 +939,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
                     showConfirmButton: false
                 });
             }
-        }, 1500); // Simulate API call delay
+        }, 1500);
     });
 
     cameraModal.on('hidden.bs.modal', () => {
@@ -1196,11 +948,6 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         }
     });
     
-    // Close student info modal and re-open class detail modal
-    studentInfoModal.on('hidden.bs.modal', function () {
-        classDetailModal.modal('show');
-    });
-
     function formatDateThai(dateStr) {
         const [year, month, day] = dateStr.split('-');
         const d = new Date(year, month - 1, day);
@@ -1210,22 +957,30 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         return `${dayStr} ${monthStr} ${yearStr}`;
     }
 
-    // Event Listeners
     prevMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar();
+        dailyScheduleDisplay.innerHTML = ''; 
     });
 
     nextMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
         renderCalendar();
+        dailyScheduleDisplay.innerHTML = '';
     });
 
+    function initialize() {
+        renderCalendar();
+        const today = new Date();
+        const todayDateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        showDailySchedule(todayDateStr);
+    }
+
     // Initial render
-    renderCalendar();
+    initialize();
 </script>
 
- <?php
+    <?php
     require_once ("component/footer.php")
     ?>
 </body>
