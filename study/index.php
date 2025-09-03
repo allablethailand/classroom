@@ -1,12 +1,7 @@
 <?php
     session_start();
-    $url = $_SERVER['REQUEST_URI'];
+    $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     
-    $condition_student_info = '/classroom/study/studentinfo.php?' . $_SERVER['QUERY_STRING'];
-    $condition_student_info_extra = '/classroom/study/student/studentinfo.php?' . $_SERVER['QUERY_STRING'];
-    // print_r($_SERVER);
-    // print_r($url);
-    // exit;
     switch($url) {
         case '/classroom/study/':
         case '/classroom/study':
@@ -15,6 +10,10 @@
         case '/classroom/study/schedule/':
         case '/classroom/study/schedule':
             require __DIR__.'/views/schedule.php';
+        break;
+        case '/classroom/study/calendar/':
+        case '/classroom/study/calendar':
+            require __DIR__.'/views/calendar.php';
         break;
         case '/classroom/study/myphoto/':
         case '/classroom/study/myphoto':
@@ -36,22 +35,10 @@
         case '/classroom/study/student':
             require __DIR__.'/views/student.php';
         break;
-        // case '/classroom/study/studentinfo/':
-        // case '/classroom/study/studentinfo':
-        //     require __DIR__.'/views/studentinfo.php';
-        // break;
-        // case '/classroom/study/studentinfo/':
-        // case '/classroom/study/studentinfo':
-        case $condition_student_info:
-        case $condition_student_info_extra:
-            // print_r('Goooo'); exit;
-            // print_r(__DIR__);
-            // print_r("Gooo"); exit;
-            // require 'origami.local/
-             header('Location: /classroom/study/views/studentinfo.php?' . $_SERVER['QUERY_STRING']);
+        case '/classroom/study/studentinfo/':
+        case '/classroom/study/studentinfo':
+            require __DIR__.'/views/studentinfo.php';
         break;
-        
-
         case '/classroom/study/profile/':
         case '/classroom/study/profile':
             require __DIR__.'/views/profile.php';
@@ -68,6 +55,11 @@
         case '/classroom/study/setting':
             require __DIR__.'/views/setting.php';
         break;
+        case '/classroom/study/register/':
+        case '/classroom/study/register':
+            require __DIR__.'/views/register.php';
+        break;
+
         case '/classroom/study/login/':
         case '/classroom/study/login':
             require __DIR__.'/views/login.php';

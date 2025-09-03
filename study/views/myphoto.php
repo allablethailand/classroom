@@ -1,3 +1,17 @@
+<?php
+// บรรทัดแรกสุดของไฟล์
+
+session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start() ก่อนการใช้งาน Session ทุกครั้ง
+
+// ตรวจสอบว่ามีค่า student_id หรือ join_info ใน Session หรือไม่
+// ถ้าไม่มี แสดงว่ายังไม่ได้ล็อกอิน ให้ Redirect กลับไปหน้า login.php ทันที
+if (!isset($_SESSION['student_id']) || !isset($_SESSION['join_info'])) {
+    header("Location: http://origami.local/classroom/study/login.php");
+    exit();
+}
+
+// โค้ดส่วนอื่นๆ ของหน้าจะเริ่มที่นี่
+?>
 <!doctype html>
 <html>
 <head>
