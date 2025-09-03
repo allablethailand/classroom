@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
-<title>Classroom • ORIGAMI SYSTEM</title>
+<title>Academy • ORIGAMI SYSTEM</title>
 <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="/dist/css/dataTables.bootstrap.min.css">
 <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
@@ -39,7 +39,7 @@
                 <div class="col-md-5ths col-sm-4 col-xs-12">
                     <p style="margin:10px auto;">
                         <i class="far fa-calendar"></i>
-                        <span lang="en">Classroom Date</span>
+                        <span lang="en">Academy Date</span>
                     </p>
                     <input type="text" id="filter_date" class="form-control filter-object" placeholder="All">
                 </div>
@@ -60,7 +60,7 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th lang="en">Classroom</th>
+                    <th lang="en">Academy</th>
                     <th lang="en">Start - End</th>
                     <th lang="en">Student</th>
                     <th lang="en">Mode</th>
