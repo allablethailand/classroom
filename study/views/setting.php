@@ -374,7 +374,7 @@ global $mysqli;
                         <i class="fas fa-chevron-right"></i>
                     </a>
 
-                    <a href="#" class="setting-item">
+                    <a href="logout" class="setting-item">
                         <div class="setting-icon">
                             <i class="fas fa-sign-out-alt"></i>
                         </div>
@@ -400,23 +400,23 @@ global $mysqli;
             
             $('.top-nav a[href="#B"]').addClass('active');
 
-            $('.setting-item .fa-sign-out-alt').closest('.setting-item').on('click', function(e) {
-                e.preventDefault();
-                swal({
-                    title: "ออกจากระบบ",
-                    text: "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#ff6600",
-                    confirmButtonText: "ใช่, ออกจากระบบ!",
-                    cancelButtonText: "ยกเลิก",
-                    closeOnConfirm: false
-                }, function() {
-                    swal("ออกจากระบบแล้ว!", "คุณได้ออกจากระบบเรียบร้อยแล้ว", "success");
-                    // สามารถใส่โค้ดสำหรับนำทางไปยังหน้า login หรือทำการ logout ที่นี่
-                    // เช่น window.location.href = '/logout';
-                });
-            });
+        //    $('.setting-item .fa-sign-out-alt').closest('.setting-item').on('click', function(e) {
+        //         e.preventDefault();
+        //         swal({
+        //             title: "ออกจากระบบ",
+        //             text: "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
+        //             type: "warning",
+        //             showCancelButton: true,
+        //             confirmButtonColor: "#ff6600",
+        //             confirmButtonText: "ใช่, ออกจากระบบ!",
+        //             cancel ButtonText: "ยกเลิก",
+        //             closeOnConfirm: false
+        //         }, function() {
+        //             swal("ออกจากระบบแล้ว!", "คุณได้ออกจากระบบเรียบร้อยแล้ว", "success");
+        //             // สามารถใส่โค้ดสำหรับนำทางไปยังหน้า login หรือทำการ logout ที่นี่
+        //             // เช่น window.location.href = '/logout';
+        //         });
+        //     });
         });
     </script>
     <?php
