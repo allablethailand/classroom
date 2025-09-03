@@ -54,6 +54,7 @@
 <script src="/classroom/management/js/course.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/group.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/registration.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="/classroom/management/js/consent.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/student.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 <body>
@@ -74,10 +75,16 @@
                 <i class="fas fa-cubes"></i>
                 <span lang="en">Group</span>
             </a>
+            <a href=".management_tab" class="get-management edit-mode" data-page="consent" data-toggle="tab">
+                <i class="fas fa-user-shield"></i>
+                <span lang="en">Consent</span>
+            </a>
             <a href=".management_tab" class="get-management edit-mode" data-page="registration" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Registration</span>
             </a>
+            
+            
             <!-- <a href=".management_tab" class="get-management edit-mode" data-page="student" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Student</span>
