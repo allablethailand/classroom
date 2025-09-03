@@ -1,6 +1,5 @@
 <!doctype html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,7 +27,6 @@
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
-    <script src="/classroom/study/js/group.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 
 <body>
@@ -37,134 +35,29 @@
 
     <!-- work ON mobile screen ONLY -->
     <div class="min-vh-100 bg-ori-gray">
-        <div class="container-fluid px-4 py-2">
-            <div class="text-center mb-4">
-                <h1 class="display-4 fw-bold text-dark mb-bs-5 text-center">
-                    Group
-                    <!-- Element Group -->
+        <div class="text-center space-y-8 max-w-4xl mx-auto">
+            <div className="relative mx-auto w-32 h-32 md:w-40 md:h-40 mb-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full animate-ping opacity-75"></div>
+                <div className="relative bg-white rounded-full p-8 shadow-2xl">
+                  <Rocket className="w-full h-full text-purple-600 animate-bounce" />
+                </div>
+                <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-yellow-400 animate-spin" />
+              </div>
+            <div class="container-fluid px-4 py-2">
+               <div className="space-y-4">
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent animate-pulse">
+                  Origami AI
                 </h1>
-            </div>
-
-            <div class="g-4 justify-content-center bg-element-fire-two mx-3 mb-bs-3 rounded-small">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card group-card h-100 ">
-                        <div class="panel-heading border-0">
-                            <div class="d-flex-bs align-items-center gap-3">
-                                <div class="group-icon-large" style="color: #FFF;">
-                                    <!-- {group.icon} -->
-                                    <i class="fas fa-fire-alt" style="width: 50px;"></i>
-                                </div>
-
-                                <!-- {/* Group Info on Right */} -->
-                                <div class="flex-grow-bs-1" style=" min-Width: 0 ">
-                                    <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                        <h4 class="panel-title mb-0 text-truncate">Fire</h4>
-                                    </div>
-                                    <p class="text-secondary mb-0 small text-truncate-2">
-                                        สมาชิกปัจจุบัน 39 คน
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="g-4 justify-content-center bg-element-water-two mx-3 mb-bs-3 rounded-small">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card group-card h-100 ">
-
-                        <div class="panel-heading border-0">
-                            <div class="d-flex-bs align-items-center gap-3">
-                                <div class="group-icon-large" style="color: #FFF;">
-                                    <!-- {group.icon} -->
-                                    <i class="fas fa-tint" style="width: 50px;"></i>
-                                </div>
-
-                                <!-- {/* Group Info on Right */} -->
-                                <div class="flex-grow-bs-1" style=" min-Width: 0 ">
-                                    <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                        <h4 class="panel-title mb-0 text-truncate">Water</h4>
-                                    </div>
-                                    <p class="text-secondary mb-0 small text-truncate-2">
-                                        สมาชิกปัจจุบัน 40 คน
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-            </div>
-            <div class="g-4 justify-content-center bg-element-earth-two mx-3 mb-bs-3 rounded-small">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card group-card h-100 ">
-                        <div class="panel-heading border-0">
-                            <div class="d-flex-bs align-items-center gap-3">
-                                <a href="student">
-
-                                    <!-- {group.icon} -->
-                                    <i class="fas fa-leaf" style="width: 50px;"></i>
-
-                            </div>
-
-                            <!-- {/* Group Info on Right */} -->
-                            <div class="flex-grow-bs-1" style=" min-Width: 0 ">
-                                <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                    <h4 class="panel-title mb-0 text-truncate">Fire</h4>
-                                    <!-- <span 
-                                        class="badge-custom rounded-pill"
-                                        style=" 
-                                        backgroundColor: `${group.color}20`, 
-                                        color: group.color,
-                                        border: `1px solid ${group.color}30`
-                                        "
-                                    >
-                                     50 / 50
-                                </span> -->
-                                </div>
-                                <p class="text-secondary mb-0 small text-truncate-2">
-                                    สมาชิกปัจจุบัน 50 คน
-                                </p>
-                            </div>
-                        </div>
-                        <b>TESTT</b>
-                        </a>
-
-                    </div>
-                </div>
-
-
-            </div>
-            <div class="g-4 justify-content-center bg-element-wind-two mx-3 mb-bs-3 rounded-small">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card group-card h-100 ">
-                        <div class="panel-heading border-0">
-                            <div class="d-flex-bs align-items-center gap-3">
-                                <div class="group-icon-large" style="color: #FFF;">
-                                    <!-- {group.icon} -->
-                                    <i class="fas fa-wind" style="width: 50px;"></i>
-                                </div>
-
-                                <!-- {/* Group Info on Right */} -->
-                                <div class="flex-grow-bs-1" style=" min-Width: 0 ">
-                                    <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                        <h4 class="panel-title mb-0 text-truncate">Fire</h4>
-                                    </div>
-                                    <p class="text-secondary mb-0 small text-truncate-2">
-                                        สมาชิกปัจจุบัน 50 คน
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white">
+                  is coming soon!
+                </h2>
+                <p className="text-lg md:text-xl text-purple-200 max-w-2xl mx-auto leading-relaxed">
+                  We're working hard to bring you something extraordinary. <br>
+                  Get ready for an incredible experience that will blow your mind!
+                </p>
+              </div>
             </div>
         </div>
-
-
         <?php require_once 'component/footer.php'; ?>
     </div>
 

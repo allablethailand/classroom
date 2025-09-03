@@ -44,7 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน";
     } else {
         // เตรียมคำสั่ง SQL ด้วย Prepared Statement เพื่อป้องกัน SQL Injection
+
         $sql = "SELECT `student_id`, `student_password`, student_password_key, comp_id FROM `classroom_student` WHERE `student_username` = ?";
+
         $stmt = $mysqli->prepare($sql);
 
         if ($stmt === false) {
@@ -57,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
+
                 $student_password = $row['student_password'];
                 $student_password_key = $row['student_password_key'];
                 $stored_password_hash = decryptToken($student_password, $student_password_key);
@@ -64,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // ตรวจสอบรหัสผ่าน
                 if ($password == $stored_password_hash) {
+
                     // ล็อกอินสำเร็จ: บันทึกข้อมูลที่จำเป็นลงใน Session
                     $_SESSION['student_id'] = $student_id;
                     $_SESSION['comp_id'] = $row["comp_id"];

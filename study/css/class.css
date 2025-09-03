@@ -1,0 +1,134 @@
+.card {
+      position: relative;
+      padding: 1.5rem 1.5rem 2rem;
+      border-radius: 1.5rem;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: <?php echo htmlspecialchars($backgroundColor); ?>;
+      max-width: 400px;
+    }
+    /* Header */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .icon-wrapper {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Simple placeholder for IconComponent */
+    .icon {
+      width: 20px;
+      height: 20px;
+      color: #4a5568; /* gray-700 */
+      fill: currentColor;
+    }
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: rgba(255,255,255,0.3);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #4a5568;
+    }
+    .rating svg {
+      width: 16px;
+      height: 16px;
+      color: #2b5327; /* yellow-500 */
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* Content */
+    .card-content {
+      margin-bottom: 1.5rem;
+    }
+    .category {
+      font-size: 0.875rem;
+      color: #718096; /* gray-600 */
+      margin-bottom: 0.5rem;
+    }
+    .title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #2d3748; /* gray-800 */
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    /* Footer */
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .avatars {
+      display: flex;
+      align-items: center;
+    }
+    .avatar-group {
+      display: flex;
+      margin-right: 0.5rem;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid white;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 0.75rem;
+      color: white;
+      margin-left: -8px; /* overlap */
+      background: linear-gradient(135deg, #9f7aea, #ed64a6);
+      flex-shrink: 0;
+    }
+    /* We'll generate colors dynamically inline */
+
+    .extra-participants {
+      margin-left: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #4a5568;
+      user-select: none;
+    }
+
+    /* Button */
+    .action-button {
+      width: 48px;
+      height: 48px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+      border: none;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      flex-shrink: 0;
+    }
+    .action-button:hover {
+      box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+    }
+    .action-icon {
+      width: 20px;
+      height: 20px;
+      color: #4a5568;
+      fill: currentColor;
+    }
