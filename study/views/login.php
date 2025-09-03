@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน";
     } else {
         // เตรียมคำสั่ง SQL ด้วย Prepared Statement เพื่อป้องกัน SQL Injection
-        $sql = "SELECT `student_id`, `student_password`, student_password_key FROM `classroom_student` WHERE `student_username` = ?";
+        $sql = "SELECT `student_id`, `student_password`, student_password_key, comp_id FROM `classroom_student` WHERE `student_username` = ?";
         $stmt = $mysqli->prepare($sql);
 
         if ($stmt === false) {
@@ -66,6 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($password == $stored_password_hash) {
                     // ล็อกอินสำเร็จ: บันทึกข้อมูลที่จำเป็นลงใน Session
                     $_SESSION['student_id'] = $student_id;
+                    $_SESSION['comp_id'] = $row["comp_id"];
 
                     // ดึงข้อมูลจากตาราง classroom_student_join และตรวจสอบ consent_accept
                     $join_sql = "SELECT `join_id`, `student_id`, `classroom_id`, `group_id`, `consent_accept` FROM `classroom_student_join` WHERE `student_id` = ? AND `status` = 0";

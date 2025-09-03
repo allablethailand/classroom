@@ -21,25 +21,74 @@ if (!isset($_SESSION['student_id']) || !isset($_SESSION['join_info'])) {
 session_start();
 
 // --- ส่วน PHP จำลองข้อมูลตารางเรียน (เหมือนเดิม) ---
+
 $schedule_data = [
-    '2025-09-01' => [
-        ['subject' => 'วิชาคณิตศาสตร์', 'time' => '09:00 - 10:30', 'status' => 'checked_in', 'id' => 1],
-        ['subject' => 'วิชาภาษาไทย', 'time' => '11:00 - 12:30', 'status' => 'not_checked_in', 'id' => 2]
+    '2025-10-01' => [
+        ['subject' => 'ลงทะเบียนผู้เข้าอบรม, รายงานตัว, ตัดสูท, ถ่ายรูป, แจกเสื้อโปโล หมวก, ป้ายชื่อ, สแกน QR เข้ากลุ่ม 3 กลุ่ม, sign PDPA, สมุดโทรศัพท์', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 1],
+        ['subject' => 'พิธีเปิด ประธานกล่าวเปิดหลักสูตร, ผอ.หลักสูตร อธิบายรายละเอียดหลักสูตร, กิจกรรมละลายพฤติกรรม', 'time' => '13:00 - 17:00', 'status' => 'not_checked_in', 'id' => 2],
+        ['subject' => 'แต่ละกลุ่มคุยเรื่องการแสดงโชว์ในช่วงกินเลี้ยง, กินเลี้ยง, แสดงโชว์แต่ละกลุ่ม ("หลักสูตร เป็นเจ้าภาพจัดเลี้ยง")', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 3]
     ],
-    '2025-09-03' => [
-        ['subject' => 'วิชาภาษาอังกฤษ', 'time' => '13:00 - 14:30', 'status' => 'not_checked_in', 'id' => 3],
+    '2025-10-02' => [
+        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Deep drive in AI', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 4],
+        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Knowledge Base and Business AI in Organization', 'time' => '13:00 - 16:00', 'status' => 'not_checked_in', 'id' => 5]
     ],
-    '2025-09-05' => [
-        ['subject' => 'วิชาวิทยาศาสตร์', 'time' => '10:00 - 12:00', 'status' => 'checked_in', 'id' => 4],
-        ['subject' => 'วิชาศิลปะ', 'time' => '14:00 - 16:00', 'status' => 'not_checked_in', 'id' => 5],
+    '2025-10-03' => [
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: Green : Shift & Sustainability Landscape', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 6],
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: กลยุทธ์และธรรมมาภิบาล ESG', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 7],
+        ['subject' => 'กลุ่มดิน เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 8]
     ],
-    '2025-09-08' => [
-        ['subject' => 'วิชาคอมพิวเตอร์', 'time' => '09:30 - 11:30', 'status' => 'not_checked_in', 'id' => 6],
+    '2025-10-04' => [
+        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: AWS Deep AI Technology', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 9],
+        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Transform your organization by Huawei cloud', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 10],
+        ['subject' => 'กลุ่มน้ำ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 11]
     ],
-    '2025-09-10' => [
-        ['subject' => 'วิชาสังคมศึกษา', 'time' => '13:00 - 15:00', 'status' => 'not_checked_in', 'id' => 7],
+    '2025-10-05' => [
+        ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 12]
     ],
+    '2025-10-06' => [
+        ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 13]
+    ],
+    '2025-10-07' => [
+        ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 14]
+    ],
+    '2025-10-08' => [
+        ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 15]
+    ],
+    '2025-10-09' => [
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: การเงินสีเขียว & ความเสี่ยงสภาพภูมิอากาศ', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 16],
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: Green Innovation & Cirular Models', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 17],
+        ['subject' => 'กลุ่มลม เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 18]
+    ],
+    '2025-10-10' => [
+        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Digital Transformation by AI in Organization', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 19],
+        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Organization Digital Technology', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 20],
+        ['subject' => 'กลุ่มไฟ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 21]
+    ],
+    '2025-10-11' => [
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: Sector Deep Dive (เลือกตามกลุ่มเป้าหมาย)', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 22],
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: ผู้นำ องค์กร และอนาคต', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 23],
+        ['subject' => 'กลุ่มหลักสูตร เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 24]
+    ],
+    '2025-10-12' => [
+        ['subject' => 'เยี่ยมชม โรงงาน', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 25],
+        ['subject' => 'เยี่ยมชม โรงงาน', 'time' => '14:30 - 16:00', 'status' => 'not_checked_in', 'id' => 26]
+    ],
+    '2025-10-13' => [
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: การพัฒนาอุตสหกรรมสู่สังคมคาร์บอนเครดิตต่ำ ในสถานประกอบการ', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 27],
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: การส่งเสริมยกระดับมาตรฐานสถานประกอบการสู่อุตสาหกรรมสีเขียว', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 28],
+        ['subject' => '**กลุ่มดิน+น้ำ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 29]
+    ],
+    '2025-10-14' => [
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: แนวการจัดการกากอุตสาหกรรมตามหลักกฎหมาย', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 30],
+        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: โอกาสทองของอุตสาหกรรมกับพื้นที่ EEC', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 31],
+        ['subject' => '**กลุ่มลม+ไฟ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 32]
+    ],
+    '2025-10-15' => [
+        ['subject' => 'สรุปประสบการณ์และผลการเรียนรู้ ปิดหลักสูตร', 'time' => '09:30 - 16:00', 'status' => 'not_checked_in', 'id' => 33],
+        ['subject' => 'หลักสูตรเป็นเจ้าภาพจัดเลี้ยง, theme กาล่าดินเนอร์ เดินพรมแดง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 34]
+    ]
 ];
+
 
 // เพิ่มฟังก์ชันสำหรับดึงข้อมูลทั้งเดือน
 $all_month_schedule = [];
