@@ -37,6 +37,9 @@ function buildPage(page) {
         case 'registration':
             buildRegistrationPage();
             break;
+        case 'consent':
+            buildConsentPage();
+            break;
         default:
             console.warn('Unknown page type:', page);
     }
@@ -1274,9 +1277,6 @@ function getJoinTemplate() {
     `;
 }
 window.addEventListener('load', handleClickOutside);
-function saveManagement() {
-    console.log('saveManagement function should be implemented');
-}
 function closeManagement() {
     event.stopPropagation();
     swal({
