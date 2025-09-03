@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accept_consent'])) {
         $update_stmt->close();
 
         // Redirect ไปหน้าหลักหลังจากยอมรับ
-        header("Location: /classroom/study/menu");
+        header("Location: http://origami.local/classroom/study/menu");
         exit();
     }
 }
@@ -44,7 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน";
     } else {
         // เตรียมคำสั่ง SQL ด้วย Prepared Statement เพื่อป้องกัน SQL Injection
+
         $sql = "SELECT `student_id`, `student_password`, student_password_key, comp_id FROM `classroom_student` WHERE `student_username` = ?";
+
         $stmt = $mysqli->prepare($sql);
 
         if ($stmt === false) {
@@ -57,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
+
                 $student_password = $row['student_password'];
                 $student_password_key = $row['student_password_key'];
                 $stored_password_hash = decryptToken($student_password, $student_password_key);
@@ -64,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // ตรวจสอบรหัสผ่าน
                 if ($password == $stored_password_hash) {
+
                     // ล็อกอินสำเร็จ: บันทึกข้อมูลที่จำเป็นลงใน Session
                     $_SESSION['student_id'] = $student_id;
                     $_SESSION['comp_id'] = $row["comp_id"];
@@ -426,7 +430,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <!-- <p class="forgot-password"><a href="#">ลืมรหัสผ่าน ?</a></p> -->
                 <button type="submit" class="login-button">เข้าสู่ระบบ</button>
             </form>
-            <p class="register-link">ยังไม่มีบัญชี? <a href=" /classroom/study/register">ลงทะเบียนใช้งาน</a></p>
+            <p class="register-link">ยังไม่มีบัญชี? <a href="/classroom/study/register">ลงทะเบียนใช้งาน</a></p>
             <?php endif; ?>
         </div>
     </div>
