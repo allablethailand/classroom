@@ -10,7 +10,7 @@
 
                 <!-- Home -->
                 <div class="nav-item-wrapper">
-                    <a href="group" class="nav-button">
+                    <a class="nav-button" href="group?id=1">
                         <label for="home" class="nav-button">
                             <svg class="nav-icon" fill="currentColor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 508 508" xml:space="preserve">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -68,7 +68,7 @@
 
                 <!-- Cart - Main Logo -->
                 <div class="nav-item-wrapper nav-main-item">
-                    <a href="menu" class="nav-button">
+                    <a href="chat">
                         <label for="home" class="nav-button nav-main-button">
                             <svg class="nav-icon nav-main-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />

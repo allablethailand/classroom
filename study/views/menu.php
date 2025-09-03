@@ -28,6 +28,7 @@
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/menu.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+
 </head>
 
 <body>
@@ -37,7 +38,7 @@ $segments = ['complete', 'complete', 'complete', 'complete', 'complete', 'upcomi
 $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming',];
 
 ?>
-    <div class="main-content" style="margin-top: 10px; min-height: 80vh">
+    <div class="main-content" style="margin-top: 10px; min-height: 100vh;">
         <!-- <h2 class="menu-section-title">เมนู</h2> -->
         <div class="container-fluid">
             <div class="row">
@@ -55,7 +56,7 @@ $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'up
                         <h4>SCHEDULE</h4>
                     </a>
 
-                    <a class="action-card" href="student">
+                    <a class="action-card" href="class">
                         <div class="action-icon green">
                             <svg fill="#FFF" width="24" height="24" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.001 512.001" xml:space="preserve">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -132,7 +133,7 @@ $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'up
                         <h4>CLASSROOM</h4>
                     </a>
 
-                    <a class="action-card" href="./myphoto.php">
+                    <a class="action-card" href="myphoto">
                         <div class="action-icon orange">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -147,7 +148,7 @@ $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'up
                         <h4>MY PHOTO</h4>
                     </a>
 
-                    <a class="action-card" href="./document.php">
+                    <a class="action-card" href="document">
                         <div class="action-icon blue">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
