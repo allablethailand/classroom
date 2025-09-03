@@ -1,65 +1,65 @@
 <?php
-    // $class_id = isset($_GET['id']) ? $_GET['id'] :  null;
+// $class_id = isset($_GET['id']) ? $_GET['id'] :  null;
 
-    // var_dump($class_id);
+// var_dump($class_id);
 // // $classroom_group = $_POST['classroom_group'];
 
-        $base_include = $_SERVER['DOCUMENT_ROOT'];
-        $base_path = '';
-        if($_SERVER['HTTP_HOST'] == 'localhost'){
-            $request_uri = $_SERVER['REQUEST_URI'];
-            $exl_path = explode('/',$request_uri);
-            if(!file_exists($base_include."/dashboard.php")){
-                $base_path .= "/".$exl_path[1];
-            }
-            $base_include .= "/".$exl_path[1];
-        }
-        define('BASE_PATH', $base_path);
-        define('BASE_INCLUDE', $base_include);
-        require_once $base_include.'/lib/connect_sqli.php';
-        require_once $base_include.'/actions/func.php';
+$base_include = $_SERVER['DOCUMENT_ROOT'];
+$base_path = '';
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $exl_path = explode('/', $request_uri);
+    if (!file_exists($base_include . "/dashboard.php")) {
+        $base_path .= "/" . $exl_path[1];
+    }
+    $base_include .= "/" . $exl_path[1];
+}
+define('BASE_PATH', $base_path);
+define('BASE_INCLUDE', $base_include);
+require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/actions/func.php';
 
-        $std_id = $_SESSION['student_id'];
+$std_id = $_SESSION['student_id'];
 
-        $columnStudent  = "classroom_id";
-        $tableStudent= "classroom_student_join";
-        $whereStudent = "where student_id = '{$std_id}'";
+$columnStudent  = "classroom_id";
+$tableStudent = "classroom_student_join";
+$whereStudent = "where student_id = '{$std_id}'";
 
-        $student_class = select_data($columnStudent, $tableStudent, $whereStudent);
-        
-        $our_class = $student_class[0]["classroom_id"];
+$student_class = select_data($columnStudent, $tableStudent, $whereStudent);
 
-        // var_dump($our_class);
+$our_class = $student_class[0]["classroom_id"];
 
-
-        //  $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
-        // $tableGroup = "classroom_template";
-        // $whereGroup = "where classroom_id = '{$std_id}'";
-
-        // $class_generation_id = $_POST['class_gen_id'];
-        // $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
-        // $tableGroup = "classroom_template";
-        // $whereGroup = "where classroom_id = '{$our_class}'";
-        // $whereGroup = "where classroom_id = '1' AND status = 0";
-
-        $columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
-        $tableCourseGroup = "classroom_template";
-        $whereCourseGroup = "where classroom_id = '{$our_class}'";
-
-        $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
-
-        // var_dump($course);
+// var_dump($our_class);
 
 
-        // $classroom_group = select_data($columnGroup, $tableGroup, $whereGroup);
+//  $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
+// $tableGroup = "classroom_template";
+// $whereGroup = "where classroom_id = '{$std_id}'";
 
-        // var_dump($classroom_group["classroom_id"]);
+// $class_generation_id = $_POST['class_gen_id'];
+// $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
+// $tableGroup = "classroom_template";
+// $whereGroup = "where classroom_id = '{$our_class}'";
+// $whereGroup = "where classroom_id = '1' AND status = 0";
 
-        // $class_id = $classroom_group['classroom_id'];
-        // var_dump($class_id);
+$columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
+$tableCourseGroup = "classroom_template";
+$whereCourseGroup = "where classroom_id = '{$our_class}'";
+
+$classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
+
+// var_dump($course);
 
 
-        // var_dump($userGroup);
+// $classroom_group = select_data($columnGroup, $tableGroup, $whereGroup);
+
+// var_dump($classroom_group["classroom_id"]);
+
+// $class_id = $classroom_group['classroom_id'];
+// var_dump($class_id);
+
+
+// var_dump($userGroup);
 ?>
 
 <!doctype html>
@@ -126,34 +126,35 @@
             }
             foreach ($classroom_group as $item): {
             ?>
-                <div class="g-4 justify-content-center bg-element-<?php echo $item['group_color']; ?>-two mx-3 mb-bs-3 rounded-small">
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="card group-card h-100">
-                            <div class="panel-heading border-0">
-                                <div class="d-flex-bs align-items-center gap-3">
-                                    <div class="group-icon-large" style="color: #FFF;">
-                                        <i class="fas fa-fire-alt" style="width: 50px;"></i>
-                                    </div>
-                                    <div class="flex-grow-bs-1" style="min-width: 0;">
-                                        <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
-                                            <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                                <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["group_name"] ?></h4>
+                    <div class="g-4 justify-content-center bg-element-earth-two mx-3 mb-bs-3 rounded-small">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="card group-card h-100">
+                                <div class="panel-heading border-0" style="padding:0;">
+                                    <div class="d-flex-bs align-items-center gap-3">
+                                        <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;" class="d-flex-bs">
+                                            <div class="group-icon-large" style="color: #FFF;">
+                                                <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
+                                                <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"  alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
                                             </div>
-                                            <p class="text-secondary mb-0 small text-truncate-2">
-                                                สมาชิกปัจจุบัน 39 คน
-                                            </p>
+                                            <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
+                                                <div class="d-flex-bs align-items-center gap-2 mb-1">
+                                                    <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["classroom_name"] ?></h4>
+                                                </div>
+                                                <p class="text-secondary mb-0 small text-truncate-2" >
+                                                    สมาชิกปัจจุบัน 5 คน
+                                                </p>
+                                            </div>
                                         </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
             <?php
                 }
             endforeach; ?>
-            
+
 
             <!-- <div class="g-4 justify-content-center bg-element-fire-two mx-3 mb-bs-3 rounded-small">
                 <div class="col-12 col-md-6 col-lg-3">

@@ -346,12 +346,12 @@ $arrayData = [
             <p class="featured-time"><?php echo $program_slogan; ?></p>
             <p><?php echo "01/10/2025 - 15/10/2025" ?></p>
           </div>
-          <svg class="featured-more-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- <svg class="featured-more-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zM12 13a1 1 0 110-2 1 1 0 010 2zM12 20a1 1 0 110-2 1 1 0 010 2z" />
-          </svg>
+          </svg> -->
         </div>
 
-        <div class="featured-professor">
+        <!-- <div class="featured-professor">
           <div class="professor-avatar-container">
             <div class="professor-avatar">
               <span style="font-size: 20px;">👨‍🏫</span>
@@ -360,7 +360,7 @@ $arrayData = [
           <div>
             <p class="professor-name">Mr. Cody Fisher</p>
             <p class="professor-title">Professor</p>
-          </div>
+          </div> -->
         </div>
 
         <div class="featured-decoration-1"></div>
@@ -395,8 +395,11 @@ $arrayData = [
           <div class="schedule-content schedule-content-purple">
             <div class="schedule-header">
               <div>
-                <h3 class="schedule-title"><?php echo $item['morning_session_details']; ?></h3>
-                <p class="schedule-duration"><?php echo $item['morning_sesstion_time']; ?></p>
+                <h3 class="schedule-title" style=" display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;"><?php echo $item['morning_session_details']; ?></h3>
+                <p class="schedule-duration"><?php echo isset($item['morning_sesstion_time']) ? $item['morning_sesstion_time'] : $item['evening_sesstion_time']; ?></p>
               </div>
               <span class="schedule-badge badge-class">Class</span>
             </div>
