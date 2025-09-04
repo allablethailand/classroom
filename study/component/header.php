@@ -50,7 +50,7 @@ if (!isset($_SESSION['student_id'])) {
                     </span>
                     <div class="">
                         <h1>Green Tech</h1>
-                        <p>Hello ! Mukrob Kratium</p>
+                        <p>Hello ! Admin Origami</p>
                     </div>       
                 </div>
                 <div class="icons">

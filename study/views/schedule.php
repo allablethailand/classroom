@@ -339,7 +339,7 @@ $arrayData = [
 <div style="min-height:140vh;">
   <div class="container-fluid" style="margin-top: 2rem;">
 
-    <div class="featured-class">
+    <div class="featured-class" >
       <div class="featured-header">
         <div>
           <h2 class="featured-title"><?php echo $program_name; ?></h2>
@@ -351,8 +351,9 @@ $arrayData = [
       <div class="featured-decoration-2"></div>
     </div>
 
-    <?php foreach ($arrayData as $item) { ?>
-      <div class="schedule-container">
+    <?php foreach ($arrayData as $index => $item) { 
+      $isLast = ($index === count($arrayData) - 1) ? ' last' : ''; ?>
+      <div class="schedule-container<?php echo $isLast; ?>">
         <div class="schedule-item">
           <div class="schedule-time">
             <span class="schedule-time-text"><?php echo $item['date']; ?></span>
@@ -376,7 +377,7 @@ $arrayData = [
                   ?>
                 </p>
               </div>
-              <span class="schedule-badge badge-class">Class</span>
+              <span class="schedule-badge badge-class"><?php echo isset($item['morning_session_speaker']) ? $item['morning_session_speaker'] : 'ยังไม่ระบุ' ; ?></span>
             </div>
 
             <div class="schedule-footer">
@@ -385,13 +386,40 @@ $arrayData = [
                 <div class="member-avatar avatar-teal"><span>👤</span></div>
                 <div class="member-avatar avatar-orange"><span>👤</span></div>
               </div>
-              <span class="member-count"><?php echo $item['morning_session_speaker']; ?></span>
+              <!-- <span class="member-count"><?php echo $item['morning_session_speaker']; ?></span> -->
+               <button type="button" class="btn btn-primary" style="background-color: #7936e4;  border-radius: 15px;"
+      data-toggle="modal" 
+      data-target="#scheduleModal" 
+      data-index="<?php echo $index; ?>">
+      รายละเอียด
+    </button>
             </div>
           </div>
 
         </div>
       </div>
     <?php } ?>
+
+    <!-- Modal Structure -->
+    <div id="scheduleModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="scheduleModalLabel">Schedule Detail</h4>
+          </div>
+          <div class="modal-body">
+            <!-- Content will be injected here -->
+            <p id="modalDetails"></p>
+            <p id="modalTime"></p>
+            <p id="modalSpeakers"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
   <?php require_once("component/footer.php"); ?>
@@ -401,5 +429,22 @@ $arrayData = [
 
 
 </body>
+<!-- jQuery to Load Modal Content Dynamically -->
+<script>
+  var arrayData = <?php echo json_encode($arrayData); ?>;
+  $('#scheduleModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget); // Button that triggered the modal
+    var index = button.data('index');
+    var modal = $(this);
+    var item = arrayData[index];
+
+    var timeSchedule = item.morning_session_time ? item.morning_session_time : item.evening_session_time
+
+    modal.find('#modalDetails').text(item.morning_session_details);
+    modal.find('#modalTime').text('ช่วงเวลา: ' + timeSchedule);
+    modal.find('#modalSpeakers').text('Speakers: ' + item.morning_session_speaker);
+  });
+</script>
+
 
 </html>
