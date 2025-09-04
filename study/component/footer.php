@@ -81,13 +81,3 @@
         </div>
     </nav>
 
-<script>
-    document.querySelectorAll('.nav-item-wrapper').forEach(item => {
-  item.addEventListener('click', () => {
-    // Remove active class from all nav items
-    document.querySelectorAll('.nav-item-wrapper.active').forEach(i => i.classList.remove('active'));
-    // Add active class to the clicked nav item
-    item.classList.add('active');
-  });
-});
-</script>

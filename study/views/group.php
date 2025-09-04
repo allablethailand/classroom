@@ -128,10 +128,10 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             ?>
                     <div class="g-4 justify-content-center mb-bs-3 ">
                         <div class="col-12 col-md-6 col-lg-3">
+                            <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
                             <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 10px;">
                                 <div class="panel-heading border-0" style="padding:0;">
                                     <div class="d-flex-bs align-items-center gap-3">
-                                        <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;" class="d-flex-bs">
                                             <div class="group-icon-large" style="color: #FFF;">
                                                 <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
                                                 <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"  alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
@@ -144,10 +144,10 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                                     สมาชิกปัจจุบัน 5 คน
                                                 </p>
                                             </div>
-                                        </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
 
