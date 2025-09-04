@@ -467,7 +467,7 @@ $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_em
     
     <div class="profile-header-container" style="gap: 5px;">
         <div class="profile-avatar-circle">
-            <img src="<?= $row_all["student_image_profile"]; ?>" 
+            <img src="<?= GetUrl($row_all["student_image_profile"]); ?>" 
                 onerror="this.src='../../../images/default.png'" 
                 alt="Profile Picture">
         </div>

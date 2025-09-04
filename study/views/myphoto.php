@@ -6,7 +6,7 @@ session_start(); // สำคัญมาก: ต้องเรียกใช�
 // ตรวจสอบว่ามีค่า student_id หรือ join_info ใน Session หรือไม่
 // ถ้าไม่มี แสดงว่ายังไม่ได้ล็อกอิน ให้ Redirect กลับไปหน้า login.php ทันที
 if (!isset($_SESSION['student_id']) || !isset($_SESSION['join_info'])) {
-    header("Location: http://origami.local/classroom/study/login.php");
+    header("Location: /classroom/study/login.php");
     exit();
 }
 

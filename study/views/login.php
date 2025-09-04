@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accept_consent'])) {
         $update_stmt->close();
 
         // Redirect ไปหน้าหลักหลังจากยอมรับ
-        header("Location: http://origami.local/classroom/study/menu");
+        header("Location: /classroom/study/menu");
         exit();
     }
 }
