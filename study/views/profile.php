@@ -445,7 +445,7 @@
             </a>
         </div>
         <div class="profile-avatar-circle">
-            <img src="<?= $row_all["student_image_profile"]; ?>" 
+            <img src="<?= GetUrl($row_all["student_image_profile"]); ?>" 
                 onerror="this.src='../../../images/default.png'" 
                 alt="Profile Picture">
         </div>
