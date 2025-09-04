@@ -343,6 +343,10 @@ html {
   margin-top: 1.5rem;
 }
 
+.schedule-container.last {
+  margin-bottom: 8rem;
+}
+
 .schedule-item {
   display: flex;
   align-items: flex-start;
@@ -440,6 +444,8 @@ html {
 .badge-class {
   background-color: #e9d5ff;
   color: #7c3aed;
+  min-width: 75px;
+  text-align:center;
 }
 
 .badge-consultation {
