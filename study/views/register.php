@@ -27,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $status_message = "รหัสผ่านไม่ตรงกัน โปรดลองอีกครั้ง";
     } else {
         // *** ส่วนที่สำคัญ: Hash รหัสผ่านอย่างปลอดภัย ***
-        // password_hash() เป็นฟังก์ชันมาตรฐานของ PHP ที่ใช้ bcrypt และสร้าง salt ให้โดยอัตโนมัติ
-        $hashed_password = password_hash($plain_password, PASSWORD_DEFAULT);
+        $student_password_key = bin2hex(openssl_random_pseudo_bytes(16));
+        $password_encrypt = encryptToken($plain_password, $student_password_key);
 
         // ตรวจสอบว่าชื่อผู้ใช้ซ้ำหรือไม่เพื่อหลีกเลี่ยงข้อผิดพลาด
         $stmt = $mysqli->prepare("SELECT `student_username` FROM `classroom_student` WHERE `student_username` = ?");
@@ -42,14 +42,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // เตรียมคำสั่ง SQL เพื่อป้องกัน SQL Injection
             $sql = "INSERT INTO `classroom_student` (
                             `student_firstname_th`, `student_lastname_th`, `student_email`, 
-                            `student_mobile`, `student_username`, `student_password`, 
+                            `student_mobile`, `student_username`, `student_password`, `student_password_key`,
                             `date_create`, `status`
-                        ) VALUES (?, ?, ?, ?, ?, ?, NOW(), 1)";
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 1)";
 
             $stmt = $mysqli->prepare($sql);
             if ($stmt) {
                 // Bind parameters และ execute
-                $stmt->bind_param("ssssss", $firstname, $lastname, $email, $mobile, $username_input, $hashed_password);
+                $stmt->bind_param("sssssss", $firstname, $lastname, $email, $mobile, $username_input, $password_encrypt, $student_password_key);
 
                 if ($stmt->execute()) {
                     $status_message = "ลงทะเบียนสำเร็จ!";
