@@ -496,3 +496,12 @@ html {
   font-size: 0.875rem;
   color: #c084fc;
 }
+
+
+.modal-dialog {
+  position: relative;
+  top: 30%;
+  transform: translateY(-50%);
+  /* For older browsers without transform support, you may add margin-top adjustment */
+  margin: 0 20px;
+}
