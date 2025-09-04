@@ -137,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             if ($stmt_image->execute()) {
                 // อัปเดต session สำหรับรูปโปรไฟล์ใหม่
-                // $_SESSION["emp_pic"] = $target_file;
+                $_SESSION['student_image_profile'] = $target_file;
             }
             $stmt_image->close();
         } else {

@@ -323,7 +323,7 @@ if (isset($_SESSION['student_id'])) {
             <div class="settings-header">
                 <div class="profile-card" style="margin-top: 50px;">
                     <div class="profile-avatar-square">
-                        <img src="<?php echo $_SESSION["student_image_profile"]; ?>" onerror="this.src='../../../images/default.png'" alt="Profile Picture">
+                        <img src="<?php echo GetUrl($_SESSION["student_image_profile"]); ?>" onerror="this.src='../../../images/default.png'" alt="Profile Picture">
                     </div>
                     <h2 class="profile-name">
                         <?= $row_all["student_firstname_th"] . " " . $row_all["student_lastname_th"]; ?>
