@@ -1,4 +1,5 @@
 <?php
+
 session_start();
     $base_include = $_SERVER['DOCUMENT_ROOT'];
     $base_path = '';
@@ -38,10 +39,14 @@ if (!isset($_SESSION['student_id'])) {
     header("Location: /classroom/study/login");
     exit();
 }
+
+// var_dump($_SESSION['student_id']);
 $studentId = (int)$_SESSION['student_id'];
 $sql = "SELECT `student_id`, comp_id , student_image_profile, IFNULL(student_firstname_en, student_firstname_th) AS student_name FROM `classroom_student` WHERE `student_id` = ?";
 
 $stmt = $mysqli->prepare($sql);
+
+// var_dump($studentId );
 
 if ($stmt === false) {
     $error_message = "Database prepare error: " . $mysqli->error;
@@ -57,6 +62,8 @@ if ($stmt === false) {
         $student_name = $row['student_name'];
     }
 }
+
+// var_dump($result);
 ?>
 
 <head>

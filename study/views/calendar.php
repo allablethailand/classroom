@@ -1,15 +1,30 @@
 <?php
 // บรรทัดแรกสุดของไฟล์
 // login.php
-require_once("actions/login.php");
-// ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
-require_once($base_include."/lib/connect_sqli.php");
-include_once($base_include."/login_history.php");
-session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
+// session_start();
+
+    $base_include = $_SERVER['DOCUMENT_ROOT'];
+    $base_path = '';
+    if($_SERVER['HTTP_HOST'] == 'localhost'){
+        $request_uri = $_SERVER['REQUEST_URI'];
+        $exl_path = explode('/',$request_uri);
+        if(!file_exists($base_include."/dashboard.php")){
+            $base_path .= "/".$exl_path[1];
+        }
+        $base_include .= "/".$exl_path[1];
+    }
+    define('BASE_PATH', $base_path);
+    define('BASE_INCLUDE', $base_include);
+    require_once $base_include.'/lib/connect_sqli.php';
+
+// require_once("actions/login.php");
+// // ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
+
+// require_once($base_include."/lib/connect_sqli.php");
+// include_once($base_include."/login_history.php");
+// session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
 global $mysqli;
-?>
-<?php
-session_start();
+
 
 // --- ส่วน PHP จำลองข้อมูลตารางเรียน (เหมือนเดิม) ---
 
@@ -81,6 +96,7 @@ $schedule_data = [
 ];
 
 
+
 // เพิ่มฟังก์ชันสำหรับดึงข้อมูลทั้งเดือน
 $all_month_schedule = [];
 foreach ($schedule_data as $date => $classes) {
@@ -99,7 +115,7 @@ $json_all_month_schedule = json_encode($all_month_schedule);
 
 // --- ส่วน PHP สำหรับดึงข้อมูลนักเรียนจากฐานข้อมูล ---
 require_once("../../lib/connect_sqli.php");
-global $mysqli;
+// global $mysqli;
 
 $students_data = [];
 // เพิ่มคอลัมน์ที่จำเป็นจากโค้ด studentinfo.php เข้ามาใน query
@@ -152,7 +168,7 @@ if ($result) {
         ];
     }
 }
-$mysqli->close();
+// $mysqli->close();
 
 $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
 ?>
