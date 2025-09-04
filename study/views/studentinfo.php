@@ -44,6 +44,34 @@ if ($row_all === null) {
 
 // Check for contact information
 $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_email']) || !empty($row_all['student_line']) || !empty($row_all['student_ig']) || !empty($row_all['student_facebook']);
+
+// --- ส่วนที่แก้ไขเพิ่มเข้ามา ---
+    // 1. ดึง classroom_id จาก classroom_student_join
+    $sql_join = "SELECT classroom_id FROM `classroom_student_join` WHERE student_id = ?";
+    $stmt_join = $mysqli->prepare($sql_join);
+    $stmt_join->bind_param("i", $student_id);
+    $stmt_join->execute();
+    $result_join = $stmt_join->get_result();
+    $join_data = $result_join->fetch_assoc();
+    $stmt_join->close();
+
+    $classroom_name = ""; // กำหนดค่าเริ่มต้นเป็นค่าว่าง
+    if ($join_data && $join_data['classroom_id']) {
+        $classroom_id = $join_data['classroom_id'];
+        
+        // 2. ใช้ classroom_id ดึง classroom_name จาก classroom_template
+        $sql_template = "SELECT classroom_name FROM `classroom_template` WHERE classroom_id = ?";
+        $stmt_template = $mysqli->prepare($sql_template);
+        $stmt_template->bind_param("i", $classroom_id);
+        $stmt_template->execute();
+        $result_template = $stmt_template->get_result();
+        $template_data = $result_template->fetch_assoc();
+        $stmt_template->close();
+
+        if ($template_data) {
+            $classroom_name = $template_data['classroom_name'];
+        }
+    }
 ?>
 <!doctype html>
 <html>
@@ -482,12 +510,12 @@ $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_em
         
         <div class="profile-card" style="padding: 10px;">
             <div class="profile-course-container">
-                <?php if (!empty($row_all["student_education"])) : ?>
-                <p class="profile-company">
-                    <i class="fas fa-building"></i>
-                    บริษัท: <span><?= $row_all["student_education"]; ?></span>
-                </p>
-                <?php endif; ?>
+                    <?php if (!empty($classroom_name)) : ?>
+            <p class="profile-company">
+                <i class="fas fa-graduation-cap"></i>
+                หลักสูตร: <span><?= $classroom_name; ?></span>
+            </p>
+        <?php endif; ?>
                 <?php if (!empty($row_all["student_company"])) : ?>
                 <p class="profile-company">
                     <i class="fas fa-building"></i>

@@ -185,7 +185,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        overflow: hidden;
+
     }
 
     .top-bg {

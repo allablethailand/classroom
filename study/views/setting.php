@@ -77,6 +77,38 @@ global $mysqli;
         return $img;
     }
     $this_day = date("Y-m-d");
+
+    // ดึงข้อมูลหลักสูตรที่ถูกต้องจากฐานข้อมูล
+$classroom_name = "";
+if (isset($_SESSION['student_id'])) {
+    $student_id = $_SESSION['student_id'];
+    
+    // 1. ค้นหา classroom_id จากตาราง classroom_student_join
+    $sql_join = "SELECT classroom_id FROM `classroom_student_join` WHERE student_id = ?";
+    $stmt_join = $mysqli->prepare($sql_join);
+    $stmt_join->bind_param("i", $student_id);
+    $stmt_join->execute();
+    $result_join = $stmt_join->get_result();
+    $join_data = $result_join->fetch_assoc();
+    $stmt_join->close();
+
+    if ($join_data && $join_data['classroom_id']) {
+        $classroom_id = $join_data['classroom_id'];
+        
+        // 2. ใช้ classroom_id เพื่อดึง classroom_name จากตาราง classroom_template
+        $sql_template = "SELECT classroom_name FROM `classroom_template` WHERE classroom_id = ?";
+        $stmt_template = $mysqli->prepare($sql_template);
+        $stmt_template->bind_param("i", $classroom_id);
+        $stmt_template->execute();
+        $result_template = $stmt_template->get_result();
+        $template_data = $result_template->fetch_assoc();
+        $stmt_template->close();
+
+        if ($template_data) {
+            $classroom_name = $template_data['classroom_name'];
+        }
+    }
+}
 ?>
 <!doctype html>
 <html>
@@ -299,12 +331,12 @@ global $mysqli;
                     <p class="profile-bio">
                         <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
                     </p>
-                    <div class="profile-course-container">
-                        <p class="profile-course" style="margin: 0px;">
-                            <i class="fas fa-graduation-cap"></i>
-                            หลักสูตร: <span><?= !empty($row_all["student_education"]) ? $row_all["student_education"] : "ยังไม่ได้ระบุ"; ?></span>
-                        </p>
-                    </div>
+                  <div class="profile-course-container">
+    <p class="profile-course" style="margin: 0px;">
+        <i class="fas fa-graduation-cap"></i>
+        หลักสูตร: <span><?= !empty($classroom_name) ? $classroom_name : "ยังไม่ได้ระบุ"; ?></span>
+    </p>
+</div>
                 </div>
                 
                 <div class="settings-list">
