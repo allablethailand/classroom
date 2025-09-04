@@ -50,8 +50,8 @@ $participants_two = 20;
 
 <body>
     <?php require_once 'component/header.php'; ?>
-    <div class="min-vh-100 bg-ori-gray">
-        <div class="container-fluid">
+    <div class="min-vh-100 bg-ori-gray" >
+        <div class="container-fluid" style="margin-bottom: 7rem;" >
             <div class="text-center mb-4" style="margin-top: 2rem;">
                 <!-- <h1 class="display-4 fw-bold text-dark mb-bs-5 text-center">
                     Classroom
@@ -216,11 +216,12 @@ $participants_two = 20;
                     </a>
                 </div>
             </div>
-
+            
         </div>
+        
+        <?php require_once 'component/footer.php'; ?>
     </div>
 
-    <?php require_once 'component/footer.php'; ?>
 
 
 </body>

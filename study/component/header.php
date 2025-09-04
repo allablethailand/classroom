@@ -1,19 +1,19 @@
 <?php
 
 session_start();
-    $base_include = $_SERVER['DOCUMENT_ROOT'];
-    $base_path = '';
-    if($_SERVER['HTTP_HOST'] == 'localhost'){
-        $request_uri = $_SERVER['REQUEST_URI'];
-        $exl_path = explode('/',$request_uri);
-        if(!file_exists($base_include."/dashboard.php")){
-            $base_path .= "/".$exl_path[1];
-        }
-        $base_include .= "/".$exl_path[1];
+$base_include = $_SERVER['DOCUMENT_ROOT'];
+$base_path = '';
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $exl_path = explode('/', $request_uri);
+    if (!file_exists($base_include . "/dashboard.php")) {
+        $base_path .= "/" . $exl_path[1];
     }
-    define('BASE_PATH', $base_path);
-    define('BASE_INCLUDE', $base_include);
-    require_once $base_include.'/lib/connect_sqli.php';
+    $base_include .= "/" . $exl_path[1];
+}
+define('BASE_PATH', $base_path);
+define('BASE_INCLUDE', $base_include);
+require_once $base_include . '/lib/connect_sqli.php';
 
 global $mysqli;
 // Get current directory or page identifier, example by parsing URL path
@@ -30,8 +30,7 @@ if (strpos($uriPath, $basePath) === 0) {
 $segments = explode('/', $relativePath);
 $currentScreen = isset($segments[0]) && $segments[0] !== '' ? $segments[0] : 'menu';
 
-if ($currentScreen == 'group')
-{
+if ($currentScreen == 'group') {
     $currentScreen = 'academy';
 }
 
@@ -79,7 +78,7 @@ if ($stmt === false) {
             <div class="header-topnav">
                 <div class="title-group-topnav">
                     <span>
-                        <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"   alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                        <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
 
 
 
@@ -92,24 +91,26 @@ if ($stmt === false) {
                     <div class="">
                         <h1>Green Tech</h1>
                         <p>Hello ! <?php echo ($student_name) ? $student_name : "User"; ?></p>
-                    </div>       
+                    </div>
                 </div>
                 <div class="icons">
-                    <button class="bell-button" onclick="alert('Notifications');">
+                    <button class="bell-button" id="bellButton">
                         <span>
                             <i class="far fa-bell" style="font-size: 20px;"></i>
                         </span>
                     </button>
                     <a href="profile" class="" style="background-color: white; border-radius: 100%">
-                        
+
                         <img style=" border-radius: 100%;" width="25" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
                     </a>
+
 
                     <!-- <div id="profile-right">
 							<span class="profile-img" style="border:4px solid #FF9900">
 								<img width="50" id="avatar_h" name="avatar_h" title="Admin" src="/images/default.png" onerror="this.src='/images/default.png'">
 							</span>
                 </div> -->
+
                 </div>
             </div>
 
@@ -128,13 +129,38 @@ if ($stmt === false) {
             </button>
             <h1 class="header-title"><?php echo ucfirst($currentScreen); ?></h1>
             <a href="profile" class="" style="background-color: white; border-radius: 100%">
-                        
-                        <img style=" border-radius: 100%;" width="25" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
-                    </a>
-            <div class="header-spacer"></div>
+
+                <img style=" border-radius: 100%;" width="25" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
+            </a>
+            <!-- <div class="header-spacer"></div> -->
         </div>
     <?php
     }
     ?>
 
+    <div id="notificationModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Notification</h4>
+                </div>
+                <div class="modal-body">
+                    <p>แจ้งเตือนเวอร์ชั่นปัจจุบัน คือ BETA 1.1</p>
+                    <div class="" style="text-align: right;">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
 </div>
+
+<script>
+    $('#bellButton').on('click', function() {
+        $('#notificationModal').modal('show');
+    });
+</script>
