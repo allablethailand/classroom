@@ -95,7 +95,7 @@ if ($stmt === false) {
                     </button>
                     <a href="profile" class="" style="background-color: white; border-radius: 100%">
                         
-                        <img width="25" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
+                        <img style=" border-radius: 100%;" width="25" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
                     </a>
 
                     <!-- <div id="profile-right">
@@ -120,11 +120,10 @@ if ($stmt === false) {
                 <span class="back-arrow">←</span>
             </button>
             <h1 class="header-title"><?php echo ucfirst($currentScreen); ?></h1>
-            <button class="bell-button" onclick="alert('Notifications');">
-                <span>
-                    <i class="far fa-bell" style="font-size: 20px;"></i>
-                </span>
-            </button>
+            <a href="profile" class="" style="background-color: white; border-radius: 100%">
+                        
+                        <img style=" border-radius: 100%;" width="25" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
+                    </a>
             <div class="header-spacer"></div>
         </div>
     <?php
