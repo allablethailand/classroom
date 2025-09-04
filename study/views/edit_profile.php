@@ -21,6 +21,8 @@ $sql_student = "SELECT * FROM classroom_student WHERE student_id = 1"; // คว
 $result_student = $mysqli->query($sql_student);
 $row_student = mysqli_fetch_assoc($result_student);
 
+$image_profile_path = ($row_student["student_image_profile"]) ? GetUrl($row_student["student_image_profile"]) : "";
+
 // ตั้งค่า session สำหรับรูปโปรไฟล์และชื่อ
 $_SESSION["user"] = $row_student["student_firstname_th"] . " " . $row_student["student_lastname_th"];
 $_SESSION["emp_pic"] = $row_student["student_image_profile"];
@@ -108,44 +110,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 
     // ส่วนจัดการการอัปโหลดไฟล์รูปภาพ
-    // if (isset($_FILES['image_name']) && $_FILES['image_name']['error'] == UPLOAD_ERR_OK) {
-    //     $upload_dir = '../../uploads/profile/'; // กำหนด path สำหรับบันทึกรูปภาพ
+    if (isset($_FILES['image_name']) && $_FILES['image_name']['error'] == UPLOAD_ERR_OK) {
+        $upload_dir = 'classroom/uploads/profile/'; // กำหนด path สำหรับบันทึกรูปภาพ
         
-    //     // ตรวจสอบและสร้างโฟลเดอร์ถ้าไม่มี
-    //     if (!is_dir($upload_dir)) {
-    //         mkdir($upload_dir, 0777, true);
-    //     }
+        // ตรวจสอบและสร้างโฟลเดอร์ถ้าไม่มี
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
 
-    //     $image_ext = pathinfo($_FILES['image_name']['name'], PATHINFO_EXTENSION);
-    //     $new_image_name = 'profile_' . $student_id . '_' . time() . '.' . $image_ext;
-    //     $target_file = $upload_dir . $new_image_name;
+        $image_ext = pathinfo($_FILES['image_name']['name'], PATHINFO_EXTENSION);
+        $new_image_name = 'profile_' . $student_id . '_' . time() . '.' . $image_ext;
+        $target_file = $upload_dir . $new_image_name;
 
-    //     // ย้ายไฟล์ที่อัปโหลด
-    //     if (move_uploaded_file($_FILES['image_name']['tmp_name'], $target_file)) {
-    //         // อัปเดต path ของรูปภาพในฐานข้อมูล
-    //         $sql_update_image = "UPDATE `classroom_student` SET `student_image_profile` = ? WHERE `student_id` = ?";
-    //         $stmt_image = $mysqli->prepare($sql_update_image);
-    //         if ($stmt_image === false) {
-    //              $response['status'] = 'error';
-    //              $response['message'] = 'Prepare image update failed: ' . $mysqli->error;
-    //              echo json_encode($response);
-    //              exit;
-    //         }
-    //         $stmt_image->bind_param("si", $target_file, $student_id);
+        // ย้ายไฟล์ที่อัปโหลด
+        if (SaveFile($_FILES['image_name']['tmp_name'], $target_file)) {
+            // อัปเดต path ของรูปภาพในฐานข้อมูล
+            $sql_update_image = "UPDATE `classroom_student` SET `student_image_profile` = ? WHERE `student_id` = ?";
+            $stmt_image = $mysqli->prepare($sql_update_image);
+            if ($stmt_image === false) {
+                 $response['status'] = 'error';
+                 $response['message'] = 'Prepare image update failed: ' . $mysqli->error;
+                 echo json_encode($response);
+                 exit;
+            }
+            $stmt_image->bind_param("si", $target_file, $student_id);
             
-    //         if ($stmt_image->execute()) {
-    //             // อัปเดต session สำหรับรูปโปรไฟล์ใหม่
-    //             $_SESSION["emp_pic"] = $target_file;
-    //         }
-    //         $stmt_image->close();
-    //     } else {
-    //         // ถ้าอัปโหลดรูปไม่สำเร็จ
-    //         $response['status'] = 'error';
-    //         $response['message'] = 'ไม่สามารถอัปโหลดรูปภาพได้';
-    //         echo json_encode($response);
-    //         exit;
-    //     }
-    // }
+            if ($stmt_image->execute()) {
+                // อัปเดต session สำหรับรูปโปรไฟล์ใหม่
+                // $_SESSION["emp_pic"] = $target_file;
+            }
+            $stmt_image->close();
+        } else {
+            // ถ้าอัปโหลดรูปไม่สำเร็จ
+            $response['status'] = 'error';
+            $response['message'] = 'ไม่สามารถอัปโหลดรูปภาพได้';
+            echo json_encode($response);
+            exit;
+        }
+    }
 
     // ตรวจสอบผลลัพธ์สุดท้ายของการอัปเดต
     if ($is_updated) {
@@ -908,7 +910,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form id="editProfileForm" enctype="multipart/form-data">
         <div class="row">
             <div class="col-md-6 col-md-offset-3 text-center">
-                <img src="<?= $row_student["student_image_profile"]; ?>"
+                <img src="<?= $image_profile_path; ?>"
                     onerror="this.src='../../../images/default.png'" alt="Profile Picture"
                     class="profile-img-preview">
                 <div class="form-group">
