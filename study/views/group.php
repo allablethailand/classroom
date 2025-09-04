@@ -126,9 +126,9 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             }
             foreach ($classroom_group as $item): {
             ?>
-                    <div class="g-4 justify-content-center bg-element-earth-two mx-3 mb-bs-3 rounded-small">
+                    <div class="g-4 justify-content-center mb-bs-3 ">
                         <div class="col-12 col-md-6 col-lg-3">
-                            <div class="card group-card h-100">
+                            <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 10px;">
                                 <div class="panel-heading border-0" style="padding:0;">
                                     <div class="d-flex-bs align-items-center gap-3">
                                         <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;" class="d-flex-bs">
