@@ -314,7 +314,7 @@
             <?php
                 if ($num_rows > 0) {
                     foreach ($students as $row) {
-                        $student_pic = !empty($row['student_image_profile']) ? $row['student_image_profile'] : '../../../images/default.png';
+                        $student_pic = !empty($row['student_image_profile']) ? GetUrl($row['student_image_profile'] ): '../../../images/default.png';
             ?>
             <a href="studentinfo?id=<?= htmlspecialchars($row['student_id']); ?>" class="student-card">
     <div class="student-avatar">

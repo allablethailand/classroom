@@ -215,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         <div class="text-center text-sm text-gray-600">
             มีบัญชีอยู่แล้วใช่ไหม?
-            <a href="http://origami.local/classroom/study/login" class="font-medium link-orange">เข้าสู่ระบบ</a>
+            <a href="/classroom/study/login" class="font-medium link-orange">เข้าสู่ระบบ</a>
         </div>
     </div>
 </body>
