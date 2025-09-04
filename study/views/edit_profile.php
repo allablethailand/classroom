@@ -16,10 +16,31 @@ require_once $base_include.'/lib/connect_sqli.php';
 
 global $mysqli;
 
-// แก้ไข: ดึงข้อมูลจากตาราง classroom_student แทน
-$sql_student = "SELECT * FROM classroom_student WHERE student_id = 1"; // ควรเปลี่ยนเป็น $_SESSION['student_id'] ถ้ามี
-$result_student = $mysqli->query($sql_student);
-$row_student = mysqli_fetch_assoc($result_student);
+// แก้ไข: ดึงข้อมูลจากตาราง classroom_student และ group_color
+// ตรวจสอบว่ามี session id ของนักเรียนหรือไม่
+if (!isset($_SESSION['student_id'])) {
+    // กรณีที่ไม่มี session ให้ redirect หรือแสดงข้อความแจ้งเตือน
+    // หรือใช้ค่าเริ่มต้น
+    $student_id = 1; // หรือค่าเริ่มต้นอื่นๆ
+} else {
+    $student_id = $_SESSION['student_id'];
+}
+
+$sql_student = "
+    SELECT 
+        cs.*,
+        cg.group_color
+    FROM classroom_student cs
+    LEFT JOIN classroom_student_join csj ON cs.student_id = csj.student_id
+    LEFT JOIN classroom_group cg ON csj.group_id = cg.group_id
+    WHERE cs.student_id = ?
+";
+$stmt = $mysqli->prepare($sql_student);
+$stmt->bind_param("i", $student_id);
+$stmt->execute();
+$result_student = $stmt->get_result();
+$row_student = $result_student->fetch_assoc();
+$stmt->close();
 
 $image_profile_path = ($row_student["student_image_profile"]) ? GetUrl($row_student["student_image_profile"]) : "";
 
@@ -27,6 +48,9 @@ $image_profile_path = ($row_student["student_image_profile"]) ? GetUrl($row_stud
 $_SESSION["user"] = $row_student["student_firstname_th"] . " " . $row_student["student_lastname_th"];
 $_SESSION["emp_pic"] = $row_student["student_image_profile"];
 $comp_id = $_SESSION['comp_id'] ? $_SESSION['comp_id']: null; // ใช้ Null Coalescing Operator เพื่อป้องกัน error ถ้าไม่มี session
+
+// กำหนดสีขอบรูปภาพ
+$profile_border_color = !empty($row_student['group_color']) ? htmlspecialchars($row_student['group_color']) : '#ff8c00';
 
 // ตรวจสอบว่ามีการส่งข้อมูลแบบ POST มาหรือไม่
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -163,6 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 ?>
+
 <!doctype html>
 <html>
 
@@ -909,19 +934,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <hr>
     <form id="editProfileForm" enctype="multipart/form-data">
         <div class="row">
-            <div class="col-md-6 col-md-offset-3 text-center">
-                <img src="<?= $image_profile_path; ?>"
-                    onerror="this.src='../../../images/default.png'" alt="Profile Picture"
-                    class="profile-img-preview">
-                <div class="form-group">
-                    <label for="image_name">รูปโปรไฟล์</label>
-                    <input type="file" name="image_name" id="image_name" class="form-control-file"
-                        accept="image/*">
-                    <small class="text-muted">เลือกรูปภาพเพื่อเปลี่ยนรูปโปรไฟล์ (นามสกุลไฟล์ที่รองรับ:
-                        .jpeg, .jpg, .png, .gif)</small>
-                </div>
-            </div>
+    <div class="col-md-6 col-md-offset-3 text-center">
+        <img src="<?= $image_profile_path; ?>"
+            onerror="this.src='../../../images/default.png'" alt="Profile Picture"
+            class="profile-img-preview" style="border: 4px solid <?= $profile_border_color; ?>;">
+        <div class="form-group">
+            <label for="image_name">รูปโปรไฟล์</label>
+            <input type="file" name="image_name" id="image_name" class="form-control-file"
+                accept="image/*">
+            <small class="text-muted">เลือกรูปภาพเพื่อเปลี่ยนรูปโปรไฟล์ (นามสกุลไฟล์ที่รองรับ:
+                .jpeg, .jpg, .png, .gif)</small>
         </div>
+    </div>
+</div>
         <hr>
         <div class="row">
             <div class="col-md-6">

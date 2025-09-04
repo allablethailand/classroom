@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             `student_firstname_th`, `student_lastname_th`, `student_email`, 
                             `student_mobile`, `student_username`, `student_password`, `student_password_key`,
                             `date_create`, `status`
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 1)";
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 0)";
 
             $stmt = $mysqli->prepare($sql);
             if ($stmt) {

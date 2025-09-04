@@ -1,84 +1,93 @@
 <?php
-    // login.php
+// แก้ไข: login.php
+// ใช้ไฟล์ที่จำเป็น
 require_once("actions/login.php");
-// ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
 require_once($base_include."/lib/connect_sqli.php");
 include_once($base_include."/login_history.php");
 session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
 global $mysqli;
 
-    if (isset($_POST['save_thumbnail'])) {
-        $this_date_time = date("Y-m-d H:i:s");
-        $x1 = ($_POST['x1']) ? $_POST['x1'] : 1;
-        $y1 = ($_POST['y1']) ? $_POST['y1'] : 1;
-        $w = ($_POST['w_head']) ? $_POST['w_head'] : 1;
-        $h = ($_POST['h_head']) ? $_POST['h_head'] : 1;
-        // เปลี่ยนการอ้างอิงจาก emp_pic เป็น student_image_profile
-        $student_pic = explode("?", $_SESSION["student_image_profile"]);
-        if ($_SESSION["student_image_profile"] != '' && $x1 != '') {
-            $sql = "update classroom_student set student_image_profile='" . $student_pic[0] . "?" . $x1 . "&" . $y1 . "&" . $w . "&" . $h . "', date_modify='" . $this_date_time . "' where student_id='" . $_SESSION["student_id"] . "'  ";
-            $result = $mysqli -> query($sql);
-            $_SESSION["student_image_profile"] = $student_pic[0] . "?" . $x1 . "&" . $y1 . "&" . $w . "&" . $h;
-        } else {
-            $_SESSION["student_image_profile"] = $student_pic[0];
-        }
+// ตรวจสอบว่ามีค่า student_id ใน session หรือไม่ก่อนที่จะดึงข้อมูล
+// ถ้าไม่มีค่าใน session จะไม่สามารถดำเนินการต่อได้
+if (!isset($_SESSION['student_id'])) {
+    // ถ้าไม่มี session student_id ให้ redirect กลับไปหน้า login
+    header("Location: /login.php");
+    exit();
+}
+
+// โค้ดส่วนที่บันทึกข้อมูลและอัปโหลดรูปภาพยังคงเดิม
+// ในส่วนนี้ใช้ $_SESSION["student_id"] อยู่แล้วจึงไม่จำเป็นต้องแก้ไข
+if (isset($_POST['save_thumbnail'])) {
+    $this_date_time = date("Y-m-d H:i:s");
+    $x1 = ($_POST['x1']) ? $_POST['x1'] : 1;
+    $y1 = ($_POST['y1']) ? $_POST['y1'] : 1;
+    $w = ($_POST['w_head']) ? $_POST['w_head'] : 1;
+    $h = ($_POST['h_head']) ? $_POST['h_head'] : 1;
+    $student_pic = explode("?", $_SESSION["student_image_profile"]);
+    if ($_SESSION["student_image_profile"] != '' && $x1 != '') {
+        // ใช้ prepared statement เพื่อความปลอดภัย
+        $sql = "UPDATE classroom_student SET student_image_profile=?, date_modify=? WHERE student_id=?";
+        $stmt = $mysqli->prepare($sql);
+        $new_image_profile = $student_pic[0] . "?" . $x1 . "&" . $y1 . "&" . $w . "&" . $h;
+        $stmt->bind_param("ssi", $new_image_profile, $this_date_time, $_SESSION["student_id"]);
+        $stmt->execute();
+        $_SESSION["student_image_profile"] = $new_image_profile;
+    } else {
+        $_SESSION["student_image_profile"] = $student_pic[0];
     }
-    
-    // ส่วนนี้ถูกคอมเมนต์ออกเพราะไม่เกี่ยวข้องกับข้อมูลนักเรียน
-    // if (isset($_POST['submit_info'])) {
-    //     $sql = "UPDATE m_employee_info SET signature='" . $_POST['signature'] . "', signature_drawing='" . $_POST['signature_drawing'] . "',last_update = NOW() where emp_id='" . $_POST['hid_id2'] . "'";
-    //     $result = $mysqli -> query($sql);
-    //     $hid_id2 = $_POST['hid_id2'];
-    //     $home_location = $_POST['home_location_input'];
-    //     $home_code = "UPDATE m_employee_info SET home_location = '{$home_location}' WHERE emp_id = '{$hid_id2}' AND (home_location is null OR home_location = '')";
-    //     $home_query = $mysqli -> query($home_code);
-    //     if ($result) {
-    //         redirect("m_profile.php");
-    //     }
-    // }
-    
-    // ส่วนนี้ถูกคอมเมนต์ออกเพราะไม่เกี่ยวข้องกับข้อมูลนักเรียน
-    // if (isset($_POST['upload_avatar'])) {
-    //     $image_name = $_FILES['image_name']['name'];
-    //     $image_tmp = $_FILES['image_name']['tmp_name'];
-    //     if($image_name) {
-    //         $ext = pathinfo($image_name, PATHINFO_EXTENSION);
-    //         $unique_id = substr(base_convert(time(),10,36).md5(microtime()),0,16).'.'.$ext;
-    //         $dir = 'uploads/student/'.$_SESSION['comp_id'];
-    //         $path_save = $dir.$unique_id;
-    //         move_uploaded_file($image_tmp,$path_save);
-    //         $sql = "update classroom_student set student_image_profile = '{$path_save}' where student_id = '{$_SESSION['student_id']}'";
-    //         $result = $mysqli -> query($sql);
-    //         $_SESSION["student_image_profile"] = $path_save;
-    //     }
-    //     echo "<script language=\"javascript\">alert('Upload success.');</script>";
-    //     redirect("../../m_profile.php");
-    // }
-    
-    // เปลี่ยนมาดึงข้อมูลจากตาราง classroom_student
-    $sql_all = $mysqli->query("select * from classroom_student where student_id = 1");
-    $row_all = mysqli_fetch_array($sql_all);
+}
 
-    // ดึงข้อมูลเข้า session เพื่อนำไปใช้ต่อ
-    $_SESSION["student_id"] = $row_all["student_id"];
-    $_SESSION["student_image_profile"] = $row_all["student_image_profile"];
-    $_SESSION["student_firstname_th"] = $row_all["student_firstname_th"];
-    $_SESSION["student_lastname_th"] = $row_all["student_lastname_th"];
-    $_SESSION["student_bio"] = $row_all["student_bio"];
+// *** ส่วนที่ต้องแก้ไข: ดึงข้อมูลจากฐานข้อมูลให้ครอบคลุม group_color ***
+$student_id_from_session = $_SESSION['student_id'];
 
-    function _avatar($picname) {
-        if ($picname == "images/default.png" || empty($picname)) {
-            $img = "<img width=\"150\" title=\"" . $_SESSION["student_firstname_th"] . "\" src=\"";
-            $img .= "../../images/default.png\"/>";
-        } else {
-            $img = "<img width=\"150\" id=\"avatar\" title=\"" . $_SESSION["student_firstname_th"] . "\"  src=\"";
-            $img .= $picname . "\"/>";
-        }
-        return $img;
+$sql_all = "
+    SELECT 
+        cs.*, 
+        csj.group_id,
+        cg.group_color
+    FROM `classroom_student` cs
+    LEFT JOIN `classroom_student_join` csj ON cs.student_id = csj.student_id
+    LEFT JOIN `classroom_group` cg ON csj.group_id = cg.group_id
+    WHERE cs.student_id = ?
+";
+$stmt_all = $mysqli->prepare($sql_all);
+$stmt_all->bind_param("i", $student_id_from_session);
+$stmt_all->execute();
+$result_all = $stmt_all->get_result();
+$row_all = $result_all->fetch_assoc();
+$stmt_all->close();
+
+// ตรวจสอบว่าดึงข้อมูลได้หรือไม่ ถ้าไม่ได้ให้ redirect
+if (!$row_all) {
+    // กรณีที่ไม่พบข้อมูลนักเรียน ให้ redirect กลับหน้า login หรือแสดงข้อความผิดพลาด
+    header("Location: /login.php?error=notfound");
+    exit();
+}
+
+// ดึงข้อมูลเข้า session เพื่อนำไปใช้ต่อ
+$_SESSION["student_id"] = $row_all["student_id"];
+$_SESSION["student_image_profile"] = $row_all["student_image_profile"];
+$_SESSION["student_firstname_th"] = $row_all["student_firstname_th"];
+$_SESSION["student_lastname_th"] = $row_all["student_lastname_th"];
+$_SESSION["student_bio"] = $row_all["student_bio"];
+
+// กำหนดสีขอบรูปภาพ
+$profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_all['group_color']) : '#ff8c00';
+
+// ฟังก์ชัน _avatar และส่วนอื่นๆ ยังคงเดิม
+function _avatar($picname) {
+    if ($picname == "images/default.png" || empty($picname)) {
+        $img = "<img width=\"150\" title=\"" . htmlspecialchars($_SESSION["student_firstname_th"]) . "\" src=\"";
+        $img .= "../../images/default.png\"/>";
+    } else {
+        $img = "<img width=\"150\" id=\"avatar\" title=\"" . htmlspecialchars($_SESSION["student_firstname_th"]) . "\"  src=\"";
+        $img .= htmlspecialchars($picname) . "\"/>";
     }
-    $this_day = date("Y-m-d");
+    return $img;
+}
+$this_day = date("Y-m-d");
 
-    // ดึงข้อมูลหลักสูตรที่ถูกต้องจากฐานข้อมูล
+// ดึงข้อมูลหลักสูตรที่ถูกต้องจากฐานข้อมูล
 $classroom_name = "";
 if (isset($_SESSION['student_id'])) {
     $student_id = $_SESSION['student_id'];
@@ -322,19 +331,19 @@ if (isset($_SESSION['student_id'])) {
         <div class="settings-card" style="margin-top: 10px;">
             <div class="settings-header">
                 <div class="profile-card" style="margin-top: 50px;">
-                    <div class="profile-avatar-square">
+                    <div class="profile-avatar-square" style="border-color: <?= $profile_border_color; ?>;">
                         <img src="<?php echo GetUrl($_SESSION["student_image_profile"]); ?>" onerror="this.src='../../../images/default.png'" alt="Profile Picture">
                     </div>
                     <h2 class="profile-name">
-                        <?= $row_all["student_firstname_th"] . " " . $row_all["student_lastname_th"]; ?>
+                        <?= htmlspecialchars($row_all["student_firstname_th"]) . " " . htmlspecialchars($row_all["student_lastname_th"]); ?>
                     </h2>
                     <p class="profile-bio">
-                        <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
+                        <?= !empty($row_all["student_bio"]) ? htmlspecialchars($row_all["student_bio"]) : "ยังไม่ได้เขียน Bio"; ?>
                     </p>
-                  <div class="profile-course-container">
+                    <div class="profile-course-container">
     <p class="profile-course" style="margin: 0px;">
         <i class="fas fa-graduation-cap"></i>
-        หลักสูตร: <span><?= !empty($classroom_name) ? $classroom_name : "ยังไม่ได้ระบุ"; ?></span>
+        หลักสูตร: <span><?= !empty($classroom_name) ? htmlspecialchars($classroom_name) : "ยังไม่ได้ระบุ"; ?></span>
     </p>
 </div>
                 </div>
@@ -432,23 +441,23 @@ if (isset($_SESSION['student_id'])) {
             
             $('.top-nav a[href="#B"]').addClass('active');
 
-        //    $('.setting-item .fa-sign-out-alt').closest('.setting-item').on('click', function(e) {
-        //         e.preventDefault();
-        //         swal({
-        //             title: "ออกจากระบบ",
-        //             text: "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
-        //             type: "warning",
-        //             showCancelButton: true,
-        //             confirmButtonColor: "#ff6600",
-        //             confirmButtonText: "ใช่, ออกจากระบบ!",
-        //             cancel ButtonText: "ยกเลิก",
-        //             closeOnConfirm: false
-        //         }, function() {
-        //             swal("ออกจากระบบแล้ว!", "คุณได้ออกจากระบบเรียบร้อยแล้ว", "success");
-        //             // สามารถใส่โค้ดสำหรับนำทางไปยังหน้า login หรือทำการ logout ที่นี่
-        //             // เช่น window.location.href = '/logout';
-        //         });
-        //     });
+        //  $('.setting-item .fa-sign-out-alt').closest('.setting-item').on('click', function(e) {
+        //      e.preventDefault();
+        //      swal({
+        //          title: "ออกจากระบบ",
+        //          text: "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
+        //          type: "warning",
+        //          showCancelButton: true,
+        //          confirmButtonColor: "#ff6600",
+        //          confirmButtonText: "ใช่, ออกจากระบบ!",
+        //          cancel ButtonText: "ยกเลิก",
+        //          closeOnConfirm: false
+        //      }, function() {
+        //          swal("ออกจากระบบแล้ว!", "คุณได้ออกจากระบบเรียบร้อยแล้ว", "success");
+        //          // สามารถใส่โค้ดสำหรับนำทางไปยังหน้า login หรือทำการ logout ที่นี่
+        //          // เช่น window.location.href = '/logout';
+        //      });
+        //  });
         });
     </script>
     <?php

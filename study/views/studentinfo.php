@@ -19,8 +19,13 @@ global $mysqli;
 $student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($student_id > 0) {
-    // Use a prepared statement to prevent SQL injection
-    $stmt = $mysqli->prepare("SELECT * FROM classroom_student WHERE student_id = ? AND status = 0");
+    // Modified SQL query to join with `classroom_student_join` and `classroom_group`
+    // เพื่อดึงข้อมูล group_color ตามที่ต้องการ
+    $stmt = $mysqli->prepare("SELECT cs.*, cg.group_color 
+                              FROM classroom_student cs 
+                              LEFT JOIN classroom_student_join csj ON cs.student_id = csj.student_id
+                              LEFT JOIN classroom_group cg ON csj.group_id = cg.group_id
+                              WHERE cs.student_id = ? AND cs.status = 0");
     $stmt->bind_param("i", $student_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -72,6 +77,8 @@ $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_em
             $classroom_name = $template_data['classroom_name'];
         }
     }
+// กำหนดสีขอบรูปภาพเริ่มต้นเป็นสีส้ม ถ้าไม่มี group_color
+$profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_all['group_color']) : '#ff8c00';
 ?>
 <!doctype html>
 <html>
@@ -135,6 +142,7 @@ $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_em
             overflow: hidden;
             margin-bottom: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: border-color 0.3s ease;
         }
         
         .profile-avatar-circle img {
@@ -466,7 +474,7 @@ $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_em
     <?php require_once("component/header.php") ?>
     
     <div class="profile-header-container" style="gap: 5px;">
-        <div class="profile-avatar-circle">
+        <div class="profile-avatar-circle" style="border-color: <?= $profile_border_color; ?>;">
             <img src="<?= GetUrl($row_all["student_image_profile"]); ?>" 
                 onerror="this.src='../../../images/default.png'" 
                 alt="Profile Picture">
