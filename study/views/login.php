@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accept_consent'])) {
         $update_stmt->close();
 
         // Redirect ไปหน้าหลักหลังจากยอมรับ
-        header("Location: http://origami.local/classroom/study/menu");
+        header("Location: /classroom/study/menu");
         exit();
     }
 }
@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         // เตรียมคำสั่ง SQL ด้วย Prepared Statement เพื่อป้องกัน SQL Injection
 
-        $sql = "SELECT `student_id`, `student_password`, student_password_key, comp_id FROM `classroom_student` WHERE `student_username` = ?";
+        $sql = "SELECT `student_id`, `student_password`, student_password_key, comp_id , student_image_profile FROM `classroom_student` WHERE `student_username` = ?";
 
         $stmt = $mysqli->prepare($sql);
 
@@ -71,6 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // ล็อกอินสำเร็จ: บันทึกข้อมูลที่จำเป็นลงใน Session
                     $_SESSION['student_id'] = $student_id;
                     $_SESSION['comp_id'] = $row["comp_id"];
+                    $_SESSION['student_image_profile'] = $row["student_image_profile"];
 
                     // ดึงข้อมูลจากตาราง classroom_student_join และตรวจสอบ consent_accept
                     $join_sql = "SELECT `join_id`, `student_id`, `classroom_id`, `group_id`, `consent_accept` FROM `classroom_student_join` WHERE `student_id` = ? AND `status` = 0";
@@ -185,7 +186,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        overflow: hidden;
+
     }
 
     .top-bg {

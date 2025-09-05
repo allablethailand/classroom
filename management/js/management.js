@@ -113,7 +113,7 @@ function buildClassroom() {
                 "className": "dt-click",
                 "render": function (data,type,row,meta) {	
 					return `
-                        <img src="${data}" style="width: 100px; border-radius: 5px; border: 3px solid #FFFFFF; box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.16);">
+                        <img src="${data}" style="width: 100px; border-radius: 5px; border: 3px solid #FFFFFF; box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.16);" onerror="this.src='/images/training.jpg'">
                     `;
                 }
             },{ 

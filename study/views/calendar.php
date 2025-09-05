@@ -1,15 +1,30 @@
 <?php
 // บรรทัดแรกสุดของไฟล์
 // login.php
-require_once("actions/login.php");
-// ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
-require_once($base_include."/lib/connect_sqli.php");
-include_once($base_include."/login_history.php");
-session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
+// session_start();
+
+    $base_include = $_SERVER['DOCUMENT_ROOT'];
+    $base_path = '';
+    if($_SERVER['HTTP_HOST'] == 'localhost'){
+        $request_uri = $_SERVER['REQUEST_URI'];
+        $exl_path = explode('/',$request_uri);
+        if(!file_exists($base_include."/dashboard.php")){
+            $base_path .= "/".$exl_path[1];
+        }
+        $base_include .= "/".$exl_path[1];
+    }
+    define('BASE_PATH', $base_path);
+    define('BASE_INCLUDE', $base_include);
+    require_once $base_include.'/lib/connect_sqli.php';
+
+// require_once("actions/login.php");
+// // ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
+
+// require_once($base_include."/lib/connect_sqli.php");
+// include_once($base_include."/login_history.php");
+// session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
 global $mysqli;
-?>
-<?php
-session_start();
+
 
 // --- ส่วน PHP จำลองข้อมูลตารางเรียน (เหมือนเดิม) ---
 
@@ -81,6 +96,7 @@ $schedule_data = [
 ];
 
 
+
 // เพิ่มฟังก์ชันสำหรับดึงข้อมูลทั้งเดือน
 $all_month_schedule = [];
 foreach ($schedule_data as $date => $classes) {
@@ -99,7 +115,7 @@ $json_all_month_schedule = json_encode($all_month_schedule);
 
 // --- ส่วน PHP สำหรับดึงข้อมูลนักเรียนจากฐานข้อมูล ---
 require_once("../../lib/connect_sqli.php");
-global $mysqli;
+// global $mysqli;
 
 $students_data = [];
 // เพิ่มคอลัมน์ที่จำเป็นจากโค้ด studentinfo.php เข้ามาใน query
@@ -152,7 +168,7 @@ if ($result) {
         ];
     }
 }
-$mysqli->close();
+// $mysqli->close();
 
 $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
 ?>
@@ -290,7 +306,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     }
     
     /* Responsive styles for mobile devices */
-    @media (max-width: 767px) {
+    @media (max-width: 900px) {
         .calendar-day {
             min-height: 60px; /* ลดความสูงของวันในปฏิทิน */
         }
@@ -772,6 +788,54 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     margin-top: 20px;
     border: 1px dashed #ccc;
+}
+/* เพิ่ม Media Query สำหรับหน้าจอขนาดใหญ่ (Desktop) */
+@media (min-width: 901px) {
+    /* กำหนดขนาดสูงสุดและจัดกึ่งกลางสำหรับคอนเทนเนอร์หลัก */
+    .schedule-container,
+    .daily-schedule-display-container {
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* จัดการให้ event-item แสดงผลได้ดีขึ้นบนจอใหญ่ */
+    .calendar-day .event-item {
+        /* ใช้คำสั่งนี้เพื่อกำหนดให้ข้อความเกินขอบแล้วแสดงเป็น ... */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 2px 8px;
+        /* ปรับขนาดฟอนต์ให้เหมาะสม */
+        font-size: 0.85em;
+        width: 90%;
+        margin: 3px auto 0;
+    }
+
+    /* เพิ่มสไตล์สำหรับ card รายวันในส่วนแสดงตารางเรียนรายวัน */
+    .daily-schedule-item {
+        max-width: 600px; /* จำกัดความกว้างของแต่ละรายการ */
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 15px;
+    }
+}
+
+/* เพิ่ม Media Query สำหรับจอใหญ่ */
+@media (min-width: 901px) {
+    /* กำหนดสไตล์ใหม่สำหรับ event-item บนจอใหญ่ */
+    .event-item {
+        /* บังคับให้ข้อความอยู่ในบรรทัดเดียว */
+        white-space: nowrap; 
+        /* ซ่อนส่วนที่ล้นออกมา */
+        overflow: hidden; 
+        /* แสดงเครื่องหมายจุดไข่ปลา (...) เมื่อข้อความล้น */
+        text-overflow: ellipsis; 
+        /* ตั้งค่าความกว้างสูงสุดเพื่อให้ข้อความไม่ยืดยาวเกินไป */
+        max-width: 100px; 
+        /* เพื่อให้การตัดข้อความมีประสิทธิภาพ ควรใช้ flex-shrink: 0; */
+        flex-shrink: 0; 
+    }
 }
 </style>
 <body>

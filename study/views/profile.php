@@ -6,8 +6,19 @@
     // Get the student_id from the session
     $student_id = $_SESSION['student_id'];
     
-    // Updated SQL query to select all columns
-    $sql_profile = "SELECT * FROM `classroom_student` WHERE `student_id` = ?";
+    // Updated SQL query to select all columns, including group_id
+    // เพิ่มการ join ตาราง classroom_student_join และ classroom_group เพื่อดึง group_id และ group_color
+    $sql_profile = "
+        SELECT 
+            cs.*, 
+            csj.group_id,
+            cg.group_color
+        FROM `classroom_student` cs
+        LEFT JOIN `classroom_student_join` csj ON cs.student_id = csj.student_id
+        LEFT JOIN `classroom_group` cg ON csj.group_id = cg.group_id
+        WHERE cs.student_id = ?
+    ";
+    
     $stmt = $mysqli->prepare($sql_profile);
     $stmt->bind_param("i", $student_id);
     $stmt->execute();
@@ -16,6 +27,38 @@
     $stmt->close();
     
     $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_email']) || !empty($row_all['student_line']) || !empty($row_all['student_ig']) || !empty($row_all['student_facebook']);
+
+    // --- ส่วนที่แก้ไขเพิ่มเข้ามา ---
+    // 1. ดึง classroom_id จาก classroom_student_join
+    $sql_join = "SELECT classroom_id FROM `classroom_student_join` WHERE student_id = ?";
+    $stmt_join = $mysqli->prepare($sql_join);
+    $stmt_join->bind_param("i", $student_id);
+    $stmt_join->execute();
+    $result_join = $stmt_join->get_result();
+    $join_data = $result_join->fetch_assoc();
+    $stmt_join->close();
+
+    $classroom_name = ""; // กำหนดค่าเริ่มต้นเป็นค่าว่าง
+    if ($join_data && $join_data['classroom_id']) {
+        $classroom_id = $join_data['classroom_id'];
+        
+        // 2. ใช้ classroom_id ดึง classroom_name จาก classroom_template
+        $sql_template = "SELECT classroom_name FROM `classroom_template` WHERE classroom_id = ?";
+        $stmt_template = $mysqli->prepare($sql_template);
+        $stmt_template->bind_param("i", $classroom_id);
+        $stmt_template->execute();
+        $result_template = $stmt_template->get_result();
+        $template_data = $result_template->fetch_assoc();
+        $stmt_template->close();
+
+        if ($template_data) {
+            $classroom_name = $template_data['classroom_name'];
+        }
+    }
+    // ----------------------------
+    
+    // กำหนดสีขอบรูปภาพ
+    $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_all['group_color']) : '#ff8c00';
 ?>
 <!doctype html>
 <html>
@@ -75,10 +118,11 @@
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            border: 5px solid #fff;
+            border: 5px solid #fff; /* ขอบสีขาวเริ่มต้น */
             overflow: hidden;
             margin-bottom: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: border-color 0.3s ease; /* เพิ่ม transition สำหรับการเปลี่ยนสีขอบ */
         }
         
         .profile-avatar-circle img {
@@ -415,13 +459,13 @@
                 <i class="fas fa-cog"></i>
             </a>
         </div>
-        <div class="profile-avatar-circle">
-            <img src="<?= $row_all["student_image_profile"]; ?>" 
+        <div class="profile-avatar-circle" style="border-color: <?= $profile_border_color; ?>;">
+            <img src="<?= GetUrl($row_all["student_image_profile"]); ?>" 
                 onerror="this.src='../../../images/default.png'" 
                 alt="Profile Picture">
         </div>
         <h2 class="profile-name" style="
-     background-color: rgba(0, 0, 0, 0.1); 
+      background-color: rgba(0, 0, 0, 0.1); 
     
     backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์เบลอ */
     padding: 8px;
@@ -432,7 +476,7 @@
         </h2>
         <?php if (!empty($row_all["student_address"])) : ?>
         <p class="profile-location" style="
-     background-color: rgba(0, 0, 0, 0.1); 
+      background-color: rgba(0, 0, 0, 0.1); 
     
     backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์เบลอ */
     padding: 2px;
@@ -444,7 +488,7 @@
         </p>
         <?php endif; ?>
         <p class="profile-bio" style="
-     background-color: rgba(0, 0, 0, 0.1); 
+      background-color: rgba(0, 0, 0, 0.1); 
     
     backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์เบลอ */
     padding: 4px;
@@ -459,16 +503,12 @@
         
         <div class="profile-card" style="padding: 10px;">
             <div class="profile-course-container">
-                 <?php if (!empty($row_all["student_education"])) : ?>
-                <p class="profile-company">
-                    <i class="fas fa-building"></i>
-                    บริษัท: <span><?= $row_all["student_education"]; ?></span>
-                </p>
-                <?php endif; ?>
-                <!-- <p class="profile-course">
-                    <i class="fas fa-graduation-cap"></i>
-                    หลักสูตร: <span ><?= !empty($row_all["student_education"]) ? $row_all["student_education"] : "ยังไม่ได้ระบุ"; ?></span>
-                </p> -->
+                <?php if (!empty($classroom_name)) : ?>
+            <p class="profile-company">
+                <i class="fas fa-graduation-cap"></i>
+                หลักสูตร: <span><?= $classroom_name; ?></span>
+            </p>
+        <?php endif; ?>
                 <?php if (!empty($row_all["student_company"])) : ?>
                 <p class="profile-company">
                     <i class="fas fa-building"></i>

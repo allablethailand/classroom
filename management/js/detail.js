@@ -152,6 +152,9 @@ function buildPage(page) {
         case 'student':
             buildStudentPage();
             break;
+        case 'teacher':
+            buildTeacherPage();
+            break;
         default:
             console.warn('Unknown page type:', page);
     }

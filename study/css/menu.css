@@ -241,7 +241,7 @@ body {
 .action-card {
   background: white;
   border-radius: 20px;
-  padding: 24px 20px;
+  padding: 22px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   text-align: left;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -403,6 +403,13 @@ body {
   display: flex;
 }
 
+.progress-text-bottom {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+  display: flex;
+}
+
 .progress-container {
   position: relative;
 }
@@ -444,4 +451,10 @@ body {
 
 .progress-segment.missed {
   background-color: #ef4444;
+}
+
+.featured-more-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: white;
 }
