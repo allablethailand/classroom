@@ -307,9 +307,12 @@
                         <i class="fas fa-star" style="color: #ffee00ff; font-size: 2.5em; padding-right:.5em;"></i> ทั้งหมด
                     </a>
                     <?php foreach ($groups as $group) : ?>
-                        <a href="?group_id=<?= htmlspecialchars($group['group_id']); ?>" class="group-item-dropdown">
+                       <a href="?group_id=<?= htmlspecialchars($group['group_id']); ?>" class="group-item-dropdown">
                             <div class="group-logo-container" style="border-color: <?= htmlspecialchars($group['group_color']); ?>;">
-                                <img src="<?= htmlspecialchars($group['group_logo']); ?>" alt="Group Logo" class="group-logo">
+                                <?php
+                                    $group_logo = !empty($group['group_logo']) ? GetUrl($group['group_logo']) : '';
+                                ?>
+                                <img src="<?= htmlspecialchars($group_logo); ?>" alt="Group Logo" class="group-logo">
                             </div>
                             <?= htmlspecialchars($group['group_name']); ?>
                         </a>
