@@ -209,7 +209,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         background-color: #fff;
         border-bottom-right-radius: 20px;
         border-bottom-left-radius: 20px;
-        padding: 20px;
+        padding: 5px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     .calendar-header {
@@ -998,39 +998,44 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         }
     }
 
-    function showDailySchedule(dateStr) {
-        const classes = allMonthScheduleData.filter(cls => cls.date === dateStr);
-        
-        let htmlContent = `<div style="color:#555;"class="schedule-header-inline"><h3>ตารางเรียนวันที่ ${formatDateThai(dateStr)}</h3></div>`;
+   function showDailySchedule(dateStr) {
+    const classes = allMonthScheduleData.filter(cls => cls.date === dateStr);
 
-        if (classes && classes.length > 0) {
-            htmlContent += `<div class="daily-schedule-list">`;
-            classes.forEach(cls => {
-                const statusText = cls.status === 'checked_in' ? 
-                    `<span class="status-text"><i class="fas fa-check-circle"></i> เช็คอินแล้ว</span>` :
-                    `<span class="status-text-not-checked-in"></span>`;
+    let htmlContent = `<div id="dailyScheduleHeader" style="color:#555;"class="schedule-header-inline"><h3>ตารางเรียนวันที่ ${formatDateThai(dateStr)}</h3></div>`;
 
-                const checkinButtonHtml = cls.status === 'checked_in'
-                    ? ``
-                    : `<div class="btn-checkin-container" style="padding-top:5px;"><button class="btn-checkin" >ยังไม่เช็คอิน</button></div>`;
+    if (classes && classes.length > 0) {
+        htmlContent += `<div class="daily-schedule-list">`;
+        classes.forEach(cls => {
+            const statusText = cls.status === 'checked_in' ? 
+                `<span class="status-text"><i class="fas fa-check-circle"></i> เช็คอินแล้ว</span>` :
+                `<span class="status-text-not-checked-in"></span>`;
 
-                htmlContent += `
-                    <div class="daily-schedule-item ${cls.status === 'checked_in' ? 'checked-in' : 'not-checked-in'}">
-                        <div class="subject">${cls.subject}</div>
-                        <div class="date-time">${formatDateThai(cls.date)} • ${cls.time}</div>
-                        ${statusText}
-                        ${checkinButtonHtml}
-                    </div>
-                `;
-            });
-            htmlContent += `</div>`;
-        } else {
-            // แก้ไขตรงนี้
-            htmlContent += `<p class="no-events-message">ไม่มีตารางเรียนในวันนี้ครับ 🙂</p>`;
-        }
-        
-        dailyScheduleDisplay.innerHTML = htmlContent;
+            const checkinButtonHtml = cls.status === 'checked_in'
+                ? ``
+                : `<div class="btn-checkin-container" style="padding-top:5px;"><button class="btn-checkin" >ยังไม่เช็คอิน</button></div>`;
+
+            htmlContent += `
+                <div class="daily-schedule-item ${cls.status === 'checked_in' ? 'checked-in' : 'not-checked-in'}">
+                    <div class="subject">${cls.subject}</div>
+                    <div class="date-time">${formatDateThai(cls.date)} • ${cls.time}</div>
+                    ${statusText}
+                    ${checkinButtonHtml}
+                </div>
+            `;
+        });
+        htmlContent += `</div>`;
+    } else {
+        htmlContent += `<p class="no-events-message">ไม่มีตารางเรียนในวันนี้ครับ 🙂</p>`;
     }
+
+    dailyScheduleDisplay.innerHTML = htmlContent;
+
+    // โค้ดที่เพิ่มเข้ามาใหม่
+    const dailyScheduleHeader = document.getElementById('dailyScheduleHeader');
+    if (dailyScheduleHeader) {
+        dailyScheduleHeader.scrollIntoView({ behavior: 'smooth' });
+    }
+}
 
     function initiateCheckIn(classId) {
         currentClassId = classId;
