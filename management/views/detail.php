@@ -56,6 +56,7 @@
 <script src="/classroom/management/js/registration.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/consent.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/student.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="/classroom/management/js/teacher.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 <body>
 <?php require_once "../../include_header.php"; ?>
@@ -79,6 +80,10 @@
                 <i class="fas fa-user-shield"></i>
                 <span lang="en">Consent</span>
             </a>
+            <!-- <a href=".management_tab" class="get-management edit-mode" data-page="teacher" data-toggle="tab">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span lang="en">Teacher</span>
+            </a> -->
             <a href=".management_tab" class="get-management edit-mode" data-page="registration" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Registration</span>
@@ -87,10 +92,6 @@
                 <i class="fas fa-users"></i>
                 <span lang="en">Student</span>
             </a>
-            <!-- <a href=".management_tab" class="get-management edit-mode" data-page="teacher" data-toggle="tab">
-                <i class="fas fa-users"></i>
-                <span lang="en">Teacher</span>
-            </a> -->
         </div>
         <div class="tab-content">	
             <div class="management_tab tab-pane fade in active">
