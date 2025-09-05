@@ -52,7 +52,7 @@
                     <div class="nav-indicator"></div>
                 </div> -->
 
-                <!-- Favorite -->
+                <!-- Setting -->
                 <div class="nav-item-wrapper">
                     <a href="class" class="nav-button">
                     <label for="profile" class="nav-button">

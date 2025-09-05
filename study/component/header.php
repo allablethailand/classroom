@@ -62,6 +62,10 @@ if ($stmt === false) {
     }
 }
 
+$hide_profile = ["profile", "edit_profile", "setting"]
+
+
+
 // var_dump($result);
 ?>
 
@@ -114,10 +118,10 @@ if ($stmt === false) {
                 </div>
             </div>
 
-            <div class="balance-container">
+            <!-- <div class="balance-container">
                 <p class="balance-label">Group Element:</p>
                 <p class="balance-amount"> &nbsp; Fire 🔥</p>
-            </div>
+            </div> -->
         </div>
 
     <?php
@@ -128,10 +132,16 @@ if ($stmt === false) {
                 <span class="back-arrow">←</span>
             </button>
             <h1 class="header-title"><?php echo ucfirst($currentScreen); ?></h1>
+            <?php 
+            // var_dump($currentScreen);
+            if(!in_array($currentScreen, $hide_profile)): ?>
+            
             <a href="profile" class="" style="background-color: white; border-radius: 100%">
 
                 <img style=" border-radius: 100%;" width="25" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
             </a>
+
+            <?php endif; ?>
             <!-- <div class="header-spacer"></div> -->
         </div>
     <?php

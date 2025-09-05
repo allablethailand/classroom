@@ -51,7 +51,7 @@ session_start();
             <div class="row">
                 <div class="container-menu" style="margin-top: 10px;">
                     <div class="header-menu">
-                        <span class="title-menu">101 - Applied Physics </span>
+                        <span class="title-menu">Training Registration</span>
                         <span class="subtitle-menu">3 weeks left</span>
                     </div>
 
@@ -59,21 +59,21 @@ session_start();
                         <div class="progress-section">
                             <div class="progress-header-flex">
                                 <!-- <h3 class="progress-title">test</h3> -->
-                                <span class="progress-text">
-                                    Your Progress:
+                                <span class="progress-text-bottom">
+                                    Wednesday, October 1, 2025
                                 </span>
-                                <span class="progress-text">
-                                    70 / 100
+                                <span class="progress-text-bottom">
+                                     9:30 - 12:00 A.M.
                                 </span>
 
                             </div>
 
                             <div class="progress-container">
-                                <div class="progress-bar-new">
+                                <!-- <div class="progress-bar-new">
                                     <?php foreach ($segments as $index => $segmentType): ?>
                                         <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
                                     <?php endforeach; ?>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -83,29 +83,61 @@ session_start();
             <div class="row">
                 <div class="container-menu" style="margin-top: 10px;">
                     <div class="header-menu">
-                        <span class="title-menu">505 - Advance English </span>
-                        <span class="subtitle-menu">9 weeks left</span>
+                        <span class="title-menu">Opening Ceremony</span>
+                        <span class="subtitle-menu">3 weeks left</span>
                     </div>
 
                     <div class="usage-menu">
                         <div class="progress-section">
-                            <div class="progress-header-flex">
+                             <div class="progress-header-flex">
                                 <!-- <h3 class="progress-title">test</h3> -->
-                                <span class="progress-text">
-                                    Your Progress:
+                                <span class="progress-text-bottom">
+                                    Wednesday, October 1, 2025
                                 </span>
-                                <span class="progress-text">
-                                    20 / 100
+                                <span class="progress-text-bottom">
+                                     1:00 - 5:00 P.M.
                                 </span>
 
                             </div>
 
+
                             <div class="progress-container">
-                                <div class="progress-bar-new">
+                                <!-- <div class="progress-bar-new">
                                     <?php foreach ($segments_two as $index => $segmentType): ?>
                                         <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
                                     <?php endforeach; ?>
-                                </div>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="row">
+                <div class="container-menu" style="margin-top: 10px;">
+                    <div class="header-menu">
+                        <span class="title-menu">Dinner</span>
+                        <span class="subtitle-menu">3 weeks left</span>
+                    </div>
+                    <div class="usage-menu">
+                        <div class="progress-section">
+                             <div class="progress-header-flex">
+                                <!-- <h3 class="progress-title">test</h3> -->
+                                <span class="progress-text-bottom">
+                                    Wednesday, October 1, 2025
+                                </span>
+                                <span class="progress-text-bottom">
+                                    6:00 P.M.
+                                </span>
+
+                            </div>
+
+
+                            <div class="progress-container">
+                                <!-- <div class="progress-bar-new">
+                                    <?php foreach ($segments_two as $index => $segmentType): ?>
+                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
+                                    <?php endforeach; ?>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -177,7 +209,7 @@ session_start();
                             </linearGradient>
                             </defs>
                         </svg>
-                        <h4 style="margin-top: 10px;">MY DOC</h4>
+                        <h4 style="margin-top: 10px;">HISTORY</h4>
                     </a>
                 </div>
             </div>
