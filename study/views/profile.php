@@ -456,7 +456,7 @@
     <div class="profile-header-container" style="gap: 5px;">
         <div class="settings-button-container">
             <a href="setting" class="settings-button" title="ตั้งค่าโปรไฟล์">
-                <i class="fas fa-cog"></i>
+                <i class="fas fa-ellipsis-v"></i>
             </a>
         </div>
         <div class="profile-avatar-circle" style="border-color: <?= $profile_border_color; ?>;">
