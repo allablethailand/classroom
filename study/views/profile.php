@@ -217,7 +217,7 @@
         .main-content-container {
             padding: 40px 20px;
             position: relative;
-            top: -30px;
+            top: -10px
         }
         
         .section-title {
@@ -437,6 +437,7 @@
             justify-content: center;
             align-items: center;
             margin-bottom: 25px;
+            color: #ff9900;
         }
         .section-header-icon i {
             font-size: 2em;
@@ -504,21 +505,21 @@
         <div class="profile-card" style="padding: 10px;">
             <div class="profile-course-container">
                 <?php if (!empty($classroom_name)) : ?>
-            <p class="profile-company">
-                <i class="fas fa-graduation-cap"></i>
-                หลักสูตร: <span><?= $classroom_name; ?></span>
+            <p class="profile-company" style="font-size: 14px;">
+                <i class="fas fa-graduation-cap" style="color: #0089ff; "></i>
+                <span  style="font-size: 16px; font-weight: bold; padding-right: .3em;">หลักสูตร:</span> <span><?= $classroom_name; ?></span>
             </p>
         <?php endif; ?>
                 <?php if (!empty($row_all["student_company"])) : ?>
-                <p class="profile-company">
-                    <i class="fas fa-building"></i>
-                    บริษัท: <span><?= $row_all["student_company"]; ?></span>
+                <p class="profile-company" style="font-size: 14px;">
+                    <i class="fas fa-building" style="color: #0089ff;"></i>
+                     <span  style="font-size: 16px; font-weight: bold; padding-right: .3em;">บริษัท:</span> <span><?= $row_all["student_company"]; ?></span>
                 </p>
                 <?php endif; ?>
                 <?php if (!empty($row_all["student_position"])) : ?>
-                <p class="profile-position">
-                    <i class="fas fa-briefcase"></i>
-                    ตำแหน่ง: <span><?= $row_all["student_position"]; ?></span>
+                <p class="profile-position" style="font-size: 14px;">
+                    <i class="fas fa-briefcase" style="color: #0089ff;"></i>
+                     <span  style="font-size: 16px ;font-weight: bold; padding-right: .3em;">ตำแหน่ง:</span> <span><?= $row_all["student_position"]; ?></span>
                 </p>
                 <?php endif; ?>
             </div>
@@ -582,21 +583,21 @@
             </div>
             <div class="info-grid">
                 <div class="info-item-box">
-                    <i class="fas fa-birthday-cake" style="font-size: 25px;"></i>
+                    <i class="fas fa-birthday-cake" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">วันเกิด</strong>
+                        <strong style="padding-left:10px; ">วันเกิด</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_birth_date"]) ? date("j F Y", strtotime($row_all["student_birth_date"])) : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-church" style="font-size: 25px;"></i>
+                    <i class="fas fa-church" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">ศาสนา</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_religion"]) ? $row_all["student_religion"] : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-tint" style="font-size: 25px;"></i>
+                    <i class="fas fa-tint" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">กรุ๊ปเลือด</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_bloodgroup"]) ? $row_all["student_bloodgroup"] : "-"; ?></span>
@@ -612,28 +613,28 @@
             </div>
             <div class="info-grid">
                 <div class="info-item-box">
-                    <i class="fas fa-star" style="font-size: 25px;"></i>
+                    <i class="fas fa-star" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">งานอดิเรก</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-music" style="font-size: 25px;"></i>
+                    <i class="fas fa-music" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-film" style="font-size: 25px;"></i>
+                    <i class="fas fa-film" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">หนังที่ชอบ</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-bullseye" style="font-size: 25px;"></i>
+                    <i class="fas fa-bullseye" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">เป้าหมาย</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : "ยังไม่ได้ระบุ"; ?></span>

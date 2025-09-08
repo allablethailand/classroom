@@ -293,13 +293,10 @@ body {
 
 
 
-
-
-
 .container-menu {
   background-color: white;
   border-radius: 1rem; /* rounded-2xl */
-  padding: 1rem; /* p-4 */
+  padding: 0.7rem 1rem; /* p-4 */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
   border: 1px solid #f3f4f6; /* border-gray-100 */
 }
@@ -308,7 +305,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem; /* mb-3 */
+  margin-bottom: 0.3rem; /* mb-3 */
 }
 
 .header-menu .title {
@@ -324,7 +321,7 @@ body {
 .usage-menu {
   align-items: center;
   gap: 0.75rem; /* gap-3 */
-  margin-bottom: 0.75rem; /* mb-3 */
+  /* margin-bottom: 0.75rem;  mb-3 */
 }
 
 .progress-container-menu {
@@ -390,15 +387,22 @@ body {
   color: #6b7280;
   font-size: 0.875rem;
   margin: 0;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
   display: flex;
 }
 
 .progress-text-bottom {
-  color: #6b7280;
+  color: #adadad;
   font-size: 0.875rem;
   margin: 0;
   display: flex;
+}
+
+.progress-text-end {
+  display: flex;
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-left: auto;
 }
 
 .progress-container {
@@ -449,3 +453,31 @@ body {
   height: 1.5rem;
   color: white;
 }
+
+.pill {
+    font-size: 0.7rem; /* Bootstrap normal font size */
+    line-height: 1.5;
+    height: 1.5rem;
+    border-radius: 12px;
+    /* padding: 0.3rem 1rem; */
+    display: inline-block;
+    white-space: nowrap;
+    vertical-align: middle;
+    position: relative;
+  }
+  /* .pill-icon-before {
+    padding-left: 2rem;
+  }
+  .pill-icon-before:before {
+    content: "\1F514"; 
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: #CCCCCC; 
+  } */
+  .label-default.pill {
+    background-color: #CCCCCC; /* Gray background */
+    color: white;
+  }

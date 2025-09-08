@@ -419,7 +419,7 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .schedule-title {
@@ -506,6 +506,7 @@ html {
 .calendar-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   margin-top: 16px;
   padding: 0 4px;
@@ -519,7 +520,7 @@ html {
   min-width: 0;
   overflow: hidden;
 }
-.week-nav-button {
+.day-nav-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -537,26 +538,28 @@ html {
   user-select: none;
   flex-shrink: 0;
 }
-.week-nav-button:hover {
+.day-nav-button:hover {
   background-color: #e5e7eb;
   color: #374151;
   transform: translateY(-1px);
 }
-.week-nav-button:active {
+.day-nav-button:active {
   transform: translateY(0);
   background-color: #d1d5db;
 }
-.week-nav-button:focus {
+.day-nav-button:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
 }
+
+
 
 @media (min-width: 375px) {
   .calendar-container {
     gap: 10px;
     padding: 0 6px;
   }
-  .week-nav-button {
+  .day-nav-button {
     width: 34px;
     height: 34px;
     min-width: 34px;
@@ -572,7 +575,7 @@ html {
     gap: 12px;
     padding: 0 8px;
   }
-  .week-nav-button {
+  .day-nav-button {
     width: 36px;
     height: 36px;
     min-width: 36px;
@@ -593,7 +596,7 @@ html {
   user-select: none;
   min-width: 0;
   overflow: hidden;
-  background-color: #e1e1e1;
+  background-color: #efefef;
 
 }
 .day-item:hover {
@@ -632,8 +635,8 @@ html {
   @media (max-width: 767px) {
     .modal-dialog {
       position: fixed !important;
-      top: 50% !important;
-      left: 5% !important;
+      top: 30% !important;
+      left: 1% !important;
       /* transform: translate(-50%, -50%) !important; */
       width: auto;
       margin: 10px;
@@ -641,22 +644,22 @@ html {
   }
 
 
-.week-nav-button:hover {
+.day-nav-button:hover {
   background-color: #e5e7eb;
   color: #374151;
   transform: translateY(-1px);
 }
 
-.week-nav-button:active {
+.day-nav-button:active {
   transform: translateY(0);
   background-color: #e2e2e2;
 }
 
 
-#next-week {
+#next-day {
   background-color: #e1e1e1;
 }
-#prev-week {
+#prev-day {
   background-color: #e1e1e1;
 }
 

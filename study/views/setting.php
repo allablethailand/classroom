@@ -344,9 +344,9 @@ if (isset($_SESSION['student_id'])) {
                         <?= !empty($row_all["student_bio"]) ? htmlspecialchars($row_all["student_bio"]) : "ยังไม่ได้เขียน Bio"; ?>
                     </p>
                     <div class="profile-course-container">
-    <p class="profile-course" style="margin: 0px; ">
-        <i class="fas fa-graduation-cap"></i>
-        หลักสูตร: <span><?= !empty($classroom_name) ? htmlspecialchars($classroom_name) : "ยังไม่ได้ระบุ"; ?></span>
+    <p class="profile-course" style="margin: 0px; font-size: 14px;">
+        <i class="fas fa-graduation-cap" style="color: #0089ff;"></i>
+        <span  style="font-size: 16px; font-weight: bold; padding-right: .3em;">หลักสูตร:</span> <span><?= !empty($classroom_name) ? htmlspecialchars($classroom_name) : "ยังไม่ได้ระบุ"; ?></span>
     </p>
 </div>
                 </div>
