@@ -38,18 +38,29 @@ if (!isset($_SESSION['student_id'])) {
     exit();
 }
 
-// var_dump($_SESSION['student_id']);
+// *** ส่วนที่แก้ไข: ดึง group_color เฉพาะสำหรับนักเรียนที่ล็อกอินอยู่ ***
+$profile_border_color = '#ff8c00'; // ตั้งค่าสีเริ่มต้น
+
 $studentId = (int)$_SESSION['student_id'];
-$sql = "SELECT `student_id`, comp_id , student_image_profile, IFNULL(student_firstname_en, student_firstname_th) AS student_name FROM `classroom_student` WHERE `student_id` = ?";
+$sql = "
+    SELECT 
+        cs.student_id, 
+        cs.comp_id, 
+        cs.student_image_profile, 
+        IFNULL(cs.student_firstname_en, cs.student_firstname_th) AS student_name,
+        cg.group_color
+    FROM `classroom_student` cs
+    LEFT JOIN `classroom_student_join` csj ON cs.student_id = csj.student_id
+    LEFT JOIN `classroom_group` cg ON csj.group_id = cg.group_id
+    WHERE cs.student_id = ?
+";
 
 $stmt = $mysqli->prepare($sql);
 
-// var_dump($studentId );
-
 if ($stmt === false) {
-    $error_message = "Database prepare error: " . $mysqli->error;
+    // จัดการข้อผิดพลาดในการเตรียมคำสั่ง SQL
+    // สามารถ log ข้อผิดพลาดหรือแสดงข้อความที่เหมาะสมได้
 } else {
-    // Bind parameter และ execute คำสั่ง
     $stmt->bind_param("i", $studentId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -58,38 +69,50 @@ if ($stmt === false) {
         $row = $result->fetch_assoc();
         $student_image_profile = GetUrl($row['student_image_profile']);
         $student_name = $row['student_name'];
+        // กำหนดสีขอบรูปภาพจากฐานข้อมูล ถ้าไม่มีให้ใช้สีเริ่มต้น #ff8c00
+        $profile_border_color = !empty($row['group_color']) ? htmlspecialchars($row['group_color']) : '#ff8c00';
+    } else {
+        // หากไม่พบข้อมูล ให้ใช้สีเริ่มต้นตามที่ตั้งไว้
+        $profile_border_color = '#ff8c00';
     }
+    $stmt->close();
 }
-
-$hide_profile = ["profile", "edit_profile", "setting"]
-
-
-
-// var_dump($result);
+$hide_profile = ["profile", "edit_profile", "setting"];
 ?>
 
 <head>
     <link rel="stylesheet" href="/classroom/study/css/header.css?v=<?php echo time(); ?>">
+    <style>
+        .profile-avatar-bordered {
+            width: 54px;
+            height: 54px;
+            border-radius: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2px;
+            box-sizing: border-box;
+            background-color: transparent;
+        }
+        /* แก้ไข: ใช้คลาสใหม่เพื่อแยกสไตล์ของรูปโปรไฟล์ */
+        .profile-avatar-bordered img {
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            object-fit: cover;
+            border: 2px solid transparent; /* สร้าง border ซ้อนกันเพื่อความเนียน */
+        }
+    </style>
 </head>
 
 <div class="orange-header">
-    <?php
-    if ($currentScreen == 'menu') {
-    ?>
-
+    <?php if ($currentScreen == 'menu') { ?>
         <div class="container-topnav">
             <div class="header-topnav">
                 <div class="title-group-topnav">
                     <span>
                         <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
-
-
-
-                        <!-- <div style="width: 20px; height: 20px; background-color: white; color: green; font-weight: bold; 
-                                    font-size: 30px; width: 54px; height: 54px; display: flex; justify-content: center; 
-                                    align-items: center; border-radius: 50%; user-select: none;">
-                            G
-                        </div> -->
                     </span>
                     <div class="">
                         <h1>Green Tech</h1>
@@ -102,25 +125,11 @@ $hide_profile = ["profile", "edit_profile", "setting"]
                             <i class="far fa-bell" style="font-size: 20px;"></i>
                         </span>
                     </button>
-                    <a href="profile" class="" style="background-color: white; border-radius: 100%">
-
-                        <img style=" border-radius: 100%;" width="25" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
+                    <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>;">
+                        <img style=" border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
                     </a>
-
-
-                    <!-- <div id="profile-right">
-							<span class="profile-img" style="border:4px solid #FF9900">
-								<img width="50" id="avatar_h" name="avatar_h" title="Admin" src="/images/default.png" onerror="this.src='/images/default.png'">
-							</span>
-                </div> -->
-
                 </div>
             </div>
-
-            <!-- <div class="balance-container">
-                <p class="balance-label">Group Element:</p>
-                <p class="balance-amount"> &nbsp; Fire 🔥</p>
-            </div> -->
         </div>
 
     <?php
@@ -132,16 +141,11 @@ $hide_profile = ["profile", "edit_profile", "setting"]
             </button>
             <h1 class="header-title"><?php echo ucfirst($currentScreen); ?></h1>
             <?php 
-            // var_dump($currentScreen);
             if(!in_array($currentScreen, $hide_profile)): ?>
-            
-            <a href="profile" class="" style="background-color: white; border-radius: 100%">
-
-                <img style=" border-radius: 100%;" width="25" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
+            <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>;">
+                <img style=" border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
             </a>
-
             <?php endif; ?>
-            <!-- <div class="header-spacer"></div> -->
         </div>
     <?php
     }
@@ -163,9 +167,6 @@ $hide_profile = ["profile", "edit_profile", "setting"]
             </div>
         </div>
     </div>
-
-    
-
 </div>
 
 <script>

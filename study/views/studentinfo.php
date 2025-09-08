@@ -19,13 +19,14 @@ global $mysqli;
 $student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($student_id > 0) {
-    // Modified SQL query to join with `classroom_student_join` and `classroom_group`
+    // Corrected SQL query to join with `classroom_student_join` and `classroom_group`
     // เพื่อดึงข้อมูล group_color ตามที่ต้องการ
-    $stmt = $mysqli->prepare("SELECT cs.*, cg.group_color 
-                              FROM classroom_student cs 
-                              LEFT JOIN classroom_student_join csj ON cs.student_id = csj.student_id
-                              LEFT JOIN classroom_group cg ON csj.group_id = cg.group_id
-                              WHERE cs.student_id = ? AND cs.status = 0");
+    $stmt = $mysqli->prepare("SELECT cs.*, cg.group_color,
+                                     IFNULL(cs.student_firstname_en, cs.student_firstname_th) AS student_name_display
+                             FROM classroom_student cs 
+                             LEFT JOIN classroom_student_join csj ON cs.student_id = csj.student_id
+                             LEFT JOIN classroom_group cg ON csj.group_id = cg.group_id
+                             WHERE cs.student_id = ? AND cs.status = 0");
     $stmt->bind_param("i", $student_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -51,34 +52,34 @@ if ($row_all === null) {
 $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_email']) || !empty($row_all['student_line']) || !empty($row_all['student_ig']) || !empty($row_all['student_facebook']);
 
 // --- ส่วนที่แก้ไขเพิ่มเข้ามา ---
-    // 1. ดึง classroom_id จาก classroom_student_join
-    $sql_join = "SELECT classroom_id FROM `classroom_student_join` WHERE student_id = ?";
-    $stmt_join = $mysqli->prepare($sql_join);
-    $stmt_join->bind_param("i", $student_id);
-    $stmt_join->execute();
-    $result_join = $stmt_join->get_result();
-    $join_data = $result_join->fetch_assoc();
-    $stmt_join->close();
+// 1. ดึง classroom_id จาก classroom_student_join
+$sql_join = "SELECT classroom_id FROM `classroom_student_join` WHERE student_id = ?";
+$stmt_join = $mysqli->prepare($sql_join);
+$stmt_join->bind_param("i", $student_id);
+$stmt_join->execute();
+$result_join = $stmt_join->get_result();
+$join_data = $result_join->fetch_assoc();
+$stmt_join->close();
 
-    $classroom_name = ""; // กำหนดค่าเริ่มต้นเป็นค่าว่าง
-    if ($join_data && $join_data['classroom_id']) {
-        $classroom_id = $join_data['classroom_id'];
-        
-        // 2. ใช้ classroom_id ดึง classroom_name จาก classroom_template
-        $sql_template = "SELECT classroom_name FROM `classroom_template` WHERE classroom_id = ?";
-        $stmt_template = $mysqli->prepare($sql_template);
-        $stmt_template->bind_param("i", $classroom_id);
-        $stmt_template->execute();
-        $result_template = $stmt_template->get_result();
-        $template_data = $result_template->fetch_assoc();
-        $stmt_template->close();
+$classroom_name = ""; // กำหนดค่าเริ่มต้นเป็นค่าว่าง
+if ($join_data && $join_data['classroom_id']) {
+    $classroom_id = $join_data['classroom_id'];
+    
+    // 2. ใช้ classroom_id ดึง classroom_name จาก classroom_template
+    $sql_template = "SELECT classroom_name FROM `classroom_template` WHERE classroom_id = ?";
+    $stmt_template = $mysqli->prepare($sql_template);
+    $stmt_template->bind_param("i", $classroom_id);
+    $stmt_template->execute();
+    $result_template = $stmt_template->get_result();
+    $template_data = $result_template->fetch_assoc();
+    $stmt_template->close();
 
-        if ($template_data) {
-            $classroom_name = $template_data['classroom_name'];
-        }
+    if ($template_data) {
+        $classroom_name = $template_data['classroom_name'];
     }
+}
 // กำหนดสีขอบรูปภาพเริ่มต้นเป็นสีส้ม ถ้าไม่มี group_color
-$profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_all['group_color']) : '#ff8c00';
+$profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row_all['group_color']) : '#ff8c00';
 ?>
 <!doctype html>
 <html>
@@ -181,7 +182,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             justify-content: center;
             margin: 0 auto;
             padding: 20px;
-           /* max-width: fit-content;*/
+            /* max-width: fit-content;*/
             max-width: 600px; 
             text-align: center;
             background: #fff;
@@ -475,7 +476,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     <?php require_once("component/header.php") ?>
     
     <div class="profile-header-container" style="gap: 5px;">
-        <div class="profile-avatar-circle" style="border-color: <?= $profile_border_color; ?>;">
+        <div class="profile-avatar-circle" style="border-color: <?= $profile_border_color1; ?>;">
             <img src="<?= GetUrl($row_all["student_image_profile"]); ?>" 
                 onerror="this.src='../../../images/default.png'" 
                 alt="Profile Picture">
