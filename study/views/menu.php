@@ -42,7 +42,13 @@ session_start();
     <?php
     $segments = ['complete', 'complete', 'complete', 'complete', 'complete', 'upcoming', 'upcoming', 'upcoming',];
     $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming',];
-
+    $old_segment = '<div class="progress-container">
+                                <div class="progress-bar-new">
+                                    <?php foreach ($segments as $index => $segmentType): ?>
+                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>';
     ?>
     <div class="main-content" style="margin-top: 10px;  margin-bottom: 5rem;">
         <!-- <h2 class="menu-section-title">เมนู</h2> -->
@@ -52,28 +58,29 @@ session_start();
                 <div class="container-menu" style="margin-top: 10px;">
                     <div class="header-menu">
                         <span class="title-menu">Training Registration</span>
-                        <span class="subtitle-menu">3 weeks left</span>
+                        <span class="subtitle-menu">1 day left</span>
                     </div>
 
                     <div class="usage-menu">
                         <div class="progress-section">
                             <div class="progress-header-flex">
                                 <!-- <h3 class="progress-title">test</h3> -->
-                                <span class="progress-text-bottom">
-                                    Wednesday, October 1, 2025
+                                <span class="progress-text">
+                                    Tuesday, September 9, 2025
                                 </span>
-                                <span class="progress-text-bottom">
+                                <span class="progress-text">
                                     9:30 - 12:00 A.M.
                                 </span>
 
                             </div>
-
-                            <div class="progress-container">
-                                <!-- <div class="progress-bar-new">
-                                    <?php foreach ($segments as $index => $segmentType): ?>
-                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
-                                    <?php endforeach; ?>
-                                </div> -->
+                            <div class="progress-header-flex">
+                                <!-- <h3 class="progress-title">test</h3> -->
+                                <span id="nextclass" class="progress-text-bottom">
+                                    Class will begin in 1 hour 30 mins.
+                                </span>
+                                <span class="progress-text-end">
+                                    <span class="label label-default pill pill-icon-before">ยังไม่เช็คอิน</span>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -91,13 +98,12 @@ session_start();
                         <div class="progress-section">
                             <div class="progress-header-flex">
                                 <!-- <h3 class="progress-title">test</h3> -->
-                                <span class="progress-text-bottom">
+                                <span class="progress-text">
                                     Wednesday, October 1, 2025
                                 </span>
-                                <span class="progress-text-bottom">
+                                <span class="progress-text">
                                     1:00 - 5:00 P.M.
                                 </span>
-
                             </div>
 
 
@@ -122,10 +128,10 @@ session_start();
                         <div class="progress-section">
                             <div class="progress-header-flex">
                                 <!-- <h3 class="progress-title">test</h3> -->
-                                <span class="progress-text-bottom">
+                                <span class="progress-text">
                                     Wednesday, October 1, 2025
                                 </span>
-                                <span class="progress-text-bottom">
+                                <span class="progress-text">
                                     6:00 P.M.
                                 </span>
 
@@ -197,6 +203,24 @@ session_start();
                         <h4 style="margin-top: 10px;">CALENDAR</h4>
                     </a>
 
+                    <!-- Histroy -->
+                    <a class="action-card" href="calendar">
+
+                        <svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="48" height="48" rx="9.99999" fill="url(#paint0_linear_226_27)"/>
+<path d="M31 18C23.837 18 18 23.837 18 31C18 38.163 23.837 44 31 44C38.163 44 44 38.163 44 31C44 23.837 38.163 18 31 18ZM36.655 35.641C36.473 35.953 36.148 36.122 35.81 36.122C35.641 36.122 35.472 36.083 35.316 35.979L31.286 33.574C30.285 32.976 29.544 31.663 29.544 30.506V25.176C29.544 24.643 29.986 24.201 30.519 24.201C31.052 24.201 31.494 24.643 31.494 25.176V30.506C31.494 30.974 31.884 31.663 32.287 31.897L36.317 34.302C36.785 34.575 36.941 35.173 36.655 35.641Z" fill="white"/>
+<path d="M30.5547 5C37.1098 5 41.0179 8.90782 41 15.4629V19.8203C38.7322 17.7904 35.8433 16.4406 32.6533 16.0908C33.0742 15.8605 33.3641 15.4129 33.3643 14.9053C33.3643 14.167 32.752 13.5548 32.0137 13.5547H14.0049C13.2665 13.5547 12.6543 14.1669 12.6543 14.9053C12.6545 15.6435 13.2666 16.2559 14.0049 16.2559H28.2324C24.6214 16.9295 21.4661 18.8964 19.2646 21.6582H14.0049C13.2666 21.6582 12.6544 22.2705 12.6543 23.0088C12.6543 23.7472 13.2665 24.3594 14.0049 24.3594H17.5479C16.7307 26.0115 16.2082 27.8353 16.0508 29.7627H14.0049C13.2665 29.7627 12.6543 30.3749 12.6543 31.1133C12.6544 31.8515 13.2666 32.4639 14.0049 32.4639H16.0713C16.3883 35.7372 17.7571 38.7024 19.8359 41.0176H15.4629C8.90794 41.0174 5.00014 37.1101 5 30.5371V15.4629C5.00013 8.90793 8.90793 5.00013 15.4629 5H30.5547Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_226_27" x1="4" y1="3" x2="45" y2="46" gradientUnits="userSpaceOnUse">
+<stop stop-color="#57EA49"/>
+<stop offset="1" stop-color="#009F0B"/>
+</linearGradient>
+</defs>
+</svg>
+
+                        <h4 style="margin-top: 10px;">HISTORY</h4>
+                    </a>
+
 
                 </div>
             </div>
@@ -204,6 +228,46 @@ session_start();
     </div>
     <?php require_once 'component/footer.php'; ?>
 </body>
+<script>
+function calculateTimeDiffInBangkok(targetDate) {
+  // Get current time in Bangkok timezone (UTC+7)
+  const now = new Date();
+  const bangkokNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+
+//   console.log(now)
+
+  // Parse the targetDate as a Date object if it's not already
+  const target = new Date(targetDate);
+
+  // Calculate time difference in milliseconds
+  const diffMs = Math.abs(target - bangkokNow);
+
+  // Convert milliseconds to total minutes
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+
+  // Calculate hour and minute difference
+  let hourdiff = 0;
+  let minutediff = 0;
+
+  if (totalMinutes < 24 * 60) {
+    hourdiff = Math.floor(totalMinutes / 60);
+    minutediff = totalMinutes % 60;
+  }
+
+  return { hourdiff, minutediff };
+}
+
+// Example usage:
+const targetDate = "2025-09-09T09:30:00+07:00"; // ISO string in Bangkok timezone
+const { hourdiff, minutediff } = calculateTimeDiffInBangkok(targetDate);
+
+const nextclassSpan = document.getElementById("nextclass");
+if (hourdiff > 0 || minutediff > 0) {
+  nextclassSpan.innerHTML = `Class will begin in <span style="color: #ff8c5a;">&nbsp; ${hourdiff} &nbsp;</span> hour${hourdiff !== 1 ? "s" : ""} <span style="color: #ff8c5a;">&nbsp; ${minutediff} &nbsp;</span> min${minutediff !== 1 ? "s" : ""}.`;
+} else {
+  nextclassSpan.innerHTML = "Class has started or time not valid.";
+}
+</script>
 
 
 </html>

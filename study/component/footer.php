@@ -9,7 +9,7 @@
             <!-- Home -->
             <div class="nav-item-wrapper">
                 <a href="menu" class="nav-button">
-                    <svg width="50px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="50px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" transform="matrix(-1, 0, 0, 1, 0, 0)">
                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                         <polyline points="9,22 9,12 15,12 15,22" />
                     </svg>
@@ -22,7 +22,7 @@
             <!-- Alumni -->
             <div class="nav-item-wrapper">
                 <a class="nav-button" href="group">
-                    <svg width="50px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="transform: scaleX(-1);">
+                    <svg width="50px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" transform="matrix(-1, 0, 0, 1, 0, 0)" fill="currentColor">
                         <polygon points="32 192 256 64 480 192 256 320 32 192" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" fill="none" />
                         <polyline points="112 240 112 368 256 448 400 368 400 240" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" fill="none" />
                         <line x1="480" y1="368" x2="480" y2="192" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
@@ -36,7 +36,7 @@
             <!-- Setting -->
             <div class="nav-item-wrapper">
                 <a href="setting" class="nav-button">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="matrix(-1, 0, 0, 1, 0, 0)">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                         <g id="SVGRepo_iconCarrier">
@@ -68,3 +68,34 @@
         </div>
     </div>
 </nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+  // Get current path or file from URL (e.g., "/chat", "/home", or "/setting")
+  const currentPath = window.location.pathname.split("/").pop().toLowerCase();
+
+  // Select all nav-item-wrapper divs
+  const navItems = document.querySelectorAll(".nav-item-wrapper");
+
+  navItems.forEach(item => {
+    const link = item.querySelector("a.nav-button");
+    if (link) {
+      // Extract href attribute value (without query or hash)
+      let href = link.getAttribute("href").toLowerCase().split(/[?#]/)[0];
+      
+      // If href matches currentPath, mark active
+      if (href === currentPath || (href === "menu" && (currentPath === "" || currentPath === "index.html"))) {
+        item.classList.add("active");
+        link.classList.add("active");
+
+        // Also make nav-indicator visible
+        const indicator = item.querySelector(".nav-indicator");
+        if (indicator) {
+          indicator.style.opacity = "1";
+          indicator.style.transform = "translateY(0)";
+        }
+      }
+    }
+  });
+});
+</script>
