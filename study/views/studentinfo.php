@@ -237,7 +237,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         .main-content-container {
             padding: 40px 20px;
             position: relative;
-            top: -30px;
+            top: -10px;
         }
         
         .section-title {
