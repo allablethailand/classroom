@@ -10,14 +10,15 @@ body {
   z-index: 10;
   padding-left: 1.5rem; /* px-6 */
   padding-right: 1.5rem;
-  padding-bottom: 0.8rem; /* pb-6 */
+  padding-top: 0.8rem; /* pb-6 */
+  padding-bottom: 0.4rem; /* pb-6 */
 }
 
 .header-topnav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.3rem; /* mb-6 */
+  margin-bottom: 0.8rem; /* mb-6 */
 }
 
 .title-group-topnav h1 {
