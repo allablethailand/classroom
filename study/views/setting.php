@@ -131,6 +131,8 @@ if (isset($_SESSION['student_id'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+    <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
+
     
     <style>
         body {
@@ -183,6 +185,7 @@ if (isset($_SESSION['student_id'])) {
             max-width: 960px;
             margin: 0 auto;
             padding: 20px;
+            margin-bottom: 15vh;
         }
 
         .settings-card {
@@ -341,7 +344,7 @@ if (isset($_SESSION['student_id'])) {
                         <?= !empty($row_all["student_bio"]) ? htmlspecialchars($row_all["student_bio"]) : "ยังไม่ได้เขียน Bio"; ?>
                     </p>
                     <div class="profile-course-container">
-    <p class="profile-course" style="margin: 0px;">
+    <p class="profile-course" style="margin: 0px; ">
         <i class="fas fa-graduation-cap"></i>
         หลักสูตร: <span><?= !empty($classroom_name) ? htmlspecialchars($classroom_name) : "ยังไม่ได้ระบุ"; ?></span>
     </p>
