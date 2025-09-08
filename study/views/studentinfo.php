@@ -457,6 +457,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             justify-content: center;
             align-items: center;
             margin-bottom: 25px;
+             color: #ff9900;
         }
         .section-header-icon i {
             font-size: 2em;
@@ -519,21 +520,21 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         <div class="profile-card" style="padding: 10px;">
             <div class="profile-course-container">
                     <?php if (!empty($classroom_name)) : ?>
-            <p class="profile-company">
-                <i class="fas fa-graduation-cap"></i>
-                หลักสูตร: <span><?= $classroom_name; ?></span>
+            <p class="profile-company" style="font-size: 14px;">
+                <i class="fas fa-graduation-cap"  style="color: #0089ff;"></i>
+                <span  style="font-size: 16px; font-weight: bold; padding-right: .3em;">หลักสูตร:</span> <span><?= $classroom_name; ?></span>
             </p>
         <?php endif; ?>
                 <?php if (!empty($row_all["student_company"])) : ?>
-                <p class="profile-company">
-                    <i class="fas fa-building"></i>
-                    บริษัท: <span><?= $row_all["student_company"]; ?></span>
+                <p class="profile-company" style="font-size: 14px;">
+                    <i class="fas fa-building" style="color: #0089ff;"></i>
+                   <span  style="font-size: 16px; font-weight: bold; padding-right: .3em;">บริษัท:</span> <span><?= $row_all["student_company"]; ?></span>
                 </p>
                 <?php endif; ?>
                 <?php if (!empty($row_all["student_position"])) : ?>
-                <p class="profile-position">
-                    <i class="fas fa-briefcase"></i>
-                    ตำแหน่ง: <span><?= $row_all["student_position"]; ?></span>
+                <p class="profile-position" style="font-size: 14px;">
+                    <i class="fas fa-briefcase" style="color: #0089ff;"></i>
+                    <span  style="font-size: 16px ;font-weight: bold; padding-right: .3em;">ตำแหน่ง:</span> <span><?= $row_all["student_position"]; ?></span>
                 </p>
                 <?php endif; ?>
             </div>
