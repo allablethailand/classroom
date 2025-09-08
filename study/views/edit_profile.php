@@ -630,6 +630,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             justify-content: center;
             align-items: center;
             margin-bottom: 25px;
+             color: #ff9900;
         }
 
         .section-header-icon i {
