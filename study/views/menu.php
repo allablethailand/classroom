@@ -204,7 +204,7 @@ session_start();
                     </a>
 
                     <!-- Histroy -->
-                    <a class="action-card" href="calendar">
+                    <a class="action-card" href="history">
 
                         <svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="48" height="48" rx="9.99999" fill="url(#paint0_linear_226_27)"/>
