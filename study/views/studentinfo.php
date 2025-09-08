@@ -598,21 +598,21 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             </div>
             <div class="info-grid">
                 <div class="info-item-box">
-                    <i class="fas fa-birthday-cake" style="font-size: 25px;"></i>
+                    <i class="fas fa-birthday-cake" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">วันเกิด</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_birth_date"]) ? date("j F Y", strtotime($row_all["student_birth_date"])) : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-church" style="font-size: 25px;"></i>
+                    <i class="fas fa-church" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">ศาสนา</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_religion"]) ? $row_all["student_religion"] : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-tint" style="font-size: 25px;"></i>
+                    <i class="fas fa-tint" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">กรุ๊ปเลือด</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_bloodgroup"]) ? $row_all["student_bloodgroup"] : "-"; ?></span>
@@ -628,28 +628,28 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             </div>
             <div class="info-grid">
                 <div class="info-item-box">
-                    <i class="fas fa-star" style="font-size: 25px;"></i>
+                    <i class="fas fa-star" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">งานอดิเรก</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-music" style="font-size: 25px;"></i>
+                    <i class="fas fa-music" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-film" style="font-size: 25px;"></i>
+                    <i class="fas fa-film" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">หนังที่ชอบ</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
-                    <i class="fas fa-bullseye" style="font-size: 25px;"></i>
+                    <i class="fas fa-bullseye" style="font-size: 18px;"></i>
                     <div class="info-text">
                         <strong style="padding-left:10px;">เป้าหมาย</strong>
                         <span style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : "ยังไม่ได้ระบุ"; ?></span>
