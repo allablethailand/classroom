@@ -207,16 +207,20 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     /* Calendar Section */
     .calendar-card {
         background-color: #fff;
-        border-radius: 20px;
-        padding: 20px;
+        border-bottom-right-radius: 20px;
+        border-bottom-left-radius: 20px;
+        padding: 5px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     .calendar-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        padding: 20px;
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
         color: #ff8c00;
+        background-color: #ebebeb;
     }
     .calendar-header h2 {
         font-weight: 700;
@@ -238,12 +242,42 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         grid-template-columns: repeat(7, 1fr);
         gap: 5px;
         text-align: center;
-    }
-    .calendar-weekday {
-        font-weight: 700;
-        color: #7f8c8d;
         padding-bottom: 5px;
     }
+    .calendar-weekday {
+    font-weight: bold;
+    font-size: 1.3em;
+    /* สีฟอนต์เริ่มต้นสำหรับวันในสัปดาห์ */
+}
+
+/* สีเฉพาะเจาะจงสำหรับแต่ละวัน */
+.calendar-weekday:nth-child(1) {
+    color: #fd0101; /* สีแดงเข้มสำหรับวันอาทิตย์ */
+}
+
+.calendar-weekday:nth-child(2) {
+    color: #e9c500; /* สีเหลืองสำหรับวันจันทร์ */
+}
+
+.calendar-weekday:nth-child(3) {
+    color: #FF1493; /* สีชมพูเข้มสำหรับวันอังคาร */
+}
+
+.calendar-weekday:nth-child(4) {
+    color: #00d600; /* สีเขียวเข้มสำหรับวันพุธ */
+}
+
+.calendar-weekday:nth-child(5) {
+    color: #FF8C00; /* สีส้มเข้มสำหรับวันพฤหัสบดี */
+}
+
+.calendar-weekday:nth-child(6) {
+    color: #0000ff; /* สีน้ำเงินเข้มสำหรับวันศุกร์ */
+}
+
+.calendar-weekday:nth-child(7) {
+    color: #9503ff; /* สีม่วงเข้มสำหรับวันเสาร์ */
+}
     .calendar-day {
         position: relative;
         background-color: #f7f9fc;
@@ -409,12 +443,14 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     }
     .daily-schedule-item .subject {
         font-weight: 600;
-        font-size: 1.1em;
-        color: #333;
+        font-size: 1em;
+        color: #555;
+        padding-bottom: .6em;
     }
     .daily-schedule-item .date-time {
         color: #7f8c8d;
         font-size: 0.9em;
+        padding-bottom: .6em;
     }
     .daily-schedule-item .status-text {
         color: #2ecc71;
@@ -843,12 +879,13 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     require_once ("component/header.php")
     ?>
 <div class="schedule-container">
-    <div class="calendar-card">
-        <div class="calendar-header">
+     <div class="calendar-header">
             <button class="calendar-nav-btn" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
             <h2 id="currentMonthYear"></h2>
             <button class="calendar-nav-btn" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
         </div>
+    <div class="calendar-card">
+       
         <div class="calendar-grid">
             <div class="calendar-weekday">อา</div>
             <div class="calendar-weekday">จ</div>
@@ -961,39 +998,44 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
         }
     }
 
-    function showDailySchedule(dateStr) {
-        const classes = allMonthScheduleData.filter(cls => cls.date === dateStr);
-        
-        let htmlContent = `<div class="schedule-header-inline"><h3>ตารางเรียนวันที่ ${formatDateThai(dateStr)}</h3></div>`;
+   function showDailySchedule(dateStr) {
+    const classes = allMonthScheduleData.filter(cls => cls.date === dateStr);
 
-        if (classes && classes.length > 0) {
-            htmlContent += `<div class="daily-schedule-list">`;
-            classes.forEach(cls => {
-                const statusText = cls.status === 'checked_in' ? 
-                    `<span class="status-text"><i class="fas fa-check-circle"></i> เช็คอินแล้ว</span>` :
-                    `<span class="status-text-not-checked-in"></span>`;
+    let htmlContent = `<div id="dailyScheduleHeader" style="color:#555;"class="schedule-header-inline"><h3>ตารางเรียนวันที่ ${formatDateThai(dateStr)}</h3></div>`;
 
-                const checkinButtonHtml = cls.status === 'checked_in'
-                    ? ``
-                    : `<div class="btn-checkin-container" style="padding-top:5px;"><button class="btn-checkin" >ยังไม่เช็คอิน</button></div>`;
+    if (classes && classes.length > 0) {
+        htmlContent += `<div class="daily-schedule-list">`;
+        classes.forEach(cls => {
+            const statusText = cls.status === 'checked_in' ? 
+                `<span class="status-text"><i class="fas fa-check-circle"></i> เช็คอินแล้ว</span>` :
+                `<span class="status-text-not-checked-in"></span>`;
 
-                htmlContent += `
-                    <div class="daily-schedule-item ${cls.status === 'checked_in' ? 'checked-in' : 'not-checked-in'}">
-                        <div class="subject">${cls.subject}</div>
-                        <div class="date-time">${formatDateThai(cls.date)} • ${cls.time}</div>
-                        ${statusText}
-                        ${checkinButtonHtml}
-                    </div>
-                `;
-            });
-            htmlContent += `</div>`;
-        } else {
-            // แก้ไขตรงนี้
-            htmlContent += `<p class="no-events-message">ไม่มีตารางเรียนในวันนี้ครับ 🙂</p>`;
-        }
-        
-        dailyScheduleDisplay.innerHTML = htmlContent;
+            const checkinButtonHtml = cls.status === 'checked_in'
+                ? ``
+                : `<div class="btn-checkin-container" style="padding-top:5px;"><button class="btn-checkin" >ยังไม่เช็คอิน</button></div>`;
+
+            htmlContent += `
+                <div class="daily-schedule-item ${cls.status === 'checked_in' ? 'checked-in' : 'not-checked-in'}">
+                    <div class="subject">${cls.subject}</div>
+                    <div class="date-time">${formatDateThai(cls.date)} • ${cls.time}</div>
+                    ${statusText}
+                    ${checkinButtonHtml}
+                </div>
+            `;
+        });
+        htmlContent += `</div>`;
+    } else {
+        htmlContent += `<p class="no-events-message">ไม่มีตารางเรียนในวันนี้ครับ 🙂</p>`;
     }
+
+    dailyScheduleDisplay.innerHTML = htmlContent;
+
+    // โค้ดที่เพิ่มเข้ามาใหม่
+    const dailyScheduleHeader = document.getElementById('dailyScheduleHeader');
+    if (dailyScheduleHeader) {
+        dailyScheduleHeader.scrollIntoView({ behavior: 'smooth' });
+    }
+}
 
     function initiateCheckIn(classId) {
         currentClassId = classId;
