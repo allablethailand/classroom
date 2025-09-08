@@ -7,6 +7,10 @@
         case '/classroom/study':
             require __DIR__.'/views/menu.php';
         break;
+        case '/classroom/study/consent/':
+        case '/classroom/study/consent':
+            require __DIR__.'/views/consent.php';
+        break;
         case '/classroom/study/schedule/':
         case '/classroom/study/schedule':
             require __DIR__.'/views/schedule.php';
