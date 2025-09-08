@@ -56,6 +56,7 @@ $courses = [
 ];
 
 
+
 function renderCourseCard($course)
 {
     $initial = mb_substr($course['instructor'], 0, 1);
@@ -178,8 +179,8 @@ function renderCourseCard($course)
             </div>
         </div>
 
-        <?php require_once 'component/footer.php'; ?>
     </div>
+    <?php require_once 'component/footer.php'; ?>
 
 </body>
 

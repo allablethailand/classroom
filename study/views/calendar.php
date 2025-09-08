@@ -181,6 +181,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     <title>Schedule • ORIGAMI SYSTEM</title>
     <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/dist/css/sweetalert.css">
     <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
     <script src="/bootstrap/3.3.6/js/jquery-2.2.3.min.js" type="text/javascript"></script>

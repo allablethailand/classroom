@@ -265,8 +265,8 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                 </div>
             </div> -->
         </div>
-        <?php require_once 'component/footer.php'; ?>
     </div>
+    <?php require_once 'component/footer.php'; ?>
 
 
 </body>
