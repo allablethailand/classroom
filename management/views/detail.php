@@ -80,10 +80,10 @@
                 <i class="fas fa-user-shield"></i>
                 <span lang="en">Consent</span>
             </a>
-            <!-- <a href=".management_tab" class="get-management edit-mode" data-page="teacher" data-toggle="tab">
+            <a href=".management_tab" class="get-management edit-mode" data-page="teacher" data-toggle="tab">
                 <i class="fas fa-chalkboard-teacher"></i>
                 <span lang="en">Teacher</span>
-            </a> -->
+            </a>
             <a href=".management_tab" class="get-management edit-mode" data-page="registration" data-toggle="tab">
                 <i class="fas fa-users"></i>
                 <span lang="en">Registration</span>
