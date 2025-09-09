@@ -354,9 +354,9 @@ $(document).ready(function() {
     updateDateDisplay();
   });
 
-  function currentDateSchedule(date_input) {
-    // select the date where date_dataarray = date_input; 
-  }
+  // Cancel First Modal
 
+
+    
   updateDateDisplay();
 });

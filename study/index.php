@@ -76,7 +76,11 @@
         case '/classroom/study/class':
             require __DIR__.'/views/class.php';
         break;
-         case '/classroom/study/history/':
+        case '/classroom/study/classinfo/':
+        case '/classroom/study/classinfo':
+            require __DIR__.'/views/classinfo.php';
+        break;
+        case '/classroom/study/history/':
         case '/classroom/study/history':
             require __DIR__.'/views/history.php';
         break;

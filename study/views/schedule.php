@@ -117,69 +117,48 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
 
 
             <div id="scheduleContainer"></div>
-
-            <!-- First Modal -->
-            <div id="scheduleModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content custom-modal-color">
-                        <div class="modal-header custom-header-color">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            <h4 class="modal-title" id="scheduleModalLabel">Schedule Detail</h4>
-                        </div>
-                        <div class="modal-body">
-                            <p id="modalDetails"></p>
-                            <p id="modalTime"></p>
-                            <p id="modalSpeakers"></p>
-                            <!-- Button to open second modal -->
-                            <div class="" style="text-align: right;">
-                                <button type="button" class="btn btn-primary open-new-modal" data-toggle="modal" data-target="#newModal">
-                                    เข้าร่วม
-                                </button>
-                                <button type="button" class="btn btn-secondary decline-modal" data-toggle="modal" style="margin-left:  10px;">
-                                    ปฎิเสธ
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Second Modal -->
-            <div id="newModal" class="modal fade" tabindex="-2" role="dialog" aria-labelledby="newModalLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content custom-modal-color-2">
-                        <div class="modal-header custom-header-color-2">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            <h4 class="modal-title" id="newModalLabel">Join Event</h4>
-                        </div>
-                        <div class="modal-body" style="text-align: center;">
-                            <!-- Content of the second modal -->
-                            <p>เช็คอินเพื่อเข้าร่วมอีเว้นท์นี้เลยใช่มั้ย</p>
-                            <div style="display: flex; margin:auto">
-                                <p><b>ช่วงเวลาระหว่าง: </b>
-                                <p id="modalTimeNew" style="margin-left: 10px;"></p>
-                                </p>
-                            </div>
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary accept-event" data-dismiss="modal">ตกลง</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
         <?php require_once("component/footer.php"); ?>
 
     </div>
 
-
-
 </body>
+<script>
+    // Cancel modal on decline button click
+    $(document).on('click', '.decline-modal', function() {
+        // Find closest modal to this button and hide it
+        $(this).closest('.modal').modal('hide');
+
+        swal({
+            type: 'error',
+            title: 'ปฏิเสธ',
+            text: 'คุณได้ปฏิเสธการเข้าร่วมอีเวนท์นี้',
+        });
+    });
+
+    // Open second modal from first modal's "join" button
+    $(document).on('click', '.open-new-modal', function() {
+        const firstModal = $(this).closest('.modal');
+        const index = firstModal.attr('id').split('-').pop(); // extract index
+
+        // Hide first modal, then show second modal linked by index
+        firstModal.modal('hide');
+        firstModal.one('hidden.bs.modal', function() {
+            const newModal = $('#newModal-' + index);
+
+            newModal.modal('show');
+        });
+    });
+
+    // Accept event on second modal
+    $(document).on('click', '.accept-event', function() {
+        $(this).closest('.modal').modal('hide');
+
+        swal({
+            type: 'success',
+            title: 'เข้าร่วมสำเร็จ',
+            text: 'คุณได้เข้าร่วมอีเว้นท์นี้เรียบร้อยแล้ว',
+        });
+    });
+</script>
 </html>
