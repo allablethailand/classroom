@@ -548,6 +548,7 @@ function buildRegistration() {
         var template = `
             <input type="search" class="form-control input-sm search-datatable" placeholder="" autocomplete="off" style="margin-bottom:0px !important;">
             <button type="button" class="btn btn-white text-green" style="font-size:12px;" onclick="importStudent('')"><i class="fas fa-file-excel"></i> <span lang="en">Import</span></button> 
+            <button type="button" class="btn btn-green" style="font-size:12px;" onclick="registerStudent()"><i class="fas fa-plus"></i> <span lang="en">Register</span></button> 
         `;
         $('div#tb_registration_filter.dataTables_filter input').hide();
         $('div#tb_registration_filter.dataTables_filter label').append(template);
@@ -568,6 +569,22 @@ function buildRegistration() {
             }
         });
     }
+}
+function registerStudent() {
+   $.ajax({
+        url: "/classroom/management/actions/registration.php",
+        type: "POST",
+        data: {
+            action: 'getClassroomKey',
+            classroom_id: classroom_id
+        },
+        dataType: "JSON",
+        type: 'POST',
+        success: function(result) {
+            let classroom_key = result.classroom_key;
+            window.open(`/classroom/register/${classroom_key}`, '_blank');
+        }
+    }); 
 }
 function confirmRegistration(join_id, option) {
     event.stopPropagation();
