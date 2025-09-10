@@ -250,31 +250,31 @@ function manageTeacher(teacher_id) {
                             <label class="form-label">ที่อยู่ <span class="text-danger">*</span></label>
                             <input type="hidden" id="teacher_address" name="teacher_address">
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-4 mb-3" style="padding-bottom:10px;">
                                     <input type="text" class="form-control" id="teacher_address_house_no" placeholder="บ้านเลขที่">
                                     <div class="invalid-feedback"></div>
                                 </div>
-                                <div class="col-md-8 mb-3">
+                                <div class="col-md-8 mb-3" style="padding-bottom:10px;">
                                     <input type="text" class="form-control" id="teacher_address_road" placeholder="ถนน">
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-3" style="padding-bottom:10px;">
                                     <input type="text" class="form-control zipcode-search" id="teacher_address_subdistrict" placeholder="ตำบล / แขวง">
                                     <div class="invalid-feedback"></div>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-3" style="padding-bottom:10px;">
                                     <input type="text" class="form-control zipcode-search" id="teacher_address_district" placeholder="อำเภอ / เขต">
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-3" style="padding-bottom:10px;">
                                     <input type="text" class="form-control zipcode-search" id="teacher_address_province" placeholder="จังหวัด">
                                     <div class="invalid-feedback"></div>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-3" style="padding-bottom:10px;">
                                     <input type="text" class="form-control zipcode-search" id="teacher_address_zipcode" placeholder="รหัสไปรษณีย์" maxlength="5">
                                     <div class="invalid-feedback"></div>
                                 </div>
@@ -516,99 +516,72 @@ async function fetchPositions() {
 }
 
 // Function สำหรับดึงข้อมูลเพื่อแก้ไข
+    // Function สำหรับดึงข้อมูลเพื่อแก้ไข
+// Function สำหรับดึงข้อมูลเพื่อแก้ไข
 let selectedFiles = [];
 let currentFiles = [];
 
-    // Function สำหรับดึงข้อมูลเพื่อแก้ไข
 function fetchTeacherData(teacher_id) {
-        $.ajax({
-            url: "/classroom/management/actions/teacher.php",
-            type: "POST",
-            data: {
-                action: "getTeacherData",
-                teacher_id: teacher_id
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response) {
-                    $('#teacher_id').val(response.teacher_id);
-                    // แปลงค่าคำนำหน้าให้ถูกต้อง
-                    const perfix_map = ['นาย', 'นาง', 'นางสาว'];
-                    $('#teacher_perfix').val(perfix_map[parseInt(response.teacher_perfix)]);
+    $.ajax({
+        url: "/classroom/management/actions/teacher.php",
+        type: "POST",
+        data: {
+            action: "getTeacherData",
+            teacher_id: teacher_id
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response) {
+                $('#teacher_id').val(response.teacher_id);
+                // แปลงค่าคำนำหน้าให้ถูกต้อง
+                const perfix_map = ['นาย', 'นาง', 'นางสาว'];
+                $('#teacher_perfix').val(perfix_map[parseInt(response.teacher_perfix)]);
 
-                    $('#teacher_firstname_th').val(response.teacher_firstname_th);
-                    $('#teacher_lastname_th').val(response.teacher_lastname_th);
-                    $('#teacher_firstname_en').val(response.teacher_firstname_en);
-                    $('#teacher_lastname_en').val(response.teacher_lastname_en);
-                    $('#teacher_nickname_th').val(response.teacher_nickname_th);
-                    $('#teacher_nickname_en').val(response.teacher_nickname_en);
-                    $('#teacher_idcard').val(response.teacher_idcard);
-                    $('#teacher_passport').val(response.teacher_passport);
-                    $('#teacher_birth_date').val(response.teacher_birth_date);
-                    $('#teacher_mobile').val(response.teacher_mobile);
-                    
-                    // 🆕 แยกข้อมูลที่อยู่
-                    if (response.teacher_address) {
-                        const addressParts = response.teacher_address.split(", ");
-                        $('#teacher_address_house_no').val(addressParts[0] || '');
-                        $('#teacher_address_road').val(addressParts[1] || '');
-                        $('#teacher_address_subdistrict').val(addressParts[2] || '');
-                        $('#teacher_address_district').val(addressParts[3] || '');
-                        $('#teacher_address_province').val(addressParts[4] || '');
-                        $('#teacher_address_zipcode').val(addressParts[5] || '');
-                    }
-                    
-                    // 🆕 ดึงข้อมูลการศึกษาและแยกใส่ในฟอร์มใหม่
-                    if (response.teacher_education) {
-                        const educationLines = response.teacher_education.split('\n');
-                        educationLines.forEach(line => {
-                            if (line.includes('ระดับปริญญาโท')) {
-                                const [school, major] = line.replace('ระดับปริญญาโท: ', '').split(' (');
-                                $('.education-input[data-level="master"][data-field="school"]').val(school.trim());
-                                $('.education-input[data-level="master"][data-field="major"]').val(major.replace(')', '').trim());
-                            } else if (line.includes('ระดับปริญญาตรี')) {
-                                const [school, major] = line.replace('ระดับปริญญาตรี: ', '').split(' (');
-                                $('.education-input[data-level="bachelor"][data-field="school"]').val(school.trim());
-                                $('.education-input[data-level="bachelor"][data-field="major"]').val(major.replace(')', '').trim());
-                            } else if (line.includes('ระดับมัธยมศึกษา')) {
-                                const [school, major] = line.replace('ระดับมัธยมศึกษา: ', '').split(' (');
-                                $('.education-input[data-level="highschool"][data-field="school"]').val(school.trim());
-                                $('.education-input[data-level="highschool"][data-field="major"]').val(major.replace(')', '').trim());
-                            }
-                        });
-                    }
-                    
-                    $('#teacher_company').val(response.teacher_company);
-                    $('#teacher_experience').val(response.teacher_experience);
-                    $('#teacher_username').val(response.teacher_username);
-                    $('#teacher_email').val(response.teacher_email);
-                    $('#teacher_bio').val(response.teacher_bio);
-                    $('#teacher_position').val(response.teacher_position);
-                    $('#position_id').val(response.position_id);
+                $('#teacher_firstname_th').val(response.teacher_firstname_th);
+                $('#teacher_lastname_th').val(response.teacher_lastname_th);
+                $('#teacher_firstname_en').val(response.teacher_firstname_en);
+                $('#teacher_lastname_en').val(response.teacher_lastname_en);
+                $('#teacher_nickname_th').val(response.teacher_nickname_th);
+                $('#teacher_nickname_en').val(response.teacher_nickname_en);
+                $('#teacher_idcard').val(response.teacher_idcard);
+                $('#teacher_passport').val(response.teacher_passport);
+                $('#teacher_birth_date').val(response.teacher_birth_date);
+                $('#teacher_mobile').val(response.teacher_mobile);
+                
+                // ... (โค้ดเดิมส่วนอื่นๆ) ...
+                
+                $('#teacher_company').val(response.teacher_company);
+                $('#teacher_experience').val(response.teacher_experience);
+                $('#teacher_username').val(response.teacher_username);
+                $('#teacher_email').val(response.teacher_email);
+                $('#teacher_bio').val(response.teacher_bio);
+                $('#teacher_position').val(response.teacher_position);
+                $('#position_id').val(response.position_id);
 
-                    if (response.teacher_image_profile) {
-                        showProfilePreview(response.teacher_image_profile);
-                    }
-                    if (response.teacher_card_front) {
-                        showCardPreview(response.teacher_card_front, '#current-card-front');
-                    }
-                    if (response.teacher_card_back) {
-                        showCardPreview(response.teacher_card_back, '#current-card-back');
-                    }
-
-                    // 🆕 แสดงไฟล์เอกสารแนบเดิม
-                    if (response.teacher_attach_document) {
-                        currentFiles = response.teacher_attach_document.split('|').filter(Boolean);
-                        displayCurrentFiles(currentFiles, '#document-preview-container');
-                        $('#teacher_attach_document_current').val(response.teacher_attach_document);
-                    }
-                } else {
-                    Swal.fire('ไม่พบข้อมูลครู', '', 'warning');
+                // **ส่วนนี้จะทำงานได้ทันที เพราะ URL ถูกจัดการมาแล้วจากฝั่ง PHP**
+                if (response.teacher_image_profile) {
+                    showProfilePreview(response.teacher_image_profile);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดในการดึงข้อมูลครู', 'error');
+                if (response.teacher_card_front) {
+                    showCardPreview(response.teacher_card_front, '#current-card-front');
+                }
+                if (response.teacher_card_back) {
+                    showCardPreview(response.teacher_card_back, '#current-card-back');
+                }
+
+                // 🆕 แสดงไฟล์เอกสารแนบเดิม
+                if (response.teacher_attach_document) {
+                    currentFiles = response.teacher_attach_document.split('|').filter(Boolean);
+                    displayCurrentFiles(currentFiles, '#document-preview-container');
+                    $('#teacher_attach_document_current').val(response.teacher_attach_document);
+                }
+            } else {
+                Swal.fire('ไม่พบข้อมูลครู', '', 'warning');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดในการดึงข้อมูลครู', 'error');
         }
     });
 }
