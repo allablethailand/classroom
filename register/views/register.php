@@ -51,9 +51,9 @@
                 <div class="text-center">
                     <img class="comp-logo" onerror="this.src='/images/origami-academy.png'" style="height: 125px;">
                 </div>
-                <h3 class="form-title">
+                <h4 class="form-title">
                     <span data-lang="registration_form"></span>
-                </h3>
+                </h4>
                 <form id="registrationForm">
                     <div class="row">
                         <div class="col-md-12">

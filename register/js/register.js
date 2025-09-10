@@ -27,7 +27,6 @@ const translations = {
         position: "Position",
         username: "Username", 
         password: "Password",
-        view_on_map: "View on Map", 
         i_accept: "I accept", 
         policy: "Terms and Conditions & Privacy Policy",
         password_info: "Password must be 4–20 characters, using only English letters or numbers.",
@@ -68,7 +67,6 @@ const translations = {
         position: "ตำแหน่ง",
         username: "ชื่อผู้ใช้", 
         password: "รหัสผ่าน",
-        view_on_map: "ดูบนแผนที่", 
         i_accept: "ข้าพเจ้ายอมรับ", 
         policy: "ข้อกำหนดและเงื่อนไข รวมถึงนโยบายความเป็นส่วนตัว",
         password_info: "รหัสผ่านต้องมีความยาว 4–20 ตัวอักษร และใช้ได้เฉพาะตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น",
@@ -256,14 +254,7 @@ function initTemplate(data) {
     if (data.classroom_type === 'online') {
         $location.html(`Online at ${data.classroom_place || ''}`);
     } else {
-        let mapHtml = '';
-        if (data.classroom_place) {
-            const [lat, lng] = data.classroom_place.split(',').map(c => c.trim());
-            if (lat && lng) {
-                mapHtml = `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="btn btn-sm btn-warning" data-lang="view_on_map">View on Map</a>`;
-            }
-        }
-        $location.html(`<i class="fas fa-map-marker-alt"></i> ${data.classroom_source || '-'} <p style="margin-top:10px;">${mapHtml}</p>`);
+        $location.html(`<i class="fas fa-map-marker-alt"></i> ${data.classroom_source || '-'}`);
     }
     $("h5.classroom-date").html(`<i class="fa fa-calendar"></i> ${data.classroom_start_date} ${data.classroom_start_time} - ${data.classroom_end_date} ${data.classroom_end_time}`);
     $(".classroom-information").html(data.classroom_information || '');

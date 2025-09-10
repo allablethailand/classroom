@@ -79,7 +79,6 @@ body {
     padding: 15px;
 }
 .detail-item {
-    margin-bottom: 20px;
     padding: 15px;
     background: white;
     border-radius: 8px;
@@ -102,10 +101,6 @@ body {
 .form-title {
     color: #333;
     font-weight: 600;
-    margin-bottom: 30px;
-    text-align: center;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
 }
 .form-group {
     margin-bottom: 20px;
