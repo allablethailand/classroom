@@ -498,4 +498,16 @@
             'summary_data' => $summary
         ]);
     }
+    if(isset($_POST) && $_POST['action'] == 'getClassroomKey') {
+        $classroom_id = $_POST['classroom_id'];
+        $classroom = select_data(
+            "classroom_key",
+            "classroom_template",
+            "where classroom_id = '{$classroom_id}'"
+        );
+        echo json_encode([
+            'status'       => true,
+            'classroom_key' => $classroom[0]['classroom_key']
+        ]);
+    }
 ?>

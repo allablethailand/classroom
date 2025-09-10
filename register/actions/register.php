@@ -153,6 +153,8 @@
         }
         $student_password_key = bin2hex(openssl_random_pseudo_bytes(16));
         $student_password = encryptToken($password, $student_password_key);
+        $emp_id = ($_SESSION['emp_id']) ? "'{$_SESSION['emp_id']}'" : "nill";
+        $invite_status = ($_SESSION['emp_id']) ? 0 : 1;
         $student_id = insert_data(
             "classroom_student",
             "(
@@ -169,7 +171,9 @@
                 student_password_key,
                 comp_id,
                 status,
+                emp_create,
                 date_create,
+                emp_modify,
                 date_modify
             )",
             "(
@@ -186,7 +190,9 @@
                 '{$student_password_key}',
                 '{$comp_id}',
                 0,
+                $emp_id,
                 NOW(),
+                $emp_id,
                 NOW()
             )"
         );
@@ -201,10 +207,13 @@
                     register_by,
                     comp_id,
                     status,
+                    emp_create,
                     date_create,
+                    emp_modify
                     date_modify,
                     invite_date,
-                    invite_status
+                    invite_status,
+                    invite_by
                 )",
                 "(
                     '{$student_id}',
@@ -214,16 +223,19 @@
                     0,
                     '{$comp_id}',
                     0,
+                    $emp_id,
+                    NOW(),
+                    $emp_id,
                     NOW(),
                     NOW(),
-                    NOW(),
-                    1
+                    '{$invite_status}',
+                    $emp_id
                 )"
             );
             if($auto_approve == 0) {
                 update_data(
                     "classroom_student_join",
-                    "approve_status = 1, approve_date = NOW()",
+                    "invite_status = 1, invite_date = NOW(), approve_status = 1, approve_date = NOW(), approve_by = $emp_id",
                     "student_id = '{$student_id}' and classroom_id = '{$classroom_id}'"
                 );
             }

@@ -280,28 +280,44 @@
         exit();
     }
     if(isset($_POST['action']) && $_POST['action'] == 'getTeacherData') {
-        global $mysqli;
-        $teacher_id = $_POST['teacher_id'] ? $_POST['teacher_id'] : null;
-        if ($teacher_id === null) {
-            echo json_encode(array('status' => 'error', 'message' => 'Teacher ID not found.'));
-            exit();
-        }
-        $sql = "SELECT t.*, j.classroom_id FROM classroom_teacher t LEFT JOIN classroom_teacher_join j ON t.teacher_id = j.teacher_id WHERE t.teacher_id = ?";
-        $stmt = $mysqli->prepare($sql);
-        if ($stmt === false) {
-            die(json_encode(array('status' => 'error', 'message' => "Prepare failed: " . $mysqli->error)));
-        }
-        $stmt->bind_param('s', $teacher_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $teacherData = $result->fetch_assoc();
-        unset($teacherData['teacher_password']);
-        unset($teacherData['teacher_password_key']);
-        echo json_encode($teacherData);
-        $stmt->close();
-        $mysqli->close();
+    global $mysqli;
+    $teacher_id = $_POST['teacher_id'] ? $_POST['teacher_id'] : null;
+    if ($teacher_id === null) {
+        echo json_encode(array('status' => 'error', 'message' => 'Teacher ID not found.'));
         exit();
     }
+    
+    $sql = "SELECT t.*, j.classroom_id FROM classroom_teacher t LEFT JOIN classroom_teacher_join j ON t.teacher_id = j.teacher_id WHERE t.teacher_id = ?";
+    $stmt = $mysqli->prepare($sql);
+    if ($stmt === false) {
+        die(json_encode(array('status' => 'error', 'message' => "Prepare failed: " . $mysqli->error)));
+    }
+    
+    $stmt->bind_param('s', $teacher_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $teacherData = $result->fetch_assoc();
+    
+    // **ส่วนที่เพิ่มเข้ามา: เรียกใช้ GetUrl() เพื่อจัดการ URL รูปภาพ**
+    if ($teacherData && !empty($teacherData['teacher_image_profile'])) {
+        $teacherData['teacher_image_profile'] = GetUrl($teacherData['teacher_image_profile']);
+    }
+    if ($teacherData && !empty($teacherData['teacher_card_front'])) {
+        $teacherData['teacher_card_front'] = GetUrl($teacherData['teacher_card_front']);
+    }
+    if ($teacherData && !empty($teacherData['teacher_card_back'])) {
+        $teacherData['teacher_card_back'] = GetUrl($teacherData['teacher_card_back']);
+    }
+    
+    unset($teacherData['teacher_password']);
+    unset($teacherData['teacher_password_key']);
+    
+    echo json_encode($teacherData);
+    $stmt->close();
+    $mysqli->close();
+    exit();
+}
+
     if(isset($_POST['action']) && $_POST['action'] == 'deleteTeacher') {
         global $mysqli;
         $teacher_id = $_POST['teacher_id'] ? $_POST['teacher_id'] : null;
