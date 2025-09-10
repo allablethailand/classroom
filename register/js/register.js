@@ -135,7 +135,7 @@ $(function() {
             $(".systemModal .modal-footer").html(`
                 <div class="text-center">
                     <a href="/${tenant_key}" class="btn btn-warning" data-lang="login"></a>
-                    <button type="button" class="btn btn-default" data-lang="close"></button>
+                    <button type="button" class="btn btn-default" data-lang="close" data-dismiss="modal"></button>
                 </div>
             `);
         } else {
@@ -149,7 +149,7 @@ $(function() {
             `);
             $(".systemModal .modal-footer").html(`
                 <div class="text-center">
-                    <button type="button" class="btn btn-default" data-lang="close"></button>
+                    <button type="button" class="btn btn-default" data-lang="close" data-dismiss="modal"></button>
                 </div>
             `);
         }
