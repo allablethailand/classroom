@@ -57,6 +57,7 @@
 <script src="/classroom/management/js/consent.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/student.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/teacher.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <?php require_once "../../include_header.php"; ?>

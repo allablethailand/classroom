@@ -149,3 +149,9 @@ div#Avatar > .avatar-selector > .avatar-selector-btn>img{
     left: 50%;
     transform: translate(-50%,-50%);
 }
+.my-swal-popup {
+    z-index: 999999921848555 !important; 
+}
+.swal2-container {
+    z-index: 99999999999999999 !important;
+}
