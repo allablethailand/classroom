@@ -123,7 +123,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'saveTeacher') {
         mkdir($upload_dir, 0777, true);
     }
     
-    $file_fields = ['teacher_image_profile', 'teacher_card_front', 'teacher_card_back', 'teacher_attach_document'];
+    $file_fields = ['teacher_image_profile', 'teacher_card_front', 'teacher_card_back'];
     $file_paths = [];
     
     foreach ($file_fields as $field) {
@@ -137,6 +137,28 @@ if(isset($_POST['action']) && $_POST['action'] == 'saveTeacher') {
             // Keep existing file if new one is not uploaded
             $file_paths[$field] = $_POST[$field . '_current'];
         }
+    }
+
+    // 🆕 เพิ่มการจัดการไฟล์หลายไฟล์สำหรับ teacher_attach_document
+    $document_paths = [];
+    if (isset($_FILES['teacher_attach_document']) && count($_FILES['teacher_attach_document']['name']) > 0) {
+        // ดึงไฟล์เก่าจาก hidden input
+        $existing_documents = isset($_POST['teacher_attach_document_current']) ? $_POST['teacher_attach_document_current'] : '';
+        $document_paths = array_filter(explode('|', $existing_documents));
+
+        foreach ($_FILES['teacher_attach_document']['name'] as $key => $name) {
+            if ($_FILES['teacher_attach_document']['error'][$key] == UPLOAD_ERR_OK) {
+                $file_name = uniqid() . '_' . basename($name);
+                $target_file = $upload_dir . $file_name;
+                if (move_uploaded_file($_FILES['teacher_attach_document']['tmp_name'][$key], $target_file)) {
+                    $document_paths[] = $target_file;
+                }
+            }
+        }
+    } else {
+        // หากไม่มีการอัปโหลดไฟล์ใหม่ ให้ใช้ไฟล์เดิม
+        $existing_documents = isset($_POST['teacher_attach_document_current']) ? $_POST['teacher_attach_document_current'] : '';
+        $document_paths = array_filter(explode('|', $existing_documents));
     }
 
     // แปลงค่าคำนำหน้าจาก text เป็นตัวเลขก่อนบันทึกลงฐานข้อมูล
@@ -176,6 +198,8 @@ if(isset($_POST['action']) && $_POST['action'] == 'saveTeacher') {
     foreach ($file_paths as $key => $path) {
         $data[$key] = $path;
     }
+    // 🆕 เพิ่มไฟล์เอกสารแนบ
+    $data['teacher_attach_document'] = implode('|', $document_paths);
 
     if (empty($teacher_id)) {
         // INSERT new data to classroom_teacher table

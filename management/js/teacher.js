@@ -362,9 +362,10 @@ function manageTeacher(teacher_id) {
                     <div class="row">
                         <div class="col-12 form-group mb-3">
                             <label for="teacher_attach_document" class="form-label">เอกสารแนบอื่นๆ</label>
-                            <input type="file" class="form-control" id="teacher_attach_document" name="teacher_attach_document" multiple>
+                            <input type="file" class="form-control" id="teacher_attach_document" name="teacher_attach_document[]" multiple>
                             <small class="form-text text-muted">แนบเอกสารเพิ่มเติม เช่น วุฒิการศึกษา (pdf, docx)</small>
-                            <div class="current-file" id="current-documents"></div>
+                            <div class="file-preview-container mt-2" id="document-preview-container"></div>
+                            <input type="hidden" name="teacher_attach_document_current" id="teacher_attach_document_current">
                         </div>
                     </div>
                 </fieldset>
@@ -515,88 +516,99 @@ async function fetchPositions() {
 }
 
 // Function สำหรับดึงข้อมูลเพื่อแก้ไข
+let selectedFiles = [];
+let currentFiles = [];
+
+    // Function สำหรับดึงข้อมูลเพื่อแก้ไข
 function fetchTeacherData(teacher_id) {
-    $.ajax({
-        url: "/classroom/management/actions/teacher.php",
-        type: "POST",
-        data: {
-            action: "getTeacherData",
-            teacher_id: teacher_id
-        },
-        dataType: 'json',
-        success: function(response) {
-            if (response) {
-                $('#teacher_id').val(response.teacher_id);
-                // แปลงค่าคำนำหน้าให้ถูกต้อง
-                const perfix_map = ['นาย', 'นาง', 'นางสาว'];
-                $('#teacher_perfix').val(perfix_map[parseInt(response.teacher_perfix)]);
+        $.ajax({
+            url: "/classroom/management/actions/teacher.php",
+            type: "POST",
+            data: {
+                action: "getTeacherData",
+                teacher_id: teacher_id
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response) {
+                    $('#teacher_id').val(response.teacher_id);
+                    // แปลงค่าคำนำหน้าให้ถูกต้อง
+                    const perfix_map = ['นาย', 'นาง', 'นางสาว'];
+                    $('#teacher_perfix').val(perfix_map[parseInt(response.teacher_perfix)]);
 
-                $('#teacher_firstname_th').val(response.teacher_firstname_th);
-                $('#teacher_lastname_th').val(response.teacher_th);
-                $('#teacher_firstname_en').val(response.teacher_firstname_en);
-                $('#teacher_lastname_en').val(response.teacher_lastname_en);
-                $('#teacher_nickname_th').val(response.teacher_nickname_th);
-                $('#teacher_nickname_en').val(response.teacher_nickname_en);
-                $('#teacher_idcard').val(response.teacher_idcard);
-                $('#teacher_passport').val(response.teacher_passport);
-                $('#teacher_birth_date').val(response.teacher_birth_date);
-                $('#teacher_mobile').val(response.teacher_mobile);
-                
-                // 🆕 แยกข้อมูลที่อยู่
-                if (response.teacher_address) {
-                    const addressParts = response.teacher_address.split(", ");
-                    $('#teacher_address_house_no').val(addressParts[0] || '');
-                    $('#teacher_address_road').val(addressParts[1] || '');
-                    $('#teacher_address_subdistrict').val(addressParts[2] || '');
-                    $('#teacher_address_district').val(addressParts[3] || '');
-                    $('#teacher_address_province').val(addressParts[4] || '');
-                    $('#teacher_address_zipcode').val(addressParts[5] || '');
-                }
-                
-                // 🆕 ดึงข้อมูลการศึกษาและแยกใส่ในฟอร์มใหม่
-                if (response.teacher_education) {
-                    const educationLines = response.teacher_education.split('\n');
-                    educationLines.forEach(line => {
-                        if (line.includes('ระดับปริญญาโท')) {
-                            const [school, major] = line.replace('ระดับปริญญาโท: ', '').split(' (');
-                            $('.education-input[data-level="master"][data-field="school"]').val(school.trim());
-                            $('.education-input[data-level="master"][data-field="major"]').val(major.replace(')', '').trim());
-                        } else if (line.includes('ระดับปริญญาตรี')) {
-                            const [school, major] = line.replace('ระดับปริญญาตรี: ', '').split(' (');
-                            $('.education-input[data-level="bachelor"][data-field="school"]').val(school.trim());
-                            $('.education-input[data-level="bachelor"][data-field="major"]').val(major.replace(')', '').trim());
-                        } else if (line.includes('ระดับมัธยมศึกษา')) {
-                            const [school, major] = line.replace('ระดับมัธยมศึกษา: ', '').split(' (');
-                            $('.education-input[data-level="highschool"][data-field="school"]').val(school.trim());
-                            $('.education-input[data-level="highschool"][data-field="major"]').val(major.replace(')', '').trim());
-                        }
-                    });
-                }
-                
-                $('#teacher_company').val(response.teacher_company);
-                $('#teacher_experience').val(response.teacher_experience);
-                $('#teacher_username').val(response.teacher_username);
-                $('#teacher_email').val(response.teacher_email);
-                $('#teacher_bio').val(response.teacher_bio);
-                $('#teacher_position').val(response.teacher_position);
-                $('#position_id').val(response.position_id);
+                    $('#teacher_firstname_th').val(response.teacher_firstname_th);
+                    $('#teacher_lastname_th').val(response.teacher_lastname_th);
+                    $('#teacher_firstname_en').val(response.teacher_firstname_en);
+                    $('#teacher_lastname_en').val(response.teacher_lastname_en);
+                    $('#teacher_nickname_th').val(response.teacher_nickname_th);
+                    $('#teacher_nickname_en').val(response.teacher_nickname_en);
+                    $('#teacher_idcard').val(response.teacher_idcard);
+                    $('#teacher_passport').val(response.teacher_passport);
+                    $('#teacher_birth_date').val(response.teacher_birth_date);
+                    $('#teacher_mobile').val(response.teacher_mobile);
+                    
+                    // 🆕 แยกข้อมูลที่อยู่
+                    if (response.teacher_address) {
+                        const addressParts = response.teacher_address.split(", ");
+                        $('#teacher_address_house_no').val(addressParts[0] || '');
+                        $('#teacher_address_road').val(addressParts[1] || '');
+                        $('#teacher_address_subdistrict').val(addressParts[2] || '');
+                        $('#teacher_address_district').val(addressParts[3] || '');
+                        $('#teacher_address_province').val(addressParts[4] || '');
+                        $('#teacher_address_zipcode').val(addressParts[5] || '');
+                    }
+                    
+                    // 🆕 ดึงข้อมูลการศึกษาและแยกใส่ในฟอร์มใหม่
+                    if (response.teacher_education) {
+                        const educationLines = response.teacher_education.split('\n');
+                        educationLines.forEach(line => {
+                            if (line.includes('ระดับปริญญาโท')) {
+                                const [school, major] = line.replace('ระดับปริญญาโท: ', '').split(' (');
+                                $('.education-input[data-level="master"][data-field="school"]').val(school.trim());
+                                $('.education-input[data-level="master"][data-field="major"]').val(major.replace(')', '').trim());
+                            } else if (line.includes('ระดับปริญญาตรี')) {
+                                const [school, major] = line.replace('ระดับปริญญาตรี: ', '').split(' (');
+                                $('.education-input[data-level="bachelor"][data-field="school"]').val(school.trim());
+                                $('.education-input[data-level="bachelor"][data-field="major"]').val(major.replace(')', '').trim());
+                            } else if (line.includes('ระดับมัธยมศึกษา')) {
+                                const [school, major] = line.replace('ระดับมัธยมศึกษา: ', '').split(' (');
+                                $('.education-input[data-level="highschool"][data-field="school"]').val(school.trim());
+                                $('.education-input[data-level="highschool"][data-field="major"]').val(major.replace(')', '').trim());
+                            }
+                        });
+                    }
+                    
+                    $('#teacher_company').val(response.teacher_company);
+                    $('#teacher_experience').val(response.teacher_experience);
+                    $('#teacher_username').val(response.teacher_username);
+                    $('#teacher_email').val(response.teacher_email);
+                    $('#teacher_bio').val(response.teacher_bio);
+                    $('#teacher_position').val(response.teacher_position);
+                    $('#position_id').val(response.position_id);
 
-                if (response.teacher_image_profile) {
-                    showProfilePreview(response.teacher_image_profile);
+                    if (response.teacher_image_profile) {
+                        showProfilePreview(response.teacher_image_profile);
+                    }
+                    if (response.teacher_card_front) {
+                        showCardPreview(response.teacher_card_front, '#current-card-front');
+                    }
+                    if (response.teacher_card_back) {
+                        showCardPreview(response.teacher_card_back, '#current-card-back');
+                    }
+
+                    // 🆕 แสดงไฟล์เอกสารแนบเดิม
+                    if (response.teacher_attach_document) {
+                        currentFiles = response.teacher_attach_document.split('|').filter(Boolean);
+                        displayCurrentFiles(currentFiles, '#document-preview-container');
+                        $('#teacher_attach_document_current').val(response.teacher_attach_document);
+                    }
+                } else {
+                    Swal.fire('ไม่พบข้อมูลครู', '', 'warning');
                 }
-                if (response.teacher_card_front) {
-                    showCardPreview(response.teacher_card_front, '#current-card-front');
-                }
-                if (response.teacher_card_back) {
-                    showCardPreview(response.teacher_card_back, '#current-card-back');
-                }
-            } else {
-                Swal.fire('ไม่พบข้อมูลครู', '', 'warning');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr.responseText);
-            Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดในการดึงข้อมูลครู', 'error');
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดในการดึงข้อมูลครู', 'error');
         }
     });
 }
@@ -633,18 +645,67 @@ function showCardPreview(file, targetId) {
 }
 
 function setupFilePreview() {
-    $('#teacher_image_profile').on('change', function() {
-        showProfilePreview(this.files[0]);
-    });
+        $('#teacher_image_profile').on('change', function() {
+            showProfilePreview(this.files[0]);
+        });
 
-    $('#teacher_card_front').on('change', function() {
-        showCardPreview(this.files[0], '#current-card-front');
-    });
+        $('#teacher_card_front').on('change', function() {
+            showCardPreview(this.files[0], '#current-card-front');
+        });
 
-    $('#teacher_card_back').on('change', function() {
-        showCardPreview(this.files[0], '#current-card-back');
-    });
-}
+        $('#teacher_card_back').on('change', function() {
+            showCardPreview(this.files[0], '#current-card-back');
+        });
+
+        // 🆕 เพิ่ม event listener สำหรับช่องอัปโหลดเอกสาร
+        $('#teacher_attach_document').on('change', function() {
+            handleMultipleFileSelection(this.files);
+        });
+    }
+
+    // 🆕 ฟังก์ชันสำหรับจัดการการเลือกไฟล์หลายไฟล์
+    function handleMultipleFileSelection(files) {
+        // เพิ่มไฟล์ใหม่เข้าใน selectedFiles
+        for (let i = 0; i < files.length; i++) {
+            selectedFiles.push(files[i]);
+        }
+        displaySelectedFiles();
+        // ล้างค่า input file เพื่อให้สามารถเลือกไฟล์เดิมได้อีกครั้ง
+        $('#teacher_attach_document').val('');
+    }
+
+    // 🆕 ฟังก์ชันสำหรับแสดงไฟล์ที่เลือกไว้
+    function displaySelectedFiles() {
+        const previewContainer = $('#document-preview-container');
+        previewContainer.empty();
+        
+        // แสดงไฟล์เดิมที่อยู่ในฐานข้อมูล
+        currentFiles.forEach((path, index) => {
+            const filename = path.split('/').pop();
+            const fileItem = $(`<div class="d-flex align-items-center mb-1"><span class="me-2">${filename}</span> <button type="button" class="btn btn-danger btn-sm delete-file" data-type="current" data-index="${index}">&times;</button></div>`);
+            previewContainer.append(fileItem);
+        });
+
+        // แสดงไฟล์ใหม่ที่เลือกไว้
+        selectedFiles.forEach((file, index) => {
+            const fileItem = $(`<div class="d-flex align-items-center mb-1"><span class="me-2">${file.name}</span> <button type="button" class="btn btn-danger btn-sm delete-file" data-type="new" data-index="${index}">&times;</button></div>`);
+            previewContainer.append(fileItem);
+        });
+
+        // เพิ่ม event listener ให้กับปุ่มลบ
+        previewContainer.off('click', '.delete-file');
+        previewContainer.on('click', '.delete-file', function() {
+            const type = $(this).data('type');
+            const index = $(this).data('index');
+            if (type === 'current') {
+                currentFiles.splice(index, 1);
+            } else {
+                selectedFiles.splice(index, 1);
+            }
+            displaySelectedFiles();
+        });
+    }
+
 // 🆕 Function สำหรับตรวจสอบรูปแบบอีเมล
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -670,218 +731,250 @@ function isValidMobile(mobile) {
 
 // Function สำหรับบันทึกข้อมูล
 
-function saveTeacher() {
-    const form = $("#teacherForm");
+ function saveTeacher() {
+        const form = $("#teacherForm");
 
-    // ล้างข้อความและขอบสีแดงเดิมทั้งหมด
-    $('.form-control, .form-select').removeClass('is-invalid');
-    $('.invalid-feedback').text('').removeClass('text-danger');
+        // ล้างข้อความและขอบสีแดงเดิมทั้งหมด
+        $('.form-control, .form-select').removeClass('is-invalid');
+        $('.invalid-feedback').text('').removeClass('text-danger');
 
-    let errors = {};
-    let firstErrorField = null;
+        let errors = {};
+        let firstErrorField = null;
 
-    // 🆕 เตรียมข้อมูลที่อยู่จากช่องที่อยู่แยก
-    const houseNo = $('#teacher_address_house_no').val();
-    const road = $('#teacher_address_road').val();
-    const subdistrict = $('#teacher_address_subdistrict').val();
-    const district = $('#teacher_address_district').val();
-    const province = $('#teacher_address_province').val();
-    const zipcode = $('#teacher_address_zipcode').val();
-    const fullAddress = [houseNo, road, subdistrict, district, province, zipcode].filter(part => part).join(', ');
+        // 🆕 เตรียมข้อมูลที่อยู่จากช่องที่อยู่แยก
+        const houseNo = $('#teacher_address_house_no').val();
+        const road = $('#teacher_address_road').val();
+        const subdistrict = $('#teacher_address_subdistrict').val();
+        const district = $('#teacher_address_district').val();
+        const province = $('#teacher_address_province').val();
+        const zipcode = $('#teacher_address_zipcode').val();
+        const fullAddress = [houseNo, road, subdistrict, district, province, zipcode].filter(part => part).join(', ');
 
-    // 🆕 นำค่าที่อยู่เต็มไปใส่ใน hidden input ก่อนส่งฟอร์ม
-    $('#teacher_address').val(fullAddress);
+        // 🆕 นำค่าที่อยู่เต็มไปใส่ใน hidden input ก่อนส่งฟอร์ม
+        $('#teacher_address').val(fullAddress);
 
-    // 🆕 รวมข้อมูลการศึกษาจากช่องใหม่
-    const educationData = [];
-    
-    const masterSchool = $('.education-input[data-level="master"][data-field="school"]').val();
-    const masterMajor = $('.education-input[data-level="master"][data-field="major"]').val();
-    if (masterSchool) {
-        let line = `ระดับปริญญาโท: ${masterSchool}`;
-        if (masterMajor) {
-            line += ` (${masterMajor})`;
+        // 🆕 รวมข้อมูลการศึกษาจากช่องใหม่
+        const educationData = [];
+        
+        const masterSchool = $('.education-input[data-level="master"][data-field="school"]').val();
+        const masterMajor = $('.education-input[data-level="master"][data-field="major"]').val();
+        if (masterSchool) {
+            let line = `ระดับปริญญาโท: ${masterSchool}`;
+            if (masterMajor) {
+                line += ` (${masterMajor})`;
+            }
+            educationData.push(line);
         }
-        educationData.push(line);
-    }
-    
-    const bachelorSchool = $('.education-input[data-level="bachelor"][data-field="school"]').val();
-    const bachelorMajor = $('.education-input[data-level="bachelor"][data-field="major"]').val();
-    if (bachelorSchool) {
-        let line = `ระดับปริญญาตรี: ${bachelorSchool}`;
-        if (bachelorMajor) {
-            line += ` (${bachelorMajor})`;
+        
+        const bachelorSchool = $('.education-input[data-level="bachelor"][data-field="school"]').val();
+        const bachelorMajor = $('.education-input[data-level="bachelor"][data-field="major"]').val();
+        if (bachelorSchool) {
+            let line = `ระดับปริญญาตรี: ${bachelorSchool}`;
+            if (bachelorMajor) {
+                line += ` (${bachelorMajor})`;
+            }
+            educationData.push(line);
         }
-        educationData.push(line);
-    }
-    
-    const highschoolSchool = $('.education-input[data-level="highschool"][data-field="school"]').val();
-    const highschoolMajor = $('.education-input[data-level="highschool"][data-field="major"]').val();
-    if (highschoolSchool) {
-        let line = `ระดับมัธยมศึกษา: ${highschoolSchool}`;
-        if (highschoolMajor) {
-            line += ` (${highschoolMajor})`;
+        
+        const highschoolSchool = $('.education-input[data-level="highschool"][data-field="school"]').val();
+        const highschoolMajor = $('.education-input[data-level="highschool"][data-field="major"]').val();
+        if (highschoolSchool) {
+            let line = `ระดับมัธยมศึกษา: ${highschoolSchool}`;
+            if (highschoolMajor) {
+                line += ` (${highschoolMajor})`;
+            }
+            educationData.push(line);
         }
-        educationData.push(line);
-    }
-    
-    // ตั้งค่าค่าของ hidden input ด้วยข้อมูลที่รวมแล้ว
-    $('#teacher_education').val(educationData.join('\n'));
+        
+        // ตั้งค่าค่าของ hidden input ด้วยข้อมูลที่รวมแล้ว
+        $('#teacher_education').val(educationData.join('\n'));
 
-    // ตรวจสอบข้อมูลในช่องที่กำหนด
-    const requiredFields = {
-        teacher_perfix: "กรุณาเลือกคำนำหน้า",
-        teacher_firstname_en: "กรุณากรอกชื่อ (ภาษาอังกฤษ)",
-        teacher_lastname_en: "กรุณากรอกนามสกุล (ภาษาอังกฤษ)",
-        teacher_idcard: "กรุณากรอกเลขบัตรประชาชน",
-        teacher_mobile: "กรุณากรอกเบอร์โทรศัพท์มือถือ",
-        teacher_email: "กรุณากรอกอีเมล",
-        teacher_company: "กรุณากรอกชื่อบริษัท / องค์กร",
-        teacher_position: "กรุณากรอกตำแหน่งงาน",
-        teacher_username: "กรุณากรอกชื่อผู้ใช้งาน",
-        position_id: "กรุณาเลือกตำแหน่งครู",
-    };
+        // ตรวจสอบข้อมูลในช่องที่กำหนด
+        const requiredFields = {
+            teacher_perfix: "กรุณาเลือกคำนำหน้า",
+            teacher_firstname_en: "กรุณากรอกชื่อ (ภาษาอังกฤษ)",
+            teacher_lastname_en: "กรุณากรอกนามสกุล (ภาษาอังกฤษ)",
+            teacher_idcard: "กรุณากรอกเลขบัตรประชาชน",
+            teacher_mobile: "กรุณากรอกเบอร์โทรศัพท์มือถือ",
+            teacher_email: "กรุณากรอกอีเมล",
+            teacher_company: "กรุณากรอกชื่อบริษัท / องค์กร",
+            teacher_position: "กรุณากรอกตำแหน่งงาน",
+            teacher_username: "กรุณากรอกชื่อผู้ใช้งาน",
+            position_id: "กรุณาเลือกตำแหน่งครู",
+        };
 
-    // 🆕 แก้ไขการตรวจสอบที่อยู่ให้ถูกต้องตามแต่ละช่อง
-    const addressFields = {
-        teacher_address_house_no: "กรุณากรอกบ้านเลขที่",
-        teacher_address_subdistrict: "กรุณากรอกตำบล / แขวง",
-        teacher_address_district: "กรุณากรอกอำเภอ / เขต",
-        teacher_address_province: "กรุณากรอกจังหวัด",
-        teacher_address_zipcode: "กรุณากรอกรหัสไปรษณีย์",
-    };
+        // 🆕 แก้ไขการตรวจสอบที่อยู่ให้ถูกต้องตามแต่ละช่อง
+        const addressFields = {
+            teacher_address_house_no: "กรุณากรอกบ้านเลขที่",
+            teacher_address_subdistrict: "กรุณากรอกตำบล / แขวง",
+            teacher_address_district: "กรุณากรอกอำเภอ / เขต",
+            teacher_address_province: "กรุณากรอกจังหวัด",
+            teacher_address_zipcode: "กรุณากรอกรหัสไปรษณีย์",
+        };
 
-    // 🆕 วนลูปตรวจสอบช่องที่อยู่
-    for (const fieldId in addressFields) {
-        const value = $(`#${fieldId}`).val();
-        if (!value) {
-            errors[fieldId] = addressFields[fieldId];
-            if (!firstErrorField) {
-                firstErrorField = $(`#${fieldId}`);
+        // 🆕 วนลูปตรวจสอบช่องที่อยู่
+        for (const fieldId in addressFields) {
+            const value = $(`#${fieldId}`).val();
+            if (!value) {
+                errors[fieldId] = addressFields[fieldId];
+                if (!firstErrorField) {
+                    firstErrorField = $(`#${fieldId}`);
+                }
             }
         }
-    }
 
-    // 🆕 ตรวจสอบข้อมูลในช่องที่กำหนด
-    for (const fieldId in requiredFields) {
-        const value = $(`#${fieldId}`).val();
-        if (!value) {
-            errors[fieldId] = requiredFields[fieldId];
-            if (!firstErrorField) {
-                firstErrorField = $(`#${fieldId}`);
+        // 🆕 ตรวจสอบข้อมูลในช่องที่กำหนด
+        for (const fieldId in requiredFields) {
+            const value = $(`#${fieldId}`).val();
+            if (!value) {
+                errors[fieldId] = requiredFields[fieldId];
+                if (!firstErrorField) {
+                    firstErrorField = $(`#${fieldId}`);
+                }
             }
         }
-    }
 
-    const teacher_id = $("#teacher_id").val();
-    const password = $("#teacher_password").val();
-    const password_key = $("#teacher_password_key").val();
-    const email = $("#teacher_email").val();
-    const idCard = $("#teacher_idcard").val();
-    const mobile = $("#teacher_mobile").val();
+        const teacher_id = $("#teacher_id").val();
+        const password = $("#teacher_password").val();
+        const password_key = $("#teacher_password_key").val();
+        const email = $("#teacher_email").val();
+        const idCard = $("#teacher_idcard").val();
+        const mobile = $("#teacher_mobile").val();
 
-    // 🆕 ตรวจสอบรหัสผ่าน (เฉพาะตอนสร้างใหม่)
-    if (teacher_id === "" && (!password || !password_key)) {
-        errors['teacher_password'] = "กรุณากรอกรหัสผ่าน";
-        errors['teacher_password_key'] = "กรุณายืนยันรหัสผ่าน";
-        if (!firstErrorField) firstErrorField = $('#teacher_password');
-    } else if (password && password !== password_key) {
-        errors['teacher_password'] = "รหัสผ่านไม่ตรงกัน";
-        errors['teacher_password_key'] = "รหัสผ่านไม่ตรงกัน";
-        if (!firstErrorField) firstErrorField = $('#teacher_password');
-    }
-
-    // 🆕 ตรวจสอบรูปแบบอีเมล
-    if (email && !isValidEmail(email)) {
-        errors['teacher_email'] = "รูปแบบอีเมลไม่ถูกต้อง";
-        if (!firstErrorField) firstErrorField = $('#teacher_email');
-    }
-
-    // 🆕 ตรวจสอบรูปแบบเบอร์โทรศัพท์
-    if (mobile && !isValidMobile(mobile)) {
-        errors['teacher_mobile'] = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง (ตัวอย่าง: 0812345678)";
-        if (!firstErrorField) firstErrorField = $('#teacher_mobile');
-    }
-
-    // 🆕 ตรวจสอบรูปแบบเลขบัตรประชาชน
-    if (idCard && !isValidIdCard(idCard)) {
-        errors['teacher_idcard'] = "รูปแบบเลขบัตรประชาชนไม่ถูกต้อง";
-        if (!firstErrorField) firstErrorField = $('#teacher_idcard');
-    }
-
-    // ถ้ามีข้อผิดพลาด
-    if (Object.keys(errors).length > 0) {
-        for (const fieldId in errors) {
-            $(`#${fieldId}`).addClass('is-invalid');
-            $(`#${fieldId}`).next('.invalid-feedback').text(errors[fieldId]).addClass('text-danger');
+        // 🆕 ตรวจสอบรหัสผ่าน (เฉพาะตอนสร้างใหม่)
+        if (teacher_id === "" && (!password || !password_key)) {
+            errors['teacher_password'] = "กรุณากรอกรหัสผ่าน";
+            errors['teacher_password_key'] = "กรุณายืนยันรหัสผ่าน";
+            if (!firstErrorField) firstErrorField = $('#teacher_password');
+        } else if (password && password !== password_key) {
+            errors['teacher_password'] = "รหัสผ่านไม่ตรงกัน";
+            errors['teacher_password_key'] = "รหัสผ่านไม่ตรงกัน";
+            if (!firstErrorField) firstErrorField = $('#teacher_password');
         }
 
-        // 🆕 แสดง Pop-up แจ้งเตือนเมื่อกรอกข้อมูลไม่ครบ
-        const errorMessage = "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน";
-        Swal.fire({
-            icon: 'warning',
-            title: 'เกิดข้อผิดพลาด!',
-            text: errorMessage,
-            showCloseButton: true,
-            confirmButtonText: 'ตกลง',
-            customClass: {
-                popup: 'my-swal-popup'
+        // 🆕 ตรวจสอบรูปแบบอีเมล
+        if (email && !isValidEmail(email)) {
+            errors['teacher_email'] = "รูปแบบอีเมลไม่ถูกต้อง";
+            if (!firstErrorField) firstErrorField = $('#teacher_email');
+        }
+
+        // 🆕 ตรวจสอบรูปแบบเบอร์โทรศัพท์
+        if (mobile && !isValidMobile(mobile)) {
+            errors['teacher_mobile'] = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง (ตัวอย่าง: 0812345678)";
+            if (!firstErrorField) firstErrorField = $('#teacher_mobile');
+        }
+
+        // 🆕 ตรวจสอบรูปแบบเลขบัตรประชาชน
+        if (idCard && !isValidIdCard(idCard)) {
+            errors['teacher_idcard'] = "รูปแบบเลขบัตรประชาชนไม่ถูกต้อง";
+            if (!firstErrorField) firstErrorField = $('#teacher_idcard');
+        }
+
+        // ถ้ามีข้อผิดพลาด
+        if (Object.keys(errors).length > 0) {
+            for (const fieldId in errors) {
+                $(`#${fieldId}`).addClass('is-invalid');
+                $(`#${fieldId}`).next('.invalid-feedback').text(errors[fieldId]).addClass('text-danger');
             }
+
+            // 🆕 แสดง Pop-up แจ้งเตือนเมื่อกรอกข้อมูลไม่ครบ
+            const errorMessage = "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน";
+            Swal.fire({
+                icon: 'warning',
+                title: 'เกิดข้อผิดพลาด!',
+                text: errorMessage,
+                showCloseButton: true,
+                confirmButtonText: 'ตกลง',
+                customClass: {
+                    popup: 'my-swal-popup'
+                }
+            });
+
+            // เลื่อนไปที่ช่องแรกที่มีข้อผิดพลาด
+            if (firstErrorField) {
+                $(".systemModal .modal-body").animate({
+                    scrollTop: firstErrorField.offset().top - $(".systemModal .modal-body").offset().top + $(".systemModal .modal-body").scrollTop() - 20
+                }, 500);
+            }
+            return;
+        }
+
+        // ถ้าไม่มีข้อผิดพลาด ให้บันทึกข้อมูล
+        const formData = new FormData($("#teacherForm")[0]);
+        formData.append('action', 'saveTeacher');
+
+        // 🆕 เพิ่มไฟล์เอกสารแนบที่เลือกไว้ลงใน formData
+        selectedFiles.forEach(file => {
+            formData.append('teacher_attach_document[]', file);
         });
 
-        // เลื่อนไปที่ช่องแรกที่มีข้อผิดพลาด
-        if (firstErrorField) {
-            $(".systemModal .modal-body").animate({
-                scrollTop: firstErrorField.offset().top - $(".systemModal .modal-body").offset().top + $(".systemModal .modal-body").scrollTop() - 20
-            }, 500);
-        }
-        return;
-    }
+        // 🆕 ส่งค่าไฟล์เดิมที่เหลืออยู่
+        formData.append('teacher_attach_document_current', currentFiles.join('|'));
 
-    // ถ้าไม่มีข้อผิดพลาด ให้บันทึกข้อมูล
-    const formData = new FormData($("#teacherForm")[0]);
-    formData.append('action', 'saveTeacher');
 
-    $.ajax({
-        url: "/classroom/management/actions/teacher.php",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 'success') {
-                // 🆕 แสดง Pop-up แจ้งเตือนเมื่อบันทึกสำเร็จ
-                Swal.fire({
-                    icon: 'success',
-                    title: 'บันทึกเรียบร้อย!',
-                    text: response.message || 'บันทึกข้อมูลเรียบร้อยแล้ว'
-                });
+        $.ajax({
+            url: "/classroom/management/actions/teacher.php",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    // 🆕 แสดง Pop-up แจ้งเตือนเมื่อบันทึกสำเร็จ
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'บันทึกเรียบร้อย!',
+                        text: response.message || 'บันทึกข้อมูลเรียบร้อยแล้ว'
+                    });
 
-                setTimeout(() => {
-                    $(".systemModal").modal('hide');
-                    if (window.tb_teacher) {
-                        window.tb_teacher.ajax.reload(null, false);
-                    }
-                }, 2000);
-            } else {
+                    setTimeout(() => {
+                        $(".systemModal").modal('hide');
+                        if (window.tb_teacher) {
+                            window.tb_teacher.ajax.reload(null, false);
+                        }
+                    }, 2000);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด!',
+                        text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + response.message,
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
                 Swal.fire({
                     icon: 'error',
-                    title: 'เกิดข้อผิดพลาด!',
-                    text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + response.message,
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์',
                 });
             }
-        },
-        error: function(xhr) {
-            console.error(xhr.responseText);
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์',
-            });
-        }
+        });
+    }
+
+    // ฟังก์ชันสำหรับแสดงไฟล์เดิม
+    function displayCurrentFiles(files, containerId) {
+        const container = $(containerId);
+        container.empty();
+        files.forEach((path, index) => {
+            const filename = path.split('/').pop();
+            const fileItem = $(`<div class="d-flex align-items-center mb-1"><span class="me-2">${filename}</span> <button type="button" class="btn btn-danger btn-sm delete-file" data-type="current" data-index="${index}">&times;</button></div>`);
+            container.append(fileItem);
+        });
+        container.on('click', '.delete-file', function() {
+            const index = $(this).data('index');
+            files.splice(index, 1);
+            $(this).parent().remove();
+            // อัปเดต hidden input
+            $('#teacher_attach_document_current').val(files.join('|'));
+        });
+    }
+
+    // Call setup function on document ready
+    $(document).ready(function() {
+        setupFilePreview();
     });
-}
 
 function deleteTeacher(teacher_id) {
     Swal.fire({
