@@ -139,7 +139,7 @@ function buildTeacher() {
 function manageTeacher(teacher_id) {
     $(".systemModal").modal();
     $(".systemModal .modal-header").html(`
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <button type="button" class="close">&times;</button>
         <h5 class="modal-title" lang="en">Teacher Management</h5> 
     `);
     
@@ -508,12 +508,15 @@ function isValidMobile(mobile) {
 }
 
 // Function สำหรับบันทึกข้อมูล
+// Function สำหรับบันทึกข้อมูล
+// Function สำหรับบันทึกข้อมูล
+// Function สำหรับบันทึกข้อมูล
 function saveTeacher() {
     const form = $("#teacherForm");
     
     // ล้างข้อความและขอบสีแดงเดิมทั้งหมด
     $('.form-control, .form-select').removeClass('is-invalid');
-    $('.invalid-feedback').text('');
+    $('.invalid-feedback').text('').removeClass('text-danger'); // 👈 เพิ่มโค้ดตรงนี้เพื่อล้างสีแดงเดิมออก
 
     let errors = {};
     let firstErrorField = null;
@@ -583,9 +586,22 @@ function saveTeacher() {
     if (Object.keys(errors).length > 0) {
         for (const fieldId in errors) {
             $(`#${fieldId}`).addClass('is-invalid');
-            $(`#${fieldId}`).next('.invalid-feedback').text(errors[fieldId]);
+            $(`#${fieldId}`).next('.invalid-feedback').text(errors[fieldId]).addClass('text-danger'); // 👈 เพิ่ม .addClass('text-danger') ที่นี่
         }
         
+        // 🆕 แสดง Pop-up แจ้งเตือนเมื่อกรอกข้อมูลไม่ครบ
+        const errorMessage = "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน"; // หรือสามารถรวมข้อความ error จาก errors object ได้
+        Swal.fire({
+            icon: 'warning',
+            title: 'เกิดข้อผิดพลาด!',
+            text: errorMessage,
+            showCloseButton: true,
+            confirmButtonText: 'ตกลง',
+            customClass: {
+                popup: 'my-swal-popup' // เพิ่ม class สำหรับ custom CSS
+            }
+        });
+
         // เลื่อนไปที่ช่องแรกที่มีข้อผิดพลาด
         if (firstErrorField) {
             $(".systemModal .modal-body").animate({
@@ -608,6 +624,7 @@ function saveTeacher() {
         dataType: 'json',
         success: function(response) {
             if (response.status === 'success') {
+                // 🆕 แสดง Pop-up แจ้งเตือนเมื่อบันทึกสำเร็จ
                 Swal.fire({
                     icon: 'success',
                     title: 'บันทึกเรียบร้อย!',
@@ -638,6 +655,8 @@ function saveTeacher() {
         }
     });
 }
+
+
 function deleteTeacher(teacher_id) {
     Swal.fire({
         title: 'คุณแน่ใจหรือไม่?',
