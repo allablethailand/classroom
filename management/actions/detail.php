@@ -26,6 +26,7 @@
         $classroom_id = $_POST['classroom_id'];
         $classrooms = select_data(
             "
+                template.classroom_key,
                 template.classroom_name,
                 template.classroom_information,
                 template.classroom_poster,
@@ -66,7 +67,8 @@
                 template.auto_password_type,
                 template.auto_password_length,
                 template.auto_password_custom,
-                template.password_sensitivity_case
+                template.password_sensitivity_case,
+                template.contact_us
             ",
             "classroom_template template",
             "
@@ -88,6 +90,7 @@
         echo json_encode([
             'status' => true,
             'classroom_data' => [
+                'classroom_key' => $classroom['classroom_key'],
                 'classroom_name' => $classroom['classroom_name'],
                 'classroom_information' => $classroom['classroom_information'],
                 'classroom_poster' => ($classroom['classroom_poster']) ? GetUrl($classroom['classroom_poster']) : '',
@@ -118,6 +121,7 @@
                 'auto_password_length' => $classroom['auto_password_length'],
                 'auto_password_custom' => $classroom['auto_password_custom'],
                 'password_sensitivity_case' => $classroom['password_sensitivity_case'],
+                'contact_us' => $classroom['contact_us'],
                 'staff_groups' => $staff_groups,
             ]
         ]);
@@ -408,6 +412,7 @@
         $classroom_open_register = initVal($sql_classroom_open_register);
         $classroom_close_register = initVal($sql_classroom_close_register);
         $close_register_message = initVal($_POST['close_register_message']);
+        $contact_us = initVal($_POST['contact_us']);
         $line_oa = $_POST['line_oa'];
         $line_oa_link = initVal($_POST['line_oa_link']);
         $auto_approve = $_POST['auto_approve'];
@@ -449,15 +454,18 @@
                     auto_password_length = $auto_password_length,
                     auto_password_custom = $auto_password_custom,
                     password_sensitivity_case = $password_sensitivity_case,
+                    contact_us = $contact_us,
                     emp_modify = '{$_SESSION['emp_id']}',
                     date_modify = NOW()
                 ",
                 "classroom_id = '{$classroom_id}'"
             );
         } else {
+            $classroom_key = bin2hex(openssl_random_pseudo_bytes(16));
             $classroom_id = insert_data(
                 "classroom_template",
                 "(
+                    classroom_key,
                     classroom_name,
                     classroom_information,
                     classroom_start,
@@ -482,6 +490,7 @@
                     auto_password_length,
                     auto_password_custom,
                     password_sensitivity_case,
+                    contact_us,
                     comp_id,
                     status,
                     emp_create,
@@ -490,6 +499,7 @@
                     date_modify
                 )",
                 "(
+                    '{$classroom_key}',
                     $classroom_name,
                     $classroom_information,
                     $classroom_start,
@@ -514,6 +524,7 @@
                     $auto_password_length,
                     $auto_password_custom,
                     $password_sensitivity_case,
+                    $contact_us,
                     '{$_SESSION['comp_id']}',
                     0,
                     '{$_SESSION['emp_id']}',

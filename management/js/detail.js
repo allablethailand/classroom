@@ -234,6 +234,18 @@ function initializeEditor() {
             });
             $("a[href='http://editor.froala.com']").parent().remove();
         }
+        const editorElement2 = $('#contact_us');
+        if (editorElement2.length && typeof editorElement2.editable === 'function') {
+            editorElement2.editable({
+                theme: 'gray',
+                inlineMode: false,
+                buttons: [
+                    'bold', 'italic', 'underline', 'strikeThrough'
+                ],
+                minHeight: 150,
+            });
+            $("a[href='http://editor.froala.com']").parent().remove();
+        }
     } catch (error) {
         console.error('Error initializing editor:', error);
     }
@@ -341,6 +353,9 @@ function populateFormData(data) {
         }
         if (data.classroom_information) {
             $('#classroom_information').editable("setHTML", data.classroom_information, true);
+        }
+        if (data.contact_us) {
+            $('#contact_us').editable("setHTML", data.contact_us, true);
         }
         if (data.auto_username === '0') {
             $("#auto_uname_settings").show();
@@ -1111,6 +1126,14 @@ function getManagementTemplate() {
                             <select class="form-control require_obj" name="line_oa_link" id="line_oa_link"></select>
                         </div>
                     </div>
+                    <div class="form-group row">
+                        <div class="col-sm-3">
+                            <label lang="en" class="control-label">Contact Us</label>
+                        </div>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" id="contact_us" name="contact_us"></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="form-group row">							
@@ -1508,6 +1531,7 @@ function saveManagement() {
     }
     fd.append('emp_group', $("#emp_group").val());
     fd.append('classroom_information', $("#classroom_information").val());
+    fd.append('contact_us', $("#contact_us").val());
     $.ajax({
 		url: "/classroom/management/actions/detail.php?action=saveManagement",
 		type: "POST",
