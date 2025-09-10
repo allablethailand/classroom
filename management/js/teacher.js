@@ -8,7 +8,7 @@ function getTeacherTemplate() {
             <thead>
                 <tr>
                     <th><span lang="en">No.</span></th>
-                    <th lang="en">Teacher</th>
+                    <th lang="en">Name</th>
                     <th lang="en">Position</th>
                     <th lang="en">Company</th>
                     <th lang="en">Job Position</th>
@@ -98,8 +98,8 @@ function buildTeacher() {
                 "data": "teacher_id",
                 "render": function (data, type, row, meta) {
                     return `
-                        <button class="btn btn-warning btn-sm" onclick="manageTeacher('${data}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteTeacher('${data}')"><i class="fas fa-trash-alt"></i></button>
+                        <button class="btn btn-warning btn-circle" onclick="manageTeacher('${data}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-circle" onclick="deleteTeacher('${data}')"><i class="fas fa-trash-alt"></i></button>
                     `;
                 }
             }
@@ -139,16 +139,15 @@ function buildTeacher() {
 function manageTeacher(teacher_id) {
     $(".systemModal").modal();
     $(".systemModal .modal-header").html(`
-        <button type="button" class="close">&times;</button>
         <h5 class="modal-title" lang="en">Teacher Management</h5> 
     `);
-    
+
     // โค้ด HTML ของฟอร์มที่ถูกแก้ไข
     const formHtml = `
         <div class="container-fluid p-4">
             <form id="teacherForm" enctype="multipart/form-data">
                 <input type="hidden" name="teacher_id" id="teacher_id">
-                <input type="hidden" name="classroom_id" id="form_classroom_id"> 
+                <input type="hidden" name="classroom_id" id="form_classroom_id">
 
                 <div class="form-group mb-4 text-center">
                     <div class="profile-image-preview" id="current-profile-img" style="position: relative; width: 150px; height: 150px; margin: 0 auto 10px; border-radius: 50%; overflow: hidden; border: 2px solid #ddd; background-color: #f8f9fa;">
@@ -158,11 +157,12 @@ function manageTeacher(teacher_id) {
                         </div>
                     </div>
                     <label for="teacher_image_profile" class="form-label d-block text-primary" style="cursor: pointer;">
-                        <i class="fas fa-upload me-2"></i> เลือกรูปโปรไฟล์
+                        <i class="fas fa-upload me-2"></i>
+                        <span id="file-label">เลือกรูปโปรไฟล์</span>
                     </label>
                     <input type="file" class="d-none" id="teacher_image_profile" name="teacher_image_profile" accept="image/*">
                 </div>
-                
+
                 <fieldset class="border p-3 mb-4 rounded">
                     <legend class="w-auto px-2 h5 text-primary">ข้อมูลส่วนตัว</legend>
                     <div class="row">
@@ -223,7 +223,7 @@ function manageTeacher(teacher_id) {
                     <div class="row">
                         <div class="col-md-6 form-group mb-3">
                             <label for="teacher_birth_date" class="form-label">วันเกิด</label>
-                            <input type="date" class="form-control" id="teacher_birth_date" name="teacher_birth_date">
+                            <input type="text" class="form-control" id="teacher_birth_date" name="teacher_birth_date">
                         </div>
                         <div class="col-md-6 form-group mb-3">
                             <label for="teacher_mobile" class="form-label">เบอร์โทรศัพท์มือถือ <span class="text-danger">*</span></label>
@@ -247,9 +247,32 @@ function manageTeacher(teacher_id) {
                     </div>
                     <div class="row">
                         <div class="col-12 form-group mb-3">
-                            <label for="teacher_address" class="form-label">ที่อยู่ <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="teacher_address" name="teacher_address" rows="3"></textarea>
-                            <div class="invalid-feedback"></div>
+                            <label class="form-label">ที่อยู่ <span class="text-danger">*</span></label>
+                            <input type="hidden" id="teacher_address" name="teacher_address">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <input type="text" class="form-control" id="teacher_address_house_no" placeholder="บ้านเลขที่">
+                                </div>
+                                <div class="col-md-8 mb-3">
+                                    <input type="text" class="form-control" id="teacher_address_road" placeholder="ถนน">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control zipcode-search" id="teacher_address_subdistrict" placeholder="ตำบล / แขวง">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control zipcode-search" id="teacher_address_district" placeholder="อำเภอ / เขต">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control zipcode-search" id="teacher_address_province" placeholder="จังหวัด">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control zipcode-search" id="teacher_address_zipcode" placeholder="รหัสไปรษณีย์" maxlength="5">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </fieldset>
@@ -267,12 +290,47 @@ function manageTeacher(teacher_id) {
                             <div class="invalid-feedback"></div>
                         </div>
                     </div>
+                    
                     <div class="row">
                         <div class="col-12 form-group mb-3">
-                            <label for="teacher_education" class="form-label">ประวัติการศึกษา</label>
-                            <textarea class="form-control" id="teacher_education" name="teacher_education" rows="4"></textarea>
+                            <label class="form-label">ประวัติการศึกษา</label>
+                            <div class="education-form mb-3">
+                                <h6 class="text-muted">วุฒิปริญญาโท</h6>
+                                <div class="row mb-2">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control education-input" data-level="master" data-field="school" placeholder="ชื่อมหาวิทยาลัย/สถาบัน">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control education-input" data-level="master" data-field="major" placeholder="คณะ/สาขาวิชา">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="education-form mb-3">
+                                <h6 class="text-muted">วุฒิปริญญาตรี</h6>
+                                <div class="row mb-2">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control education-input" data-level="bachelor" data-field="school" placeholder="ชื่อมหาวิทยาลัย/สถาบัน">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control education-input" data-level="bachelor" data-field="major" placeholder="คณะ/สาขาวิชา">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="education-form mb-3">
+                                <h6 class="text-muted">วุฒิระดับมัธยมศึกษา</h6>
+                                <div class="row mb-2">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control education-input" data-level="highschool" data-field="school" placeholder="ชื่อโรงเรียน">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control education-input" data-level="highschool" data-field="major" placeholder="สายวิชา (เช่น วิทย์-คณิต)">
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="teacher_education" name="teacher_education">
                         </div>
                     </div>
+                    
                     <div class="row">
                         <div class="col-12 form-group mb-3">
                             <label for="teacher_experience" class="form-label">ประสบการณ์ทำงาน</label>
@@ -333,15 +391,15 @@ function manageTeacher(teacher_id) {
 
     $(".systemModal .modal-body").html(formHtml);
     $(".systemModal .modal-footer").html(`
-        <button type="button" class="btn btn-white" data-dismiss="modal" lang="en">Close</button> 
+        <button type="button" class="btn btn-white" data-dismiss="modal" lang="en">Close</button>
         <button type="button" class="btn btn-primary" id="saveBtn" lang="en">Save</button>
     `);
-    
+
     const classroom_id = $('#classroom_id').val();
     if (classroom_id) {
         $('#form_classroom_id').val(classroom_id);
     }
-    
+
     // ตั้งค่า Event Listener ที่ปุ่ม Save
     $("#saveBtn").on('click', saveTeacher);
 
@@ -355,6 +413,70 @@ function manageTeacher(teacher_id) {
     });
 
     setupFilePreview();
+
+    // ตั้งค่า Event Listener สำหรับการอัปโหลดไฟล์
+    $('#teacher_image_profile').on('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'เลือกรูปโปรไฟล์';
+        $('#file-label').text(fileName);
+
+        // แสดงรูปภาพตัวอย่าง
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                $('#profile-img').attr('src', event.target.result).show();
+                $('#upload-icon-overlay').hide();
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    // 🆕 Event Listener สำหรับการกรอกที่อยู่
+    setupAddressAutocomplete();
+
+    // 🆕 เปลี่ยน input type="date" เป็น type="text" และใช้ jQuery UI Datepicker
+    $('#teacher_birth_date').datepicker({
+        dateFormat: 'yy-mm-dd', // กำหนดรูปแบบวันที่เป็น ปี-เดือน-วัน
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "-100:+0" // ให้เลือกปีได้ 100 ปีย้อนหลัง
+    });
+}
+
+function setupAddressAutocomplete() {
+    // ใช้ debounce เพื่อลดการเรียก API เมื่อผู้ใช้พิมพ์
+    const debounce = (func, delay) => {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                func.apply(null, args);
+            }, delay);
+        };
+    };
+
+    const handleSearch = debounce(async (event) => {
+        const target = $(event.target);
+        const term = target.val();
+
+        if (term.length >= 3) {
+            try {
+                // ตัวอย่างการดึงข้อมูลจาก API ไปรษณีย์
+                const result = await thailand.search(term);
+                if (result.length > 0) {
+                    const data = result[0];
+                    $('#teacher_address_subdistrict').val(data.subdistrict);
+                    $('#teacher_address_district').val(data.district);
+                    $('#teacher_address_province').val(data.province);
+                    $('#teacher_address_zipcode').val(data.zipcode);
+                }
+            } catch (error) {
+                console.error("Autocomplete failed:", error);
+            }
+        }
+    }, 500);
+
+    // ดักจับการเปลี่ยนแปลงในช่อง ตำบล, อำเภอ, จังหวัด และ รหัสไปรษณีย์
+    $('#teacher_address_subdistrict, #teacher_address_district, #teacher_address_province, #teacher_address_zipcode').on('input', handleSearch);
 }
 
 // ** NEW: Function สำหรับดึงข้อมูลตำแหน่งจาก API **
@@ -363,10 +485,12 @@ async function fetchPositions() {
         const response = await $.ajax({
             url: "/classroom/management/actions/teacher.php",
             type: "POST",
-            data: { action: "getPositions" },
+            data: {
+                action: "getPositions"
+            },
             dataType: 'json'
         });
-        
+
         if (response.status === 'success') {
             const dropdown = $("#position_id");
             dropdown.empty();
@@ -394,12 +518,11 @@ function fetchTeacherData(teacher_id) {
         dataType: 'json',
         success: function(response) {
             if (response) {
-                // ... (โค้ดเดิม)
                 $('#teacher_id').val(response.teacher_id);
                 // แปลงค่าคำนำหน้าให้ถูกต้อง
                 const perfix_map = ['นาย', 'นาง', 'นางสาว'];
                 $('#teacher_perfix').val(perfix_map[parseInt(response.teacher_perfix)]);
-                
+
                 $('#teacher_firstname_th').val(response.teacher_firstname_th);
                 $('#teacher_lastname_th').val(response.teacher_th);
                 $('#teacher_firstname_en').val(response.teacher_firstname_en);
@@ -410,9 +533,39 @@ function fetchTeacherData(teacher_id) {
                 $('#teacher_passport').val(response.teacher_passport);
                 $('#teacher_birth_date').val(response.teacher_birth_date);
                 $('#teacher_mobile').val(response.teacher_mobile);
-                $('#teacher_address').val(response.teacher_address);
+                
+                // 🆕 แยกข้อมูลที่อยู่
+                if (response.teacher_address) {
+                    const addressParts = response.teacher_address.split(", ");
+                    $('#teacher_address_house_no').val(addressParts[0] || '');
+                    $('#teacher_address_road').val(addressParts[1] || '');
+                    $('#teacher_address_subdistrict').val(addressParts[2] || '');
+                    $('#teacher_address_district').val(addressParts[3] || '');
+                    $('#teacher_address_province').val(addressParts[4] || '');
+                    $('#teacher_address_zipcode').val(addressParts[5] || '');
+                }
+                
+                // 🆕 ดึงข้อมูลการศึกษาและแยกใส่ในฟอร์มใหม่
+                if (response.teacher_education) {
+                    const educationLines = response.teacher_education.split('\n');
+                    educationLines.forEach(line => {
+                        if (line.includes('ระดับปริญญาโท')) {
+                            const [school, major] = line.replace('ระดับปริญญาโท: ', '').split(' (');
+                            $('.education-input[data-level="master"][data-field="school"]').val(school.trim());
+                            $('.education-input[data-level="master"][data-field="major"]').val(major.replace(')', '').trim());
+                        } else if (line.includes('ระดับปริญญาตรี')) {
+                            const [school, major] = line.replace('ระดับปริญญาตรี: ', '').split(' (');
+                            $('.education-input[data-level="bachelor"][data-field="school"]').val(school.trim());
+                            $('.education-input[data-level="bachelor"][data-field="major"]').val(major.replace(')', '').trim());
+                        } else if (line.includes('ระดับมัธยมศึกษา')) {
+                            const [school, major] = line.replace('ระดับมัธยมศึกษา: ', '').split(' (');
+                            $('.education-input[data-level="highschool"][data-field="school"]').val(school.trim());
+                            $('.education-input[data-level="highschool"][data-field="major"]').val(major.replace(')', '').trim());
+                        }
+                    });
+                }
+                
                 $('#teacher_company').val(response.teacher_company);
-                $('#teacher_education').val(response.teacher_education);
                 $('#teacher_experience').val(response.teacher_experience);
                 $('#teacher_username').val(response.teacher_username);
                 $('#teacher_email').val(response.teacher_email);
@@ -430,7 +583,7 @@ function fetchTeacherData(teacher_id) {
                     showCardPreview(response.teacher_card_back, '#current-card-back');
                 }
             } else {
-                    Swal.fire('ไม่พบข้อมูลครู', '', 'warning');
+                Swal.fire('ไม่พบข้อมูลครู', '', 'warning');
             }
         },
         error: function(xhr, status, error) {
@@ -508,18 +661,63 @@ function isValidMobile(mobile) {
 }
 
 // Function สำหรับบันทึกข้อมูล
-// Function สำหรับบันทึกข้อมูล
-// Function สำหรับบันทึกข้อมูล
-// Function สำหรับบันทึกข้อมูล
 function saveTeacher() {
     const form = $("#teacherForm");
-    
+
     // ล้างข้อความและขอบสีแดงเดิมทั้งหมด
     $('.form-control, .form-select').removeClass('is-invalid');
-    $('.invalid-feedback').text('').removeClass('text-danger'); // 👈 เพิ่มโค้ดตรงนี้เพื่อล้างสีแดงเดิมออก
+    $('.invalid-feedback').text('').removeClass('text-danger');
 
     let errors = {};
     let firstErrorField = null;
+
+    // 🆕 เตรียมข้อมูลที่อยู่จากช่องที่อยู่แยก
+    const houseNo = $('#teacher_address_house_no').val();
+    const road = $('#teacher_address_road').val();
+    const subdistrict = $('#teacher_address_subdistrict').val();
+    const district = $('#teacher_address_district').val();
+    const province = $('#teacher_address_province').val();
+    const zipcode = $('#teacher_address_zipcode').val();
+    const fullAddress = [houseNo, road, subdistrict, district, province, zipcode].filter(part => part).join(', ');
+
+    // 🆕 นำค่าที่อยู่เต็มไปใส่ใน hidden input ก่อนส่งฟอร์ม
+    $('#teacher_address').val(fullAddress);
+
+    // 🆕 รวมข้อมูลการศึกษาจากช่องใหม่
+    const educationData = [];
+    
+    const masterSchool = $('.education-input[data-level="master"][data-field="school"]').val();
+    const masterMajor = $('.education-input[data-level="master"][data-field="major"]').val();
+    if (masterSchool) {
+        let line = `ระดับปริญญาโท: ${masterSchool}`;
+        if (masterMajor) {
+            line += ` (${masterMajor})`;
+        }
+        educationData.push(line);
+    }
+    
+    const bachelorSchool = $('.education-input[data-level="bachelor"][data-field="school"]').val();
+    const bachelorMajor = $('.education-input[data-level="bachelor"][data-field="major"]').val();
+    if (bachelorSchool) {
+        let line = `ระดับปริญญาตรี: ${bachelorSchool}`;
+        if (bachelorMajor) {
+            line += ` (${bachelorMajor})`;
+        }
+        educationData.push(line);
+    }
+    
+    const highschoolSchool = $('.education-input[data-level="highschool"][data-field="school"]').val();
+    const highschoolMajor = $('.education-input[data-level="highschool"][data-field="major"]').val();
+    if (highschoolSchool) {
+        let line = `ระดับมัธยมศึกษา: ${highschoolSchool}`;
+        if (highschoolMajor) {
+            line += ` (${highschoolMajor})`;
+        }
+        educationData.push(line);
+    }
+    
+    // ตั้งค่าค่าของ hidden input ด้วยข้อมูลที่รวมแล้ว
+    $('#teacher_education').val(educationData.join('\n'));
 
     // ตรวจสอบข้อมูลในช่องที่กำหนด
     const requiredFields = {
@@ -529,12 +727,17 @@ function saveTeacher() {
         teacher_idcard: "กรุณากรอกเลขบัตรประชาชน",
         teacher_mobile: "กรุณากรอกเบอร์โทรศัพท์มือถือ",
         teacher_email: "กรุณากรอกอีเมล",
-        teacher_address: "กรุณากรอกที่อยู่",
         teacher_company: "กรุณากรอกชื่อบริษัท / องค์กร",
         teacher_position: "กรุณากรอกตำแหน่งงาน",
         teacher_username: "กรุณากรอกชื่อผู้ใช้งาน",
         position_id: "กรุณาเลือกตำแหน่งครู",
     };
+
+    // ตรวจสอบข้อมูลที่อยู่แบบใหม่
+    if (!houseNo || !subdistrict || !district || !province || !zipcode) {
+        errors['teacher_address_house_no'] = "กรุณากรอกที่อยู่ให้ครบถ้วน";
+        if (!firstErrorField) firstErrorField = $('#teacher_address_house_no');
+    }
 
     for (const fieldId in requiredFields) {
         const value = $(`#${fieldId}`).val();
@@ -586,11 +789,11 @@ function saveTeacher() {
     if (Object.keys(errors).length > 0) {
         for (const fieldId in errors) {
             $(`#${fieldId}`).addClass('is-invalid');
-            $(`#${fieldId}`).next('.invalid-feedback').text(errors[fieldId]).addClass('text-danger'); // 👈 เพิ่ม .addClass('text-danger') ที่นี่
+            $(`#${fieldId}`).next('.invalid-feedback').text(errors[fieldId]).addClass('text-danger');
         }
-        
+
         // 🆕 แสดง Pop-up แจ้งเตือนเมื่อกรอกข้อมูลไม่ครบ
-        const errorMessage = "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน"; // หรือสามารถรวมข้อความ error จาก errors object ได้
+        const errorMessage = "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน";
         Swal.fire({
             icon: 'warning',
             title: 'เกิดข้อผิดพลาด!',
@@ -598,7 +801,7 @@ function saveTeacher() {
             showCloseButton: true,
             confirmButtonText: 'ตกลง',
             customClass: {
-                popup: 'my-swal-popup' // เพิ่ม class สำหรับ custom CSS
+                popup: 'my-swal-popup'
             }
         });
 
@@ -614,7 +817,7 @@ function saveTeacher() {
     // ถ้าไม่มีข้อผิดพลาด ให้บันทึกข้อมูล
     const formData = new FormData($("#teacherForm")[0]);
     formData.append('action', 'saveTeacher');
-    
+
     $.ajax({
         url: "/classroom/management/actions/teacher.php",
         type: "POST",
@@ -630,7 +833,7 @@ function saveTeacher() {
                     title: 'บันทึกเรียบร้อย!',
                     text: response.message || 'บันทึกข้อมูลเรียบร้อยแล้ว'
                 });
-                
+
                 setTimeout(() => {
                     $(".systemModal").modal('hide');
                     if (window.tb_teacher) {
@@ -655,7 +858,6 @@ function saveTeacher() {
         }
     });
 }
-
 
 function deleteTeacher(teacher_id) {
     Swal.fire({
