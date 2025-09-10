@@ -354,14 +354,28 @@ html {
 }
 
 .schedule-time {
-  width: 4rem;
+  width: 2.5rem;
   margin-right: 1rem;
   padding-top: 0.25rem;
+  /* space out vertically */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+  height: 100%;
+  font-weight: 700;
+
 }
 
 .schedule-time-text {
   font-size: 0.875rem;
   color: #c084fc;
+}
+
+.schedule-time-bottom {
+  font-size: 0.875rem;
+  color: #c084fc;
+  vertical-align: bottom;
+  margin-top: 3rem;
 }
 
 .schedule-timeline {
@@ -636,7 +650,7 @@ html {
     .modal-dialog {
       position: fixed !important;
       top: 30% !important;
-      left: 1% !important;
+      left: 10% !important;
       /* transform: translate(-50%, -50%) !important; */
       width: auto;
       margin: 10px;

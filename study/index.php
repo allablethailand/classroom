@@ -7,10 +7,6 @@
         case '/classroom/study':
             require __DIR__.'/views/menu.php';
         break;
-        case '/classroom/study/consent/':
-        case '/classroom/study/consent':
-            require __DIR__.'/views/consent.php';
-        break;
         case '/classroom/study/schedule/':
         case '/classroom/study/schedule':
             require __DIR__.'/views/schedule.php';
@@ -79,6 +75,14 @@
         case '/classroom/study/class/':
         case '/classroom/study/class':
             require __DIR__.'/views/class.php';
+        break;
+        case '/classroom/study/classinfo/':
+        case '/classroom/study/classinfo':
+            require __DIR__.'/views/classinfo.php';
+        break;
+        case '/classroom/study/history/':
+        case '/classroom/study/history':
+            require __DIR__.'/views/history.php';
         break;
         default: 
            header('Location: /classroom/study/');
