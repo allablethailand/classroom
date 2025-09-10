@@ -302,6 +302,17 @@ function manageTeacher(teacher_id) {
                         <div class="col-12 form-group mb-3">
                             <label class="form-label">ประวัติการศึกษา</label>
                             <div class="education-form mb-3">
+                                <h6 class="text-muted">วุฒิปริญญาเอก</h6>
+                                <div class="row mb-2">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control education-input" data-level="doctorate" data-field="school" placeholder="ชื่อมหาวิทยาลัย/สถาบัน">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control education-input" data-level="doctorate" data-field="major" placeholder="คณะ/สาขาวิชา">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="education-form mb-3">
                                 <h6 class="text-muted">วุฒิปริญญาโท</h6>
                                 <div class="row mb-2">
                                     <div class="col-md-6">
@@ -521,6 +532,7 @@ async function fetchPositions() {
 let selectedFiles = [];
 let currentFiles = [];
 
+
 function fetchTeacherData(teacher_id) {
     $.ajax({
         url: "/classroom/management/actions/teacher.php",
@@ -547,9 +559,75 @@ function fetchTeacherData(teacher_id) {
                 $('#teacher_passport').val(response.teacher_passport);
                 $('#teacher_birth_date').val(response.teacher_birth_date);
                 $('#teacher_mobile').val(response.teacher_mobile);
-                
-                // ... (โค้ดเดิมส่วนอื่นๆ) ...
-                
+
+                // ✅ แก้ไขส่วนดึงข้อมูลที่อยู่
+                if (response.teacher_address) {
+                    const addressParts = response.teacher_address.split(',').map(part => part.trim());
+                    $('#teacher_address_house_no').val(addressParts[0] || '');
+                    $('#teacher_address_road').val(addressParts[1] || '');
+                    $('#teacher_address_subdistrict').val(addressParts[2] || '');
+                    $('#teacher_address_district').val(addressParts[3] || '');
+                    $('#teacher_address_province').val(addressParts[4] || '');
+                    $('#teacher_address_zipcode').val(addressParts[5] || '');
+                } else {
+                    $('#teacher_address_house_no').val('');
+                    $('#teacher_address_road').val('');
+                    $('#teacher_address_subdistrict').val('');
+                    $('#teacher_address_district').val('');
+                    $('#teacher_address_province').val('');
+                    $('#teacher_address_zipcode').val('');
+                }
+
+                // ✅ แก้ไขส่วนดึงข้อมูลประวัติการศึกษา
+                if (response.teacher_education) {
+                    const educationLines = response.teacher_education.split('\n').filter(line => line.trim() !== '');
+                    
+                    const educationMap = {};
+                    educationLines.forEach(line => {
+                        const levelMatch = line.match(/^(ระดับปริญญาเอก|ระดับปริญญาโท|ระดับปริญญาตรี|ระดับมัธยมศึกษา)/);
+                        if (!levelMatch) return;
+
+                        const level = levelMatch[1];
+                        const content = line.replace(level + ': ', '').trim();
+                        const majorMatch = content.match(/\((.*?)\)$/);
+                        const school = content.replace(/\s*\((.*?)\)$/, '').trim();
+                        const major = majorMatch ? majorMatch[1].trim() : '';
+
+                        educationMap[level] = {
+                            school: school,
+                            major: major
+                        };
+                    });
+
+                    if (educationMap['ระดับปริญญาเอก']) {
+                        $('.education-input[data-level="doctorate"][data-field="school"]').val(educationMap['ระดับปริญญาเอก'].school);
+                        $('.education-input[data-level="doctorate"][data-field="major"]').val(educationMap['ระดับปริญญาเอก'].major);
+                    }
+                    if (educationMap['ระดับปริญญาโท']) {
+                        $('.education-input[data-level="master"][data-field="school"]').val(educationMap['ระดับปริญญาโท'].school);
+                        $('.education-input[data-level="master"][data-field="major"]').val(educationMap['ระดับปริญญาโท'].major);
+                    }
+                    if (educationMap['ระดับปริญญาตรี']) {
+                        $('.education-input[data-level="bachelor"][data-field="school"]').val(educationMap['ระดับปริญญาตรี'].school);
+                        $('.education-input[data-level="bachelor"][data-field="major"]').val(educationMap['ระดับปริญญาตรี'].major);
+                    }
+                    if (educationMap['ระดับมัธยมศึกษา']) {
+                        $('.education-input[data-level="highschool"][data-field="school"]').val(educationMap['ระดับมัธยมศึกษา'].school);
+                        $('.education-input[data-level="highschool"][data-field="major"]').val(educationMap['ระดับมัธยมศึกษา'].major);
+                    }
+
+                } else {
+                    // ถ้าไม่มีข้อมูล ให้ตั้งค่าเป็นค่าว่างทั้งหมด
+                    $('.education-input[data-level="doctorate"][data-field="school"]').val('');
+                    $('.education-input[data-level="doctorate"][data-field="major"]').val('');
+                    $('.education-input[data-level="master"][data-field="school"]').val('');
+                    $('.education-input[data-level="master"][data-field="major"]').val('');
+                    $('.education-input[data-level="bachelor"][data-field="school"]').val('');
+                    $('.education-input[data-level="bachelor"][data-field="major"]').val('');
+                    $('.education-input[data-level="highschool"][data-field="school"]').val('');
+                    $('.education-input[data-level="highschool"][data-field="major"]').val('');
+                }
+
                 $('#teacher_company').val(response.teacher_company);
                 $('#teacher_experience').val(response.teacher_experience);
                 $('#teacher_username').val(response.teacher_username);
@@ -558,7 +636,6 @@ function fetchTeacherData(teacher_id) {
                 $('#teacher_position').val(response.teacher_position);
                 $('#position_id').val(response.position_id);
 
-                // **ส่วนนี้จะทำงานได้ทันที เพราะ URL ถูกจัดการมาแล้วจากฝั่ง PHP**
                 if (response.teacher_image_profile) {
                     showProfilePreview(response.teacher_image_profile);
                 }
@@ -569,19 +646,26 @@ function fetchTeacherData(teacher_id) {
                     showCardPreview(response.teacher_card_back, '#current-card-back');
                 }
 
-                // 🆕 แสดงไฟล์เอกสารแนบเดิม
                 if (response.teacher_attach_document) {
                     currentFiles = response.teacher_attach_document.split('|').filter(Boolean);
                     displayCurrentFiles(currentFiles, '#document-preview-container');
                     $('#teacher_attach_document_current').val(response.teacher_attach_document);
                 }
             } else {
-                Swal.fire('ไม่พบข้อมูลครู', '', 'warning');
+                swal({
+                    type: 'ไม่พบข้อมูลครู',
+                    title: "",
+                    text: 'warning'
+                });
             }
         },
         error: function(xhr, status, error) {
             console.error(xhr.responseText);
-            Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดในการดึงข้อมูลครู', 'error');
+            swal({
+                type: 'เกิดข้อผิดพลาด',
+                title: "เกิดข้อผิดพลาดในการดึงข้อมูลครู",
+                text: 'error'
+            });
         }
     });
 }
@@ -728,6 +812,17 @@ function isValidMobile(mobile) {
 
         // 🆕 รวมข้อมูลการศึกษาจากช่องใหม่
         const educationData = [];
+
+         // เพิ่มส่วนสำหรับวุฒิปริญญาเอก
+        const doctorateSchool = $('.education-input[data-level="doctorate"][data-field="school"]').val();
+        const doctorateMajor = $('.education-input[data-level="doctorate"][data-field="major"]').val();
+        if (doctorateSchool) {
+            let line = `ระดับปริญญาเอก: ${doctorateSchool}`;
+            if (doctorateMajor) {
+                line += ` (${doctorateMajor})`;
+            }
+            educationData.push(line);
+        }
         
         const masterSchool = $('.education-input[data-level="master"][data-field="school"]').val();
         const masterMajor = $('.education-input[data-level="master"][data-field="major"]').val();
@@ -852,7 +947,7 @@ function isValidMobile(mobile) {
 
             // 🆕 แสดง Pop-up แจ้งเตือนเมื่อกรอกข้อมูลไม่ครบ
             const errorMessage = "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน";
-            Swal.fire({
+            swal({
                 icon: 'warning',
                 title: 'เกิดข้อผิดพลาด!',
                 text: errorMessage,
@@ -862,6 +957,7 @@ function isValidMobile(mobile) {
                     popup: 'my-swal-popup'
                 }
             });
+            // swal({type: 'เกิดข้อผิดพลาด',title: "เกิดข้อผิดพลาดในการดึงข้อมูลครู",text: 'error'});
 
             // เลื่อนไปที่ช่องแรกที่มีข้อผิดพลาด
             if (firstErrorField) {
@@ -895,11 +991,13 @@ function isValidMobile(mobile) {
             success: function(response) {
                 if (response.status === 'success') {
                     // 🆕 แสดง Pop-up แจ้งเตือนเมื่อบันทึกสำเร็จ
-                    Swal.fire({
+                    swal({
                         icon: 'success',
                         title: 'บันทึกเรียบร้อย!',
                         text: response.message || 'บันทึกข้อมูลเรียบร้อยแล้ว'
                     });
+                                // swal({type: 'เกิดข้อผิดพลาด',title: "เกิดข้อผิดพลาดในการดึงข้อมูลครู",text: 'error'});
+
 
                     setTimeout(() => {
                         $(".systemModal").modal('hide');
@@ -908,7 +1006,7 @@ function isValidMobile(mobile) {
                         }
                     }, 2000);
                 } else {
-                    Swal.fire({
+                    swal({
                         icon: 'error',
                         title: 'เกิดข้อผิดพลาด!',
                         text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + response.message,
@@ -917,7 +1015,7 @@ function isValidMobile(mobile) {
             },
             error: function(xhr) {
                 console.error(xhr.responseText);
-                Swal.fire({
+                swal({
                     icon: 'error',
                     title: 'เกิดข้อผิดพลาด',
                     text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์',
@@ -950,7 +1048,7 @@ function isValidMobile(mobile) {
     });
 
 function deleteTeacher(teacher_id) {
-    Swal.fire({
+    swal({
         title: 'คุณแน่ใจหรือไม่?',
         text: "คุณต้องการลบข้อมูลครูท่านนี้ใช่ไหม? การกระทำนี้ไม่สามารถย้อนกลับได้",
         icon: 'warning',
@@ -971,7 +1069,7 @@ function deleteTeacher(teacher_id) {
                 dataType: 'json',
                 success: function(response) {
                     if (response.status === 'success') {
-                        Swal.fire(
+                        swal(
                             'ลบเรียบร้อย!',
                             response.message,
                             'success'
@@ -981,7 +1079,7 @@ function deleteTeacher(teacher_id) {
                             window.tb_teacher.ajax.reload(null, false);
                         }
                     } else {
-                        Swal.fire(
+                        swal(
                             'เกิดข้อผิดพลาด!',
                             'ไม่สามารถลบข้อมูลครูได้: ' + response.message,
                             'error'
@@ -990,7 +1088,7 @@ function deleteTeacher(teacher_id) {
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
-                    Swal.fire(
+                    swal(
                         'เกิดข้อผิดพลาด!',
                         'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์',
                         'error'

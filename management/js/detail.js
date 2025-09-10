@@ -165,6 +165,7 @@ function buildManagementPage() {
     initializeDateTimePickers();
     initializeEditor();
     buildManagementData();
+    buildRegisterTemplate();
     buildStaff();
     bindFormEventHandlers();
     buildLineOA();
@@ -282,6 +283,42 @@ function bindFormEventHandlers() {
         const isOnline = $(this).val() === 'online';
         $('.for-online').toggleClass('hidden', !isOnline);
         $('.for-onsite').toggleClass('hidden', isOnline);
+    });
+}
+function buildRegisterTemplate() {
+    $.ajax({
+        url: "/classroom/management/actions/detail.php",
+        type: "POST",
+        data: { 
+            action: 'buildRegisterTemplate', 
+            classroom_id: classroom_id 
+        },
+        dataType: "JSON",
+        success: function(result) {
+            if (result && result.template_data) {
+                populateFormRegister(result.template_data);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading management data:', error);
+        }
+    });
+}
+function populateFormRegister(template_data) {
+    let tbody = $("#tb_register_template tbody");
+    tbody.empty();
+    template_data.forEach(function(t) {
+        let chkDisplay = `<input type="checkbox" class="chk-display" data-id="${t.template_id}" name="register_template[]" ${t.template_display == 0 ? 'checked' : ''} ${t.is_default == 0 ? 'disabled' : ''} value="${t.template_id}">`;
+        let chkRequire = `<input type="checkbox" class="chk-require" data-id="${t.template_id}" name="register_require[]" ${t.template_require == 0 ? 'checked' : ''} ${t.is_default == 0 ? 'disabled' : ''} value="${t.template_id}">`;
+        let row = `
+            <tr>
+                <td class="text-center">${chkDisplay}</td>
+                <td class="text-center">${chkRequire}</td>
+                <td>${t.template_name_en}</td>
+                <td>${t.template_name_th}</td>
+            </tr>
+        `;
+        tbody.append(row);
     });
 }
 function buildManagementData() {
@@ -1338,6 +1375,36 @@ function getManagementTemplate() {
                     <div class="form-group">
                         <div class="cal-sm-12 text-left">
                             <span class="label label-head bg-head-first">4</span>
+                            <b lang="en">Register Template</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">							
+                <div class="col-sm-12">
+                    <div class="form-group row">
+                        <div class="col-sm-2">&nbsp;</div>
+                        <div class="col-sm-10">
+                            <table class="table table-border" id="tb_register_template">
+                                <thead>
+                                    <tr>
+                                        <th lang="en" class="text-center">Display Filed</th>
+                                        <th lang="en" class="text-center">Require Filed</th>
+                                        <th lang="en">Field name (EN)</th>
+                                        <th lang="en">Field name (TH)</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">							
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <div class="cal-sm-12 text-left">
+                            <span class="label label-head bg-head-first">5</span>
                             <b lang="en">Join Staff</b>
                         </div>
                     </div>

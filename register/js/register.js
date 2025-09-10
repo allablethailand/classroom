@@ -3,16 +3,40 @@ let tenant_key = '';
 let currentLang = "th";
 const translations = {
     en: {
-        eng: "English", thai: "Thai", register: "Register", infomation: "Details",
-        contact_us: "Contact Information", registration_form: "Registration Form",
-        firstname: "First Name (EN)", lastname: "Last Name (EN)", nickname: "Nickname",
-        gender: "Gender", male: "Male", female: "Female", other: "Prefer not to specify",
-        email: "Email", mobile: "Mobile Number", company: "Company", position: "Position",
-        view_on_map: "View on Map", i_accept: "I accept", policy: "Terms and Conditions & Privacy Policy",
-        username: "Username", password: "Password",
+        eng: "English", 
+        thai: "Thai", 
+        register: "Register", 
+        infomation: "Details",
+        contact_us: "Contact Information", 
+        registration_form: "Registration Form",
+        idcard: "ID Card",
+        passport: "Passport",
+        prefix: "Prefix",
+        firstname_en: "First Name (EN)",
+        lastname_en: "Last Name (EN)",
+        firstname_th: "First Name (TH)",
+        lastname_th: "Last Name (TH)",
+        nickname_en: "Nickname (EN)",
+        nickname_th: "Nickname (TH)",
+        gender: "Gender", 
+        birthday: "Birthday", 
+        upload_image: "Upload Image", 
+        email: "Email", 
+        mobile: "Mobile Number", 
+        company: "Company", 
+        position: "Position",
+        username: "Username", 
+        password: "Password",
+        view_on_map: "View on Map", 
+        i_accept: "I accept", 
+        policy: "Terms and Conditions & Privacy Policy",
         password_info: "Password must be 4–20 characters, using only English letters or numbers.",
         username_info: "Username must be 8–20 characters, consisting of English letters or numbers only. (By default, your registered mobile number will be used)",
-        close: "Close", accept: "Accept", already: "Already have an account?", login: "Log in", registered: "Successfully registered.",
+        close: "Close", 
+        accept: "Accept", 
+        already: "Already have an account?", 
+        login: "Log in", 
+        registered: "Successfully registered.",
         registered_success: "Your registration has been submitted successfully.",
         however: "However, your account is currently pending approval from our administrator.",
         once: "Once your registration is reviewed and approved, you will receive a notification via email.",
@@ -20,17 +44,41 @@ const translations = {
         please_login: "Please proceed by clicking the \"Login\" button below."
     },
     th: {
-        eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
-        contact_us: "ข้อมูลการติดต่อ", registration_form: "แบบฟอร์มลงทะเบียน",
-        firstname: "ชื่อ (ภาษาอังกฤษ)", lastname: "นามสกุล (ภาษาอังกฤษ)", nickname: "ชื่อเล่น",
-        gender: "เพศ", male: "ชาย", female: "หญิง", other: "ไม่ประสงค์ระบุ",
-        email: "อีเมล", mobile: "หมายเลขโทรศัพท์มือถือ", company: "บริษัท", position: "ตำแหน่ง",
-        view_on_map: "ดูบนแผนที่", i_accept: "ข้าพเจ้ายอมรับ", policy: "ข้อกำหนดและเงื่อนไข รวมถึงนโยบายความเป็นส่วนตัว",
-        username: "ชื่อผู้ใช้", password: "รหัสผ่าน",
+        eng: "อังกฤษ", 
+        thai: "ไทย", 
+        register: "ลงทะเบียน", 
+        infomation: "รายละเอียด",
+        contact_us: "ข้อมูลการติดต่อ", 
+        registration_form: "แบบฟอร์มลงทะเบียน",
+        idcard: "รหัสประจำตัวประชาชน",
+        passport: "พาสปอร์ต",
+        prefix: "คำนำหน้าชื่อ",
+        firstname_en: "ชื่อ (ภาษาอังกฤษ)",
+        lastname_en: "นามสกุล (ภาษาอังกฤษ)",
+        firstname_th: "ชื่อ (ภาษาไทย)",
+        lastname_th: "นามสกุล (ภาษาไทย)",
+        nickname_en: "ชื่อเล่น (ภาษาอังกฤษ)",
+        nickname_th: "ชื่อเล่น (ภาษาไทย)",
+        gender: "เพศ", 
+        birthday: "วันเกิด", 
+        upload_image: "อัพโหดลรูปภาพ", 
+        email: "อีเมล", 
+        mobile: "หมายเลขโทรศัพท์มือถือ", 
+        company: "บริษัท", 
+        position: "ตำแหน่ง",
+        username: "ชื่อผู้ใช้", 
+        password: "รหัสผ่าน",
+        view_on_map: "ดูบนแผนที่", 
+        i_accept: "ข้าพเจ้ายอมรับ", 
+        policy: "ข้อกำหนดและเงื่อนไข รวมถึงนโยบายความเป็นส่วนตัว",
         password_info: "รหัสผ่านต้องมีความยาว 4–20 ตัวอักษร และใช้ได้เฉพาะตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น",
         username_info: "ชื่อผู้ใช้ต้องมีความยาว 8–20 ตัวอักษร และประกอบด้วยตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น (ค่าเริ่มต้นคือหมายเลขโทรศัพท์มือถือที่ท่านกรอกไว้)",
-        close: "ปิด", accept: "ยอมรับ", already: "มีบัญชีผู้ใช้อยู่แล้ว?", login: "เข้าสู่ระบบ",
-        registered: "ลงทะเบียนสำเร็จ", registered_success: "การลงทะเบียนของคุณเรียบร้อยแล้ว",
+        close: "ปิด", 
+        accept: "ยอมรับ", 
+        already: "มีบัญชีผู้ใช้อยู่แล้ว?", 
+        login: "เข้าสู่ระบบ",
+        registered: "ลงทะเบียนสำเร็จ", 
+        registered_success: "การลงทะเบียนของคุณเรียบร้อยแล้ว",
         however: "อย่างไรก็ตาม บัญชีของคุณกำลังรอการอนุมัติจากผู้ดูแลระบบของเรา",
         once: "เมื่อการลงทะเบียนของคุณได้รับการตรวจสอบและอนุมัติแล้ว คุณจะได้รับการแจ้งเตือนทางอีเมล",
         registered_login: "คุณสามารถเข้าสู่ระบบโดยใช้ชื่อผู้ใช้และรหัสผ่านที่คุณลงทะเบียนไว้ได้แล้ว",
@@ -203,22 +251,22 @@ $(function() {
 });
 function initTemplate(data) {
     $(".poster-content img").attr("src", data.classroom_poster || '');
-    $(".poster-content .classroom-name").text(data.classroom_name || '-');
+    $(".poster-content .classroom-name").text(data.classroom_name || '');
     const $location = $(".poster-content h5.classroom-location");
     if (data.classroom_type === 'online') {
-        $location.html(`Online at ${data.classroom_place || '-'}`);
+        $location.html(`Online at ${data.classroom_place || ''}`);
     } else {
         let mapHtml = '';
         if (data.classroom_place) {
             const [lat, lng] = data.classroom_place.split(',').map(c => c.trim());
             if (lat && lng) {
-                mapHtml = `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="btn btn-sm btn-warning" data-lang="view_on_map"></a>`;
+                mapHtml = `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="btn btn-sm btn-warning" data-lang="view_on_map">View on Map</a>`;
             }
         }
         $location.html(`<i class="fas fa-map-marker-alt"></i> ${data.classroom_source || '-'} <p style="margin-top:10px;">${mapHtml}</p>`);
     }
     $("h5.classroom-date").html(`<i class="fa fa-calendar"></i> ${data.classroom_start_date} ${data.classroom_start_time} - ${data.classroom_end_date} ${data.classroom_end_time}`);
-    $(".classroom-information").html(data.classroom_information || '-');
-    $(".contact-us").html(data.contact_us || '-');
+    $(".classroom-information").html(data.classroom_information || '');
+    $(".contact-us").html(data.contact_us || '');
     $(".comp-logo").attr("src", data.comp_logo || '');
 }

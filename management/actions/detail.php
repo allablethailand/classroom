@@ -426,6 +426,8 @@
         $auto_password_length = ($_POST['auto_password_length']) ? initVal($_POST['auto_password_length']) : 4;
         $password_sensitivity_case = $_POST['password_sensitivity_case'];
         $classroom_information = initVal($_POST['classroom_information']);
+        $register_template = implode(',', $_POST['register_template']);
+        $register_require = implode(',', $_POST['register_require']);
         if($classroom_id) {
             update_data(
                 "classroom_template",
@@ -456,7 +458,9 @@
                     password_sensitivity_case = $password_sensitivity_case,
                     contact_us = $contact_us,
                     emp_modify = '{$_SESSION['emp_id']}',
-                    date_modify = NOW()
+                    date_modify = NOW(),
+                    register_template = '{$register_template}',
+                    register_require = '{$register_require}'
                 ",
                 "classroom_id = '{$classroom_id}'"
             );
@@ -496,7 +500,9 @@
                     emp_create,
                     date_create,
                     emp_modify,
-                    date_modify
+                    date_modify,
+                    register_template,
+                    register_require
                 )",
                 "(
                     '{$classroom_key}',
@@ -530,7 +536,9 @@
                     '{$_SESSION['emp_id']}',
                     NOW(),
                     '{$_SESSION['emp_id']}',
-                    NOW()
+                    NOW(),
+                    '{$register_template}',
+                    '{$register_require}'
                 )"
             );
         }
@@ -653,5 +661,45 @@
         $datetime_string = $date . ' ' . $time;
         $datetime = DateTime::createFromFormat('Y/m/d H:i', $datetime_string);
         return ($datetime !== false) ? $datetime->format('Y-m-d H:i:s') : null;
+    }
+    if(isset($_POST) && $_POST['action'] == 'buildRegisterTemplate') {
+        $classroom_id = $_POST['classroom_id'];
+        $display = [];
+        $require = [];
+        if($classroom_id) {
+            $classroom = select_data(
+                "register_template, register_template",
+                "classroom_template",
+                "where classroom_id = '{$classroom_id}'"
+            );
+            $register_template = $classroom[0]['register_template'];
+            $register_require = $classroom[0]['register_require'];
+            if($register_template) {
+                $display = explode(',', $register_template);
+            }
+            if($register_require) {
+                $require = explode(',', $register_require);
+            }
+        }
+        $templates = select_data(
+            "template_id, template_name_en, template_name_th, is_default, template_order",
+            "classroom_register_template",
+            "where status = 0 order by is_default asc, template_order asc"
+        );
+        $template_data = [];
+        foreach($templates as $t) {
+            $template_data[] = [
+                'template_id' => $t['template_id'],
+                'template_name_en' => $t['template_name_en'],
+                'template_name_th' => $t['template_name_th'],
+                'is_default' => (int) $t['is_default'],
+                'template_display' => ((int) $t['is_default'] == 0) ? 0 : ((in_array($t['template_id'], $display)) ? 0 : 1),
+                'template_require' => ((int) $t['is_default'] == 0) ? 0 : ((in_array($t['template_id'], $require)) ? 0 : 1),
+            ];
+        }
+        echo json_encode([
+            'status' => true,
+            'template_data' => $template_data
+        ]);
     }
 ?>

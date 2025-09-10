@@ -57,7 +57,6 @@
 <script src="/classroom/management/js/consent.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/student.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/teacher.js?v=<?php echo time(); ?>" type="text/javascript"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/zipcode-th-api@1.0.0/dist/zipcode-th-api.min.js"></script>
 </head>
 <body>
