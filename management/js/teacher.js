@@ -252,27 +252,34 @@ function manageTeacher(teacher_id) {
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <input type="text" class="form-control" id="teacher_address_house_no" placeholder="บ้านเลขที่">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                                 <div class="col-md-8 mb-3">
                                     <input type="text" class="form-control" id="teacher_address_road" placeholder="ถนน">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <input type="text" class="form-control zipcode-search" id="teacher_address_subdistrict" placeholder="ตำบล / แขวง">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input type="text" class="form-control zipcode-search" id="teacher_address_district" placeholder="อำเภอ / เขต">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <input type="text" class="form-control zipcode-search" id="teacher_address_province" placeholder="จังหวัด">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input type="text" class="form-control zipcode-search" id="teacher_address_zipcode" placeholder="รหัสไปรษณีย์" maxlength="5">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
+                            <div class="invalid-feedback" id="address-invalid-feedback" style="display: none;"></div>
                         </div>
                     </div>
                 </fieldset>
@@ -479,6 +486,7 @@ function setupAddressAutocomplete() {
     $('#teacher_address_subdistrict, #teacher_address_district, #teacher_address_province, #teacher_address_zipcode').on('input', handleSearch);
 }
 
+
 // ** NEW: Function สำหรับดึงข้อมูลตำแหน่งจาก API **
 async function fetchPositions() {
     try {
@@ -661,6 +669,7 @@ function isValidMobile(mobile) {
 }
 
 // Function สำหรับบันทึกข้อมูล
+
 function saveTeacher() {
     const form = $("#teacherForm");
 
@@ -733,12 +742,27 @@ function saveTeacher() {
         position_id: "กรุณาเลือกตำแหน่งครู",
     };
 
-    // ตรวจสอบข้อมูลที่อยู่แบบใหม่
-    if (!houseNo || !subdistrict || !district || !province || !zipcode) {
-        errors['teacher_address_house_no'] = "กรุณากรอกที่อยู่ให้ครบถ้วน";
-        if (!firstErrorField) firstErrorField = $('#teacher_address_house_no');
+    // 🆕 แก้ไขการตรวจสอบที่อยู่ให้ถูกต้องตามแต่ละช่อง
+    const addressFields = {
+        teacher_address_house_no: "กรุณากรอกบ้านเลขที่",
+        teacher_address_subdistrict: "กรุณากรอกตำบล / แขวง",
+        teacher_address_district: "กรุณากรอกอำเภอ / เขต",
+        teacher_address_province: "กรุณากรอกจังหวัด",
+        teacher_address_zipcode: "กรุณากรอกรหัสไปรษณีย์",
+    };
+
+    // 🆕 วนลูปตรวจสอบช่องที่อยู่
+    for (const fieldId in addressFields) {
+        const value = $(`#${fieldId}`).val();
+        if (!value) {
+            errors[fieldId] = addressFields[fieldId];
+            if (!firstErrorField) {
+                firstErrorField = $(`#${fieldId}`);
+            }
+        }
     }
 
+    // 🆕 ตรวจสอบข้อมูลในช่องที่กำหนด
     for (const fieldId in requiredFields) {
         const value = $(`#${fieldId}`).val();
         if (!value) {
