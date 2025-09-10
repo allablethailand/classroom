@@ -24,39 +24,29 @@
 <input type="hidden" id="classroomCode" value="<?php echo $classroomCode; ?>">
 <div class="container-fluid registration-container">
     <div class="row" style="height: 100vh;">
-        <div class="col-sm-8 left-section">
-            <div class="poster-image">
-                <div class="poster-content">
-                    <div class="poster-container">
-                        <img onerror="this.src='/images/training.jpg'">
-                    </div>
-                    <div class="poster-text">
-                        <div style="margin-top: 15px;" class="classroom-name"></div>
-                    </div>
-                    <h5 class="classroom-date"></h5>
-                    <h5 class="classroom-location"></h5>
-                </div>
-            </div>
+        <div class="col-sm-9 left-section">
             <div class="event-details">
                 <div class="detail-item">
-                    <div class="detail-label" style="margin-bottom: 20px;">
-                        <i class="fa fa-info-circle text-info"></i> <span data-lang="infomation"></span>
+                    <div class="poster-content">
+                        <div class="poster-container">
+                            <img onerror="this.src='/images/training.jpg'">
+                        </div>
+                        <div class="poster-text">
+                            <h4 style="margin-top: 15px;" class="classroom-name"></h4>
+                        </div>
+                        <h5 class="classroom-date"></h5>
+                        <h5 class="classroom-location"></h5>
                     </div>
                     <div class="detail-value classroom-information"></div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">
-                         <i class="fa fa-info-circle text-info"></i> <span data-lang="contact_us"></span>
-                    </div>
                     <div class="detail-value contact-us"></div>
+                    <div class="text-center hidden-xs" style="margin-bottom: 35px;">
+                        <img src="/images/origami-academy.png" style="height: 100px;">
+                        <h5 style="margin-bottom: 25px;">Powered by Origami</h5>
+                    </div>
                 </div>
-            </div>
-            <div class="text-center hidden-xs" style="margin-bottom: 35px;">
-                <img src="/images/origami-academy.png" style="height: 100px;">
-                <h5 style="margin-bottom: 25px;">Powered by Origami Academy</h5>
             </div>
         </div>
-        <div class="col-sm-4 right-section" id="registration-form">
+        <div class="col-sm-3 right-section" id="registration-form">
             <div class="form-section">
                 <div class="text-center">
                     <img class="comp-logo" onerror="this.src='/images/origami-academy.png'" style="height: 125px;">
@@ -66,27 +56,49 @@
                 </h3>
                 <form id="registrationForm">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="firstName"><span data-lang="firstname"></span> <span style="color: red;">*</span></label>
+                                <label for="firstName"><span data-lang="firstname_en"></span> <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control fixed-character" id="firstName" name="firstName" autocomplete="off" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="lastName"><span data-lang="lastname"></span> <span style="color: red;">*</span></label>
+                                <label for="lastName"><span data-lang="lastname_en"></span> <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control fixed-character" id="lastName" name="lastName" autocomplete="off" required>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="gender"><span data-lang="nickname"></span> <span style="color: red;">*</span></label>
+                                <label for="firstName"><span data-lang="firstname_th"></span> <span style="color: red;">*</span></label>
+                                <input type="text" class="form-control fixed-character" id="firstNameTH" name="firstNameTH" autocomplete="off" required>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="lastName"><span data-lang="lastname_th"></span> <span style="color: red;">*</span></label>
+                                <input type="text" class="form-control fixed-character" id="lastNameTH" name="lastNameTH" autocomplete="off" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="gender"><span data-lang="nickname_en"></span> <span style="color: red;">*</span></label>
                                  <input type="text" class="form-control" id="nickname" name="nickname" autocomplete="off" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="gender"><span data-lang="nickname_th"></span> <span style="color: red;">*</span></label>
+                                 <input type="text" class="form-control" id="nicknameTH" name="nicknameTH" autocomplete="off" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label for="gender"><span data-lang="gender"></span> <span style="color: red;">*</span></label>
                                 <select class="form-control" id="gender" name="gender" required>
@@ -149,7 +161,7 @@
             </div>
             <div class="text-center visible-xs" style="margin-bottom: 35px;">
                 <img src="/images/origami-academy.png" style="height: 100px;">
-                <h5 style="margin-bottom: 25px;">Powered by Origami Academy</h5>
+                <h5 style="margin-bottom: 25px;">Powered by Origami</h5>
             </div>
         </div>
     </div>
