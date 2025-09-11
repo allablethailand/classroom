@@ -923,7 +923,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require_once("component/header.php")
         ?>
 
-    <div class="main-container">
+    <div class="main-container" style="margin-bottom: 4rem;">
 
         <div class="tab-content">
 
@@ -1075,6 +1075,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         </div>
     </div>
+     <?php
+    require_once("component/footer.php")
+        ?>
 </body>
 
 </html>
