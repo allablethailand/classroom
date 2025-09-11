@@ -15,9 +15,6 @@ define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
 
-
-
-
 // Program Name
 $program_name = 'Green Tech Leadership (GTL) รุ่นที่ 1';
 $program_slogan = '"CONNECT LOCAL TO GLOBAL"';
@@ -51,7 +48,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script>
-    
+
     <style>
         .sweet-alert h2 {
             font-family: 'Kanit', sans-serif !important;
@@ -101,19 +98,19 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                 </div>
             </div>
 
-            
+
             <div class="featured-class">
                 <div class="featured-header">
 
-                        <div>
-                            <h2 class="featured-title"><?php echo $program_name; ?></h2>
-                            <p class="featured-time"><?php echo $program_slogan; ?></p>
-                            <p><?php echo "01/10/2025 - 15/10/2025"; ?></p>
-                        </div>
+                    <div>
+                        <h2 class="featured-title"><?php echo $program_name; ?></h2>
+                        <p class="featured-time"><?php echo $program_slogan; ?></p>
+                        <p><?php echo "01/10/2025 - 15/10/2025"; ?></p>
                     </div>
-                    <div class="featured-decoration-1"></div>
-                    <div class="featured-decoration-2"></div>
                 </div>
+                <div class="featured-decoration-1"></div>
+                <div class="featured-decoration-2"></div>
+            </div>
 
 
             <div id="scheduleContainer"></div>
@@ -122,43 +119,53 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
 
     </div>
 
+    <!-- One generic modal in your HTML -->
+    <div id="scheduleModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content custom-modal-color">
+                <div class="modal-header custom-header-color">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="scheduleModalLabel">Schedule Detail</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="modalDetails"><strong>รายละเอียด:</strong> <span></span></p>
+                    <p id="modalTime"><strong>ช่วงเวลาระหว่าง:</strong> <span></span></p>
+                    <p id="modalSpeakers"><strong>วิทยากร:</strong> <span></span></p>
+                    <div style="text-align: right;">
+                        <button type="button" class="btn btn-primary open-new-modal">เข้าร่วม</button>
+                        <button type="button" class="btn btn-secondary decline-modal" style="margin-left: 10px;">ปฎิเสธ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="newModal" class="modal fade" tabindex="-2" role="dialog" aria-labelledby="newModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content custom-modal-color-2">
+                <div class="modal-header custom-header-color-2">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="newModalLabel">Join Event</h4>
+                </div>
+                <div class="modal-body" style="text-align: center;">
+                    <!-- Content of the second modal -->
+                    <p>เช็คอินเพื่อเข้าร่วมอีเว้นท์นี้เลยใช่มั้ย</p>
+                    <div style="display: flex; margin:auto">
+                        <p><b>ช่วงเวลาระหว่าง: </b></p>
+                        <p id="modalTimeNew" style="margin-left: 10px;"> </p>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary accept-event" data-dismiss="modal">ตกลง</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
 </body>
-<script>
-    // Cancel modal on decline button click
-    $(document).on('click', '.decline-modal', function() {
-        // Find closest modal to this button and hide it
-        $(this).closest('.modal').modal('hide');
 
-        swal({
-            type: 'error',
-            title: 'ปฏิเสธ',
-            text: 'คุณได้ปฏิเสธการเข้าร่วมอีเวนท์นี้',
-        });
-    });
-
-    // Open second modal from first modal's "join" button
-    $(document).on('click', '.open-new-modal', function() {
-        const firstModal = $(this).closest('.modal');
-        const index = firstModal.attr('id').split('-').pop(); // extract index
-
-        // Hide first modal, then show second modal linked by index
-        firstModal.modal('hide');
-        firstModal.one('hidden.bs.modal', function() {
-            const newModal = $('#newModal-' + index);
-
-            newModal.modal('show');
-        });
-    });
-
-    // Accept event on second modal
-    $(document).on('click', '.accept-event', function() {
-        $(this).closest('.modal').modal('hide');
-
-        swal({
-            type: 'success',
-            title: 'เข้าร่วมสำเร็จ',
-            text: 'คุณได้เข้าร่วมอีเว้นท์นี้เรียบร้อยแล้ว',
-        });
-    });
-</script>
 </html>

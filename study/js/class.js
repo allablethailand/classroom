@@ -95,6 +95,7 @@ function renderCourseCard(course) {
                 <span class="progress-text">
                  ${course.classroom_information}
                 </span>
+
               </div>
               <div class="progress-header-flex">
                 <span class="progress-text-end"></span>
@@ -121,16 +122,15 @@ function renderClassCard(course) {
   const courseCover = course.course_cover 
     ? `<img src="${course.course_cover}" alt="${course.course_name}" style="width:100%; height:auto; margin-bottom: 1rem;">` 
     : '';
-
-   
-
   return `
     <div class="row" onclick="redirectCurreculum('${course.course_id}', '${course.course_type}')">
       <div class="container-menu" style="margin-top: 10px; padding: 2rem;">
         <div class="header-menu">
           <span class="title-menu" style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden;">
-            ${course.course_name.trim()}
+            ${course.course_name.trim()} 
+            
           </span>
+          <i class="fas fa-chevron-right"></i>
         </div>
 
         <div class="usage-menu">
