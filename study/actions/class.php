@@ -37,7 +37,7 @@ if ($_POST['action'] === 'loadClass' && !empty($_POST['classroom_id'])) {
     $class_id = $_POST['classroom_id'];
     
     $course_data = select_data(
-        "cc.course_type,
+    "cc.course_type,
     c.trn_id AS course_id,
     c.trn_subject AS course_name,
     c.picture_title AS course_cover",
