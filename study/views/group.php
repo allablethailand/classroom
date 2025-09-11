@@ -126,31 +126,30 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             }
             foreach ($classroom_group as $item): {
             ?>
-                    <div class="g-4 justify-content-center mb-bs-3 ">
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
-                            <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 10px;">
-                                <div class="panel-heading border-0" style="padding:0;">
-                                    <div class="d-flex-bs align-items-center gap-3">
-                                            <div class="group-icon-large" style="color: #FFF;">
-                                                <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                                <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"  alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                <div class="g-4 justify-content-center mb-bs-3 ">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
+                        <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 10px;">
+                            <div class="panel-heading border-0" style="padding:0;">
+                                <div class="d-flex-bs align-items-center gap-3">
+                                        <div class="group-icon-large" style="color: #FFF;">
+                                            <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
+                                            <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"  alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                                        </div>
+                                        <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
+                                            <div class="d-flex-bs align-items-center gap-2 mb-1">
+                                                <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["classroom_name"] ?></h4>
                                             </div>
-                                            <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
-                                                <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                                    <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["classroom_name"] ?></h4>
-                                                </div>
-                                                <p class="text-secondary mb-0 small text-truncate-2" >
-                                                    สมาชิกปัจจุบัน 5 คน
-                                                </p>
-                                            </div>
+                                            <p class="text-secondary mb-0 small text-truncate-2" >
+                                                สมาชิกปัจจุบัน <?php echo $item['classroom_student']; ?> คน
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                            </a>
-                        </div>
+                            </div>
+                        </a>
                     </div>
-
+                </div>
             <?php
                 }
             endforeach; ?>

@@ -83,8 +83,8 @@ $isCheckIn = false;
     <?php require_once("component/header.php"); ?>
 
     <div style="min-height:120vh;">
+        <!-- CLASS CURRICULUM -->
         <div id="classinfo-container" class="app-container">
-
             <!-- Content Area -->
             <div class="content">
                 <!-- Unit 1 Hello -->
@@ -130,13 +130,13 @@ $isCheckIn = false;
                     </div>
                 </div>
             </div>
-            <div class="unit-section">
+            <!-- <div class="unit-section">
                 <button id="timestamp-button" class="center-box" style="cursor: pointer;">
                     <img id="timestamp-img" src="images/stamp_in_button.png" height="100" alt="timestamp button">
                 </button>
                 <input id="stamp_photo" type="file" accept="image/*" style="display: none;" capture="camera">
                 <div id="time-server"></div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="container-fluid" style="margin-top: 1rem;">
