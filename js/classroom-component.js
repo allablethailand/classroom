@@ -1157,7 +1157,7 @@ const vm = new Vue({
                     if (this.classroom_id) {
                         await this.onLoadFormData();
                     } else {
-                        this.onMessage('error', 'Error', 'An error occurred while loading the form.');
+                        // this.onMessage('error', 'Error', 'An error occurred while loading the form.');
                         return;
                     }
                 } catch (error) {
@@ -1437,7 +1437,7 @@ const vm = new Vue({
             if (this.classroom_id) {
                 await this.onLoadFormData();
             }else {
-                this.onMessage('error', 'Error', 'An error occurred while loading the form.');
+                // this.onMessage('error', 'Error', 'An error occurred while loading the form.');
                 return;
             }
             setTimeout(() => {
