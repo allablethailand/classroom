@@ -1,0 +1,417 @@
+.form-container {
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+.form-container.questions, .form-container.response-questions {
+    border-left: 5px solid transparent;
+}
+.bg-purple {
+    background-color: #948dff21 !important;
+}
+.form-container.form {
+    border-top: 5px solid #ff9900 !important;
+}
+.form-container.questions:active, .form-container.questions:hover {
+    border-left: 5px solid #ff9900 !important;
+}
+.form-container.response-form {
+    border-top: 5px solid #07006F !important;
+    padding-bottom: 4px;
+}
+.form-container.response-questions:active, .form-container.response-questions:hover {
+    border-left: 5px solid #07006F !important;
+}
+.form-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.form-name-input,.question-text-input,.option-input,.new-option-input,.question-type-select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.form-control {
+    font-size: 14px !important;
+}
+.question-type > h4 {
+    font-weight: bold;
+    width: fit-content;
+    padding: 2px 8px 0px;
+    background-color: #d2d2d240;
+    border-radius: 4px;
+}
+.btn {
+    font-size: 12px;
+}
+.buttons {
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin: 5px 0;
+    font-size: 14px;
+}
+.buttons.default-button {
+    background-color: #d5d5d5;
+}
+.buttons.default-button:hover {
+    background-color: #a6a6a6;
+}
+.add-question-button {
+    width: 130px;
+}
+.add-question-button,.add-option-button,.submit-form-button,.confirm-type-button,.add-consent-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin: 5px 0;
+    font-size: 14px;
+}
+button.save-question-button {
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin: 5px 0;
+    font-size: 14px;
+    width: 130px;
+    position: fixed;
+    z-index: 10;
+    right: 2%;
+    top: 40%;
+}
+.add-question-button:hover,.add-option-button:hover,.submit-form-button:hover,.confirm-type-button:hover {
+    background-color: #0056b3;
+}
+button.add-question-button {
+    position: fixed;
+    z-index: 10;
+    right: 2%;
+    top: 52%;
+}
+button.add-consent-button {
+    position: fixed;
+    z-index: 10;
+    right: 2%;
+    top: 64%;
+    width: 130px;
+    background-color: #28c000;
+}
+.button-success {
+    background-color: #28c000;
+}
+.text-success {
+    color: #28c000;
+}
+input.new-option-input {
+    background-color: #ffa5001c;
+}
+.publish-block {
+    width: max-content;
+    background-color: #e4e4e4;
+    border-radius: 4px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.remove-question-button,.remove-option-button {
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin: 5px 0;
+    font-size: 14px;
+}
+.remove-question-button:hover {
+    background-color: #c20f0f;
+}
+.remove-option-button:hover {
+    color: #c20f0f;
+    background-color: #fff;
+}
+.question-options {
+    margin-top: 10px;
+}
+.question-item {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 16px;
+    background-color: #fff;
+}
+.question-item.move {
+    cursor: move;
+}
+.question-item.dragging {
+    background-color: #f9f9f9;
+    opacity: 0.5;
+}
+.remove-question-row {
+    text-align: end;
+}
+.check-box-other {
+    width: 18px;
+    height: 18px;
+}
+.other-option-checkbox {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    margin-top: 10px;
+}
+.option-item {
+    display: flex;
+    align-items: center;
+    column-gap: 6px;
+}
+.remove-option-button {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 16px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.remove-option-button:hover {
+    color: darkred;
+}
+.switch {
+    display: inline-flex;
+    gap: 50px;
+    position: relative;
+    width: 42px;
+    height: 24px;
+    margin-top: 10px;
+    align-items: center;
+}
+.switch input {
+    opacity: 0; 
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px; 
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 1px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider {
+    background-color: #24ae00;
+}
+input:checked + .slider:before {
+    transform: translateX(20px); 
+}
+.label-text {
+    margin-left: 10px; 
+    vertical-align: middle;
+    font-size: 12px;
+    color: #333;
+}
+.modal-form-type {
+    display: block;
+    position: fixed;
+    top: 30%;
+}
+.modal-form-type .modal-body {
+    min-height: 150px;
+}
+.modal-form-type .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+}
+@media(max-width: 1024px) {
+    button.save-question-button {
+        top: 30% !important;
+    }
+    button.add-question-button {
+        top: 40% !important;
+    }
+    button.add-consent-button {
+        top: 50% !important;
+    }
+}
+.menu-container {
+    display: flex;
+    gap: 12px;
+    width: fit-content;
+    padding: 6px 9px;
+    background-color: #ddd;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 4px;
+    margin: 2rem auto;
+}
+.sub-menus {
+    padding: 4px 8px;
+    background-color: #fff;
+    border-radius: 4PX;
+    color: #333;
+    cursor: pointer;
+    min-width: 100px;
+    text-align: center;
+}
+.sub-menus.active {
+    background-color: #333;
+    color: #fff;
+    cursor: unset;
+}
+#piechart {
+    width: 100%;
+    height: 400px;
+    margin: 0 auto;
+}
+.option-answer-response {
+    text-align: center;
+    padding: 20px;
+}
+.loading-spinner {
+    font-size: 18px;
+    color: #666;
+}
+.d-flex {
+    gap: 10px;
+    display: flex;
+}
+.align-item-baseline {
+    align-items: baseline;
+}
+.align-item-center {
+    align-items: center;
+}
+.q-label {
+    font-size: 18px !important;
+    font-weight: 400;
+}
+.a-lable {
+    font-size: 18px !important;
+    font-weight: 400;
+}
+.text-deafault {
+    color: #aaa;
+}
+.pagination {
+    color: #777;
+    background-color: #fff;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.pagination button:hover {
+    background-color: #777;
+    color: #fff;
+}
+.count-answer-label {
+    font-size: 16px;
+    background-color: #07006F15;
+    color: #07006F;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.zero-count-answer-label {
+    font-size: 16px;
+    background-color: #eeeeeec2;
+    color: #777;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.text-answer-label {
+    font-size: 16px;
+    color: #07006f;
+    height: 26px;
+}
+.dotted {
+    border-bottom: 1px dotted #333;
+}
+.mb-1 {
+    margin-bottom: 1rem;
+}
+.mb-2 {
+    margin-bottom: 2rem;
+}
+.card-item-content {
+    word-break: break-word;
+    width: 100%;
+    padding: 2px 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+}
+.card-item-content:hover {
+    background-color: #07006F15;
+    color: #07006F;
+}
+.response-menu-container {
+    display: flex;
+    gap: 14px;
+}
+.response-sub-menus {
+    background-color: #fff;
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    border: 0;
+    min-width: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.response-sub-menus.active {
+    cursor: unset;
+    border-bottom: 3px solid #07006F;
+    border-radius: 0;
+}
+.btn-flex {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+}
+.form-name-input:focus, .question-text-input:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+}
