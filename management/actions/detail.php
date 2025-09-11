@@ -641,6 +641,56 @@
                 exit;
             }
         }
+        $columnMaster = "mail_master_id,mail_master_name,mail_master_description,mail_master_html";
+        $tableMaster = "classroom_mail_master";
+        $whereMaster = "where status = 0 and mail_master_public = 0";
+        $Master = select_data($columnMaster,$tableMaster,$whereMaster);
+        $count_master = count($Master);
+        $i_master = 0;
+        while($i_master < $count_master) {
+            $mail_master_id = $Master[$i_master]['mail_master_id'];
+            $mail_master_name = escape_string($Master[$i_master]['mail_master_name']);
+            $mail_master_description = escape_string($Master[$i_master]['mail_master_description']);
+            $mail_master_html = escape_string($Master[$i_master]['mail_master_html']);
+            $columnData = "*";
+            $tableData = "classroom_mail_template";
+            $whereData = "where ifnull(mail_reference,0) = '{$mail_master_id}' and classroom_id = '{$classroom_id}'";
+            $Data = select_data($columnData,$tableData,$whereData);
+            $count_data = count($Data);
+            if($count_data == 0) {
+                $tableInsData = "classroom_mail_template";
+                $columnInsData = "(
+                    classroom_id,
+                    comp_id,
+                    mail_name,
+                    mail_subject,
+                    mail_reason,
+                    mail_description,
+                    mail_reference,
+                    status,
+                    emp_create,
+                    date_create,
+                    emp_modify,
+                    date_modify
+                )";
+                $valueInsData = "(
+                    '{$classroom_id}',
+                    '{$_SESSION['comp_id']}',
+                    '{$mail_master_name}',
+                    '{$mail_master_name}',
+                    '{$mail_master_description}',
+                    '{$mail_master_html}',
+                    '{$mail_master_id}',
+                    0,
+                    '{$_SESSION['emp_id']}',
+                    NOW(),
+                    '{$_SESSION['emp_id']}',
+                    NOW()
+                )";
+                insert_data($tableInsData,$columnInsData,$valueInsData);
+            }
+            ++$i_master;
+        }
         echo json_encode([
             'status' => true,
             'classroom_id' => $classroom_id

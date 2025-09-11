@@ -155,6 +155,9 @@ function buildPage(page) {
         case 'teacher':
             buildTeacherPage();
             break;
+        case 'email':
+            buildEmailPage();
+            break;
         default:
             console.warn('Unknown page type:', page);
     }
@@ -1622,4 +1625,31 @@ function saveManagement() {
 			}
 		}
 	});
+}
+function handleResponse(response) {
+    if (response.status === 'redirect') {
+        swal({
+            type: 'warning',
+            title: 'Something went wrong',
+            text: response.message,
+            confirmButtonColor: '#FF9900'
+		},function(isConfirm){
+			if (isConfirm) {
+				window.location.href = response.redirect_url;
+			}
+		});
+		return;
+    } else if(response.status == false) {
+		swal({
+            type: 'warning',
+            title: 'Something went wrong',
+            text: response.message,
+            confirmButtonColor: '#FF9900'
+        },function(isConfirm){
+			if (isConfirm) {
+				swal.close();
+			}
+		});
+		return;
+	}
 }
