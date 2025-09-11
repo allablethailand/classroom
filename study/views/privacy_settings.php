@@ -195,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 </head>
 <body>
      <?php require_once("component/header.php") ?>
-    <div class="main-container">
+    <div class="main-container" style="margin-bottom: 7rem;">
         <div class="edit-profile-card">
             <div class="section-header-icon">
                 <i class="fas fa-user-edit"></i>

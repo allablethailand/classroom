@@ -131,6 +131,11 @@ $hide_profile = ["profile", "edit_profile", "setting"];
                 </div>
             </div>
         </div>
+        <script>
+        $('#bellButton').on('click', function() {
+            $('#notificationModal').modal('show');
+        });
+    </script>
 
     <?php
     } else {
@@ -169,8 +174,8 @@ $hide_profile = ["profile", "edit_profile", "setting"];
     </div>
 </div>
 
-<script>
+<!-- <script>
     $('#bellButton').on('click', function() {
         $('#notificationModal').modal('show');
     });
-</script>
+</script> -->

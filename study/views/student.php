@@ -54,6 +54,8 @@
 <title>Student • ORIGAMI SYSTEM</title>
 <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
 <style>
@@ -371,6 +373,9 @@
             ?>
         </div>
     </div>
+     <?php
+    require_once ("component/footer.php")
+    ?>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script>
@@ -402,8 +407,6 @@
             this.classList.remove('show');
         });
     </script>
-    <?php
-    require_once ("component/footer.php")
-    ?>
+   
 </body>
 </html>
