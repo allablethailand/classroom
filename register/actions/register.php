@@ -14,6 +14,7 @@
     define('BASE_INCLUDE', $base_include);
     require_once $base_include.'/lib/connect_sqli.php';
     require_once $base_include.'/actions/func.php';
+    require_once $base_include.'/classroom/actions/mailsend.php';
     $fsData = getBucketMaster();
     $filesystem_user = $fsData['fs_access_user'];
     $filesystem_pass = $fsData['fs_access_pass'];
@@ -37,6 +38,7 @@
                 template.classroom_name, 
                 template.classroom_information, 
                 template.classroom_poster, 
+                template.classroom_bg, 
                 date_format(template.classroom_start, '%d %b %Y') as classroom_start_date, 
                 date_format(template.classroom_start, '%H:%i') as classroom_start_time, 
                 date_format(template.classroom_end, '%d %b %Y') as classroom_end_date, 
@@ -82,6 +84,7 @@
             'classroom_name' => $classroom['classroom_name'], 
             'classroom_information' => $classroom['classroom_information'], 
             'classroom_poster' => ($classroom['classroom_poster']) ? GetUrl($classroom['classroom_poster']) : '', 
+            'classroom_bg' => ($classroom['classroom_bg']) ? GetUrl($classroom['classroom_bg']) : '', 
             'classroom_start_date' => $classroom['classroom_start_date'], 
             'classroom_start_time' => $classroom['classroom_start_time'], 
             'classroom_end_date' => $classroom['classroom_end_date'], 
@@ -94,9 +97,18 @@
             'comp_logo' => ($classroom['comp_logo']) ? ($classroom['comp_logo_target'] == 0) ? '/' . $classroom['contact_us'] : GetUrl($classroom['contact_us']) : '', 
             'classroom_allow_register' => $classroom['classroom_allow_register']
         ];
+        $register_forms = select_data(
+            "register_template, register_require",
+            "classroom_template",
+            "where classroom_id = '{$classroom['classroom_id']}'"
+        );
+        $register_template = explode(',', $register_forms[0]['register_template']);
+        $register_require = explode(',', $register_forms[0]['register_require']);
         echo json_encode([
             'status' => true,
-            'classroom_data' => $classroom_data
+            'classroom_data' => $classroom_data,
+            'register_template' => $register_template,
+            'register_require' => $register_require
         ]);
         exit;
     }
@@ -107,53 +119,89 @@
         );
         echo json_encode([
             'status' => true,
-            'classroom_consent' => $Term[0]['classroom_consent']
+            'classroom_consent' => $Term[0]['classroom_consent'],
         ]);
     }
     if(isset($_GET) && $_GET['action'] == 'saveRegister') {
         $classroom_id = $_POST['classroom_id'];
+        $dial_code = isset($_POST['dialCode']) ? initVal(trim($_POST['dialCode'])) : '+66';
         $classroom = select_data(
-            "comp_id, auto_approve",
+            "comp_id",
             "classroom_template",
             "where classroom_id = '{$classroom_id}'"
         );
         $comp_id = $classroom[0]['comp_id'];
-        $auto_approve = $classroom[0]['auto_approve'];
-        $firstname_en = escape_string($_POST['firstName']);
-        $lastname_en = escape_string($_POST['lastName']);
-        $nickname = escape_string($_POST['nickname']);
-        $gender = escape_string($_POST['gender']);
-        $email = escape_string($_POST['email']);
-        $mobile = escape_string($_POST['mobile']);
-        $organization = escape_string($_POST['organization']);
-        $position = escape_string($_POST['position']);
-        $username = escape_string($_POST['username']);
-        $password = escape_string($_POST['password']);
-        $exits_email = select_data(
-            "student_id",
-            "classroom_student",
-            "where LOWER(student_email) = LOWER('{$email}') and comp_id = '{$comp_id}' and status = 0"
-        );
-        if(!empty($exits_email)) {
-            echo json_encode([
-                'status' => false,
-                'message' => 'This email is already registered. Please log in instead.'
-            ]);
+        $student_firstname_en  = isset($_POST['student_firstname_en']) ? initVal(trim($_POST['student_firstname_en'])) : '';
+        $student_lastname_en = isset($_POST['student_lastname_en']) ? initVal(trim($_POST['student_lastname_en'])) : '';
+        $student_nickname_en = isset($_POST['student_nickname_en']) ? initVal(trim($_POST['student_nickname_en'])) : '';
+        $student_nickname_th = isset($_POST['student_nickname_th']) ? initVal(trim($_POST['student_nickname_th'])) : '';
+        $student_firstname_th = isset($_POST['student_firstname_th']) ? initVal(trim($_POST['student_firstname_th'])) : '';
+        $student_lastname_th = isset($_POST['student_lastname_th']) ? initVal(trim($_POST['student_lastname_th'])) : '';
+        $student_gender = isset($_POST['student_gender']) ? initVal(trim($_POST['student_gender'])) : '';
+        $student_email = isset($_POST['student_email']) ? initVal(trim($_POST['student_email'])) : '';
+        if(isset($_POST['student_mobile'])) {
+            $mobile = trim($_POST['student_mobile']);
+            if (substr($mobile, 0, 1) === '0') {
+                $mobile = substr($mobile, 1);
+            }
+            $student_mobile = "'{$mobile}'";
+        } else {
+            $student_mobile = "null";
         }
-        $exits_mobile = select_data(
-            "student_id",
-            "classroom_student",
-            "where student_mobile = '{$mobile}' and comp_id = '{$comp_id}' and status = 0"
-        );
-        if(!empty($exits_mobile)) {
-            echo json_encode([
-                'status' => false,
-                'message' => 'This mobile is already registered. Please log in instead.'
-            ]);
+        $student_company = isset($_POST['student_company']) ? initVal(trim($_POST['student_company'])) : '';
+        $student_position = isset($_POST['student_position']) ? initVal(trim($_POST['student_position'])) : '';
+        $student_username = isset($_POST['student_username']) ? initVal(trim($_POST['student_username'])) : '';
+        $student_birth_date = isset($_POST['student_birth_date']) ? initVal(trim(str_replace('/', '-', $_POST['student_birth_date']))) : '';
+        $student_perfix = isset($_POST['student_perfix']) ? initVal(trim($_POST['student_perfix'])) : '';
+        $student_idcard = isset($_POST['student_idcard']) ? initVal(trim($_POST['student_idcard'])) : '';
+        $student_passport = isset($_POST['student_passport']) ? initVal(trim($_POST['student_passport'])) : '';
+        $student_image_name = isset($_FILES['student_image_profile']['name']) ? $_FILES['student_image_profile']['name'] : '';
+        $student_image_profile = "null";
+        if($student_image_name) {
+            $student_image_tmp = $_FILES['student_image_profile']['tmp_name'];
+            $strname = md5($classroom_id . microtime(true) . rand(1000,9999));
+            $student_image_dir = 'uploads/classroom/' . $comp_id . '/student/';
+            $path_info = pathinfo($student_image_name);
+            $student_image_ext = strtolower($path_info['extension']);
+            $upload = $student_image_dir . $strname . '.' . $student_image_ext;
+            SaveFile($student_image_tmp, $upload);
+            $student_image_profile = "'{$upload}'";
         }
-        $student_password_key = bin2hex(openssl_random_pseudo_bytes(16));
-        $student_password = encryptToken($password, $student_password_key);
-        $emp_id = ($_SESSION['emp_id']) ? "'{$_SESSION['emp_id']}'" : "nill";
+        if($student_email !== "null" || $student_mobile !== "null") {
+            $exits_email = select_data(
+                "student_id",
+                "classroom_student",
+                "where LOWER(student_email) = LOWER($student_email) and status = 0"
+            );
+            if(!empty($exits_email)) {
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'This email is already registered. Please log in instead.'
+                ]);
+                exit;
+            }
+            $exits_mobile = select_data(
+                "student_id",
+                "classroom_student",
+                "where student_mobile = $student_mobile and status = 0"
+            );
+            if(!empty($exits_mobile)) {
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'This mobile is already registered. Please log in instead.'
+                ]);
+                exit;
+            }
+        }
+        $student_password_key = "null";
+        $student_password = "null";
+        if(isset($_POST['student_password'])) {
+            $password_key = bin2hex(openssl_random_pseudo_bytes(16));
+            $password = encryptToken($_POST['student_password'], $password_key);
+            $student_password_key = "'{$password_key}'";
+            $student_password = "'{$password}'";
+        }
+        $emp_id = ($_SESSION['emp_id']) ? "'{$_SESSION['emp_id']}'" : "null";
         $invite_status = ($_SESSION['emp_id']) ? 0 : 1;
         $student_id = insert_data(
             "classroom_student",
@@ -161,15 +209,23 @@
                 student_firstname_en,
                 student_lastname_en,
                 student_nickname_en,
+                student_nickname_th,
+                student_firstname_th,
+                student_lastname_th,
                 student_gender,
                 student_email,
+                dial_code,
                 student_mobile,
                 student_company,
                 student_position,
                 student_username,
                 student_password,
                 student_password_key,
-                comp_id,
+                student_birth_date,
+                student_image_profile,
+                student_perfix,
+                student_idcard,
+                student_passport,
                 status,
                 emp_create,
                 date_create,
@@ -177,18 +233,26 @@
                 date_modify
             )",
             "(
-                '{$firstname_en}',
-                '{$lastname_en}',
-                '{$nickname}',
-                '{$gender}',
-                '{$email}',
-                '{$mobile}',
-                '{$organization}',
-                '{$position}',
-                '{$username}',
-                '{$student_password}',
-                '{$student_password_key}',
-                '{$comp_id}',
+                $student_firstname_en,
+                $student_lastname_en,
+                $student_nickname_en,
+                $student_nickname_th,
+                $student_firstname_th,
+                $student_lastname_th,
+                $student_gender,
+                $student_email,
+                $dial_code,
+                $student_mobile,
+                $student_company,
+                $student_position,
+                $student_username,
+                $student_password,
+                $student_password_key,
+                $student_birth_date,
+                $student_image_profile,
+                $student_perfix,
+                $student_idcard,
+                $student_passport,
                 0,
                 $emp_id,
                 NOW(),
@@ -232,17 +296,19 @@
                     $emp_id
                 )"
             );
-            if($auto_approve == 0) {
-                update_data(
-                    "classroom_student_join",
-                    "invite_status = 1, invite_date = NOW(), approve_status = 1, approve_date = NOW(), approve_by = $emp_id",
-                    "student_id = '{$student_id}' and classroom_id = '{$classroom_id}'"
-                );
-            }
         }
+        notiMail($classroom_id, $student_id, 'Register');
         echo json_encode([
-            'status' => true,
-            'auto_approve' => $auto_approve
+            'status' => true
         ]);
+        exit;
+    }
+    function initVal($val) {
+        global $mysqli;
+        if($val) {
+            return "'" . mysqli_real_escape_string($mysqli, $val) . "'";
+        } else {
+            return "null";
+        }
     }
 ?>

@@ -14,38 +14,57 @@ define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
 
+function getStudentClass()
+{
+    $student_id = isset($_SESSION['student_id']) ? $_SESSION['student_id'] : null;
+    if($student_id == null)
+    {
+        return "ERROR";
+    }
+        
+    $student_classroom_id = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
+    $classroom_id = $student_classroom_id[0]['classroom_id'];
+
+    return $classroom_id;
+}
+
 if (isset($_POST) && $_POST['action'] == 'fetch_schedules') {
     $dateSchedule = $_POST['date_range'];
 
     // course logo
     // w.image_path,
 
+    $classroom_id = getStudentClass();
+
     $scheduleItems = select_data(
         "w.workshop_name as schedule_name,
+            tts.topic_name as topic_name,
             DATE_FORMAT(w.date_start,'%Y/%m/%d') as date_start, 
             DATE_FORMAT(w.time_start,'%H:%i') as time_start, 
             DATE_FORMAT(w.time_end,'%H:%i') as time_end",
-        "ot_workshop w INNER JOIN ot_training_topic_setup tts ON w.workshop_id = tts.workshop_id 
-            INNER JOIN classroom_course cc ON tts.trn_id = cc.course_ref_id",
-        "cc.classroom_id = 2 
+        "ot_workshop AS w 
+            INNER JOIN ot_training_topic_setup AS tts ON w.workshop_id = tts.workshop_id 
+            INNER JOIN classroom_course AS cc ON tts.trn_id = cc.course_ref_id",
+        "WHERE cc.classroom_id = {$classroom_id}
             AND cc.status = 0 
             AND tts.status = 0 
             AND tts.workshop_id IS NOT NULL 
             AND tts.workshop_id <> ''
-            AND w.date_start = '{$dateSchedule}'"
+            AND w.date_start = '{$dateSchedule}' ORDER BY time_start ASC"
     );
-
-    $schedule_data = $scheduleItems[0];
-
-    echo json_encode([
-        'status' => true,
-        'group_data' => [
-            'schedule_name' => $schedule_data['schedule_name'],
-            'schedule_date' => $schedule_data['date_start'],
-            'schedule_start' => $schedule_data['time_start'],
-            'schedule_end' => $schedule_data['time_end'],
-        ]
-    ]);
+    
+    if (!empty($scheduleItems)) {
+        $schedule_data = $scheduleItems[0];
+        echo json_encode([
+            'status' => true,
+            'group_data' => $scheduleItems,
+            ]);
+    } else {
+        echo json_encode([
+            'status' => false,
+            'group_data' => []
+        ]);
+    }
 }
 
 
@@ -97,7 +116,7 @@ if (isset($input['action']) && $input['action'] == 'fetch_mydata') {
                                 <?= escape($item['session_detail']) ?>
                             </h3>
                             <p class="schedule-duration">
-                                <?= escape($displayDate) . " • " . escape($startTime) ?><?= $endTime ? ' - ' . escape($endTime) : ''; ?> 
+                                <?= escape($displayDate) . " • " . escape($startTime) ?><?= $endTime ? ' - ' . escape($endTime) : ''; ?>
                             </p>
                         </div>
                         <span class="schedule-badge badge-class">
@@ -128,9 +147,9 @@ if (isset($input['action']) && $input['action'] == 'fetch_mydata') {
                                         <h4 class="modal-title" id="scheduleModalLabel">Schedule Detail</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <p id="modalDetails"><strong>รายละเอียด:</strong>  <?= escape($item['session_detail']) ?> </p>
-                                        <p id="modalTime"><strong>ช่วงเวลาระหว่าง:</strong>  <?= escape($startTime) ?><?= $endTime ? ' - ' . escape($endTime) : ''; ?> </p>
-                                        <p id="modalSpeakers"><strong>วิทยากร:</strong>  <?= isset($item['session_speaker']) && $item['session_speaker'] ? escape($item['session_speaker']) : 'ยังไม่ระบุ'; ?>  </p>
+                                        <p id="modalDetails"><strong>รายละเอียด:</strong> <?= escape($item['session_detail']) ?> </p>
+                                        <p id="modalTime"><strong>ช่วงเวลาระหว่าง:</strong> <?= escape($startTime) ?><?= $endTime ? ' - ' . escape($endTime) : ''; ?> </p>
+                                        <p id="modalSpeakers"><strong>วิทยากร:</strong> <?= isset($item['session_speaker']) && $item['session_speaker'] ? escape($item['session_speaker']) : 'ยังไม่ระบุ'; ?> </p>
 
                                         <div class="" style="text-align: right;">
                                             <button type="button" class="btn btn-primary open-new-modal" data-toggle="modal" data-target="#newModal-<?= $index ?>">
