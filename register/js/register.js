@@ -347,15 +347,10 @@ function handleRegisterResponse(result) {
     });
 }
 function initTemplate(data) {
-    $(".poster-bg").css(
-        "background-image",
-        `url(${data.classroom_bg || "/images/bg.jpg"})`
-    );
+    let bg = (data.classroom_bg != '') ? data.classroom_bg : "/images/bg.jpg";
+    $(".poster-bg").css("background-image",`url(${bg})`);
     $(".poster-img img").attr("src", data.classroom_poster || "/images/training.jpg");
-    $(".container-header-bg").css(
-        "background-image",
-        `url(${data.classroom_bg || "/images/bg.jpg"})`
-    );
+    $(".container-header-bg").css("background-image",`url(${bg})`);
     $(".container-header-logo img").attr("src", data.comp_logo);
     const sheet = document.styleSheets[0];
     const rule = `
