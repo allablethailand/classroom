@@ -179,33 +179,6 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                     </div>
                 </div>
             </div>
-            <div class="g-4 justify-content-center bg-element-water-two mx-3 mb-bs-3 rounded-small">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card group-card h-100 ">
-
-                        <div class="panel-heading border-0">
-                            <div class="d-flex-bs align-items-center gap-3">
-                                <div class="group-icon-large" style="color: #FFF;">
-                                    
-                                    <i class="fas fa-tint" style="width: 50px;"></i>
-                                </div>
-
-                                
-                                <div class="flex-grow-bs-1" style=" min-Width: 0 ">
-                                    <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                        <h4 class="panel-title mb-0 text-truncate">Water</h4>
-                                    </div>
-                                    <p class="text-secondary mb-0 small text-truncate-2">
-                                        สมาชิกปัจจุบัน 40 คน
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-            </div>
             <div class="g-4 justify-content-center bg-element-earth-two mx-3 mb-bs-3 rounded-small">
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="card group-card h-100 ">
