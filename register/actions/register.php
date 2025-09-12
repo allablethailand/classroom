@@ -94,7 +94,7 @@
             'classroom_source' => $classroom['classroom_source'], 
             'contact_us' => $classroom['contact_us'], 
             'tenant_key' => $tenant_key, 
-            'comp_logo' => ($classroom['comp_logo']) ? ($classroom['comp_logo_target'] == 0) ? '/' . $classroom['contact_us'] : GetUrl($classroom['contact_us']) : '', 
+            'comp_logo' => ($classroom['comp_logo']) ? ($classroom['comp_logo_target'] == 0) ? '/' . $classroom['comp_logo'] : GetUrl($classroom['comp_logo']) : '', 
             'classroom_allow_register' => $classroom['classroom_allow_register']
         ];
         $register_forms = select_data(
@@ -115,7 +115,7 @@
     if($action == 'loadTerm') {
         $classroom_id = (!empty($_POST['classroom_id'])) ? escape_string($_POST['classroom_id']) : ''; 
         $Term = select_data(
-            "classroom_consent", "classroom_template", "where classroom_id = '{$classroom_id}'"
+            "consent_body as classroom_consent", "classroom_consent", "where classroom_id = '{$classroom_id}' and status = 0 and consent_use = 0"
         );
         echo json_encode([
             'status' => true,
