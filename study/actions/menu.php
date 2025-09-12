@@ -37,21 +37,19 @@ if (!$student_classroom_id) {
 $classroom_id = $student_classroom_id[0]['classroom_id'];
 
 $scheduleItems = select_data(
-    "w.workshop_name as schedule_name,
-    tts.topic_name as topic_name,
-    w.date_start,
-    w.time_start,
-    w.time_end",
-    "ot_workshop AS w 
-    INNER JOIN ot_training_topic_setup AS tts ON w.workshop_id = tts.workshop_id 
-    INNER JOIN classroom_course AS cc ON tts.trn_id = cc.course_ref_id",
+    "course.trn_subject AS  schedule_name,
+    course.trn_detail AS topic_name,
+    course.trn_date AS date_start,
+    course.trn_from_time AS time_start,
+    course.trn_to_time AS time_end",
+    "ot_training_list course 
+        LEFT JOIN classroom_course cc ON course.trn_id = cc.course_ref_id
+        JOIN ot_training_categories categories ON course.categories_id = categories.categories_id",
     "WHERE cc.classroom_id = {$classroom_id}
     AND cc.status = 0 
-    AND tts.status = 0 
-    AND tts.workshop_id IS NOT NULL 
-    AND tts.workshop_id <> ''
-    AND w.date_start = '{$dateSchedule}'
-    ORDER BY w.time_start ASC LIMIT 5"
+            AND course.status = 0 
+            AND course.trn_date = '{$dateSchedule}' 
+    ORDER BY time_start ASC LIMIT 5"
 );
 
 $now = new DateTime();
@@ -71,7 +69,7 @@ foreach ($scheduleItems as $item) {
     } else if ($minutesDiff <= 180 && $soonClass === null) {
         $item['starting_soon'] = true;
         $item['minutes_to_start'] = round($minutesDiff);
-        $item['stamp_in_status'] = 'ยังไม่เช็คอิน'; // real logic
+        $item['stamp_in_status'] = 'No Stamp'; // real logic
         $soonClass = $item;
     } else {
         $item['starting_soon'] = false;

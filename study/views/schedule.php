@@ -114,6 +114,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
 
 
             <div id="scheduleContainer"></div>
+            
         </div>
         <?php require_once("component/footer.php"); ?>
 
@@ -128,6 +129,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                     <h4 class="modal-title" id="scheduleModalLabel">Schedule Detail</h4>
                 </div>
                 <div class="modal-body">
+                    <p id="modalTitle"><strong>หัวข้อ:</strong> ทดสอบ <span></span></p>
                     <p id="modalDetails"><strong>รายละเอียด:</strong> <span></span></p>
                     <p id="modalTime"><strong>ช่วงเวลาระหว่าง:</strong> <span></span></p>
                     <p id="modalSpeakers"><strong>วิทยากร:</strong> <span></span></p>
@@ -151,7 +153,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                 </div>
                 <div class="modal-body" style="text-align: center;">
                     <!-- Content of the second modal -->
-                    <p>เช็คอินเพื่อเข้าร่วมอีเว้นท์นี้เลยใช่มั้ย</p>
+                    <p>ต้องการไปยังหน้าเช็คอินเพื่อเข้าร่วมอีเว้นท์นี้เลยใช่มั้ย</p>
                     <div style="display: flex; margin:auto">
                         <p><b>ช่วงเวลาระหว่าง: </b></p>
                         <p id="modalTimeNew" style="margin-left: 10px;"> </p>

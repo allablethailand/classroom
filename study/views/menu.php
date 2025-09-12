@@ -56,9 +56,12 @@ session_start();
             <div class="row">Upcoming Class</div>
 
             <div class="row" id="upcomingClass"></div>
-                
 
-                <div class="row">
+            <div class="row" id="otherUpClass"></div>
+
+                
+                                        
+                <!-- <div class="row">
                     <div class="container-menu" style="margin-top: 10px;">
                         <div class="header-menu">
                             <span class="title-menu">Opening Ceremony</span>
@@ -68,7 +71,7 @@ session_start();
                         <div class="usage-menu">
                             <div class="progress-section">
                                 <div class="progress-header-flex">
-                                    <!-- <h3 class="progress-title">test</h3> -->
+                                   
                                     <span class="progress-text">
                                         Wednesday, October 1, 2025
                                     </span>
@@ -91,7 +94,7 @@ session_start();
                         <div class="usage-menu">
                             <div class="progress-section">
                                 <div class="progress-header-flex">
-                                    <!-- <h3 class="progress-title">test</h3> -->
+                                
                                     <span class="progress-text">
                                         Wednesday, October 1, 2025
                                     </span>
@@ -102,7 +105,7 @@ session_start();
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             <div class="row" style="margin-top: 1rem; ">
                 <div class="actions-grid">
 
@@ -158,7 +161,7 @@ session_start();
                     </a>
 
                     <!-- Histroy -->
-                    <a class="action-card" href="history">
+                    <a class="action-card" href="#">
                         <svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="48" height="48" rx="9.99999" fill="url(#paint0_linear_226_27)"/>
                         <path d="M31 18C23.837 18 18 23.837 18 31C18 38.163 23.837 44 31 44C38.163 44 44 38.163 44 31C44 23.837 38.163 18 31 18ZM36.655 35.641C36.473 35.953 36.148 36.122 35.81 36.122C35.641 36.122 35.472 36.083 35.316 35.979L31.286 33.574C30.285 32.976 29.544 31.663 29.544 30.506V25.176C29.544 24.643 29.986 24.201 30.519 24.201C31.052 24.201 31.494 24.643 31.494 25.176V30.506C31.494 30.974 31.884 31.663 32.287 31.897L36.317 34.302C36.785 34.575 36.941 35.173 36.655 35.641Z" fill="white"/>
@@ -181,44 +184,44 @@ session_start();
     <?php require_once 'component/footer.php'; ?>
 </body>
 <script>
-function calculateTimeDiffInBangkok(targetDate) {
-  // Get current time in Bangkok timezone (UTC+7)
-  const now = new Date();
-  const bangkokNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+// function calculateTimeDiffInBangkok(targetDate) {
+//   // Get current time in Bangkok timezone (UTC+7)
+//   const now = new Date();
+//   const bangkokNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
 
-//   console.log(now)
+// //   console.log(now)
 
-  // Parse the targetDate as a Date object if it's not already
-  const target = new Date(targetDate);
+//   // Parse the targetDate as a Date object if it's not already
+//   const target = new Date(targetDate);
 
-  // Calculate time difference in milliseconds
-  const diffMs = Math.abs(target - bangkokNow);
+//   // Calculate time difference in milliseconds
+//   const diffMs = Math.abs(target - bangkokNow);
 
-  // Convert milliseconds to total minutes
-  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+//   // Convert milliseconds to total minutes
+//   const totalMinutes = Math.floor(diffMs / (1000 * 60));
 
-  // Calculate hour and minute difference
-  let hourdiff = 0;
-  let minutediff = 0;
+//   // Calculate hour and minute difference
+//   let hourdiff = 0;
+//   let minutediff = 0;
 
-  if (totalMinutes < 24 * 60) {
-    hourdiff = Math.floor(totalMinutes / 60);
-    minutediff = totalMinutes % 60;
-  }
+//   if (totalMinutes < 24 * 60) {
+//     hourdiff = Math.floor(totalMinutes / 60);
+//     minutediff = totalMinutes % 60;
+//   }
 
-  return { hourdiff, minutediff };
-}
+//   return { hourdiff, minutediff };
+// }
 
-// Example usage:
-const targetDate = "2025-09-09T09:30:00+07:00"; // ISO string in Bangkok timezone
-const { hourdiff, minutediff } = calculateTimeDiffInBangkok(targetDate);
+// // Example usage:
+// const targetDate = "2025-09-13T09:30:00+07:00"; // ISO string in Bangkok timezone
+// const { hourdiff, minutediff } = calculateTimeDiffInBangkok(targetDate);
 
-const nextclassSpan = document.getElementById("nextclass");
-if (hourdiff > 0 || minutediff > 0) {
-  nextclassSpan.innerHTML = `Class will begin in <span style="color: #ff8c5a;">&nbsp; ${hourdiff} &nbsp;</span> hour${hourdiff !== 1 ? "s" : ""} <span style="color: #ff8c5a;">&nbsp; ${minutediff} &nbsp;</span> min${minutediff !== 1 ? "s" : ""}.`;
-} else {
-  nextclassSpan.innerHTML = "Class has started or time not valid.";
-}
+// const nextclassSpan = document.getElementById("countdown");
+// if (hourdiff > 0 || minutediff > 0) {
+//   nextclassSpan.innerHTML = `Class will begin in <span style="color: #ff8c5a;">&nbsp; ${hourdiff} &nbsp;</span> hour${hourdiff !== 1 ? "s" : ""} <span style="color: #ff8c5a;">&nbsp; ${minutediff} &nbsp;</span> min${minutediff !== 1 ? "s" : ""}.`;
+// } else {
+//   nextclassSpan.innerHTML = "Class has started or time not valid.";
+// }
 </script>
 
 
