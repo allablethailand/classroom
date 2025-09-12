@@ -118,6 +118,14 @@ div#Avatar > .avatar-selector > .avatar-selector-btn>img{
     overflow-x: hidden !important;
     overflow-y: hidden !important;
 }
+.consent-example {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+}
 .profile {
     width: 220px;
     background-color: #FFFFFF;
@@ -207,5 +215,5 @@ a:hover .notofication-share{
     content: '';
 }
 .modal.systemModal {
-    z-index: 9999999999 !important;
+    z-index: 99999991 !important;
 }
