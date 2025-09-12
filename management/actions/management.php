@@ -98,4 +98,34 @@
             'status' => true
         ]);
     }
+    if(isset($_POST) && $_POST['action'] == 'viewLink') {
+        global $domain_name;
+        $classroom_id = $_POST['classroom_id'];
+        $classrooms = select_data(
+            "classroom_key, classroom_name, comp_id",
+            "classroom_template",
+            "where classroom_id = '{$classroom_id}'"
+        );
+        $classroom = $classrooms[0];
+        $classroom_key = $classroom['classroom_key'];
+        $classroom_name = $classroom['classroom_name'];
+        $comp_id = $classroom['comp_id'];
+        $tenant = select_data(
+            "tenant_key",
+            "ogm_tenant",
+            "where comp_id = '{$comp_id}' and status = 0"
+        );
+        $tenant_key = '';
+        if(!empty($tenant)) {
+            $tenant_key = $tenant[0]['tenant_key'];
+        }
+        $login_url = $domain_name . $tenant_key;
+        $register_url = $domain_name . 'classroom/register/' .$classroom_key;
+        echo json_encode([
+            'status' => true,
+            'classroom_name' => $classroom_name,
+            'login_url' => $login_url,
+            'register_url' => $register_url
+        ]);
+    }
 ?>

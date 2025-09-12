@@ -157,9 +157,11 @@ function buildClassroom() {
                 "data": "classroom_id",
                 "className": "text-center",
                 "render": function (data,type,row,meta) {	
+                    let classroom_key = row['classroom_key'];
 					return `
                         <div class="nowarp">
-                            <button type="button" class="btn btn-orange btn-circle" onclick="manageClassroom(${data})"><i class="fas fa-pencil-alt"></i></button>
+                            <button type="button" class="btn btn-info btn-circle" onclick="viewLink(${data})"><i class="fas fa-link"></i></button> 
+                            <button type="button" class="btn btn-orange btn-circle" onclick="manageClassroom(${data})"><i class="fas fa-pencil-alt"></i></button> 
                             <button type="button" class="btn btn-red btn-circle" onclick="delClassroom(${data})"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     `;
@@ -244,3 +246,71 @@ $(window).on('storage', function(e) {
 		buildClassroom();
 	}
 });
+function viewLink(classroom_id) {
+    $(".systemModal").modal();
+    $(".systemModal .modal-header").html(`
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h5 class="modal-title"></h5>    
+    `);
+    $(".systemModal .modal-footer").html(`
+        <button type="button" class="btn btn-white" data-dismiss="modal" lang="en">Close</button>
+    `);
+    $.ajax({
+        url: "/classroom/management/actions/management.php",
+        type: "POST",
+        data: {
+            action:'viewLink',
+            classroom_id: classroom_id
+        },
+        dataType: "JSON",
+        type: 'POST',
+        success: function(result){
+            if(result.status === true){			
+                let classroom_name = result.classroom_name;
+                let login_url = result.login_url;
+                let register_url = result.register_url;
+                $(".modal-title").html(classroom_name);
+                var panels = [];
+                var links = [
+                    { icon: 'fa-sign-in-alt text-orange', label: 'Login', key: 'login_url', copyId: 1 },
+                    { icon: 'fa-notes-medical text-orange', label: 'Register', key: 'register_url', copyId: 2 },
+                ];
+                $.each(links, function(i, item) {
+                    var value = result[item.key];
+                    if (value) {
+                        panels.push(`
+                            <div class="col-sm-6 col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-body text-center">
+                                        <i class="fa ${item.icon} fa-4x"></i>
+                                        <p lang="en" style="margin-top:15px;">${item.label}</p>
+                                        <input type="hidden" class="form-control input-sm m-b-sm" readonly value="${value}">
+                                        <a class="btn btn-xs btn-orange" href="${value}" target="_blank">Go to</a> 
+                                        <a class="btn btn-xs btn-white text-grey share-link copy-${item.copyId}" 
+                                        onclick="copyLink(${item.copyId})"
+                                        data-clipboard-text="${value}">
+                                        <i class="fa fa-link"></i> <span lang="en">Copy</span>
+                                        <span class="notofication-share"><i class="fa fa-check"></i> 
+                                        <label lang="en">Copy Link</label></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    }
+                });
+                var html = `<div class="row">${panels.join('')}</div>`;
+                $(".systemModal .modal-body").html(html);
+            } else {
+                swal({type: 'error',title: "Sorry...",text: "Something went wrong!",timer: 2000});
+            }
+        }
+    });
+}
+function copyLink(rows) {
+    new ClipboardJS('.copy-'+rows);
+    $(".copy-"+rows+" .notofication-share").addClass("active");
+    setTimeout(function() { 
+        $(".copy-"+rows+" .notofication-share").removeClass("active");
+    }, 2000);
+}
