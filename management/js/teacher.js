@@ -137,328 +137,12 @@ function buildTeacher() {
 // ตัวอย่าง: <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 function manageTeacher(teacher_id) {
-    $(".systemModal").modal();
-    $(".systemModal .modal-header").html(`
-        <h5 class="modal-title" lang="en">Teacher Management</h5> 
-    `);
-
-    // โค้ด HTML ของฟอร์มที่ถูกแก้ไข
-    const formHtml = `
-        <div class="container-fluid p-4">
-            <form id="teacherForm" enctype="multipart/form-data">
-                <input type="hidden" name="teacher_id" id="teacher_id">
-                <input type="hidden" name="classroom_id" id="form_classroom_id">
-
-                <div class="form-group mb-4 text-center">
-                    <div class="profile-image-preview" id="current-profile-img" style="position: relative; width: 150px; height: 150px; margin: 0 auto 10px; border-radius: 50%; overflow: hidden; border: 2px solid #ddd; background-color: #f8f9fa;">
-                        <img id="profile-img" src="" class="img-fluid" style="display: none; width: 100%; height: 100%; object-fit: cover;">
-                        <div id="upload-icon-overlay" class="d-flex align-items-center justify-content-center" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; font-size: 2rem; color: #ced4da;">
-                            <i class="fas fa-camera"></i>
-                        </div>
-                    </div>
-                    <label for="teacher_image_profile" class="form-label d-block text-primary" style="cursor: pointer;">
-                        <i class="fas fa-upload me-2"></i>
-                        <span id="file-label">เลือกรูปโปรไฟล์</span>
-                    </label>
-                    <input type="file" class="d-none" id="teacher_image_profile" name="teacher_image_profile" accept="image/*">
-                </div>
-
-                <fieldset class="border p-3 mb-4 rounded">
-                    <legend class="w-auto px-2 h5 text-primary">ข้อมูลส่วนตัว</legend>
-                    <div class="row">
-                        <div class="col-md-2 form-group mb-3">
-                            <label for="teacher_perfix" class="form-label">คำนำหน้า <span class="text-danger">*</span></label>
-                            <select class="form-control" id="teacher_perfix" name="teacher_perfix">
-                                <option value="">เลือกคำนำหน้า</option>
-                                <option value="นาย">นาย</option>
-                                <option value="นาง">นาง</option>
-                                <option value="นางสาว">นางสาว</option>
-                            </select>
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-5 form-group mb-3">
-                            <label for="teacher_firstname_th" class="form-label">ชื่อ (ภาษาไทย)</label>
-                            <input type="text" class="form-control" id="teacher_firstname_th" name="teacher_firstname_th">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-5 form-group mb-3">
-                            <label for="teacher_lastname_th" class="form-label">นามสกุล (ภาษาไทย)</label>
-                            <input type="text" class="form-control" id="teacher_lastname_th" name="teacher_lastname_th">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_firstname_en" class="form-label">ชื่อ (ภาษาอังกฤษ) <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="teacher_firstname_en" name="teacher_firstname_en">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_lastname_en" class="form-label">นามสกุล (ภาษาอังกฤษ) <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="teacher_lastname_en" name="teacher_lastname_en">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_nickname_th" class="form-label">ชื่อเล่น (ไทย)</label>
-                            <input type="text" class="form-control" id="teacher_nickname_th" name="teacher_nickname_th">
-                        </div>
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_nickname_en" class="form-label">ชื่อเล่น (en)</label>
-                            <input type="text" class="form-control" id="teacher_nickname_en" name="teacher_nickname_en">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_idcard" class="form-label">เลขบัตรประชาชน <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="teacher_idcard" name="teacher_idcard" maxlength="13">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_passport" class="form-label">เลขที่หนังสือเดินทาง</label>
-                            <input type="text" class="form-control" id="teacher_passport" name="teacher_passport">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_birth_date" class="form-label">วันเกิด</label>
-                            <input type="text" class="form-control" id="teacher_birth_date" name="teacher_birth_date">
-                        </div>
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_mobile" class="form-label">เบอร์โทรศัพท์มือถือ <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control" id="teacher_mobile" name="teacher_mobile" maxlength="10">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_email" class="form-label">อีเมล <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="teacher_email" name="teacher_email">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="position_id" class="form-label">ตำแหน่งครู <span class="text-danger">*</span></label>
-                            <select class="form-control" id="position_id" name="position_id">
-                                <option value="">เลือกตำแหน่ง</option>
-                            </select>
-                            <div class="invalid-feedback"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 form-group mb-3">
-                            <label class="form-label">ที่อยู่ <span class="text-danger">*</span></label>
-                            <input type="hidden" id="teacher_address" name="teacher_address">
-                            <div class="row">
-                                <div class="col-md-4 mb-3" style="padding-bottom:10px;">
-                                    <input type="text" class="form-control" id="teacher_address_house_no" placeholder="บ้านเลขที่">
-                                    <div class="invalid-feedback"></div>
-                                </div>
-                                <div class="col-md-8 mb-3" style="padding-bottom:10px;">
-                                    <input type="text" class="form-control" id="teacher_address_road" placeholder="ถนน">
-                                    <div class="invalid-feedback"></div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3" style="padding-bottom:10px;">
-                                    <input type="text" class="form-control zipcode-search" id="teacher_address_subdistrict" placeholder="ตำบล / แขวง">
-                                    <div class="invalid-feedback"></div>
-                                </div>
-                                <div class="col-md-6 mb-3" style="padding-bottom:10px;">
-                                    <input type="text" class="form-control zipcode-search" id="teacher_address_district" placeholder="อำเภอ / เขต">
-                                    <div class="invalid-feedback"></div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3" style="padding-bottom:10px;">
-                                    <input type="text" class="form-control zipcode-search" id="teacher_address_province" placeholder="จังหวัด">
-                                    <div class="invalid-feedback"></div>
-                                </div>
-                                <div class="col-md-6 mb-3" style="padding-bottom:10px;">
-                                    <input type="text" class="form-control zipcode-search" id="teacher_address_zipcode" placeholder="รหัสไปรษณีย์" maxlength="5">
-                                    <div class="invalid-feedback"></div>
-                                </div>
-                            </div>
-                            <div class="invalid-feedback" id="address-invalid-feedback" style="display: none;"></div>
-                        </div>
-                    </div>
-                </fieldset>
-                <fieldset class="border p-3 mb-4 rounded">
-                    <legend class="w-auto px-2 h5 text-primary">ข้อมูลการทำงานและการศึกษา</legend>
-                    <div class="row">
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_company" class="form-label">บริษัท / องค์กร <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="teacher_company" name="teacher_company">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_position" class="form-label">ตำแหน่งงาน <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="teacher_position" name="teacher_position">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-12 form-group mb-3">
-                            <label class="form-label">ประวัติการศึกษา</label>
-                            <div class="education-form mb-3">
-                                <h6 class="text-muted">วุฒิปริญญาเอก</h6>
-                                <div class="row mb-2">
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control education-input" data-level="doctorate" data-field="school" placeholder="ชื่อมหาวิทยาลัย/สถาบัน">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control education-input" data-level="doctorate" data-field="major" placeholder="คณะ/สาขาวิชา">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="education-form mb-3">
-                                <h6 class="text-muted">วุฒิปริญญาโท</h6>
-                                <div class="row mb-2">
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control education-input" data-level="master" data-field="school" placeholder="ชื่อมหาวิทยาลัย/สถาบัน">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control education-input" data-level="master" data-field="major" placeholder="คณะ/สาขาวิชา">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="education-form mb-3">
-                                <h6 class="text-muted">วุฒิปริญญาตรี</h6>
-                                <div class="row mb-2">
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control education-input" data-level="bachelor" data-field="school" placeholder="ชื่อมหาวิทยาลัย/สถาบัน">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control education-input" data-level="bachelor" data-field="major" placeholder="คณะ/สาขาวิชา">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="education-form mb-3">
-                                <h6 class="text-muted">วุฒิระดับมัธยมศึกษา</h6>
-                                <div class="row mb-2">
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control education-input" data-level="highschool" data-field="school" placeholder="ชื่อโรงเรียน">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control education-input" data-level="highschool" data-field="major" placeholder="สายวิชา (เช่น วิทย์-คณิต)">
-                                    </div>
-                                </div>
-                            </div>
-                            <input type="hidden" id="teacher_education" name="teacher_education">
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-12 form-group mb-3">
-                            <label for="teacher_experience" class="form-label">ประสบการณ์ทำงาน</label>
-                            <textarea class="form-control" id="teacher_experience" name="teacher_experience" rows="4"></textarea>
-                        </div>
-                    </div>
-                </fieldset>
-                <fieldset class="border p-3 mb-4 rounded">
-                    <legend class="w-auto px-2 h5 text-primary">เอกสารและรูปภาพ</legend>
-                    <div class="row">
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_card_front" class="form-label">รูปนามบัตร (ด้านหน้า)</label>
-                            <input type="file" class="form-control" id="teacher_card_front" name="teacher_card_front" accept="image/*">
-                            <div class="current-file" id="current-card-front"></div>
-                        </div>
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_card_back" class="form-label">รูปนามบัตร (ด้านหลัง)</label>
-                            <input type="file" class="form-control" id="teacher_card_back" name="teacher_card_back" accept="image/*">
-                            <div class="current-file" id="current-card-back"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 form-group mb-3">
-                            <label for="teacher_attach_document" class="form-label">เอกสารแนบอื่นๆ</label>
-                            <input type="file" class="form-control" id="teacher_attach_document" name="teacher_attach_document[]" multiple>
-                            <small class="form-text text-muted">แนบเอกสารเพิ่มเติม เช่น วุฒิการศึกษา (pdf, docx)</small>
-                            <div class="file-preview-container mt-2" id="document-preview-container"></div>
-                            <input type="hidden" name="teacher_attach_document_current" id="teacher_attach_document_current">
-                        </div>
-                    </div>
-                </fieldset>
-                <fieldset class="border p-3 mb-4 rounded">
-                    <legend class="w-auto px-2 h5 text-primary">ข้อมูลผู้ใช้และระบบ</legend>
-                    <div class="row">
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_username" class="form-label">ชื่อผู้ใช้งาน <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="teacher_username" name="teacher_username">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_password" class="form-label">รหัสผ่าน <span class="text-danger">*</span></label>
-                            <input type="password" class="form-control" id="teacher_password" name="teacher_password">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-md-6 form-group mb-3">
-                            <label for="teacher_password_key" class="form-label">ยืนยันรหัสผ่าน <span class="text-danger">*</span></label>
-                            <input type="password" class="form-control" id="teacher_password_key" name="teacher_password_key">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                    </div>
-                </fieldset>
-                <div class="form-group mb-4">
-                    <label for="teacher_bio" class="form-label">ประวัติย่อ</label>
-                    <textarea class="form-control" id="teacher_bio" name="teacher_bio" rows="5"></textarea>
-                </div>
-            </form>
-        </div>
-    `;
-
-    $(".systemModal .modal-body").html(formHtml);
-    $(".systemModal .modal-footer").html(`
-        <button type="button" class="btn btn-white" data-dismiss="modal" lang="en">Close</button>
-        <button type="button" class="btn btn-primary" id="saveBtn" lang="en">Save</button>
-    `);
-
-    const classroom_id = $('#classroom_id').val();
-    if (classroom_id) {
-        $('#form_classroom_id').val(classroom_id);
-    }
-
-    // ตั้งค่า Event Listener ที่ปุ่ม Save
-    $("#saveBtn").on('click', saveTeacher);
-
-    fetchPositions().then(() => {
-        if (teacher_id) {
-            $("#teacher_id").val(teacher_id);
-            fetchTeacherData(teacher_id);
-        }
-    }).catch(error => {
-        console.error("Failed to load positions:", error);
-    });
-
-    setupFilePreview();
-
-    // ตั้งค่า Event Listener สำหรับการอัปโหลดไฟล์
-    $('#teacher_image_profile').on('change', function(e) {
-        const fileName = e.target.files[0] ? e.target.files[0].name : 'เลือกรูปโปรไฟล์';
-        $('#file-label').text(fileName);
-
-        // แสดงรูปภาพตัวอย่าง
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                $('#profile-img').attr('src', event.target.result).show();
-                $('#upload-icon-overlay').hide();
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    });
-
-    // 🆕 Event Listener สำหรับการกรอกที่อยู่
-    setupAddressAutocomplete();
-
-    // 🆕 เปลี่ยน input type="date" เป็น type="text" และใช้ jQuery UI Datepicker
-    $('#teacher_birth_date').datepicker({
-        dateFormat: 'yy-mm-dd', // กำหนดรูปแบบวันที่เป็น ปี-เดือน-วัน
-        changeMonth: true,
-        changeYear: true,
-        yearRange: "-100:+0" // ให้เลือกปีได้ 100 ปีย้อนหลัง
-    });
+    let classroom_id = $("#classroom_id").val();
+    // console.log(classroom_id);
+    
+    
+    // window.location.href = `/classroom/management/form?type=teacher&id=${teacher_id}`;
+    $.redirect(`form?type=teacher&id=${teacher_id}`,{classroom_id: classroom_id},'post','_self');
 }
 
 function setupAddressAutocomplete() {
@@ -636,14 +320,15 @@ function fetchTeacherData(teacher_id) {
                 $('#teacher_position').val(response.teacher_position);
                 $('#position_id').val(response.position_id);
 
-                if (response.teacher_image_profile) {
-                    showProfilePreview(response.teacher_image_profile);
+                // Handle file previews - โค้ดส่วนนี้จะทำงานถูกต้อง
+                if (data[`${type}_image_profile`]) {
+                    showFilePreview(`${type}_image_profile`, data[`${type}_image_profile`]);
                 }
-                if (response.teacher_card_front) {
-                    showCardPreview(response.teacher_card_front, '#current-card-front');
+                if (data[`${type}_card_front`]) {
+                    showFilePreview(`${type}_card_front`, data[`${type}_card_front`]);
                 }
-                if (response.teacher_card_back) {
-                    showCardPreview(response.teacher_card_back, '#current-card-back');
+                if (data[`${type}_card_back`]) {
+                    showFilePreview(`${type}_card_back`, data[`${type}_card_back`]);
                 }
 
                 if (response.teacher_attach_document) {
@@ -1098,3 +783,284 @@ function deleteTeacher(teacher_id) {
         }
     });
 }
+
+
+
+
+// function manageTeacher(teacher_id) {
+//     $(".systemModal").modal();
+//     $(".systemModal .modal-header").html(`
+//         <h5 class="modal-title" lang="en">Teacher Management</h5> 
+//     `);
+
+//     // โค้ด HTML ของฟอร์มที่ถูกแก้ไข
+//     const formHtml = `
+//         <div class="container-fluid p-4">
+//             <form id="teacherForm" enctype="multipart/form-data">
+//                 <input type="hidden" name="teacher_id" id="teacher_id">
+//                 <input type="hidden" name="classroom_id" id="form_classroom_id">
+
+//                 <div class="form-group mb-4 text-center">
+//                     <div class="profile-image-preview" id="current-profile-img" style="position: relative; width: 150px; height: 150px; margin: 0 auto 10px; border-radius: 50%; overflow: hidden; border: 2px solid #ddd; background-color: #f8f9fa;">
+//                         <img id="profile-img" src="" class="img-fluid" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+//                         <div id="upload-icon-overlay" class="d-flex align-items-center justify-content-center" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; font-size: 2rem; color: #ced4da;">
+//                             <i class="fas fa-camera"></i>
+//                         </div>
+//                     </div>
+//                     <label for="teacher_image_profile" class="form-label d-block text-primary" style="cursor: pointer;">
+//                         <i class="fas fa-upload me-2"></i>
+//                         <span id="file-label">เลือกรูปโปรไฟล์</span>
+//                     </label>
+//                     <input type="file" class="d-none" id="teacher_image_profile" name="teacher_image_profile" accept="image/*">
+//                 </div>
+
+//                 <fieldset class="border p-3 mb-4 rounded">
+//                     <legend class="w-auto px-2 h5 text-primary">ข้อมูลส่วนตัว</legend>
+//                     <div class="row">
+//                         <div class="col-md-2 form-group mb-3">
+//                             <label for="teacher_perfix" class="form-label">คำนำหน้า <span class="text-danger">*</span></label>
+//                             <select class="form-control" id="teacher_perfix" name="teacher_perfix">
+//                                 <option value="">เลือกคำนำหน้า</option>
+//                                 <option value="นาย">นาย</option>
+//                                 <option value="นาง">นาง</option>
+//                                 <option value="นางสาว">นางสาว</option>
+//                             </select>
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                         <div class="col-md-5 form-group mb-3">
+//                             <label for="teacher_firstname_th" class="form-label">ชื่อ (ภาษาไทย)</label>
+//                             <input type="text" class="form-control" id="teacher_firstname_th" name="teacher_firstname_th">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                         <div class="col-md-5 form-group mb-3">
+//                             <label for="teacher_lastname_th" class="form-label">นามสกุล (ภาษาไทย)</label>
+//                             <input type="text" class="form-control" id="teacher_lastname_th" name="teacher_lastname_th">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                     </div>
+//                     <div class="row">
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_firstname_en" class="form-label">ชื่อ (ภาษาอังกฤษ) <span class="text-danger">*</span></label>
+//                             <input type="text" class="form-control" id="teacher_firstname_en" name="teacher_firstname_en">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_lastname_en" class="form-label">นามสกุล (ภาษาอังกฤษ) <span class="text-danger">*</span></label>
+//                             <input type="text" class="form-control" id="teacher_lastname_en" name="teacher_lastname_en">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                     </div>
+//                     <div class="row">
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_nickname_th" class="form-label">ชื่อเล่น (ไทย)</label>
+//                             <input type="text" class="form-control" id="teacher_nickname_th" name="teacher_nickname_th">
+//                         </div>
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_nickname_en" class="form-label">ชื่อเล่น (en)</label>
+//                             <input type="text" class="form-control" id="teacher_nickname_en" name="teacher_nickname_en">
+//                         </div>
+//                     </div>
+//                     <div class="row">
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_idcard" class="form-label">เลขบัตรประชาชน <span class="text-danger">*</span></label>
+//                             <input type="text" class="form-control" id="teacher_idcard" name="teacher_idcard" maxlength="13">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_passport" class="form-label">เลขที่หนังสือเดินทาง</label>
+//                             <input type="text" class="form-control" id="teacher_passport" name="teacher_passport">
+//                         </div>
+//                     </div>
+//                     <div class="row">
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_birth_date" class="form-label">วันเกิด</label>
+//                             <input type="text" class="form-control" id="teacher_birth_date" name="teacher_birth_date">
+//                         </div>
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_mobile" class="form-label">เบอร์โทรศัพท์มือถือ <span class="text-danger">*</span></label>
+//                             <input type="tel" class="form-control" id="teacher_mobile" name="teacher_mobile" maxlength="10">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                     </div>
+//                     <div class="row">
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_email" class="form-label">อีเมล <span class="text-danger">*</span></label>
+//                             <input type="email" class="form-control" id="teacher_email" name="teacher_email">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="position_id" class="form-label">ตำแหน่งครู <span class="text-danger">*</span></label>
+//                             <select class="form-control" id="position_id" name="position_id">
+//                                 <option value="">เลือกตำแหน่ง</option>
+//                             </select>
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                     </div>
+//                     <div class="row">
+//                         <div class="col-12 form-group mb-3">
+//                             <label class="form-label">ที่อยู่ <span class="text-danger">*</span></label>
+//                             <input type="hidden" id="teacher_address" name="teacher_address">
+//                             <div class="row">
+//                                 <div class="col-md-4 mb-3" style="padding-bottom:10px;">
+//                                     <input type="text" class="form-control" id="teacher_address_house_no" placeholder="บ้านเลขที่">
+//                                     <div class="invalid-feedback"></div>
+//                                 </div>
+//                                 <div class="col-md-8 mb-3" style="padding-bottom:10px;">
+//                                     <input type="text" class="form-control" id="teacher_address_road" placeholder="ถนน">
+//                                     <div class="invalid-feedback"></div>
+//                                 </div>
+//                             </div>
+//                             <div class="row">
+//                                 <div class="col-md-6 mb-3" style="padding-bottom:10px;">
+//                                     <input type="text" class="form-control zipcode-search" id="teacher_address_subdistrict" placeholder="ตำบล / แขวง">
+//                                     <div class="invalid-feedback"></div>
+//                                 </div>
+//                                 <div class="col-md-6 mb-3" style="padding-bottom:10px;">
+//                                     <input type="text" class="form-control zipcode-search" id="teacher_address_district" placeholder="อำเภอ / เขต">
+//                                     <div class="invalid-feedback"></div>
+//                                 </div>
+//                             </div>
+//                             <div class="row">
+//                                 <div class="col-md-6 mb-3" style="padding-bottom:10px;">
+//                                     <input type="text" class="form-control zipcode-search" id="teacher_address_province" placeholder="จังหวัด">
+//                                     <div class="invalid-feedback"></div>
+//                                 </div>
+//                                 <div class="col-md-6 mb-3" style="padding-bottom:10px;">
+//                                     <input type="text" class="form-control zipcode-search" id="teacher_address_zipcode" placeholder="รหัสไปรษณีย์" maxlength="5">
+//                                     <div class="invalid-feedback"></div>
+//                                 </div>
+//                             </div>
+//                             <div class="invalid-feedback" id="address-invalid-feedback" style="display: none;"></div>
+//                         </div>
+//                     </div>
+//                 </fieldset>
+//                 <fieldset class="border p-3 mb-4 rounded">
+//                     <legend class="w-auto px-2 h5 text-primary">ข้อมูลการทำงานและการศึกษา</legend>
+//                     <div class="row">
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_company" class="form-label">บริษัท / องค์กร <span class="text-danger">*</span></label>
+//                             <input type="text" class="form-control" id="teacher_company" name="teacher_company">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_position" class="form-label">ตำแหน่งงาน <span class="text-danger">*</span></label>
+//                             <input type="text" class="form-control" id="teacher_position" name="teacher_position">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                     </div>
+                    
+//                     <div class="row">
+//                         <div class="col-12 form-group mb-3">
+//                             <label class="form-label">ประวัติการศึกษา</label>
+//                             <div class="education-form mb-3">
+//                                 <h6 class="text-muted">วุฒิปริญญาเอก</h6>
+//                                 <div class="row mb-2">
+//                                     <div class="col-md-6">
+//                                         <input type="text" class="form-control education-input" data-level="doctorate" data-field="school" placeholder="ชื่อมหาวิทยาลัย/สถาบัน">
+//                                     </div>
+//                                     <div class="col-md-6">
+//                                         <input type="text" class="form-control education-input" data-level="doctorate" data-field="major" placeholder="คณะ/สาขาวิชา">
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                             <div class="education-form mb-3">
+//                                 <h6 class="text-muted">วุฒิปริญญาโท</h6>
+//                                 <div class="row mb-2">
+//                                     <div class="col-md-6">
+//                                         <input type="text" class="form-control education-input" data-level="master" data-field="school" placeholder="ชื่อมหาวิทยาลัย/สถาบัน">
+//                                     </div>
+//                                     <div class="col-md-6">
+//                                         <input type="text" class="form-control education-input" data-level="master" data-field="major" placeholder="คณะ/สาขาวิชา">
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                             <div class="education-form mb-3">
+//                                 <h6 class="text-muted">วุฒิปริญญาตรี</h6>
+//                                 <div class="row mb-2">
+//                                     <div class="col-md-6">
+//                                         <input type="text" class="form-control education-input" data-level="bachelor" data-field="school" placeholder="ชื่อมหาวิทยาลัย/สถาบัน">
+//                                     </div>
+//                                     <div class="col-md-6">
+//                                         <input type="text" class="form-control education-input" data-level="bachelor" data-field="major" placeholder="คณะ/สาขาวิชา">
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                             <div class="education-form mb-3">
+//                                 <h6 class="text-muted">วุฒิระดับมัธยมศึกษา</h6>
+//                                 <div class="row mb-2">
+//                                     <div class="col-md-6">
+//                                         <input type="text" class="form-control education-input" data-level="highschool" data-field="school" placeholder="ชื่อโรงเรียน">
+//                                     </div>
+//                                     <div class="col-md-6">
+//                                         <input type="text" class="form-control education-input" data-level="highschool" data-field="major" placeholder="สายวิชา (เช่น วิทย์-คณิต)">
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                             <input type="hidden" id="teacher_education" name="teacher_education">
+//                         </div>
+//                     </div>
+                    
+//                     <div class="row">
+//                         <div class="col-12 form-group mb-3">
+//                             <label for="teacher_experience" class="form-label">ประสบการณ์ทำงาน</label>
+//                             <textarea class="form-control" id="teacher_experience" name="teacher_experience" rows="4"></textarea>
+//                         </div>
+//                     </div>
+//                 </fieldset>
+//                 <fieldset class="border p-3 mb-4 rounded">
+//                     <legend class="w-auto px-2 h5 text-primary">เอกสารและรูปภาพ</legend>
+//                     <div class="row">
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_card_front" class="form-label">รูปนามบัตร (ด้านหน้า)</label>
+//                             <input type="file" class="form-control" id="teacher_card_front" name="teacher_card_front" accept="image/*">
+//                             <div class="current-file" id="current-card-front"></div>
+//                         </div>
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_card_back" class="form-label">รูปนามบัตร (ด้านหลัง)</label>
+//                             <input type="file" class="form-control" id="teacher_card_back" name="teacher_card_back" accept="image/*">
+//                             <div class="current-file" id="current-card-back"></div>
+//                         </div>
+//                     </div>
+//                     <div class="row">
+//                         <div class="col-12 form-group mb-3">
+//                             <label for="teacher_attach_document" class="form-label">เอกสารแนบอื่นๆ</label>
+//                             <input type="file" class="form-control" id="teacher_attach_document" name="teacher_attach_document[]" multiple>
+//                             <small class="form-text text-muted">แนบเอกสารเพิ่มเติม เช่น วุฒิการศึกษา (pdf, docx)</small>
+//                             <div class="file-preview-container mt-2" id="document-preview-container"></div>
+//                             <input type="hidden" name="teacher_attach_document_current" id="teacher_attach_document_current">
+//                         </div>
+//                     </div>
+//                 </fieldset>
+//                 <fieldset class="border p-3 mb-4 rounded">
+//                     <legend class="w-auto px-2 h5 text-primary">ข้อมูลผู้ใช้และระบบ</legend>
+//                     <div class="row">
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_username" class="form-label">ชื่อผู้ใช้งาน <span class="text-danger">*</span></label>
+//                             <input type="text" class="form-control" id="teacher_username" name="teacher_username">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_password" class="form-label">รหัสผ่าน <span class="text-danger">*</span></label>
+//                             <input type="password" class="form-control" id="teacher_password" name="teacher_password">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                         <div class="col-md-6 form-group mb-3">
+//                             <label for="teacher_password_key" class="form-label">ยืนยันรหัสผ่าน <span class="text-danger">*</span></label>
+//                             <input type="password" class="form-control" id="teacher_password_key" name="teacher_password_key">
+//                             <div class="invalid-feedback"></div>
+//                         </div>
+//                     </div>
+//                 </fieldset>
+//                 <div class="form-group mb-4">
+//                     <label for="teacher_bio" class="form-label">ประวัติย่อ</label>
+//                     <textarea class="form-control" id="teacher_bio" name="teacher_bio" rows="5"></textarea>
+//                 </div>
+//             </form>
+//         </div>
+//     `;
+
+//     $(".systemModal .modal-body").html(formHtml);
+//     $(".systemModal .modal-footer").html(`
+//         <button type="button" class="btn btn-white" data-dismiss="modal" lang="en">Close</button>
+//         <button type="button" class="btn btn-primary" id="saveBtn" lang="en">Save</button>
+//     `);
