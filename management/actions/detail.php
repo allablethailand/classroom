@@ -1,4 +1,5 @@
 <?php
+
     session_start();
    
     $base_include = $_SERVER['DOCUMENT_ROOT'];

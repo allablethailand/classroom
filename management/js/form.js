@@ -343,6 +343,10 @@ function handleFormSubmission(type, id) {
         });
     });
 
+    // **แก้ไข: เพิ่มการดึง classroom_id และส่งไปใน formData**
+    const classroom_id = $('#classroom_id').val();
+    formData.append('classroom_id', classroom_id);
+
     // Append file data
     $(`input[type="file"]`).each(function() {
         if (this.files.length > 0) {
@@ -361,7 +365,11 @@ function handleFormSubmission(type, id) {
         if (this.id.includes('_attach_document')) {
             // Append each document URL individually
             if (this.value) {
-                formData.append(this.name + '[]', this.value);
+                // **แก้ไข: แยก URL ที่เป็น array ออกจากกันก่อนส่ง**
+                const docs = this.value.split(',');
+                docs.forEach(doc => {
+                    formData.append(this.name + '[]', doc.trim());
+                });
             }
         } else {
             formData.append(this.name, this.value);
@@ -400,9 +408,9 @@ function handleFormSubmission(type, id) {
             if (response.status === 'success') {
                 swal("สำเร็จ!", response.message, "success");
                 setTimeout(() => {
-                    // Update the URL to include the new ID and prevent re-insert
                     const newId = response.id || id;
                     if (newId) {
+                         // Redirect to the same form with the updated ID
                          window.location.href = `?type=${type}&id=${newId}`;
                     } else {
                          window.location.reload();
