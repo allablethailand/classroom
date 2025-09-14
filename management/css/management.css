@@ -262,3 +262,107 @@ a:hover .notofication-share{
 .preview-uploads .remove-btn {
     color: #ff9900;
 }
+
+
+   .modal-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .card {
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .card-body {
+        padding: 2rem;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-box {
+        background-color: #fcfcfc;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .control-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+    .form-control {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+    }
+    .form-control:focus {
+        border-color: #ff9800;
+        box-shadow: 0 0 0 0.2rem rgba(255, 152, 0, 0.25);
+    }
+    .nav-origami .nav-link,
+    .nav-origami .nav-item a {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #6c757d;
+        padding: 1rem 1.5rem;
+        border-radius: 10px 10px 0 0;
+    }
+    .nav-origami .nav-item.active a {
+        color: #ff9800 !important;
+        border-bottom: 3px solid #ff9800;
+    }
+    .nav-origami .nav-item.active a i {
+        color: #ff9800 !important;
+    }
+    .nav-origami .nav-item a i {
+        margin-right: 8px;
+        font-size: 1.25rem;
+    }
+    .tab-content {
+        padding-top: 2rem;
+    }
+    .input-group-addon {
+        background-color: #ff9800;
+        border: 1px solid #ff9800;
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 0 8px 8px 0;
+    }
+    .input-group-addon i {
+        font-size: 1.2rem;
+    }
+    .preview-uploads {
+        border-radius: 10px;
+        border: 2px dashed #ff9800;
+    }
+    .text-muted {
+        font-size: 0.9rem;
+    }
+    .required-field::before {
+        content: '🧡';
+        margin-right: 5px;
+    }
+     /* CSS ที่จำเป็นสำหรับการแสดงผลชื่อไฟล์แบบย่อ */
+    .document-file-link {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        max-width: calc(100% - 40px); /* Adjust max-width as needed */
+        vertical-align: middle;
+        word-break: break-all;
+    }
+    .document-file-icon {
+        margin-right: 8px;
+    }
+    .input-group-append .btn {
+        min-width: 40px; /* Ensure trash icon button has a fixed width */
+    }
