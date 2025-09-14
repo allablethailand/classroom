@@ -48,18 +48,37 @@ if (isset($_POST['action'])) {
 echo json_encode($response);
 exit();
 
+// ✨ เพิ่มฟังก์ชันใหม่สำหรับดึง Path ออกจาก URL
+function extractPathFromUrl($url) {
+    if (strpos($url, '://') === false) {
+        return cleanPath($url);
+    }
+    $parsed_url = parse_url($url);
+    if (isset($parsed_url['path'])) {
+        $path = $parsed_url['path'];
+        $path = strtok($path, '?');
+        return cleanPath($path);
+    }
+    return '';
+}
+
+// ✨ ฟังก์ชันใหม่สำหรับทำให้ Path สะอาด (ไม่มี / นำหน้า)
+function cleanPath($path) {
+    return ltrim($path, '/');
+}
+
 function uploadFile($file, $name, $currentFile, $key = 0) {
     global $base_path;
-    // Set target directory for uploads relative to the document root
     $target_dir = $_SERVER['DOCUMENT_ROOT'] . $base_path . "/uploads/classroom/";
-    // Ensure the directory exists
     if (!is_dir($target_dir)) {
         mkdir($target_dir, 0755, true);
     }
     
+    // ตรวจสอบว่า $currentFile เป็น URL เต็มหรือไม่ ถ้าใช่ให้แปลงกลับมาเป็น path
+    $currentFile = extractPathFromUrl($currentFile);
+    
     $new_file_path = $currentFile;
     
-    // Check if a new file was uploaded
     if (isset($file[$name]['tmp_name'])) {
         // Handle single file upload
         if (!is_array($file[$name]['tmp_name'])) {
@@ -79,12 +98,14 @@ function uploadFile($file, $name, $currentFile, $key = 0) {
             $target_file = $target_dir . $new_file_name;
 
             // Delete old file if it exists and is not a default/system path
-            if ($currentFile && file_exists($_SERVER['DOCUMENT_ROOT'] . $currentFile) && !strpos($currentFile, 'default')) {
-                unlink($_SERVER['DOCUMENT_ROOT'] . $currentFile);
+            // Note: We need to add the leading slash back to check if the file exists on the server's file system
+            if ($currentFile && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $currentFile) && !strpos($currentFile, 'default')) {
+                unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $currentFile);
             }
             
             if (move_uploaded_file($tmp_name, $target_file)) {
-                $new_file_path = $base_path . "/uploads/classroom/" . $new_file_name;
+                // บันทึก path โดยไม่มี / นำหน้า
+                $new_file_path = cleanPath("uploads/classroom/" . $new_file_name);
             } else {
                 return null; // Handle upload error
             }
@@ -98,7 +119,6 @@ function fetchData($type, $id) {
     $table = "classroom_" . $type;
     $id_col = $type . "_id";
 
-    // Use LEFT JOIN to get classroom_id from the join table
     $join_table = "classroom_" . $type . "_join";
     $sql = "SELECT t.*, j.classroom_id FROM `$table` AS t LEFT JOIN `$join_table` AS j ON t.`$id_col` = j.`$id_col` WHERE t.`$id_col` = ? LIMIT 1";
 
@@ -113,14 +133,23 @@ function fetchData($type, $id) {
     
     if ($result->num_rows > 0) {
         $data = $result->fetch_assoc();
+        
+        $prefix_map = ['1' => 'นาย', '2' => 'นาง', '3' => 'นางสาว', '4' => 'ด.ช.', '5' => 'ด.ญ.'];
+        $data[$type . '_perfix_text'] = isset($prefix_map[$data[$type . '_perfix']]) ? $prefix_map[$data[$type . '_perfix']] : $data[$type . '_perfix'];
+        
+        $gender_map = ['M' => 'ชาย', 'F' => 'หญิง'];
+        $data[$type . '_gender_text'] = isset($gender_map[$data[$type . '_gender']]) ? $gender_map[$data[$type . '_gender']] : $data[$type . '_gender'];
+
         // Decode JSON for attached documents and add full path
-        if (isset($data[$type . '_attach_document'])) {
-            $docs = json_decode($data[$type . '_attach_document'], true);
-            if(is_array($docs)) {
-                $data[$type . '_attach_document'] = array_map('GetUrl', $docs);
-            }
+        if (isset($data[$type . '_attach_document']) && !empty($data[$type . '_attach_document'])) {
+            $docs_str = $data[$type . '_attach_document'];
+            $docs_arr = explode('|', $docs_str);
+            $full_paths = array_map('GetUrl', $docs_arr);
+            // Re-join the array into a string with '|' for JS to split easily
+            $data[$type . '_attach_document'] = implode('|', array_filter($full_paths));
         }
-        // Add full path for image fields using GetUrl()
+
+        // Add full path for other image fields
         if (isset($data[$type . '_image_profile'])) {
             $data[$type . '_image_profile'] = GetUrl($data[$type . '_image_profile']);
         }
@@ -130,6 +159,7 @@ function fetchData($type, $id) {
         if (isset($data[$type . '_card_back'])) {
             $data[$type . '_card_back'] = GetUrl($data[$type . '_card_back']);
         }
+        
         return ['status' => 'success', 'data' => $data];
     } else {
         return ['status' => 'error', 'message' => 'Data not found.'];
@@ -146,7 +176,6 @@ function saveData($post) {
     $comp_id = isset($_SESSION['comp_id']) ? $_SESSION['comp_id'] : null;
     $emp_id = isset($_SESSION['emp_id']) ? $_SESSION['emp_id'] : 1;
     
-    // Check for required data
     if ($comp_id === null || $classroom_id === null) {
         return ['status' => 'error', 'message' => 'Required data (comp_id or classroom_id) not found.'];
     }
@@ -154,34 +183,47 @@ function saveData($post) {
     $mysqli->begin_transaction();
 
     try {
-        // Handle file uploads
-        $image_profile = uploadFile($_FILES, $type . '_image_profile', isset($post[$type . '_image_profile_current']) ? $post[$type . '_image_profile_current'] : '');
-        $card_front = uploadFile($_FILES, $type . '_card_front', isset($post[$type . '_card_front_current']) ? $post[$type . '_card_front_current'] : '');
-        $card_back = uploadFile($_FILES, $type . '_card_back', isset($post[$type . '_card_back_current']) ? $post[$type . '_card_back_current'] : '');
+        $current_image_profile = isset($post[$type . '_image_profile_current']) ? extractPathFromUrl($post[$type . '_image_profile_current']) : '';
+        $current_card_front = isset($post[$type . '_card_front_current']) ? extractPathFromUrl($post[$type . '_card_front_current']) : '';
+        $current_card_back = isset($post[$type . '_card_back_current']) ? extractPathFromUrl($post[$type . '_card_back_current']) : '';
+        
+        $image_profile = uploadFile($_FILES, $type . '_image_profile', $current_image_profile);
+        $card_front = uploadFile($_FILES, $type . '_card_front', $current_card_front);
+        $card_back = uploadFile($_FILES, $type . '_card_back', $current_card_back);
 
         // Handle attached documents
         $attached_docs = [];
+        // Add new uploaded documents
         if (isset($_FILES[$type . '_attach_document']['tmp_name']) && is_array($_FILES[$type . '_attach_document']['tmp_name'])) {
             foreach ($_FILES[$type . '_attach_document']['tmp_name'] as $key => $tmp_name) {
                 if ($tmp_name) {
-                    $new_file_name = uploadFile($_FILES, $type . '_attach_document', '', $key);
-                    if ($new_file_name) {
-                        $attached_docs[] = $new_file_name;
+                    $new_file_path = uploadFile($_FILES, $type . '_attach_document', '', $key);
+                    if ($new_file_path) {
+                        $attached_docs[] = $new_file_path;
                     }
                 }
             }
         }
 
-        // Merge existing and new documents
-        if (isset($post[$type . '_attach_document_current'])) {
-            $existing_docs = json_decode($post[$type . '_attach_document_current'], true);
-            if (is_array($existing_docs)) {
-                $attached_docs = array_merge($attached_docs, $existing_docs);
+        // Add existing documents that were not removed
+        if (isset($post[$type . '_attach_document_current']) && is_array($post[$type . '_attach_document_current'])) {
+            foreach ($post[$type . '_attach_document_current'] as $doc_url) {
+                if (!empty(trim($doc_url))) {
+                    $path_to_save = extractPathFromUrl($doc_url);
+                    if (!empty($path_to_save)) {
+                        $attached_docs[] = $path_to_save;
+                    }
+                }
             }
         }
-        $attached_docs_json = json_encode(array_values(array_filter($attached_docs)));
         
-        // Prepare data for insertion/update
+        $attached_docs_unique = array_unique(array_filter($attached_docs));
+        $attached_docs_str = implode('|', $attached_docs_unique);
+        
+        $gender_input = isset($post[$type . '_gender']) ? $post[$type . '_gender'] : null;
+        $gender_map_to_db = ['ชาย' => 'M', 'หญิง' => 'F', 'M' => 'M', 'F' => 'F'];
+        $gender_for_db = isset($gender_map_to_db[$gender_input]) ? $gender_map_to_db[$gender_input] : $gender_input;
+
         $data = [
             $type . '_perfix' => isset($post[$type . '_perfix']) ? $post[$type . '_perfix'] : null,
             $type . '_firstname_th' => isset($post[$type . '_firstname_th']) ? $post[$type . '_firstname_th'] : null,
@@ -190,10 +232,13 @@ function saveData($post) {
             $type . '_lastname_en' => isset($post[$type . '_lastname_en']) ? $post[$type . '_lastname_en'] : null,
             $type . '_nickname_th' => isset($post[$type . '_nickname_th']) ? $post[$type . '_nickname_th'] : null,
             $type . '_nickname_en' => isset($post[$type . '_nickname_en']) ? $post[$type . '_nickname_en'] : null,
-            $type . '_gender' => isset($post[$type . '_gender']) ? $post[$type . '_gender'] : null,
+            $type . '_gender' => $gender_for_db,
             $type . '_idcard' => isset($post[$type . '_idcard']) ? $post[$type . '_idcard'] : null,
             $type . '_passport' => isset($post[$type . '_passport']) ? $post[$type . '_passport'] : null,
-            $type . '_birth_date' => isset($post[$type . '_birth_date']) ? $post[$type . '_birth_date'] : null,
+            
+            // ✨ แก้ไขใหม่: ตรวจสอบและแปลง format วันที่
+            $type . '_birth_date' => isset($post[$type . '_birth_date']) && !empty($post[$type . '_birth_date']) ? date('Y-m-d', strtotime($post[$type . '_birth_date'])) : null,
+            
             $type . '_email' => isset($post[$type . '_email']) ? $post[$type . '_email'] : null,
             $type . '_mobile' => isset($post[$type . '_mobile']) ? $post[$type . '_mobile'] : null,
             $type . '_facebook' => isset($post[$type . '_facebook']) ? $post[$type . '_facebook'] : null,
@@ -207,9 +252,17 @@ function saveData($post) {
             $type . '_image_profile' => $image_profile,
             $type . '_card_front' => $card_front,
             $type . '_card_back' => $card_back,
-            $type . '_attach_document' => $attached_docs_json,
+            $type . '_attach_document' => $attached_docs_str,
+            $type . '_company' => isset($post[$type . '_company']) ? $post[$type . '_company'] : null,
+            $type . '_position' => isset($post[$type . '_position']) ? $post[$type . '_position'] : null,
+            $type . '_hobby' => isset($post[$type . '_hobby']) ? $post[$type . '_hobby'] : null,
+            $type . '_music' => isset($post[$type . '_music']) ? $post[$type . '_music'] : null,
+            $type . '_movie' => isset($post[$type . '_movie']) ? $post[$type . '_movie'] : null,
+            $type . '_goal' => isset($post[$type . '_goal']) ? $post[$type . '_goal'] : null,
+            $type . '_religion' => isset($post[$type . '_religion']) ? $post[$type . '_religion'] : null,
+            $type . '_bloodgroup' => isset($post[$type . '_bloodgroup']) ? $post[$type . '_bloodgroup'] : null,
         ];
-        // Add specific fields for teachers
+
         if ($type === 'teacher') {
             $data['position_id'] = isset($post['position_id']) ? $post['position_id'] : null;
             $data['teacher_ref_type'] = isset($post['teacher_ref_type']) ? $post['teacher_ref_type'] : null;
@@ -217,7 +270,6 @@ function saveData($post) {
             $data['teacher_position'] = isset($post['teacher_position']) ? $post['teacher_position'] : null;
         }
 
-        // Handle password encryption
         if (isset($post[$type . '_password']) && !empty($post[$type . '_password'])) {
             $plain_password = $post[$type . '_password'];
             $password_key = bin2hex(openssl_random_pseudo_bytes(16));
@@ -243,7 +295,6 @@ function saveData($post) {
             $stmt_update->bind_param($types, ...$params);
             $stmt_update->execute();
 
-            // Check if join record exists
             $join_table = "classroom_" . $type . "_join";
             $join_id_col = $type . "_id";
             $check_sql = "SELECT * FROM `$join_table` WHERE `$join_id_col` = ? AND `classroom_id` = ?";
@@ -254,24 +305,45 @@ function saveData($post) {
             $check_stmt->bind_param('is', $id, $classroom_id);
             $check_stmt->execute();
             $check_result = $check_stmt->get_result();
-
+            $current_datetime = date('Y-m-d H:i:s');
+            
             if ($check_result->num_rows > 0) {
-                // Update existing join record
-                $update_join_sql = "UPDATE `$join_table` SET `comp_id` = ?, `status` = 0, `emp_modify` = ?, `date_modify` = NOW() WHERE `$join_id_col` = ? AND `classroom_id` = ?";
+                $update_join_sql = "UPDATE `$join_table` SET `comp_id` = ?, `status` = 0, `emp_modify` = ?, `date_modify` = NOW()";
+                if ($type === 'student') {
+                    $update_join_sql .= ", `approve_status` = 1, `approve_by` = ?, `approve_date` = ?";
+                    $params_join = [$comp_id, $emp_id, $emp_id, $current_datetime, $id, $classroom_id];
+                    $types_join = 'sissis';
+                } else {
+                    $params_join = [$comp_id, $emp_id, $id, $classroom_id];
+                    $types_join = 'siss';
+                }
+                $update_join_sql .= " WHERE `$join_id_col` = ? AND `classroom_id` = ?";
                 $update_join_stmt = $mysqli->prepare($update_join_sql);
                 if (!$update_join_stmt) {
                     throw new Exception("Update join prepare statement failed: " . $mysqli->error);
                 }
-                $update_join_stmt->bind_param('siss', $comp_id, $emp_id, $id, $classroom_id);
+                $update_join_stmt->bind_param($types_join, ...$params_join);
                 $update_join_stmt->execute();
             } else {
-                // Insert new join record
-                $insert_join_sql = "INSERT INTO `$join_table` (`classroom_id`, `$join_id_col`, `comp_id`, `status`, `emp_create`, `date_create`) VALUES (?, ?, ?, 0, ?, NOW())";
+                $insert_join_sql = "INSERT INTO `$join_table` (`classroom_id`, `$join_id_col`, `comp_id`, `status`, `emp_create`, `date_create`";
+                $join_placeholders = "?, ?, ?, 0, ?, NOW()";
+                $join_params = [$classroom_id, $id, $comp_id, $emp_id];
+                $join_types = "sisi";
+
+                if ($type === 'student') {
+                    $current_datetime = date('Y-m-d H:i:s');
+                    $insert_join_sql .= ", `register_date`, `register_by_emp`, `invite_date`, `approve_date`, `approve_by`, `payment_status`, `payment_status_by`, `payment_status_date`";
+                    $join_placeholders .= ", ?, ?, ?, ?, ?, ?, ?, ?";
+                    $join_params = array_merge($join_params, [$current_datetime, $emp_id, $current_datetime, $current_datetime, $emp_id, 1, $emp_id, $current_datetime]);
+                    $join_types .= "sisisisi";
+                }
+
+                $insert_join_sql .= ") VALUES ($join_placeholders)";
                 $insert_join_stmt = $mysqli->prepare($insert_join_sql);
                 if (!$insert_join_stmt) {
                     throw new Exception("Insert join prepare statement failed: " . $mysqli->error);
                 }
-                $insert_join_stmt->bind_param('sisi', $classroom_id, $id, $comp_id, $emp_id);
+                $insert_join_stmt->bind_param($join_types, ...$join_params);
                 $insert_join_stmt->execute();
             }
 
@@ -299,20 +371,32 @@ function saveData($post) {
                 throw new Exception("Failed to get last inserted ID.");
             }
             
-            // Insert into join table
             $join_table = "classroom_" . $type . "_join";
             $join_id_col = $type . "_id";
-            $insert_join_sql = "INSERT INTO `$join_table` (`classroom_id`, `$join_id_col`, `comp_id`, `status`, `emp_create`, `date_create`) VALUES (?, ?, ?, 0, ?, NOW())";
+            $insert_join_sql = "INSERT INTO `$join_table` (`classroom_id`, `$join_id_col`, `comp_id`, `status`, `emp_create`, `date_create`";
+            $join_placeholders = "?, ?, ?, 0, ?, NOW()";
+            $join_params = [$classroom_id, $new_id, $comp_id, $emp_id];
+            $join_types = "sisi";
+
+            if ($type === 'student') {
+                $current_datetime = date('Y-m-d H:i:s');
+                $insert_join_sql .= ", `register_date`, `register_by_emp`, `invite_date`, `approve_date`, `approve_by`, `payment_status`, `payment_status_by`, `payment_status_date`";
+                $join_placeholders .= ", ?, ?, ?, ?, ?, ?, ?, ?";
+                $join_params = array_merge($join_params, [$current_datetime, $emp_id, $current_datetime, $current_datetime, $emp_id, 1, $emp_id, $current_datetime]);
+                $join_types .= "sisisisi";
+            }
+
+            $insert_join_sql .= ") VALUES ($join_placeholders)";
             $insert_join_stmt = $mysqli->prepare($insert_join_sql);
             if (!$insert_join_stmt) {
                 throw new Exception("Insert join prepare statement failed: " . $mysqli->error);
             }
-            $insert_join_stmt->bind_param('sisi', $classroom_id, $new_id, $comp_id, $emp_id);
+            $insert_join_stmt->bind_param($join_types, ...$join_params);
             $insert_join_stmt->execute();
         }
 
         $mysqli->commit();
-        return ['status' => 'success', 'message' => 'Data saved successfully.'];
+        return ['status' => 'success', 'message' => 'Data saved successfully.', 'id' => $id];
 
     } catch (Exception $e) {
         $mysqli->rollback();
