@@ -26,11 +26,21 @@
     $action = (isset($_POST['action']) && $_POST['action']) ? $_POST['action'] : ''; 
     if ($action == 'verifyClassroom') {
         $classroomCode = (!empty($_POST['classroomCode'])) ? escape_string($_POST['classroomCode']) : ''; 
+        $channel = (!empty($_POST['channel'])) ? escape_string($_POST['channel']) : ''; 
         if (!$classroomCode) {
             echo json_encode([
                 'status' => false
             ]);
             exit;
+        }
+        $channel_id = '';
+        if (!$channel) {
+            $channels = select_data(
+                "channel_id",
+                "classroom_channel",
+                "where md5(channel_id) = '{$channel}'"
+            );
+            $channel_id = $channels[0]['channel_id'];
         }
         $classrooms = select_data(
             "
@@ -104,11 +114,64 @@
         );
         $register_template = explode(',', $register_forms[0]['register_template']);
         $register_require = explode(',', $register_forms[0]['register_require']);
+        $forms = select_data(
+            "form_id",
+            "classroom_forms",
+            "where classroom_id = '{$classroom['classroom_id']}'"
+        );
+        $form = $forms[0];
+        $form_id = $form['form_id'];
+        $questions = select_data(
+            "question_id, question_text, question_type, has_other_option, has_options, has_required, `order`",
+            "classroom_form_questions",
+            "where form_id = '{$form_id}' and status = 0 order by `order` asc"
+        );
+        $form_data = [];
+        foreach($questions as $q) {
+            $question_id = $q['question_id'];
+            $question_text = $q['question_text'];
+            $question_type = $q['question_type'];
+            $has_other_option = $q['has_other_option'];
+            $has_options = $q['has_options'];
+            $has_required = $q['has_required'];
+            $option_item = [];
+            if($has_options == 1) {
+                $items = select_data(
+                    "choice_id, choice_text",
+                    "classroom_form_choices",
+                    "where question_id = '{$question_id}' and status = 0 order by choice_id asc"
+                );
+                foreach($items as $i) {
+                    $option_item[] = [
+                        'choice_id' => $i['choice_id'],
+                        'choice_text' => $i['choice_text'],
+                    ];
+                }
+            }
+            $form_data[] = [
+                'question_id' => $question_id,
+                'question_text' => $question_text,
+                'question_type' => $question_type,
+                'has_other_option' => $has_other_option,
+                'has_options' => $has_options,
+                'has_required' => $has_required,
+                'option_item' => $option_item
+            ];
+        }
+        $consents = select_data(
+            "consent_id",
+            "classroom_consent",
+            "where classroom_id = '{$classroom['classroom_id']}' and consent_use = 0 and status = 0"
+        );
+        $consent_status = (!empty($consents)) ? 'Y' : 'N';
         echo json_encode([
             'status' => true,
             'classroom_data' => $classroom_data,
             'register_template' => $register_template,
-            'register_require' => $register_require
+            'register_require' => $register_require,
+            'consent_status' => $consent_status,
+            'form_data' => $form_data,
+            'channel_id' => $channel_id
         ]);
         exit;
     }
@@ -124,6 +187,7 @@
     }
     if(isset($_GET) && $_GET['action'] == 'saveRegister') {
         $classroom_id = $_POST['classroom_id'];
+        $channel_id = ($_POST['channel_id']) ? initVal(trim($_POST['channel_id'])) : "null";
         $dial_code = isset($_POST['dialCode']) ? initVal(trim($_POST['dialCode'])) : '+66';
         $classroom = select_data(
             "comp_id",
@@ -195,14 +259,12 @@
         }
         $student_password_key = "null";
         $student_password = "null";
-        if(isset($_POST['student_password'])) {
+        if (isset($_POST['student_password']) && trim($_POST['student_password']) !== '') {
             $password_key = bin2hex(openssl_random_pseudo_bytes(16));
             $password = encryptToken($_POST['student_password'], $password_key);
             $student_password_key = "'{$password_key}'";
             $student_password = "'{$password}'";
         }
-        $emp_id = ($_SESSION['emp_id']) ? "'{$_SESSION['emp_id']}'" : "null";
-        $invite_status = ($_SESSION['emp_id']) ? 0 : 1;
         $student_id = insert_data(
             "classroom_student",
             "(
@@ -227,9 +289,7 @@
                 student_idcard,
                 student_passport,
                 status,
-                emp_create,
                 date_create,
-                emp_modify,
                 date_modify
             )",
             "(
@@ -254,9 +314,7 @@
                 $student_idcard,
                 $student_passport,
                 0,
-                $emp_id,
                 NOW(),
-                $emp_id,
                 NOW()
             )"
         );
@@ -271,13 +329,11 @@
                     register_by,
                     comp_id,
                     status,
-                    emp_create,
                     date_create,
-                    emp_modify
                     date_modify,
                     invite_date,
                     invite_status,
-                    invite_by
+                    channel_id
                 )",
                 "(
                     '{$student_id}',
@@ -287,21 +343,113 @@
                     0,
                     '{$comp_id}',
                     0,
-                    $emp_id,
-                    NOW(),
-                    $emp_id,
                     NOW(),
                     NOW(),
-                    '{$invite_status}',
-                    $emp_id
+                    NOW(),
+                    1,
+                    $channel_id
                 )"
             );
+            if(isset($_POST['question_id']) && is_array($_POST['question_id'])) {
+                $forms = select_data(
+                    "form_id",
+                    "classroom_forms",
+                    "where classroom_id = '{$classroom_id}'"
+                );
+                $form = $forms[0];
+                $form_id = $form['form_id'];
+                insert_data(
+                    "classroom_form_question_users",
+                    "(user_id, form_id, question_list, date_create)",
+                    "('{$student_id}', '{$form_id}', null, NOW())"
+                );
+                $type = $_POST['question_type'];
+                $item = 0;
+                $q_list = [];
+                foreach($_POST['question_id'] as $question_id) {
+                    $q_list[] = $question_id;
+                    $question_type = $type[$item];
+                    switch($question_type) {
+                        case 'short_answer':
+                            $answer = isset($_POST['q_'.$question_id]) ? $_POST['q_'.$question_id] : '';
+                            $other_text = '';
+                            saveAnswer($classroom_id, $student_id, $question_id, 0, $answer, $other_text);
+                            break;
+                        case 'checkbox':
+                            if(isset($_POST['q_'.$question_id]) && is_array($_POST['q_'.$question_id])) {
+                                $answers  = $_POST['q_'.$question_id];
+                                foreach($answers as $a) {
+                                    $answer = $a;
+                                    saveAnswer($classroom_id, $student_id, $question_id, 1, $answer, '');
+                                }
+                                if(isset($_POST['q_'.$question_id.'_other']) && $_POST['q_'.$question_id.'_other'] != '') {
+                                    $last_answer = end($answers);
+                                    $other_text = $_POST['q_'.$question_id.'_other'];
+                                    saveAnswer($classroom_id, $student_id, $question_id, 2, $last_answer, $other_text);
+                                }
+                            }
+                            break;
+                        case 'multiple_choice':
+                        case 'radio':
+                            $answer = isset($_POST['q_'.$question_id]) ? $_POST['q_'.$question_id] : '';
+                            if(isset($_POST['q_'.$question_id.'_other']) && $_POST['q_'.$question_id.'_other'] != '') {
+                                $other_text = $_POST['q_'.$question_id.'_other'];
+                                saveAnswer($classroom_id, $student_id, $question_id, 2, $answer, $other_text);
+                            } else {
+                                saveAnswer($classroom_id, $student_id, $question_id, 1, $answer, '');
+                            }
+                            break;
+                    }
+                    $item++;
+                }
+                $q_no = implode(',', $q_list);
+                update_data(
+                    "classroom_form_question_users",
+                    "question_list = '{$q_no}'",
+                    "user_id = '{$student_id}' and form_id = '{$form_id}'"
+                );
+            }
         }
         notiMail($classroom_id, $student_id, 'Register');
         echo json_encode([
             'status' => true
         ]);
         exit;
+    }
+    function saveAnswer($classroom_id, $student_id, $question_id, $answer_type, $answer, $other_text) {
+        $answer_text = ($answer && $answer_type == 0) ? "'{$answer}'" : "null";
+        $choice_id = ($answer_type <> 0 && !$other_text) ? "'{$answer}'" : "null";
+        $other = ($other_text) ? "'{$other_text}'" : "null";
+        $is_other = ($other_text) ? 0 : 1;
+        insert_data(
+            "classroom_form_answer_users",
+            "(
+                answer_text,
+                question_id,
+                answer_type,
+                choice_id,
+                other_text,
+                is_other,
+                classroom_id,
+                student_id,
+                create_date,
+                date_update,
+                status
+            )",
+            "(
+                $answer_text,
+                '{$question_id}',
+                '{$answer_type}',
+                $choice_id,
+                $other,
+                $is_other,
+                '{$classroom_id}',
+                '{$student_id}',
+                NOW(),
+                NOW(),
+                0
+            )"
+        );
     }
     function initVal($val) {
         global $mysqli;

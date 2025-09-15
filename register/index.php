@@ -3,6 +3,7 @@
     $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $parts = explode('/', trim($url, '/'));
     $classroomCode = isset($parts[2]) ? $parts[2] : null;
+    $channel = isset($parts[3]) ? $parts[3] : '';
     if(empty($classroomCode)) {
         header('Location: /');
         exit;
