@@ -294,10 +294,11 @@ a:hover .notofication-share{
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     .control-label {
-        font-size: 1.1rem;
-        /* font-weight: 600;
-        color: #333; */
-        width: 100%;
+         font-size: 1.4rem;
+    /* font-weight: 600;
+    color: #333; */
+    display: block; /* ทำให้ label ขึ้นบรรทัดใหม่ เพื่อไม่ให้ติดกับ input */
+    margin-bottom: .5rem; /* เพิ่มระยะห่างด้านล่างของ label */
     }
     .form-control {
         font-size: 1rem;
@@ -306,9 +307,10 @@ a:hover .notofication-share{
         border: 1px solid #ced4da;
     }
     .form-control:focus {
-        border-color: #ff9800;
-        box-shadow: 0 0 0 0.2rem rgba(255, 152, 0, 0.25);
-    }
+    border-color: #ff9800;
+    box-shadow: 0 0 0 0.2rem rgba(255, 152, 0, 0.25);
+    background-color: #fffaf0; /* เพิ่มสีพื้นหลังอ่อนๆ เมื่อ focus */
+}
     .nav-origami .nav-link,
     .nav-origami .nav-item a {
         font-size: 1.1rem;
