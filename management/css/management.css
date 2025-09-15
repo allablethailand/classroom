@@ -294,11 +294,11 @@ a:hover .notofication-share{
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     .control-label {
-         font-size: 1.4rem;
-    /* font-weight: 600;
-    color: #333; */
+         /* font-size: 1.4rem; */
+     /* font-weight: 600;  */
+    /* color: #333;  */
     display: block; /* ทำให้ label ขึ้นบรรทัดใหม่ เพื่อไม่ให้ติดกับ input */
-    margin-bottom: .5rem; /* เพิ่มระยะห่างด้านล่างของ label */
+    /* margin-bottom: .5rem; เพิ่มระยะห่างด้านล่างของ label */
     }
     .form-control {
         font-size: 1rem;
@@ -334,11 +334,11 @@ a:hover .notofication-share{
         padding-top: 2rem;
     }
     .input-group-addon {
-        background-color: #ff9800;
+        /* background-color: #ff9800;
         border: 1px solid #ff9800;
         color: white;
         padding: 0.75rem 1rem;
-        border-radius: 0 8px 8px 0;
+        border-radius: 0 8px 8px 0; */
     }
     .input-group-addon i {
         font-size: 1.2rem;
