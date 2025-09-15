@@ -277,6 +277,7 @@ a:hover .notofication-share{
         border-bottom: 1px solid #dee2e6;
         border-top-left-radius: 15px;
         border-top-right-radius: 15px;
+        padding: 1em;
     }
     .card-body {
         padding: 2rem;
