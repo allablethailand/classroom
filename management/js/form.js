@@ -24,7 +24,7 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group text-center mt-3">
-                                                <label for="${type}_image_profile" class="control-label"><i class="fas fa-camera-retro" style="color: #6c757d;"></i> Profile Picture </label>
+                                                <label for="${type}_image_profile" class="control-label"><i class="fas fa-camera-retro" style="color: #6c757d;"></i> Profile Picture 
                                                 <div class="preview-uploads preview-uploads-logo">
                                                     <div class="image-placeholder">
                                                         <span class="fa fa-cloud-upload-alt fa-3x text-muted"></span>
@@ -39,13 +39,16 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                </label>
                                                 <input type="hidden" name="${type}_image_profile_current" id="${type}_image_profile_current" value="">
                                             </div>
                                             <div class="form-group row mt-3">
-                                                <div class="col-sm-12">
-                                                    <label for="${type}_gender" class="control-label">เพศ 🚻</label>
-                                                    <input type="text" name="${type}_gender" id="${type}_gender" class="form-control">
-                                                </div>
+                                              <div class="col-sm-12">
+                                                <label for="${type}_gender" class="control-label">เพศ 🚻</label>
+                                                <input type="text" name="${type}_gender" id="${type}_gender" class="form-control" list="gender-list">
+                                                <datalist id="gender-list">
+                                                    </datalist>
+                                            </div>
                                             </div>
                                             <div class="form-group row">
                                                 <div class="col-sm-12">
@@ -59,23 +62,29 @@
                                         </div>
                                         <div class="col-md-8">
                                             <div class="row">
-                                                <div class="form-group col-sm-6">
-                                                    <label for="${type}_firstname_en" class="control-label">Firstname (EN) </label>
-                                                    <input type="text" name="${type}_firstname_en" id="${type}_firstname_en" class="form-control">
+                                                <div class="form-group col-sm-12">
+                                                    <label for="${type}_perfix" class="control-label">คำนำหน้า </label>
+                                                    <input type="text" name="${type}_perfix" id="${type}_perfix" class="form-control" list="prefix-list">
+                                                    <datalist id="prefix-list">
+                                                        </datalist>
                                                 </div>
                                                 <div class="form-group col-sm-6">
-                                                    <label for="${type}_lastname_en" class="control-label">Lastname (EN) </label>
-                                                    <input type="text" name="${type}_lastname_en" id="${type}_lastname_en" class="form-control">
+                                                    <label for="${type}_firstname_en" class="control-label">Firstname (EN) *</label>
+                                                    <input type="text" name="${type}_firstname_en" id="${type}_firstname_en" class="form-control" required>
+                                                </div>
+                                                <div class="form-group col-sm-6">
+                                                    <label for="${type}_lastname_en" class="control-label">Lastname (EN) *</label>
+                                                    <input type="text" name="${type}_lastname_en" id="${type}_lastname_en" class="form-control" required>
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="form-group col-sm-6">
-                                                    <label for="${type}_firstname_th" class="control-label ">ชื่อจริง (TH) </label>
-                                                    <input type="text" name="${type}_firstname_th" id="${type}_firstname_th" class="form-control required-field-input" required>
+                                                    <label for="${type}_firstname_th" class="control-label">ชื่อจริง (TH)</label>
+                                                    <input type="text" name="${type}_firstname_th" id="${type}_firstname_th" class="form-control">
                                                 </div>
                                                 <div class="form-group col-sm-6">
-                                                    <label for="${type}_lastname_th" class="control-label">นามสกุล (TH) </label>
-                                                    <input type="text" name="${type}_lastname_th" id="${type}_lastname_th" class="form-control required-field-input" required>
+                                                    <label for="${type}_lastname_th" class="control-label">นามสกุล (TH)</label>
+                                                    <input type="text" name="${type}_lastname_th" id="${type}_lastname_th" class="form-control">
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -105,7 +114,7 @@
                                 <div class="form-box mt-4">
                                     <div class="row">
                                         <div class="col-sm-6 text-center">
-                                            <label for="${type}_card_front" class="control-label">บัตรประชาชน (ด้านหน้า) 💳</label>
+                                            <label for="${type}_card_front" class="control-label">บัตรประชาชน (ด้านหน้า) 💳
                                             <div class="preview-uploads preview-uploads-card">
                                                 <div class="image-placeholder">
                                                     <span class="fa fa-cloud-upload-alt fa-3x text-muted"></span>
@@ -120,10 +129,11 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            </label>
                                             <input type="hidden" name="${type}_card_front_current" id="${type}_card_front_current" value="">
                                         </div>
                                         <div class="col-sm-6 text-center">
-                                            <label for="${type}_card_back" class="control-label">บัตรประชาชน (ด้านหลัง) 🪪</label>
+                                            <label for="${type}_card_back" class="control-label">บัตรประชาชน (ด้านหลัง) 🪪
                                             <div class="preview-uploads preview-uploads-card">
                                                 <div class="image-placeholder">
                                                     <span class="fa fa-cloud-upload-alt fa-3x text-muted"></span>
@@ -138,6 +148,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            </label>
                                             <input type="hidden" name="${type}_card_back_current" id="${type}_card_back_current" value="">
                                         </div>
                                     </div>
@@ -193,50 +204,50 @@
                         </div>
 
                         <div class="tab-pane fade" id="${type}_bio_tab">
-    <form id="frm_${type}_bio" class="mt-3">
-        <div class="form-box">
-            <div class="form-group">
-                <label for="${type}_bio" class="control-label"><i class="fas fa-book-open" style="color: #ff9800; margin-right: 5px;"></i> Biography </label>
-                <textarea name="${type}_bio" id="${type}_bio" class="form-control" rows="3"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="${type}_education" class="control-label"><i class="fas fa-graduation-cap" style="color: #ff9800; margin-right: 5px;"></i> Education </label>
-                <textarea name="${type}_education" id="${type}_education" class="form-control" rows="3"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="${type}_experience" class="control-label"><i class="fas fa-briefcase" style="color: #ff9800; margin-right: 5px;"></i> Experience </label>
-                <textarea name="${type}_experience" id="${type}_experience" class="form-control" rows="3"></textarea>
-            </div>
-            <div class="form-group row">
-                <div class="col-sm-6">
-                    <label for="${type}_company" class="control-label"><i class="fas fa-building" style="color: #ff9800; margin-right: 5px;"></i> Workplace/School </label>
-                    <input type="text" name="${type}_company" id="${type}_company" class="form-control">
-                </div>
-                <div class="col-sm-6">
-                    <label for="${type}_position" class="control-label"><i class="fas fa-user-tag" style="color: #ff9800; margin-right: 5px;"></i> Position </label>
-                    <input type="text" name="${type}_position" id="${type}_position" class="form-control">
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-sm-6">
-                    <label for="${type}_religion" class="control-label"><i class="fas fa-hand-holding-heart" style="color: #ff9800; margin-right: 5px;"></i> Religion </label>
-                    <input type="text" name="${type}_religion" id="${type}_religion" class="form-control">
-                </div>
-                <div class="col-sm-6">
-                    <label for="${type}_bloodgroup" class="control-label"><i class="fas fa-tint" style="color: #ff9800; margin-right: 5px;"></i> Blood Group </label>
-                    <input type="text" name="${type}_bloodgroup" id="${type}_bloodgroup" class="form-control">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="${type}_attach_document" class="control-label"><i class="fas fa-paperclip" style="color: #ff9800; margin-right: 5px;"></i> Other Attachments </label>
-                <div id="attach-document-fields">
-                </div>
-                <button type="button" class="btn btn-default mt-2" onclick="addDocumentField('', '${type}', true)"><i class="fas fa-plus"></i> Add Document</button>
-            </div>
-            <input type="hidden" name="${type}_attach_document_current" id="${type}_attach_document_current" value="">
-        </div>
-    </form>
-</div>
+                            <form id="frm_${type}_bio" class="mt-3">
+                                <div class="form-box">
+                                    <div class="form-group">
+                                        <label for="${type}_bio" class="control-label"><i class="fas fa-book-open" style="color: #ff9800; margin-right: 5px;"></i> Biography </label>
+                                        <textarea name="${type}_bio" id="${type}_bio" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="${type}_education" class="control-label"><i class="fas fa-graduation-cap" style="color: #ff9800; margin-right: 5px;"></i> Education </label>
+                                        <textarea name="${type}_education" id="${type}_education" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="${type}_experience" class="control-label"><i class="fas fa-briefcase" style="color: #ff9800; margin-right: 5px;"></i> Experience </label>
+                                        <textarea name="${type}_experience" id="${type}_experience" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-6">
+                                            <label for="${type}_company" class="control-label"><i class="fas fa-building" style="color: #ff9800; margin-right: 5px;"></i> Workplace/School </label>
+                                            <input type="text" name="${type}_company" id="${type}_company" class="form-control">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="${type}_position" class="control-label"><i class="fas fa-user-tag" style="color: #ff9800; margin-right: 5px;"></i> Position </label>
+                                            <input type="text" name="${type}_position" id="${type}_position" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-6">
+                                            <label for="${type}_religion" class="control-label"><i class="fas fa-hand-holding-heart" style="color: #ff9800; margin-right: 5px;"></i> Religion </label>
+                                            <input type="text" name="${type}_religion" id="${type}_religion" class="form-control">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="${type}_bloodgroup" class="control-label"><i class="fas fa-tint" style="color: #ff9800; margin-right: 5px;"></i> Blood Group </label>
+                                            <input type="text" name="${type}_bloodgroup" id="${type}_bloodgroup" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="${type}_attach_document" class="control-label"><i class="fas fa-paperclip" style="color: #ff9800; margin-right: 5px;"></i> Other Attachments </label>
+                                        <div id="attach-document-fields">
+                                        </div>
+                                        <button type="button" class="btn btn-default mt-2" onclick="addDocumentField('', '${type}', true)"><i class="fas fa-plus"></i> Add Document</button>
+                                    </div>
+                                    <input type="hidden" name="${type}_attach_document_current" id="${type}_attach_document_current" value="">
+                                </div>
+                            </form>
+                        </div>
 
                         <div class="tab-pane fade" id="${type}_favorite_tab">
                             <form id="frm_${type}_favorite" class="mt-3">
@@ -291,6 +302,34 @@
 
         $("#form-container").html(formTemplate);
 
+       // สร้าง datalist สำหรับคำนำหน้าชื่อ
+        const prefixMap = getPrefixMap();
+        const prefixList = $('#prefix-list');
+        for (const key in prefixMap) {
+            prefixList.append(`<option value="${prefixMap[key]}">`);
+        }
+
+        // สร้าง datalist สำหรับเพศ
+        const genderMap = getGenderMap();
+        const genderList = $('#gender-list');
+        for (const key in genderMap) {
+            genderList.append(`<option value="${genderMap[key]}">`);
+        }
+
+        // ✨ แก้ไขใหม่: เพิ่มโค้ดสำหรับแสดง dropdown ทั้งหมดเมื่อคลิก
+        $(`#${type}_perfix, #${type}_gender`).on('focus', function() {
+            // Clear any text that might be in the input to show all options
+            $(this).attr('placeholder', $(this).val()); // Save current value as placeholder
+            $(this).val('');
+        }).on('blur', function() {
+            // Restore the original value from the placeholder if no new option was selected
+            if (!$(this).val()) {
+                $(this).val($(this).attr('placeholder'));
+            }
+        });
+
+        
+
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
             autoclose: true,
@@ -323,6 +362,27 @@
     }
 
 // --- JAVASCRIPT CODE ---
+
+// เพิ่มฟังก์ชันสำหรับสร้าง dropdown คำนำหน้าชื่อ
+function getPrefixMap() {
+    return {
+        '0': 'ไม่ระบุ (N/A)',
+        '1': 'นาย (Mr.)',
+        '2': 'นาง (Mrs.)',
+        '3': 'นางสาว (Ms.)',
+        '4': 'เด็กชาย (Master)',
+        '5': 'เด็กหญิง (Miss)'
+    };
+}
+
+// เพิ่มฟังก์ชันสำหรับสร้าง object map ของเพศ
+function getGenderMap() {
+    return {
+        'M': 'ชาย (Male)',
+        'F': 'หญิง (Female)',
+        'N': 'ไม่ระบุ (N/A)'
+    };
+}
 
 // Helper Functions (Same as yours, but adding new ones)
 function readURL(input, previewId) {
@@ -371,7 +431,7 @@ function removeImage(previewId, inputName) {
                     <input type="file" class="form-control" name="${type}_attach_document[]" multiple>
                 `}
                 <div class="input-group-append">
-                    <button class="btn btn-danger" type="button" onclick="removeDocumentField('${docId}', '${docUrl}')">
+                    <button class="btn btn-danger" type="button" style="margin-top:5px" onclick="removeDocumentField('${docId}', '${docUrl}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -412,9 +472,24 @@ function loadData(type, id) {
                     const data = response.data;
                     console.log('Data loaded:', data);
 
+
+
+                    const prefixMap = getPrefixMap();
+                    const perfixValue = data[`${type}_perfix`];
+                    const perfixText = prefixMap[perfixValue] || '';
+                    $(`#${type}_perfix`).val(perfixText);
+
+                      // แก้ไข: เพิ่มการแปลงค่าเพศจากฐานข้อมูลมาแสดงผลในฟอร์ม
+                    const genderMap = getGenderMap();
+                    const genderValue = data[`${type}_gender`];
+                    const genderText = genderMap[genderValue] || '';
+                    $(`#${type}_gender`).val(genderText);
+
+               
+
                     // Personal Information Tab
                     $(`#${type}_id`).val(data[`${type}_id`]);
-                    $(`#${type}_perfix`).val(data[`${type}_perfix_text`] || '');
+                    // $(`#${type}_perfix`).val(data[`${type}_perfix_text`] || '');
                     $(`#${type}_firstname_th`).val(data[`${type}_firstname_th`]);
                     $(`#${type}_lastname_th`).val(data[`${type}_lastname_th`]);
                     $(`#${type}_firstname_en`).val(data[`${type}_firstname_en`]);
@@ -423,7 +498,7 @@ function loadData(type, id) {
                     $(`#${type}_nickname_en`).val(data[`${type}_nickname_en`]);
                     $(`#${type}_idcard`).val(data[`${type}_idcard`]);
                     $(`#${type}_passport`).val(data[`${type}_passport`]);
-                    $(`#${type}_gender`).val(data[`${type}_gender_text`] || '');
+                    // $(`#${type}_gender`).val(data[`${type}_gender_text`] || '');
 
                     // ✨ แก้ไขใหม่: จัดการการแสดงผลวันเกิด
                     if (data[`${type}_birth_date`] && data[`${type}_birth_date`] !== '0000-00-00') {
@@ -548,28 +623,36 @@ function handleFormSubmission(type, id) {
         formData.append(this.name, this.value);
     });
 
-    const prefixMap = {
-        'นาย': '1', 'นาง': '2', 'นางสาว': '3', 'เด็กชาย': '4', 'เด็กหญิง': '5'
-    };
-    const genderMap = {
-        'ชาย': 'M', 'หญิง': 'F', 'ไม่ระบุ': 'N'
-    };
+     // เพิ่มการแปลงคำนำหน้าจากข้อความเป็นตัวเลข
+    const reversePrefixMap = {};
+    const prefixMap = getPrefixMap();
+    for (const key in prefixMap) {
+        reversePrefixMap[prefixMap[key]] = key;
+    }
 
     const perfixValue = formData.get(`${type}_perfix`);
-    const genderValue = formData.get(`${type}_gender`);
-
     if (perfixValue) {
-        const newPerfixValue = prefixMap[perfixValue] || perfixValue;
+        const newPerfixValue = reversePrefixMap[perfixValue] || '0';
         formData.set(`${type}_perfix`, newPerfixValue);
         console.log(`แปลงคำนำหน้า: '${perfixValue}' -> '${newPerfixValue}'`);
     }
 
+    // แก้ไข: เพิ่มการแปลงค่าเพศจากข้อความเป็นตัวย่อ
+    const reverseGenderMap = {};
+    const genderMap = getGenderMap();
+    for (const key in genderMap) {
+        reverseGenderMap[genderMap[key]] = key;
+    }
+
+    const genderValue = formData.get(`${type}_gender`);
     if (genderValue) {
-        const newGenderValue = genderMap[genderValue] || genderValue;
+        const newGenderValue = reverseGenderMap[genderValue] || 'N';
         formData.set(`${type}_gender`, newGenderValue);
         console.log(`แปลงเพศ: '${genderValue}' -> '${newGenderValue}'`);
     }
 
+
+   
     // Append static data
     formData.append('action', 'saveData');
     formData.append('type', type);
