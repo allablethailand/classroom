@@ -50,15 +50,14 @@
                                                         <datalist id="gender-list"></datalist>
                                                     </div>
                                                 </div>
-                                                <div class="form-group g-4 row">
-                                                    <div class="col-sm-12">
-                                                        <label for="${type}_birth_date" class="control-label">วันเกิด 🎂</label>
-                                                        <div class="input-group">
-                                                            <input type="text" name="${type}_birth_date" id="${type}_birth_date" class="form-control datepicker">
-                                                            <span class="input-group-addon"><i class="fas fa-calendar-alt"></i></span>
-                                                        </div>
+                                               <div class="form-group g-4 row">
+                                                <div class="col-sm-12">
+                                                    <label for="${type}_birth_date" class="control-label">วันเกิด 🎂</label>
+                                                    <div class="input-group" style="width:100%;">
+                                                        <input type="date" name="${type}_birth_date" id="${type}_birth_date" class="form-control">
                                                     </div>
                                                 </div>
+                                            </div>
                                             </div>
                                             <div class="col-md-8">
                                                 <div class="row">
@@ -326,11 +325,29 @@
 
         
 
-        $('.datepicker').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true
-        });
+        // เปลี่ยนการเรียกใช้งาน datepicker
+        // $('.datepicker').each(function() {
+        //     flatpickr(this, {
+        //         dateFormat: "Y/m/d", // กำหนดรูปแบบวันที่เป็น ปี/เดือน/วัน (yyyy/mm/dd)
+        //         altFormat: "Y/m/d",
+        //         altInput: true,
+        //         allowInput: true, // อนุญาตให้พิมพ์วันที่เองได้
+        //         enableTime: false, // ปิดการเลือกเวลา
+        //         // เพิ่มตัวเลือกเพื่อให้สามารถเลือกปีได้ง่ายขึ้น
+        //         // นี่คือส่วนที่ Flatpickr เหนือกว่า Bootstrap Datepicker เดิม
+        //         static: true,
+        //         clickOpens: true,
+        //         parseDate: (datestr, format) => {
+        //             if (datestr.includes('/')) {
+        //                 const parts = datestr.split('/');
+        //                 if (parts.length === 3) {
+        //                     return new Date(parts[0], parts[1] - 1, parts[2]);
+        //                 }
+        //             }
+        //             return flatpickr.parseDate(datestr, format);
+        //         }
+        //     });
+        // });
 
         if (id) {
             await loadData(type, id);
