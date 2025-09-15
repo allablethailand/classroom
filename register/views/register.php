@@ -25,6 +25,7 @@
 </head>
 <body>
 <input type="hidden" id="classroomCode" value="<?php echo $classroomCode; ?>">
+<input type="hidden" id="channel" value="<?php echo $channel; ?>">
 <div class="container-fluid registration-container">
     <div class="row" style="height: 100vh;">
         <div class="col-sm-9 left-section">
@@ -46,7 +47,7 @@
                     <div class="detail-value classroom-information"></div>
                     <div class="detail-value contact-us"></div>
                     <div class="text-center" style="margin-bottom: 35px;">
-                        <img src="/images/origami-academy.png" style="height: 100px;">
+                        <img src="/images/ogm_logo.png" style="height: 100px;">
                         <h5 style="margin-bottom: 25px;">Powered by Origami</h5>
                         <div>Copyright © 2020, Allable Co.,Ltd. All Rights Reserved.</div>
                     </div>
@@ -82,18 +83,18 @@
                                     <button type="button" id="removeProfile" style="display:none; position:absolute; top:5px; right:5px; background:#f44336; color:#fff; border:none; border-radius:50%; width:25px; height:25px; line-height:0px; font-size:20px; cursor:pointer;">&times;</button>
                                 </div>
                                 <input type="file" id="student_image_profile" name="student_image_profile" accept="image/*" style="display:none;">
-                                <p><label style="margin-top:10px;color:#888;" data-lang="upload_image"></label></p>
+                                <p><label class="register-form" style="margin-top:10px;color:#888;" data-lang="upload_image"></label></p>
                             </div>
                             <div class="form-group form-input input-17 hidden">
-                                <label for="student_idcard" data-lang="idcard"></label>
+                                <label class="register-form" for="student_idcard" data-lang="idcard"></label>
                                 <input type="text" class="form-control " id="student_idcard" name="student_idcard" autocomplete="off" maxlength="13">
                             </div>
                             <div class="form-group form-input input-18 hidden">
-                                <label for="student_passport" data-lang="passport"></label>
+                                <label class="register-form" for="student_passport" data-lang="passport"></label>
                                 <input type="text" class="form-control" id="student_passport" name="student_passport" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-16 hidden">
-                                <label for="studentstudent_perfix_gender" data-lang="prefix"></label>
+                                <label class="register-form" for="studentstudent_perfix_gender" data-lang="prefix"></label>
                                 <select class="form-control" id="student_perfix" name="student_perfix">
                                     <option value=""></option>
                                     <option value="Mr." data-lang="mr"></option>
@@ -103,31 +104,31 @@
                                 </select>
                             </div>
                             <div class="form-group form-input input-1 hidden">
-                                <label for="student_firstname_en" data-lang="firstname_en"></label>
+                                <label class="register-form" for="student_firstname_en" data-lang="firstname_en"></label>
                                 <input type="text" class="form-control" id="student_firstname_en" name="student_firstname_en" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-2 hidden">
-                                <label for="student_lastname_en" data-lang="lastname_en"></label>
+                                <label class="register-form" for="student_lastname_en" data-lang="lastname_en"></label>
                                 <input type="text" class="form-control" id="student_lastname_en" name="student_lastname_en" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-5 hidden">
-                                <label for="student_firstname_th" data-lang="firstname_th"></label>
+                                <label class="register-form" for="student_firstname_th" data-lang="firstname_th"></label>
                                 <input type="text" class="form-control" id="student_firstname_th" name="student_firstname_th" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-6 hidden">
-                                <label for="student_lastname_th" data-lang="lastname_th"></label>
+                                <label class="register-form" for="student_lastname_th" data-lang="lastname_th"></label>
                                 <input type="text" class="form-control" id="student_lastname_th" name="student_lastname_th" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-3 hidden">
-                                <label for="student_nickname_en" data-lang="nickname_en"></label>
+                                <label class="register-form" for="student_nickname_en" data-lang="nickname_en"></label>
                                  <input type="text" class="form-control" id="student_nickname_en" name="student_nickname_en" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-4 hidden">
-                                <label for="student_nickname_th" data-lang="nickname_th"></label>
+                                <label class="register-form" for="student_nickname_th" data-lang="nickname_th"></label>
                                  <input type="text" class="form-control" id="student_nickname_th" name="student_nickname_th" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-7 hidden">
-                                <label for="student_gender" data-lang="gender"></label>
+                                <label class="register-form" for="student_gender" data-lang="gender"></label>
                                 <select class="form-control" id="student_gender" name="student_gender">
                                     <option value=""></option>
                                     <option value="M" data-lang="male"></option>
@@ -136,33 +137,33 @@
                                 </select>
                             </div>
                             <div class="form-group form-input input-14 hidden">
-                                <label for="student_birth_date" data-lang="birthday"></label>
+                                <label class="register-form" for="student_birth_date" data-lang="birthday"></label>
                                 <input type="text" class="form-control datepicker" id="student_birth_date" name="student_birth_date" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-8 hidden">
-                                <label for="student_email" data-lang="email"></label>
+                                <label class="register-form" for="student_email" data-lang="email"></label>
                                 <input type="text" class="form-control" id="student_email" name="student_email" autocomplete="off">
                                 <div style="font-size: 11px; color: #888888; margin-top: 10px;">example@origami.life</div>
                             </div>
                             <div class="form-group form-input input-9 hidden">
-                                <label for="student_mobile" data-lang="mobile"></label>
+                                <label class="register-form" for="student_mobile" data-lang="mobile"></label>
                                 <input type="tel" class="form-control" id="student_mobile" name="student_mobile" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-10 hidden">
-                                <label for="student_company" data-lang="company"></label>
+                                <label class="register-form" for="student_company" data-lang="company"></label>
                                 <input type="text" class="form-control" id="student_company" name="student_company" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-11 hidden">
-                                <label for="student_position" data-lang="position"></label>
+                                <label class="register-form" for="student_position" data-lang="position"></label>
                                 <input type="text" class="form-control" id="student_position" name="student_position" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-12 hidden">
-                                <label for="student_username" data-lang="username"></label>
+                                <label class="register-form" for="student_username" data-lang="username"></label>
                                 <input type="text" class="form-control" id="student_username" name="student_username" autocomplete="off" maxlength="20">
                                 <div data-lang="username_info" style="font-size: 11px; color: #888888; margin-top: 10px;"></div>
                             </div>
                             <div class="form-group form-input input-13 hidden">
-                                <label for="student_password" data-lang="password"></label>
+                                <label class="register-form" for="student_password" data-lang="password"></label>
                                 <div class="input-group">
                                     <input type="password" class="form-control" id="student_password" name="student_password" autocomplete="off" maxlength="20">
                                     <span class="input-group-btn">
@@ -175,10 +176,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-container"></div>
+                        </div>
+                    </div>
+                    <div class="form-group input-consent hidden">
                         <div class="checkbox">
                             <input type="checkbox" id="agree" name="agree" style="margin-left: 0;">
-                            <span style="margin-left: 20px;"><span data-lang="i_accept"></span> <a class="open-term" style="color: #667eea; cursor:pointer;" data-lang="policy"></a></span>
+                            <label class="checkbox-label" for="agree" style="margin-bottom: -5px !important;"></label>
+                            <span><span data-lang="i_accept"></span> <a class="open-term" style="color: #667eea; cursor:pointer;" data-lang="policy"></a></span>
                         </div>
                     </div>
                     <div class="form-group" style="margin-top: 30px;">
