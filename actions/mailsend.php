@@ -135,15 +135,13 @@
         return $html;
     }
     function autoApprove($base_include, $classroom_id, $student_id) {
-        $AutoApprove = select_data("auto_approve, comp_id", "classroom_template", "where classroom_id = '{$classroom_id}'");
-        if ($AutoApprove[0]['auto_approve'] !== 0) return;
+        $AutoApprove = select_data("auto_approve", "classroom_template", "where classroom_id = '{$classroom_id}'");
+        if ((int) $AutoApprove[0]['auto_approve'] !== 0) return;
         $ApStatus = select_data("approve_status", "classroom_student_join", "where student_id = '{$student_id}' and classroom_id = '{$classroom_id}'");
-        if ($ApStatus[0]['approve_status'] != 0) return;
-        $comp_id = $AutoApprove[0]['comp_id'];
-        $emp_id = ($_SESSION['emp_id']) ? "'{$_SESSION['emp_id']}'" : "null";
+        if ((int) $ApStatus[0]['approve_status'] != 0) return;
         update_data(
             "classroom_student_join", 
-            "invite_status = 1, invite_date = NOW(), invite_by = $emp_id, approve_status = 1, approve_date = NOW(), approve_by = $emp_id", 
+            "approve_status = 1, approve_date = NOW()", 
             "student_id = '{$student_id}' and classroom_id = '{$classroom_id}'"
         );
         generateUser($classroom_id, $student_id);
@@ -153,7 +151,7 @@
         $template = select_data(
             "
                 auto_username,
-                include_username,
+                auto_username_type,
                 auto_username_length,
                 auto_password,
                 password_type,
@@ -165,17 +163,17 @@
             "classroom_template",
             "where classroom_id = '{$classroom_id}'"
         );
-        $auto_username = $template[0]['auto_username'];
+        $auto_username = (int) $template[0]['auto_username'];
         $auto_username_type = $template[0]['auto_username_type'];
         $auto_username_length = $template[0]['auto_username_length'];
-        $auto_password = $template[0]['auto_password'];
+        $auto_password = (int) $template[0]['auto_password'];
         $password_type = $template[0]['password_type'];
         $auto_password_type = $template[0]['auto_password_type'];
         $auto_password_length = $template[0]['auto_password_length'];
         $auto_password_custom = $template[0]['auto_password_custom'];
         $comp_id = $template[0]['comp_id'];
         if($auto_username == 1 && $auto_password == 1) {
-            exit();
+            return;
         }
         $studentData = select_data(
             "student_mobile, student_username, student_password, student_email",
@@ -228,12 +226,12 @@
         $student_password_key = bin2hex(openssl_random_pseudo_bytes(16));
         $pwd = encryptToken($password, $student_password_key);
         if ($needUpdate) {
-            $valueUpd = "student_username = '{$username}', student_password = '{$pwd}', student_password_key = '{$pwd}'";
+            $valueUpd = "student_username = '{$username}', student_password = '{$pwd}', student_password_key = '{$student_password_key}'";
             $whereUpd = "student_id = '{$student_id}'";
             update_data("classroom_student", $valueUpd, $whereUpd);
         }
     }
-   function generateSecurity($include_char, $length) {
+    function generateSecurity($include_char, $length) {
         $char_sets = array(
             1 => '0123456789',
             2 => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',

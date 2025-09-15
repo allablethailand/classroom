@@ -142,7 +142,10 @@ $hide_profile = ["profile", "edit_profile", "setting"];
     ?>
         <div class="header">
             <button class="back-button" onclick="window.history.back();">
-                <span class="back-arrow">←</span>
+                <!-- <span class="back-arrow">←</span> -->
+                <span>
+                    <i class="fas fa-long-arrow-alt-left"></i>
+                </span>
             </button>
             <h1 class="header-title"><?php echo ucfirst($currentScreen); ?></h1>
             <?php 

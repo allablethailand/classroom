@@ -101,7 +101,6 @@ body {
 }
 .form-section {
     background: white;
-    padding: 15px;
     margin-top: 175px;
 }
 .form-title {
@@ -326,4 +325,94 @@ body {
 }
 .poster-img img {
     max-height: 90%;
+}
+.required-field:after {
+    content: " *";
+    color: #FF9900;
+}
+.has-error-text {
+    color: #FF9900 !important;
+}
+input[type="checkbox"],input[type="radio"] {
+    display: none;
+}
+.checkbox-label {
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 10px !important;
+}
+.checkbox-label::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    transition: all 0.2s ease;
+}
+input[type="checkbox"]:checked + .checkbox-label::before {
+    background-color: #FF9900;
+    border-color: #FF9900;
+}
+.checkbox-label::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 45%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    opacity: 0;
+    transition: opacity 0.2s 
+ease;
+}
+input[type="checkbox"]:checked + .checkbox-label::after {
+    opacity: 1;
+}
+.radio-label {
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 10px !important;
+}
+.radio-label::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    background-color: #fff;
+    transition: all 0.2s ease;
+}
+input[type="radio"]:checked + .radio-label::before {
+    border-color: #FF9900;
+}
+.radio-label::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #FF9900;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+input[type="radio"]:checked + .radio-label::after {
+    opacity: 1;
 }

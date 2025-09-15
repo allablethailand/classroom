@@ -31,42 +31,217 @@ function getStudentClass()
 if (isset($_POST) && $_POST['action'] == 'fetch_schedules') {
     $dateSchedule = $_POST['date_range'];
 
-    // course logo
-    // w.image_path,
-
     $classroom_id = getStudentClass();
 
     $scheduleItems = select_data(
-        "w.workshop_name as schedule_name,
-            tts.topic_name as topic_name,
-            DATE_FORMAT(w.date_start,'%Y/%m/%d') as date_start, 
-            DATE_FORMAT(w.time_start,'%H:%i') as time_start, 
-            DATE_FORMAT(w.time_end,'%H:%i') as time_end",
-        "ot_workshop AS w 
-            INNER JOIN ot_training_topic_setup AS tts ON w.workshop_id = tts.workshop_id 
-            INNER JOIN classroom_course AS cc ON tts.trn_id = cc.course_ref_id",
-        "WHERE cc.classroom_id = {$classroom_id}
+        "course.trn_subject AS course_name,
+			course.trn_detail AS course_detail,
+            categories.categories_name AS course_category,
+            cc.course_id AS course_id,
+            DATE_FORMAT(course.trn_date,'%Y/%m/%d') AS date_start,
+            course.trn_from_time AS time_start,
+            course.trn_to_time AS time_end",
+        "ot_training_list course 
+            LEFT JOIN classroom_course cc 
+            ON course.trn_id = cc.course_ref_id
+        JOIN ot_training_categories categories ON course.categories_id = categories.categories_id",
+        "WHERE cc.classroom_id = '{$classroom_id}'
             AND cc.status = 0 
-            AND tts.status = 0 
-            AND tts.workshop_id IS NOT NULL 
-            AND tts.workshop_id <> ''
-            AND w.date_start = '{$dateSchedule}' ORDER BY time_start ASC"
-    );
-    
+            AND course.status = 0 
+            AND course.trn_date = '{$dateSchedule}' 
+            ORDER BY time_start ASC");
+
+
+//     $instructor_column = "*";
+//     $instructor_table = "(SELECT 
+//     sch.schedule_name,
+//     sch.course_id,
+//     sch.topic_name,
+//     sch.date_start,
+//     sch.time_start,
+//     sch.time_end,
+//     coach.coach_id,
+//     coach.coach_type,
+//     coach.coach_name,
+//     coach.coach_image,
+//     coach.coach_gender,
+//     coach.coach_academy,
+//     coach.coach_position
+// FROM
+//     (
+//         SELECT 
+//             w.workshop_name AS schedule_name,
+//             cc.course_id AS course_id,
+//             tts.topic_name AS topic_name,
+//             DATE_FORMAT(w.date_start,'%Y/%m/%d') AS date_start,
+//             DATE_FORMAT(w.time_start,'%H:%i') AS time_start,
+//             DATE_FORMAT(w.time_end,'%H:%i') AS time_end
+//         FROM 
+//             ot_workshop AS w
+//         INNER JOIN 
+//             ot_training_topic_setup AS tts ON w.workshop_id = tts.workshop_id
+//         INNER JOIN 
+//             classroom_course AS cc ON tts.trn_id = cc.course_ref_id
+//         WHERE 
+//             cc.classroom_id = '{$classroom_id}'
+//             AND cc.status = 0
+//             AND tts.status = 0
+//             AND tts.workshop_id IS NOT NULL
+//             AND tts.workshop_id <> ''
+//             AND w.date_start = '{$dateSchedule}'
+//     ) sch
+//     LEFT JOIN
+//     (
+//         SELECT 
+//             emp.emp_id AS coach_id, 
+//             'emp' AS coach_type, 
+//             CONCAT(
+//                 CASE  
+//                     WHEN i.title = 1 OR i.title = 'Mr.' THEN 'Mr.'
+//                     WHEN i.title = 2 OR i.title = 'Mrs.' THEN 'Mrs.'
+//                     WHEN i.title = 4 OR i.title = 'Miss.' THEN 'Miss.'
+//                     WHEN i.title = 5 OR i.title = 'Dr.' THEN 'Dr.'
+//                     ELSE ''
+//                 END,
+//                 ' ',
+//                 COALESCE(i.firstname, i.firstname_th),
+//                 ' ',
+//                 COALESCE(i.lastname, i.lastname_th)
+//             ) AS coach_name, 
+//             i.emp_pic AS coach_image, 
+//             i.gender AS coach_gender, 
+//             comp.comp_description AS coach_academy, 
+//             pos.posi_description AS coach_position,
+//             course.trn_id AS course_id
+//         FROM 
+//             ot_training_list course
+//         JOIN 
+//             m_employee emp ON FIND_IN_SET(emp.emp_id, course.trn_by_emp)
+//         LEFT JOIN 
+//             m_employee_info i ON i.emp_id = emp.emp_id
+//         LEFT JOIN 
+//             m_company comp ON comp.comp_id = emp.comp_id
+//         LEFT JOIN 
+//             m_position pos ON pos.posi_id = emp.posi_id
+//         UNION ALL
+//         SELECT 
+//             cont.cus_cont_id AS coach_id, 
+//             'cont' AS coach_type, 
+//             CONCAT(IFNULL(m_customer_cont_group.cont_group_name, ''), ' ', cont.cus_cont_name, ' ', cont.cus_cont_surname) AS coach_name, 
+//             cont.cus_cont_photo AS coach_image, 
+//             'O' AS coach_gender, 
+//             COALESCE(cus.cus_name_en, cus.cus_name_th) AS coach_academy, 
+//             cont.cus_posi_id AS coach_position,
+//             course.trn_id AS course_id
+//         FROM 
+//             ot_training_list course
+//         JOIN 
+//             m_customer_contact cont ON FIND_IN_SET(cont.cus_cont_id, course.trn_by_cont)
+//         LEFT JOIN 
+//             m_customer cus ON cus.cus_id = cont.cus_id
+//         LEFT JOIN 
+//             m_customer_cont_group ON m_customer_cont_group.cont_group_id = cont.cont_group_id
+//     ) coach ON sch.course_id = coach.course_id
+//         ORDER BY sch.time_start ASC) schedule_data";
+
+    $instructor_column = "*";
+    $instructor_table = "(
+        SELECT 
+            emp.emp_id AS coach_id, 
+            'emp' AS coach_type, 
+            CONCAT((
+                    CASE  
+                        WHEN i.title = 1 or i.title = 'Mr.' THEN 'Mr.'
+                        WHEN i.title = 2 or i.title = 'Mrs.' THEN 'Mrs.'
+                        WHEN i.title = 4 or i.title = 'Miss.' THEN 'Miss.'
+                        WHEN i.title = 5 or i.title = 'Dr.' THEN 'Dr.'
+                        ELSE ''
+                    END
+                ),
+                ' ',COALESCE(i.firstname, i.firstname_th), ' ', COALESCE(i.lastname, i.lastname_th)) AS coach_name, 
+            i.emp_pic AS coach_image, 
+            i.gender AS coach_gender, 
+            comp.comp_description AS coach_academy, 
+            pos.posi_description AS coach_position,
+			course.trn_subject AS course_name,
+			course.trn_detail AS course_detail,
+            cc.course_id AS course_id,
+            DATE_FORMAT(course.trn_date,'%Y/%m/%d') AS date_start,
+            course.trn_from_time AS time_start,
+            course.trn_to_time AS time_end
+        FROM 
+            ot_training_list course
+        JOIN 
+            m_employee emp ON FIND_IN_SET(emp.emp_id, REPLACE(course.trn_by_emp, ' ', ''))
+        LEFT JOIN
+            classroom_course cc ON course.trn_id = cc.course_ref_id
+        LEFT JOIN 
+            m_employee_info i ON i.emp_id = emp.emp_id 
+        LEFT JOIN 
+            m_company comp ON comp.comp_id = emp.comp_id 
+        LEFT JOIN 
+            m_position pos ON pos.posi_id = emp.posi_id
+        WHERE 
+            cc.classroom_id = '{$classroom_id}'
+            AND course.trn_date = '{$dateSchedule}') schedule_data";
+
+        // UNION ALL
+        // SELECT 
+        //     teacher_id,
+        //     teacher_ref_id,
+        //     teacher_ref_type,
+        //     teacher_perfix,
+        //     teacher_firstname_en,
+        //     teacher_lastname_en,
+        //     teacher_firstname_th,
+        //     teacher_lastname_th,
+        //     teacher_nickname_en,
+        //     teacher_nickname_th,
+        //     teacher_idcard,
+        //     teacher_passport,
+        //     teacher_image_profile,
+        //     teacher_card_front,
+        //     teacher_card_back,
+        //     teacher_email,
+        //     teacher_mobile,
+        //     teacher_address,
+        //     teacher_birth_date,
+        //     teacher_bioteacher_attach_document,
+        //     teacher_education,
+        //     teacher_experience,
+        //     teacher_company,
+        //     teacher_position,
+        //     teacher_username,
+        //     teacher_password,
+        //     teacher_password_key,
+        //     position_id,
+        //     comp_id,
+        //     status,
+        //     emp_create,
+        //     date_create,
+        //     emp_modify,
+        //     date_modify
+        //     FROM teacher;
+        // FROM 
+        //     classroom_teacher course 
+
+    $instructor_data = select_data($instructor_column, $instructor_table);
+
     if (!empty($scheduleItems)) {
-        $schedule_data = $scheduleItems[0];
+        // $schedule_data = $scheduleItems[0];
         echo json_encode([
             'status' => true,
             'group_data' => $scheduleItems,
-            ]);
+            'instructor' => $instructor_data,
+        ]);
     } else {
         echo json_encode([
             'status' => false,
-            'group_data' => []
+            'group_data' => [],
+            'instructor' => []
         ]);
     }
 }
-
 
 // DATA FROM JS
 $input = json_decode(file_get_contents('php://input'), true);

@@ -1,4 +1,4 @@
-  let allSessions = [];
+let allSessions = [];
 
 $(document).ready(function () {
   let currentDate = new Date();
@@ -34,70 +34,105 @@ $(document).ready(function () {
       dataType: "JSON",
       success: function (result) {
         console.log(result);
-        if (result.status ==  true && result.group_data) {
-            allSessions = result.group_data;
-            const sessions = result.group_data;
+        if (result.status && Array.isArray(result.group_data)) {
+          allSessions = result.group_data;
+          const allInstructors = result.instructor || [];
 
-            $('#scheduleContainer').show();
-            $('#scheduleContainer').empty();
+          $("#scheduleContainer").show().empty();
 
-             sessions.forEach((item, index) => {
-            // Access properties using keys, e.g.:
-            // item.schedule_name, item.topic_name, item.date_start, item.time_start, item.time_end
-            // Example of creating HTML output:
+          allSessions.forEach((session, key) => {
+            const eventDate = session.date_start || "";
+            const startTime = session.time_start || "";
+            const endTime = session.time_end || "";
+            const title = session.course_name || "";
+            const category = session.course_category || "";
+            const course_detail = session.course_detail || "ยังไม่ระบุ";
 
-            const eventDate = item.date_start || '';
-            const startTime = item.time_start || '';
-            const endTime = item.time_end || '';
-            const title = item.schedule_name || '';
-            const topic = item.topic_name || 'ยังไม่ระบุ'; // Means 'Not specified'
+            // Filter instructors for this course/session by matching course_id or other identifiers
+            const instructorsForSession = allInstructors.filter(
+              (instr) => instr.course_id === session.course_id
+            );
 
-            // Create a container or append to an existing element, like:
+            let instructorsHtml = "";
+            const maxVisible = 3;
+
+            if (instructorsForSession.length <= maxVisible) {
+              // Show all instructors if 3 or less
+              instructorsForSession.forEach((instr) => {
+                instructorsHtml += `
+            <div class="member-avatar avatar-orange" title="${instr.coach_name}">
+                <img src="/${instr.coach_image}" 
+                    onerror="this.src='/images/default.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
+                    alt="${instr.coach_name}" 
+                    style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill">
+            </div>`;
+              });
+            } else {
+              // Show first 3 instructors
+              for (let i = 0; i < maxVisible; i++) {
+                let instr = instructorsForSession[i];
+                instructorsHtml += `
+            <div class="member-avatar avatar-orange" title="${instr.coach_name}">
+                <img src="/${instr.coach_image}" 
+                    onerror="this.src='/images/default.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
+                    alt="${instr.coach_name}" 
+                    style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill">
+            </div>`;
+              }
+              // Add a count indicator for remaining instructors
+              const remainingCount = instructorsForSession.length - maxVisible;
+              instructorsHtml += `
+                <div class="member-avatar avatar-orange" title="and ${remainingCount} more">
+                    <div class="avatar-counter" style="width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
+                        +${remainingCount}
+                    </div>
+                </div>`;
+            }
+
             const html = `
-                <div class="schedule-container${index === sessions.length - 1 ? ' last' : ''}">
+            <div class="schedule-container${
+              key === allSessions.length - 1 ? " last" : ""
+            }">
                 <div class="schedule-item">
                     <div class="schedule-time">
-                    <span class="schedule-time-text">${startTime}</span>
-                    <span class="schedule-time-bottom">${endTime}</span>
+                        <span class="schedule-time-text">${startTime}</span>
+                        <span class="schedule-time-bottom">${endTime}</span>
                     </div>
                     <div class="schedule-timeline">
-                    <div class="timeline-dot timeline-dot-purple"></div>
-                    <div class="timeline-line"></div>
+                        <div class="timeline-dot timeline-dot-purple"></div>
+                        <div class="timeline-line"></div>
                     </div>
                     <div class="schedule-content schedule-content-purple">
-                    <div class="schedule-header">
-                        <div>
-                        <h3 class="schedule-title" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                            ${title}
-                        </h3>
-                        <p class="schedule-duration">${eventDate} • ${startTime}${endTime ? ' - ' + endTime : ''}</p>
+                        <div class="schedule-header">
+                            <div>
+                                <h3 class="schedule-title" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    ${title}
+                                </h3>
+                                <p class="schedule-duration">${eventDate} • ${startTime}${
+              endTime ? " - " + endTime : ""
+            }</p>
+                            </div>
+                            <span class="schedule-badge badge-class">${category}</span>
                         </div>
-                        <span class="schedule-badge badge-class">${topic}</span>
-                    </div>
-                    <div class="schedule-footer">
-                        <div class="member-avatars">
-                        <div class="member-avatar avatar-purple"><span>👤</span></div>
-                        <div class="member-avatar avatar-teal"><span>👤</span></div>
-                        <div class="member-avatar avatar-orange"><span>👤</span></div>
+                        <div class="schedule-footer">
+                            <div class="member-avatars">
+                                ${instructorsHtml}
+                            </div>
+                            <button type="button" class="btn btn-primary" style="background-color: #7936e4; border-radius: 15px;"
+                                data-toggle="modal"
+                                data-target="#scheduleModal"
+                                data-index="${key}">
+                                รายละเอียด
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-primary" style="background-color: #7936e4; border-radius: 15px;"
-  data-toggle="modal"
-  data-target="#scheduleModal"
-  data-index="${index}">
-  รายละเอียด
-</button>
-                    </div>
                     </div>
                 </div>
-                </div>`;
+            </div>`;
 
-            // Append the HTML to some container in your page
-            $('#scheduleContainer').append(html);
-            });
-        //   load_table();
+            $("#scheduleContainer").append(html);
+          });
         } else {
-            allSessions = [];
-            $('#scheduleContainer').hide();
+          $("#scheduleContainer").hide();
         }
       },
       error: function (xhr, status, error) {
@@ -109,8 +144,7 @@ $(document).ready(function () {
       },
     });
 
-
-     // Send the session data to PHP backend to generate HTML
+    // Send the session data to PHP backend to generate HTML
     // $.ajax({
     //   url: "/classroom/study/actions/schedule.php", // your PHP file
     //   type: "POST",
@@ -133,8 +167,6 @@ $(document).ready(function () {
     // });
   }
 
-  
-
   $("#prev-day").on("click", function () {
     currentDate.setDate(currentDate.getDate() - 1);
     updateDateDisplay();
@@ -145,76 +177,72 @@ $(document).ready(function () {
     updateDateDisplay();
   });
 
-  
-
   // Cancel First Modal
 
   updateDateDisplay();
 });
 
-
 // Handle click on "รายละเอียด" buttons dynamically
-$(document).on('click', '.btn.btn-primary[data-toggle="modal"]', function () {
-  const index = $(this).data('index');
+$(document).on("click", '.btn.btn-primary[data-toggle="modal"]', function () {
+  const index = $(this).data("index");
   if (allSessions && allSessions[index]) {
     const session = allSessions[index];
 
-    $('#modalDetails span').text(session.schedule_name || '-');
-    const start = session.time_start || '-';
-    const end = session.time_end || '';
-    $('#modalTime span').text(end ? start + ' - ' + end : start);
-    $('#modalSpeakers span').text(session.session_speaker || 'ยังไม่ระบุ');
+    $("#modalDetails span").text(session.schedule_name || "-");
+    const start = session.time_start || "-";
+    const end = session.time_end || "";
+    $("#modalTime span").text(end ? start + " - " + end : start);
+    $("#modalSpeakers span").text(session.coach_name || "ยังไม่ระบุ");
 
- // Store index on modal itself
-    $('#scheduleModal').data('sessionIndex', index);
+    // Store index on modal itself
+    $("#scheduleModal").data("sessionIndex", index);
 
-    $('#scheduleModal').modal('show');
+    $("#scheduleModal").modal("show");
   }
 });
 
- // Cancel modal on decline button click 
-    $(document).on('click', '.decline-modal', function() {
-        // Find closest modal to this button and hide it
-        $(this).closest('.modal').modal('hide');
+// Cancel modal on decline button click
+$(document).on("click", ".decline-modal", function () {
+  // Find closest modal to this button and hide it
+  $(this).closest(".modal").modal("hide");
 
-        swal({
-            type: 'error',
-            title: 'ปฏิเสธ',
-            text: 'คุณได้ปฏิเสธการเข้าร่วมอีเวนท์นี้',
-        });
-    });
+  swal({
+    type: "error",
+    title: "ปฏิเสธ",
+    text: "คุณได้ปฏิเสธการเข้าร่วมอีเวนท์นี้",
+  });
+});
 
-    // Open second modal from first modal's "join" button
-    $(document).on('click', '.open-new-modal', function() {
-        const firstModal = $(this).closest('.modal');
-        // Get the index stored when opening the modal earlier
-        const index = firstModal.data('sessionIndex');
+// Open second modal from first modal's "join" button
+$(document).on("click", ".open-new-modal", function () {
+  const firstModal = $(this).closest(".modal");
+  // Get the index stored when opening the modal earlier
+  const index = firstModal.data("sessionIndex");
 
-        if (typeof index === 'undefined' || !allSessions[index]) return;
+  if (typeof index === "undefined" || !allSessions[index]) return;
 
-        const session = allSessions[index];
-        const start = session.time_start || '-';
-        const end = session.time_end || '';
+  const session = allSessions[index];
+  const start = session.time_start || "-";
+  const end = session.time_end || "";
 
-        // Hide first modal, then show second modal
+  // Hide first modal, then show second modal
 
-        // Hide first modal, then show second modal linked by index
-        firstModal.modal('hide');
-        firstModal.one('hidden.bs.modal', function() {
-            $('#modalTimeNew').text(end ? start + ' - ' + end : start);
+  // Hide first modal, then show second modal linked by index
+  firstModal.modal("hide");
+  firstModal.one("hidden.bs.modal", function () {
+    $("#modalTimeNew").text(end ? start + " - " + end : start);
 
-            $('#newModal').modal('show');
-        });
-    });
+    $("#newModal").modal("show");
+  });
+});
 
-    // Accept event on second modal
-    $(document).on('click', '.accept-event', function() {
-        $(this).closest('.modal').modal('hide');
+// Accept event on second modal
+$(document).on("click", ".accept-event", function () {
+  $(this).closest(".modal").modal("hide");
 
-        swal({
-            type: 'success',
-            title: 'เข้าร่วมสำเร็จ',
-            text: 'คุณได้เข้าร่วมอีเว้นท์นี้เรียบร้อยแล้ว',
-        });
-    });
-
+  swal({
+    type: "success",
+    title: "เข้าร่วมสำเร็จ",
+    text: "คุณได้เข้าร่วมอีเว้นท์นี้เรียบร้อยแล้ว",
+  });
+});

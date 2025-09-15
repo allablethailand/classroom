@@ -1,6 +1,8 @@
 let classroom_id;
 let tenant_key = '';
 let currentLang = "th";
+let consent_status = 'N';
+let channel_id = '';
 const translations = {
     en: {
         eng: "English", thai: "Thai", register: "Register", infomation: "Details",
@@ -21,7 +23,8 @@ const translations = {
         however: "However, your account is currently pending approval from our administrator.",
         once: "Once your registration is reviewed and approved, you will receive a notification via email.",
         registered_login: "You can now log in to the system using your registered username and password.",
-        please_login: "Please proceed by clicking the \"Login\" button below."
+        please_login: "Please proceed by clicking the \"Login\" button below.",
+        accept_register: "Accept and register"
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
@@ -42,7 +45,8 @@ const translations = {
         however: "อย่างไรก็ตาม บัญชีของคุณกำลังรอการอนุมัติจากผู้ดูแลระบบของเรา",
         once: "เมื่อการลงทะเบียนของคุณได้รับการตรวจสอบและอนุมัติแล้ว คุณจะได้รับการแจ้งเตือนทางอีเมล",
         registered_login: "คุณสามารถเข้าสู่ระบบโดยใช้ชื่อผู้ใช้และรหัสผ่านที่คุณลงทะเบียนไว้ได้แล้ว",
-        please_login: "กรุณาดำเนินการต่อโดยคลิกปุ่ม \"เข้าสู่ระบบ\" ด้านล่าง"
+        please_login: "กรุณาดำเนินการต่อโดยคลิกปุ่ม \"เข้าสู่ระบบ\" ด้านล่าง",
+        accept_register: "ยอมรับและลงทะเบียน"
     }
 };
 $(document).ready(function () {
@@ -70,7 +74,7 @@ $(document).ready(function () {
                     type: 'warning',
                     title: 'Warning',
                     text: 'Please select a valid image file.',
-                    showConfirmButton: false,
+                    confirmButtonColor: '#FF9900'
                 });
                 $(this).val("");
                 return;
@@ -134,7 +138,12 @@ $(document).ready(function () {
             const msg = type === 'student_email'
                 ? 'Invalid email format'
                 : 'The phone number format is incorrect.';
-            swal({ type: 'warning', title: "Warning...", text: msg, showConfirmButton: false, timer: 2500 });
+            swal({ 
+                type: 'warning', 
+                title: "Warning...", 
+                text: msg, 
+                confirmButtonColor: '#FF9900'
+            });
         } else {
             $(this).removeClass('has-error');
             if (type === 'student_mobile') {
@@ -156,20 +165,29 @@ $(document).ready(function () {
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
     });
     const classroomCode = $("#classroomCode").val();
-    $.post('/classroom/register/actions/register.php', { action: "verifyClassroom", classroomCode }, (response) => {
+    const channel = $("#channel").val();
+    $.post('/classroom/register/actions/register.php', { 
+        action: "verifyClassroom", 
+        classroomCode: classroomCode, 
+        channel: channel
+    }, (response) => {
         if (!response.status) return window.location.href = '/';
         classroom_id = response.classroom_data.classroom_id;
+        channel_id = response.channel_id;
         tenant_key = response.classroom_data.tenant_key;
         response.register_template.forEach(value => $(".input-" + value).removeClass("hidden"));
         response.register_require.forEach(value => {
             const $group = $(".input-" + value);
             $group.find("input, select, textarea").addClass("require");
             $group.find("input[type=file]").addClass("require");
-            if ($group.find("label .require-mark").length === 0) {
-                $group.find("label").append(' <span class="require-mark" style="color:orange">*</span>');
-            }
+            $group.find("label").addClass("required-field");
         });
         initTemplate(response.classroom_data);
+        initForm(response.form_data);
+        consent_status = response.consent_status;
+        if(consent_status == 'Y') {
+            $(".input-consent").removeClass("hidden");
+        }
         $(".login").attr("href", "/" + tenant_key);
     }, 'json').fail(() => window.location.href = '/');
     $(".language-menu div").click(function () {
@@ -265,6 +283,46 @@ $(document).ready(function () {
         if(errorMessage) {
             errorMessage += 'must be 4–20 characters if provided. ';
         }
+        $(".form-container .form-group").each(function() {
+            const $group = $(this);
+            const $question = $group.find("[name^='q_']");
+            if ($question.length === 0) return;
+            const required = $group.find("[data-required='1']").length > 0 || $group.find(".require").length > 0;
+            if (!required) return;
+            if ($question.is(":radio") || $question.is(":checkbox")) {
+                const name = $question.attr("name");
+                const $checked = $(`[name='${name}']:checked`);
+                if ($checked.length === 0) {
+                    isValid = false;
+                    if (!firstInvalidField) firstInvalidField = $group;
+                    $group.find(".question_text").addClass("has-error-text");
+                } else {
+                    $group.removeClass("has-error");
+                    const $other = $checked.filter("[value='other']");
+                    if ($other.length > 0) {
+                        const targetBox = $("#other_box_" + $other.data("qid"));
+                        const $otherInput = targetBox.find("input[type='text']");
+                        if ($otherInput.length && $otherInput.val().trim() === "") {
+                            isValid = false;
+                            if (!firstInvalidField) firstInvalidField = $otherInput;
+                            $otherInput.addClass("has-error");
+                        } else {
+                            $otherInput.removeClass("has-error");
+                        }
+                    }
+                }
+            } else {
+                $question.each(function() {
+                    if ($(this).val().trim() === "") {
+                        isValid = false;
+                        if (!firstInvalidField) firstInvalidField = $(this);
+                        $(this).addClass("has-error");
+                    } else {
+                        $(this).removeClass("has-error");
+                    }
+                });
+            }
+        });
         if (!isValid) {
             if (firstInvalidField) {
                 $('html, body').animate({ scrollTop: firstInvalidField.offset().top - 100 }, 300);
@@ -274,20 +332,22 @@ $(document).ready(function () {
                 type: 'warning',
                 title: 'Warning',
                 text: 'Please fill in all required fields. ' + errorMessage,
-                showConfirmButton: false,
-                timer: 2500
+                confirmButtonColor: '#FF9900'
             });
             return false;
         }
-        if (!$('#agree').is(':checked')) {
-             swal({
-                type: 'warning',
-                title: 'Warning',
-                text: 'Please accept the terms and conditions.',
-                showConfirmButton: false,
-                timer: 2500
-            });
-            return false;
+        if (!$('#agree').is(':checked') && consent_status == "Y") {
+            $("#agree").prop("checked", true);
+            $(".systemModal").modal();
+            $(".systemModal .modal-header").html('<h5 class="modal-title" data-lang="policy"></h5>');
+            $(".systemModal .modal-footer").html(`
+                <button type="button" class="btn btn-warning" data-lang="accept_register" onclick="saveRegister();"></button>
+                <button type="button" class="btn" data-lang="close" data-dismiss="modal"></button>
+            `);
+            $.post('/classroom/register/actions/register.php', { action: "loadTerm", classroom_id }, (res) => {
+                $(".systemModal .modal-body").html(res.classroom_consent || '-');
+            }, 'json');
+            return;
         }
         saveRegister();
     });
@@ -300,6 +360,7 @@ function saveRegister() {
     fd.append('classroom_id', classroom_id);
     const dialCode = $(".iti__selected-dial-code").html();
     fd.append('dialCode', dialCode);
+    fd.append('channel_id', channel_id);
     $.ajax({
         url: '/classroom/register/actions/register.php?action=saveRegister',
         type: "POST",
@@ -309,21 +370,28 @@ function saveRegister() {
         dataType: "JSON",
         success: handleRegisterResponse,
         error: () => {
+            $(".systemModal").modal("hide");
             $btn.prop('disabled', false);
             swal({
                 type: 'warning',
                 title: "Warning",
                 text: "Save faild, please try again.",
-                showConfirmButton: false,
-                timer: 2500
+                confirmButtonColor: '#FF9900'
             });
         }
     });
 }
 function handleRegisterResponse(result) {
     $(".loader").removeClass("active");
+    $(".systemModal").modal("hide");
     if (!result.status) {
-        swal({ type: 'warning', title: "Duplicate Data", text: result.message, timer: 2500, showConfirmButton: false, });
+        $(".btn-register").prop('disabled', false);
+        swal({ 
+            type: 'warning', 
+            title: "Duplicate Data", 
+            text: result.message, 
+            confirmButtonColor: '#FF9900'
+        });
         return;
     }
     $(".systemModal .modal-header").html(`<h5 class="modal-title" data-lang="registered"></h5>`);
@@ -346,8 +414,89 @@ function handleRegisterResponse(result) {
         location.reload();
     });
 }
+function initForm(form_data) {
+    if(!form_data) return;
+    let html = '';
+    form_data.forEach(q => {
+        html += `<div class="form-group">
+            <input type="hidden" name="question_id[]" value="${q.question_id}">
+            <input type="hidden" name="question_type[]" value="${q.question_type}">
+        `;
+        html += `<label class="${q.has_required == 1 ? 'required-field' : ''} question_text">${q.question_text}</label>`;
+        let requiredAttr = q.has_required == 1 ? 'data-required="1"' : '';
+        if(q.has_options == 1) {
+            if(q.question_type === "radio" || q.question_type === "multiple_choice") {
+                q.option_item.forEach(opt => {
+                    html += `
+                        <div>
+                            <input type="radio" id="q_${q.question_id}_opt_${opt.choice_id}" name="q_${q.question_id}" value="${opt.choice_id}" class="option-input" data-qid="${q.question_id}" ${requiredAttr}>
+                            <label for="q_${q.question_id}_opt_${opt.choice_id}" class="radio-label">${opt.choice_text}</label>
+                        </div>
+                    `;
+                });
+            } else if(q.question_type === "checkbox") {
+                q.option_item.forEach(opt => {
+                    html += `
+                        <div>
+                            <input type="checkbox" id="q_${q.question_id}_opt_${opt.choice_id}" name="q_${q.question_id}[]" value="${opt.choice_id}" class="option-input" data-qid="${q.question_id}" ${requiredAttr}>
+                            <label for="q_${q.question_id}_opt_${opt.choice_id}" class="checkbox-label">${opt.choice_text}</label>
+                        </div>
+                    `;
+                });
+            }
+            if(q.has_other_option == 1) {
+                const inputType = (q.question_type === 'checkbox' ? 'checkbox' : 'radio');
+                const inputName = `q_${q.question_id}${inputType === 'checkbox' ? '[]' : ''}`;
+                html += `
+                    <div>
+                        <input type="${inputType}" id="q_${q.question_id}_other" name="${inputName}" value="other" class="option-input other-input" data-qid="${q.question_id}" ${requiredAttr}>
+                        <label for="q_${q.question_id}_other" class="${inputType==='checkbox' ? 'checkbox-label':'radio-label'}"><span data-lang="other">อื่นๆ</span></label>
+                    </div>
+                    <div id="other_box_${q.question_id}" style="display:none; margin-top:5px;">
+                        <input type="text" class="form-control" name="q_${q.question_id}_other">
+                    </div>
+                `;
+            }
+        } else {
+            if(q.question_type === "short_answer") {
+                html += `<textarea name="q_${q.question_id}" class="form-control" ${requiredAttr}></textarea>`;
+            }
+        }
+        html += `</div>`;
+    });
+    document.querySelector(".form-container").innerHTML = html;
+    if(typeof toggleLanguage === "function") toggleLanguage(currentLang);
+    document.querySelectorAll('.option-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const qid = this.dataset.qid;
+            const otherBox = document.getElementById(`other_box_${qid}`);
+            const otherInput = otherBox ? otherBox.querySelector("input") : null;
+            if(this.type === "radio") {
+                if(this.value === "other" && this.checked) {
+                    otherBox.style.display = "block";
+                    if(otherInput) otherInput.setAttribute("data-required","1");
+                } else {
+                    if(otherBox) otherBox.style.display = "none";
+                    if(otherInput) otherInput.removeAttribute("data-required");
+                }
+            } else if(this.type === "checkbox") {
+                if(this.value === "other") {
+                    otherBox.style.display = this.checked ? "block" : "none";
+                    if(otherInput) {
+                        if(this.checked) otherInput.setAttribute("data-required","1");
+                        else otherInput.removeAttribute("data-required");
+                    }
+                }
+            }
+        });
+    });
+}
+function autoResize(textarea) {
+    textarea.style.height = 'auto'; 
+    textarea.style.height = textarea.scrollHeight + 'px'; 
+}
 function initTemplate(data) {
-    let bg = (data.classroom_bg != '') ? data.classroom_bg : "/images/bg.jpg";
+    let bg = (data.classroom_bg != '') ? data.classroom_bg : "/images/ogm_bg.png";
     $(".poster-bg").css("background-image",`url(${bg})`);
     $(".poster-img img").attr("src", data.classroom_poster || "/images/training.jpg");
     $(".container-header-bg").css("background-image",`url(${bg})`);
