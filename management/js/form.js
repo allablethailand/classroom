@@ -3,301 +3,297 @@
         const formTitle = (id ? 'Edit ' : 'Add ') + (isTeacher ? 'Teacher Information' : 'Student Information');
 
         const formTemplate = `
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="modal-title">${formTitle}</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="nav nav-tabs nav-origami nav-contact " style="font-size:1.2em">
-                        <li class="nav active"><a href="#${type}_personal_contact_tab" data-toggle="tab"><i class="fas fa-user-circle" style="color: #007bff;"></i> Personal Contact </a></li>
-                        <li class="nav"><a href="#${type}_bio_tab" data-toggle="tab"><i class="fas fa-address-card" style="color: #6c757d;"></i> Biography </a></li>
-                        <li class="nav"><a href="#${type}_favorite_tab" data-toggle="tab"><i class="fas fa-heart" style="color: #ff9800;"></i> Favorite </a></li>
-                        <li class="nav"><a href="#${type}_setup_tab" data-toggle="tab"><i class="fas fa-cog" style="color: #6c757d;"></i> Login Setup </a></li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane fade in active" id="${type}_personal_contact_tab">
-                            <form id="frm_${type}" action="save_${type}" method="POST" enctype="multipart/form-data">
-                                <input type="hidden" name="id" id="${type}_id" value="${id || ''}">
-                                <input type="hidden" name="type" value="${type}">
+           <div class="card">
+                    <div class="card-header">
+                        <h5 class="modal-title">${formTitle}</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs nav-origami nav-contact " style="font-size:1.2em">
+                            <li class="nav active"><a href="#${type}_personal_contact_tab" data-toggle="tab"><i class="fas fa-user-circle" style="color: #007bff;"></i> Personal Contact </a></li>
+                            <li class="nav"><a href="#${type}_bio_tab" data-toggle="tab"><i class="fas fa-address-card" style="color: #6c757d;"></i> Biography </a></li>
+                            <li class="nav"><a href="#${type}_favorite_tab" data-toggle="tab"><i class="fas fa-heart" style="color: #ff9800;"></i> Favorite </a></li>
+                            <li class="nav"><a href="#${type}_setup_tab" data-toggle="tab"><i class="fas fa-cog" style="color: #6c757d;"></i> Login Setup </a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="${type}_personal_contact_tab">
+                                <form id="frm_${type}" action="save_${type}" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="id" id="${type}_id" value="${id || ''}">
+                                    <input type="hidden" name="type" value="${type}">
 
-                                <div class="form-box">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group text-center mt-3">
-                                                <label for="${type}_image_profile" class="control-label"><i class="fas fa-camera-retro" style="color: #6c757d;"></i> Profile Picture 
-                                                <div class="preview-uploads preview-uploads-logo">
-                                                    <div class="image-placeholder">
-                                                        <span class="fa fa-cloud-upload-alt fa-3x text-muted"></span>
-                                                        <h5 class="text-muted mt-2">Drag and drop an image here<br>or click to upload</h5>
-                                                        <input name="${type}_image_profile" id="${type}_image_profile" type="file" onchange="readURL(this, '${type}_image_profile_preview');" class="d-none" accept="image/*">
+                                    <div class="form-box">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group g-4 text-center mt-3">
+                                                    <label for="${type}_image_profile" class="control-label">
+                                                        <i class="fas fa-camera-retro" style="color: #6c757d;"></i> Profile Picture 📸
+                                                    </label>
+                                                    <div class="preview-uploads preview-uploads-logo">
+                                                        <div class="image-placeholder">
+                                                            <span class="fa fa-cloud-upload-alt fa-3x text-muted"></span>
+                                                            <h5 class="text-muted mt-2">Drag and drop an image here<br>or click to upload</h5>
+                                                            <input name="${type}_image_profile" id="${type}_image_profile" type="file" onchange="readURL(this, '${type}_image_profile_preview');" class="d-none" accept="image/*">
+                                                        </div>
+                                                        <div class="image-preview" style="display: none;">
+                                                            <img id="${type}_image_profile_preview" src="" alt="Image Preview">
+                                                            <div class="image-actions">
+                                                                <a href="#" onclick="previewImage('${type}_image_profile_preview');" class="preview-btn">View</a>
+                                                                <a href="#" onclick="removeImage('${type}_image_profile_preview', '${type}_image_profile');" class="remove-btn">Remove</a>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div class="image-preview" style="display: none;">
-                                                        <img id="${type}_image_profile_preview" src="" alt="Image Preview">
-                                                        <div class="image-actions">
-                                                            <a href="#" onclick="previewImage('${type}_image_profile_preview');" class="preview-btn">View</a>
-                                                            <a href="#" onclick="removeImage('${type}_image_profile_preview', '${type}_image_profile');" class="remove-btn">Remove</a>
+                                                    <input type="hidden" name="${type}_image_profile_current" id="${type}_image_profile_current" value="">
+                                                </div>
+                                                <div class="form-group g-4 row mt-3">
+                                                    <div class="col-sm-12">
+                                                        <label for="${type}_gender" class="control-label">เพศ 🚻</label>
+                                                        <input type="text" name="${type}_gender" id="${type}_gender" class="form-control" list="gender-list">
+                                                        <datalist id="gender-list"></datalist>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group g-4 row">
+                                                    <div class="col-sm-12">
+                                                        <label for="${type}_birth_date" class="control-label">วันเกิด 🎂</label>
+                                                        <div class="input-group">
+                                                            <input type="text" name="${type}_birth_date" id="${type}_birth_date" class="form-control datepicker">
+                                                            <span class="input-group-addon"><i class="fas fa-calendar-alt"></i></span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                </label>
-                                                <input type="hidden" name="${type}_image_profile_current" id="${type}_image_profile_current" value="">
                                             </div>
-                                            <div class="form-group row mt-3">
-                                              <div class="col-sm-12">
-                                                <label for="${type}_gender" class="control-label">เพศ 🚻</label>
-                                                <input type="text" name="${type}_gender" id="${type}_gender" class="form-control" list="gender-list">
-                                                <datalist id="gender-list">
-                                                    </datalist>
-                                            </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <div class="col-sm-12">
-                                                    <label for="${type}_birth_date" class="control-label">วันเกิด 🎂</label>
-                                                    <div class="input-group">
-                                                        <input type="text" name="${type}_birth_date" id="${type}_birth_date" class="form-control datepicker">
-                                                        <span class="input-group-addon"><i class="fas fa-calendar-alt"></i></span>
+                                            <div class="col-md-8">
+                                                <div class="row">
+                                                    <div class="form-group g-4 col-sm-12">
+                                                        <label for="${type}_perfix" class="control-label">คำนำหน้า </label>
+                                                        <input type="text" name="${type}_perfix" id="${type}_perfix" class="form-control" list="prefix-list">
+                                                        <datalist id="prefix-list"></datalist>
+                                                    </div>
+                                                    <div class="form-group g-4 col-sm-6">
+                                                        <label for="${type}_firstname_en" class="control-label">Firstname (EN) *</label>
+                                                        <input type="text" name="${type}_firstname_en" id="${type}_firstname_en" class="form-control" required>
+                                                    </div>
+                                                    <div class="form-group g-4 col-sm-6">
+                                                        <label for="${type}_lastname_en" class="control-label">Lastname (EN) *</label>
+                                                        <input type="text" name="${type}_lastname_en" id="${type}_lastname_en" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="form-group g-4 col-sm-6">
+                                                        <label for="${type}_firstname_th" class="control-label">ชื่อจริง (TH)</label>
+                                                        <input type="text" name="${type}_firstname_th" id="${type}_firstname_th" class="form-control">
+                                                    </div>
+                                                    <div class="form-group g-4 col-sm-6">
+                                                        <label for="${type}_lastname_th" class="control-label">นามสกุล (TH)</label>
+                                                        <input type="text" name="${type}_lastname_th" id="${type}_lastname_th" class="form-control">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="form-group g-4 col-sm-6">
+                                                        <label for="${type}_nickname_th" class="control-label">ชื่อเล่น (TH) </label>
+                                                        <input type="text" name="${type}_nickname_th" id="${type}_nickname_th" class="form-control">
+                                                    </div>
+                                                    <div class="form-group g-4 col-sm-6">
+                                                        <label for="${type}_nickname_en" class="control-label">Nickname (EN) </label>
+                                                        <input type="text" name="${type}_nickname_en" id="${type}_nickname_en" class="form-control">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="form-group g-4 col-sm-6">
+                                                        <label for="${type}_idcard" class="control-label">เลขบัตรประชาชน 🆔</label>
+                                                        <input type="text" name="${type}_idcard" id="${type}_idcard" class="form-control">
+                                                    </div>
+                                                    <div class="form-group g-4 col-sm-6">
+                                                        <label for="${type}_passport" class="control-label">เลขหนังสือเดินทาง 🛂</label>
+                                                        <input type="text" name="${type}_passport" id="${type}_passport" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-8">
-                                            <div class="row">
-                                                <div class="form-group col-sm-12">
-                                                    <label for="${type}_perfix" class="control-label">คำนำหน้า </label>
-                                                    <input type="text" name="${type}_perfix" id="${type}_perfix" class="form-control" list="prefix-list">
-                                                    <datalist id="prefix-list">
-                                                        </datalist>
-                                                </div>
-                                                <div class="form-group col-sm-6">
-                                                    <label for="${type}_firstname_en" class="control-label">Firstname (EN) *</label>
-                                                    <input type="text" name="${type}_firstname_en" id="${type}_firstname_en" class="form-control" required>
-                                                </div>
-                                                <div class="form-group col-sm-6">
-                                                    <label for="${type}_lastname_en" class="control-label">Lastname (EN) *</label>
-                                                    <input type="text" name="${type}_lastname_en" id="${type}_lastname_en" class="form-control" required>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="form-group col-sm-6">
-                                                    <label for="${type}_firstname_th" class="control-label">ชื่อจริง (TH)</label>
-                                                    <input type="text" name="${type}_firstname_th" id="${type}_firstname_th" class="form-control">
-                                                </div>
-                                                <div class="form-group col-sm-6">
-                                                    <label for="${type}_lastname_th" class="control-label">นามสกุล (TH)</label>
-                                                    <input type="text" name="${type}_lastname_th" id="${type}_lastname_th" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="form-group col-sm-6">
-                                                    <label for="${type}_nickname_th" class="control-label">ชื่อเล่น (TH) </label>
-                                                    <input type="text" name="${type}_nickname_th" id="${type}_nickname_th" class="form-control">
-                                                </div>
-                                                <div class="form-group col-sm-6">
-                                                    <label for="${type}_nickname_en" class="control-label">Nickname (EN) </label>
-                                                    <input type="text" name="${type}_nickname_en" id="${type}_nickname_en" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="form-group col-sm-6">
-                                                    <label for="${type}_idcard" class="control-label">เลขบัตรประชาชน 🆔</label>
-                                                    <input type="text" name="${type}_idcard" id="${type}_idcard" class="form-control">
-                                                </div>
-                                                <div class="form-group col-sm-6">
-                                                    <label for="${type}_passport" class="control-label">เลขหนังสือเดินทาง 🛂</label>
-                                                    <input type="text" name="${type}_passport" id="${type}_passport" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="form-box mt-4">
-                                    <div class="row">
-                                        <div class="col-sm-6 text-center">
-                                            <label for="${type}_card_front" class="control-label">บัตรประชาชน (ด้านหน้า) 💳
-                                            <div class="preview-uploads preview-uploads-card">
-                                                <div class="image-placeholder">
-                                                    <span class="fa fa-cloud-upload-alt fa-3x text-muted"></span>
-                                                    <h5 class="text-muted mt-2">Drag and drop an image<br>or click to upload</h5>
-                                                    <input name="${type}_card_front" id="${type}_card_front" type="file" onchange="readURL(this, '${type}_card_front_preview');" class="d-none" accept="image/*">
-                                                </div>
-                                                <div class="image-preview" style="display: none;">
-                                                    <img id="${type}_card_front_preview" src="" alt="Front Name Card Preview">
-                                                    <div class="image-actions">
-                                                        <a href="#" onclick="previewImage('${type}_card_front_preview');" class="preview-btn">View</a>
-                                                        <a href="#" onclick="removeImage('${type}_card_front_preview', '${type}_card_front');" class="remove-btn">Remove</a>
+                                    <div class="form-box mt-4">
+                                        <div class="row">
+                                            <div class="col-sm-6 text-center">
+                                                <label for="${type}_card_front" class="control-label">บัตรประชาชน (ด้านหน้า) 💳</label>
+                                                <div class="preview-uploads preview-uploads-card">
+                                                    <div class="image-placeholder">
+                                                        <span class="fa fa-cloud-upload-alt fa-3x text-muted"></span>
+                                                        <h5 class="text-muted mt-2">Drag and drop an image<br>or click to upload</h5>
+                                                        <input name="${type}_card_front" id="${type}_card_front" type="file" onchange="readURL(this, '${type}_card_front_preview');" class="d-none" accept="image/*">
+                                                    </div>
+                                                    <div class="image-preview" style="display: none;">
+                                                        <img id="${type}_card_front_preview" src="" alt="Front Name Card Preview">
+                                                        <div class="image-actions">
+                                                            <a href="#" onclick="previewImage('${type}_card_front_preview');" class="preview-btn">View</a>
+                                                            <a href="#" onclick="removeImage('${type}_card_front_preview', '${type}_card_front');" class="remove-btn">Remove</a>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <input type="hidden" name="${type}_card_front_current" id="${type}_card_front_current" value="">
                                             </div>
-                                            </label>
-                                            <input type="hidden" name="${type}_card_front_current" id="${type}_card_front_current" value="">
-                                        </div>
-                                        <div class="col-sm-6 text-center">
-                                            <label for="${type}_card_back" class="control-label">บัตรประชาชน (ด้านหลัง) 🪪
-                                            <div class="preview-uploads preview-uploads-card">
-                                                <div class="image-placeholder">
-                                                    <span class="fa fa-cloud-upload-alt fa-3x text-muted"></span>
-                                                    <h5 class="text-muted mt-2">Drag and drop an image<br>or click to upload</h5>
-                                                    <input name="${type}_card_back" id="${type}_card_back" type="file" onchange="readURL(this, '${type}_card_back_preview');" class="d-none" accept="image/*">
-                                                </div>
-                                                <div class="image-preview" style="display: none;">
-                                                    <img id="${type}_card_back_preview" src="" alt="Back Name Card Preview">
-                                                    <div class="image-actions">
-                                                        <a href="#" onclick="previewImage('${type}_card_back_preview');" class="preview-btn">View</a>
-                                                        <a href="#" onclick="removeImage('${type}_card_back_preview', '${type}_card_back');" class="remove-btn">Remove</a>
+                                            <div class="col-sm-6 text-center">
+                                                <label for="${type}_card_back" class="control-label">บัตรประชาชน (ด้านหลัง) 🪪</label>
+                                                <div class="preview-uploads preview-uploads-card">
+                                                    <div class="image-placeholder">
+                                                        <span class="fa fa-cloud-upload-alt fa-3x text-muted"></span>
+                                                        <h5 class="text-muted mt-2">Drag and drop an image<br>or click to upload</h5>
+                                                        <input name="${type}_card_back" id="${type}_card_back" type="file" onchange="readURL(this, '${type}_card_back_preview');" class="d-none" accept="image/*">
+                                                    </div>
+                                                    <div class="image-preview" style="display: none;">
+                                                        <img id="${type}_card_back_preview" src="" alt="Back Name Card Preview">
+                                                        <div class="image-actions">
+                                                            <a href="#" onclick="previewImage('${type}_card_back_preview');" class="preview-btn">View</a>
+                                                            <a href="#" onclick="removeImage('${type}_card_back_preview', '${type}_card_back');" class="remove-btn">Remove</a>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            </label>
-                                            <input type="hidden" name="${type}_card_back_current" id="${type}_card_back_current" value="">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-box mt-4">
-                                    <h6 class="control-label">ช่องทางการติดต่อ 📞</h6>
-                                    <hr class="mt-2 mb-4">
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="${type}_email" class="control-label"><i class="fas fa-envelope" style="color: #da4636ff; margin-right: 5px;"></i> Email </label>
-                                                <input type="email" name="${type}_email" id="${type}_email" class="form-control">
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="${type}_mobile" class="control-label"><i class="fas fa-phone-alt" style="color: #2c85d2ff; margin-right: 5px;"></i> เบอร์มือถือ </label>
-                                                <input type="text" name="${type}_mobile" id="${type}_mobile" class="form-control">
+                                                <input type="hidden" name="${type}_card_back_current" id="${type}_card_back_current" value="">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="${type}_facebook" class="control-label"><i class="fab fa-facebook" style="color: #4267B2; margin-right: 5px;"></i> Facebook </label>
-                                                <input type="text" name="${type}_facebook" id="${type}_facebook" class="form-control">
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="${type}_line" class="control-label"><i class="fab fa-line" style="color: #00B900; margin-right: 5px;"></i> Line ID </label>
-                                                <input type="text" name="${type}_line" id="${type}_line" class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="${type}_ig" class="control-label"><i class="fab fa-instagram" style="color: #E1306C; margin-right: 5px;"></i> Instagram </label>
-                                                <input type="text" name="${type}_ig" id="${type}_ig" class="form-control">
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="${type}_address" class="control-label"><i class="fas fa-map-marker-alt" style="color: #ff9800; margin-right: 5px;"></i> ที่อยู่</label>
-                                                <textarea name="${type}_address" id="${type}_address" class="form-control" rows="2"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
 
-                        <div class="tab-pane fade" id="${type}_bio_tab">
-                            <form id="frm_${type}_bio" class="mt-3">
-                                <div class="form-box">
-                                    <div class="form-group">
-                                        <label for="${type}_bio" class="control-label"><i class="fas fa-book-open" style="color: #ff9800; margin-right: 5px;"></i> Biography </label>
-                                        <textarea name="${type}_bio" id="${type}_bio" class="form-control" rows="3"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="${type}_education" class="control-label"><i class="fas fa-graduation-cap" style="color: #ff9800; margin-right: 5px;"></i> Education </label>
-                                        <textarea name="${type}_education" id="${type}_education" class="form-control" rows="3"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="${type}_experience" class="control-label"><i class="fas fa-briefcase" style="color: #ff9800; margin-right: 5px;"></i> Experience </label>
-                                        <textarea name="${type}_experience" id="${type}_experience" class="form-control" rows="3"></textarea>
-                                    </div>
-                                    <div class="form-group row">
-                                        <div class="col-sm-6">
-                                            <label for="${type}_company" class="control-label"><i class="fas fa-building" style="color: #ff9800; margin-right: 5px;"></i> Workplace/School </label>
-                                            <input type="text" name="${type}_company" id="${type}_company" class="form-control">
+                                    <div class="form-box mt-4">
+                                        <h6 class="control-label">ช่องทางการติดต่อ </h6>
+                                        <hr class="mt-2 mb-4">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="${type}_email" class="control-label"><i class="fas fa-envelope" style="color: #da4636ff; margin-right: 5px;"></i> Email </label>
+                                                    <input type="email" name="${type}_email" id="${type}_email" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="${type}_mobile" class="control-label"><i class="fas fa-phone-alt" style="color: #2c85d2ff; margin-right: 5px;"></i> เบอร์มือถือ </label>
+                                                    <input type="text" name="${type}_mobile" id="${type}_mobile" class="form-control">
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-sm-6">
-                                            <label for="${type}_position" class="control-label"><i class="fas fa-user-tag" style="color: #ff9800; margin-right: 5px;"></i> Position </label>
-                                            <input type="text" name="${type}_position" id="${type}_position" class="form-control">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="${type}_facebook" class="control-label"><i class="fab fa-facebook" style="color: #4267B2; margin-right: 5px;"></i> Facebook </label>
+                                                    <input type="text" name="${type}_facebook" id="${type}_facebook" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="${type}_line" class="control-label"><i class="fab fa-line" style="color: #00B900; margin-right: 5px;"></i> Line ID </label>
+                                                    <input type="text" name="${type}_line" id="${type}_line" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="${type}_ig" class="control-label"><i class="fab fa-instagram" style="color: #E1306C; margin-right: 5px;"></i> Instagram </label>
+                                                    <input type="text" name="${type}_ig" id="${type}_ig" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="${type}_address" class="control-label"><i class="fas fa-map-marker-alt" style="color: #ff9800; margin-right: 5px;"></i> ที่อยู่</label>
+                                                    <textarea name="${type}_address" id="${type}_address" class="form-control" rows="2"></textarea>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="form-group row">
-                                        <div class="col-sm-6">
-                                            <label for="${type}_religion" class="control-label"><i class="fas fa-hand-holding-heart" style="color: #ff9800; margin-right: 5px;"></i> Religion </label>
-                                            <input type="text" name="${type}_religion" id="${type}_religion" class="form-control">
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <label for="${type}_bloodgroup" class="control-label"><i class="fas fa-tint" style="color: #ff9800; margin-right: 5px;"></i> Blood Group </label>
-                                            <input type="text" name="${type}_bloodgroup" id="${type}_bloodgroup" class="form-control">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="${type}_attach_document" class="control-label"><i class="fas fa-paperclip" style="color: #ff9800; margin-right: 5px;"></i> Other Attachments </label>
-                                        <div id="attach-document-fields">
-                                        </div>
-                                        <button type="button" class="btn btn-default mt-2" onclick="addDocumentField('', '${type}', true)"><i class="fas fa-plus"></i> Add Document</button>
-                                    </div>
-                                    <input type="hidden" name="${type}_attach_document_current[]" > 
-                                </div>
-                            </form>
-                        </div>
+                                </form>
+                            </div>
 
-                        <div class="tab-pane fade" id="${type}_favorite_tab">
-                            <form id="frm_${type}_favorite" class="mt-3">
-                                <div class="form-box">
-                                    <div class="form-group row">
-                                        <div class="col-sm-6">
-                                            <label for="${type}_hobby" class="control-label"><i class="fas fa-palette" style="color: #ff9800; margin-right: 5px;"></i> Hobby </label>
-                                            <input type="text" name="${type}_hobby" id="${type}_hobby" class="form-control">
+                            <div class="tab-pane fade" id="${type}_bio_tab">
+                                <form id="frm_${type}_bio" class="mt-3">
+                                    <div class="form-box">
+                                        <div class="form-group">
+                                            <label for="${type}_bio" class="control-label"><i class="fas fa-book-open" style="color: #ff9800; margin-right: 5px;"></i> Biography </label>
+                                            <textarea name="${type}_bio" id="${type}_bio" class="form-control" rows="3"></textarea>
                                         </div>
-                                        <div class="col-sm-6">
-                                            <label for="${type}_music" class="control-label"><i class="fas fa-music" style="color: #ff9800; margin-right: 5px;"></i> Favorite Music </label>
-                                            <input type="text" name="${type}_music" id="${type}_music" class="form-control">
+                                        <div class="form-group">
+                                            <label for="${type}_education" class="control-label"><i class="fas fa-graduation-cap" style="color: #ff9800; margin-right: 5px;"></i> Education </label>
+                                            <textarea name="${type}_education" id="${type}_education" class="form-control" rows="3"></textarea>
                                         </div>
+                                        <div class="form-group">
+                                            <label for="${type}_experience" class="control-label"><i class="fas fa-briefcase" style="color: #ff9800; margin-right: 5px;"></i> Experience </label>
+                                            <textarea name="${type}_experience" id="${type}_experience" class="form-control" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group g-4 row">
+                                            <div class="col-sm-6">
+                                                <label for="${type}_company" class="control-label"><i class="fas fa-building" style="color: #ff9800; margin-right: 5px;"></i> Workplace/School </label>
+                                                <input type="text" name="${type}_company" id="${type}_company" class="form-control">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="${type}_position" class="control-label"><i class="fas fa-user-tag" style="color: #ff9800; margin-right: 5px;"></i> Position </label>
+                                                <input type="text" name="${type}_position" id="${type}_position" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group g-4 row">
+                                            <div class="col-sm-6">
+                                                <label for="${type}_religion" class="control-label"><i class="fas fa-hand-holding-heart" style="color: #ff9800; margin-right: 5px;"></i> Religion </label>
+                                                <input type="text" name="${type}_religion" id="${type}_religion" class="form-control">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="${type}_bloodgroup" class="control-label"><i class="fas fa-tint" style="color: #ff9800; margin-right: 5px;"></i> Blood Group </label>
+                                                <input type="text" name="${type}_bloodgroup" id="${type}_bloodgroup" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="${type}_attach_document" class="control-label"><i class="fas fa-paperclip" style="color: #ff9800; margin-right: 5px;"></i> Other Attachments </label>
+                                            <div id="attach-document-fields"></div>
+                                            <button type="button" class="btn btn-default mt-2" onclick="addDocumentField('', '${type}', true)"><i class="fas fa-plus"></i> Add Document</button>
+                                        </div>
+                                        <input type="hidden" name="${type}_attach_document_current[]">
                                     </div>
-                                    <div class="form-group row">
-                                        <div class="col-sm-6">
-                                            <label for="${type}_movie" class="control-label"><i class="fas fa-film" style="color: #ff9800; margin-right: 5px;"></i> Favorite Movies </label>
-                                            <input type="text" name="${type}_movie" id="${type}_movie" class="form-control">
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <label for="${type}_goal" class="control-label"><i class="fas fa-bullseye" style="color: #ff9800; margin-right: 5px;"></i> Life Goal </label>
-                                            <input type="text" name="${type}_goal" id="${type}_goal" class="form-control">
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                                </form>
+                            </div>
 
-                        <div class="tab-pane fade" id="${type}_setup_tab">
-                            <form id="frm_${type}_setup" class="mt-3">
-                                <div class="form-box">
-                                    <div class="form-group">
-                                        <label for="${type}_username" class="control-label"><i class="fas fa-user" style="color: #ff9800; margin-right: 5px;"></i> Username *</label>
-                                        <input type="text" name="${type}_username" id="${type}_username" class="form-control required-field-input" required>
+                            <div class="tab-pane fade" id="${type}_favorite_tab">
+                                <form id="frm_${type}_favorite" class="mt-3">
+                                    <div class="form-box">
+                                        <div class="form-group g-4 row">
+                                            <div class="col-sm-6">
+                                                <label for="${type}_hobby" class="control-label"><i class="fas fa-palette" style="color: #ff9800; margin-right: 5px;"></i> Hobby </label>
+                                                <input type="text" name="${type}_hobby" id="${type}_hobby" class="form-control">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="${type}_music" class="control-label"><i class="fas fa-music" style="color: #ff9800; margin-right: 5px;"></i> Favorite Music </label>
+                                                <input type="text" name="${type}_music" id="${type}_music" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group g-4 row">
+                                            <div class="col-sm-6">
+                                                <label for="${type}_movie" class="control-label"><i class="fas fa-film" style="color: #ff9800; margin-right: 5px;"></i> Favorite Movies </label>
+                                                <input type="text" name="${type}_movie" id="${type}_movie" class="form-control">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="${type}_goal" class="control-label"><i class="fas fa-bullseye" style="color: #ff9800; margin-right: 5px;"></i> Life Goal </label>
+                                                <input type="text" name="${type}_goal" id="${type}_goal" class="form-control">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="${type}_password" class="control-label"><i class="fas fa-lock" style="color: #ff9800; margin-right: 5px;"></i> Password </label>
-                                        <input type="password" name="${type}_password" id="${type}_password" class="form-control">
-                                        <small class="text-muted">Fill in only if you want to change the password</small>
+                                </form>
+                            </div>
+
+                            <div class="tab-pane fade" id="${type}_setup_tab">
+                                <form id="frm_${type}_setup" class="mt-3">
+                                    <div class="form-box">
+                                        <div class="form-group">
+                                            <label for="${type}_username" class="control-label"><i class="fas fa-user" style="color: #ff9800; margin-right: 5px;"></i> Username *</label>
+                                            <input type="text" name="${type}_username" id="${type}_username" class="form-control required-field-input" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="${type}_password" class="control-label"><i class="fas fa-lock" style="color: #ff9800; margin-right: 5px;"></i> Password </label>
+                                            <input type="password" name="${type}_password" id="${type}_password" class="form-control">
+                                            <small class="text-muted">Fill in only if you want to change the password</small>
+                                        </div>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
+                    <div class="card-footer text-right" style="padding: 1em;">
+                        <button type="button" class="btn btn-white" onclick="window.history.back()">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+                    </div>
                 </div>
-                <div class="card-footer text-right" style="padding: 1em;">
-                    <button type="button" class="btn btn-white" onclick="window.history.back()">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
-                </div>
-            </div>
         `;
 
         $("#form-container").html(formTemplate);
