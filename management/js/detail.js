@@ -143,6 +143,9 @@ function buildPage(page) {
         case 'group':
             buildGroupPage();
             break;
+        case 'channel':
+            buildChannelPage();
+            break;
         case 'registration':
             buildRegistrationPage();
             break;
