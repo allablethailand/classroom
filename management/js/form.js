@@ -566,7 +566,101 @@ function loadData(type, id) {
     });
 }
 
+// Function for form validation
+function validateForm(type) {
+    let isValid = true;
+    let firstInvalidField = null;
+
+    // Define the list of required fields and their validation rules
+    const fieldsToValidate = [
+        // Personal Contact Tab
+        { id: `${type}_perfix`, tab: `${type}_personal_contact_tab`, message: 'Please select a prefix.' },
+        { id: `${type}_firstname_en`, tab: `${type}_personal_contact_tab`, message: 'Please enter a first name in English.', pattern: /^[A-Za-z\s]+$/ },
+        { id: `${type}_lastname_en`, tab: `${type}_personal_contact_tab`, message: 'Please enter a last name in English.', pattern: /^[A-Za-z\s]+$/ },
+        { id: `${type}_idcard`, tab: `${type}_personal_contact_tab`, message: 'ID card number must be 13 digits.', pattern: /^[0-9]{13}$/ },
+        { id: `${type}_passport`, tab: `${type}_personal_contact_tab`, message: 'Please enter a passport number.', optional: true }, // Optional but still checked
+        { id: `${type}_gender`, tab: `${type}_personal_contact_tab`, message: 'Please select a gender.' },
+        { id: `${type}_birth_date`, tab: `${type}_personal_contact_tab`, message: 'Please select a date of birth.' },
+        { id: `${type}_email`, tab: `${type}_personal_contact_tab`, message: 'Please enter a valid email address.', pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
+        { id: `${type}_mobile`, tab: `${type}_personal_contact_tab`, message: 'Please enter a mobile number.', optional: true }, // Assuming mobile is not always required
+        { id: `${type}_address`, tab: `${type}_personal_contact_tab`, message: 'Please enter an address.' },
+        
+        // Biography Tab
+        { id: `${type}_bio`, tab: `${type}_bio_tab`, message: 'Please enter a biography.' },
+        { id: `${type}_education`, tab: `${type}_bio_tab`, message: 'Please enter your education history.' },
+        { id: `${type}_experience`, tab: `${type}_bio_tab`, message: 'Please enter your experience.' },
+        { id: `${type}_company`, tab: `${type}_bio_tab`, message: 'Please enter your workplace or school.' },
+        { id: `${type}_position`, tab: `${type}_bio_tab`, message: 'Please enter your position.' },
+
+        // Login Setup Tab
+        { id: `${type}_username`, tab: `${type}_setup_tab`, message: 'Username must be at least 6 characters.', pattern: /^.{6,}$/ },
+        { id: `${type}_password`, tab: `${type}_setup_tab`, message: 'Password must be at least 6 characters.', pattern: /^.{6,}$/, conditional: true } // Conditional field, required only when creating new user
+    ];
+
+    // Reset all previous error states
+    $(`.form-control`).removeClass('required-field-input-invalid');
+    $('.alert-danger').remove();
+
+    // Loop through each field to perform validation
+    for (const field of fieldsToValidate) {
+        const $input = $(`#${field.id}`);
+        const value = $input.val().trim();
+        let currentFieldIsValid = true;
+
+        // Check for required fields
+        if (!field.optional && value === '') {
+            currentFieldIsValid = false;
+        }
+
+        // Check for specific patterns (e.g., English alphabet, numbers)
+        if (value !== '' && field.pattern && !field.pattern.test(value)) {
+            currentFieldIsValid = false;
+        }
+
+        // Handle specific conditions
+        if (field.id === `${type}_password` && ($(`#${type}_id`).val() && value === '')) {
+            currentFieldIsValid = true; // Don't require password on edit if not changed
+        }
+        
+        // If a field is not valid, mark it and break the loop
+        if (!currentFieldIsValid) {
+            isValid = false;
+            $input.addClass('required-field-input-invalid');
+            if (!firstInvalidField) {
+                firstInvalidField = { input: $input, tab: field.tab, message: field.message };
+            }
+        } else {
+            $input.removeClass('required-field-input-invalid');
+        }
+    }
+
+    if (!isValid) {
+        // Show an error message at the top of the form
+        $('#form-container .card-header').after(`
+            <div class="alert alert-danger mx-3" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> <strong>Validation Error!</strong> Please fill in all required fields and correct any formatting errors.
+            </div>
+        `);
+        
+        // Switch to the correct tab and focus on the first invalid field
+        $(`a[href="#${firstInvalidField.tab}"]`).tab('show');
+        firstInvalidField.input.focus();
+        
+        // Add a tooltip or message near the input
+        if (firstInvalidField.message) {
+             console.log(`Validation Error: ${firstInvalidField.message}`);
+             // Note: For a more advanced UI, you would add a tooltip here.
+        }
+    }
+
+    return isValid;
+}
+
 function handleFormSubmission(type, id) {
+
+    if (!validateForm(type)) {
+        return; // Stop the function if validation fails
+    }
     const $form = $(`#frm_${type}`);
     const formData = new FormData();
     let isValid = true;
