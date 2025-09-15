@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="/dist/vue/loading.min.css">
 <link rel="stylesheet" href="/dist/element-ui/css/lib/theme-chalk/index.css">
 <link rel="stylesheet" href="/dist/element-ui/css/lib/theme-chalk/display.css">
-<link rel="stylesheet" href="/classroom/management/css/management.css?v=<?php echo time(); ?>">
+<link rel="stylesheet" href="/classroom/management/css/form.css?v=<?php echo time(); ?>">
 <link href="/classroom/css/classroom-component.css?v=<?php echo time(); ?>" rel="stylesheet">
 <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
 <script src="/dist/js/table-to-excel/tableToExcel.js" type="text/javascript"></script>
