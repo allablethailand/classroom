@@ -36,7 +36,7 @@
                                                         <div class="image-preview" style="display: none;">
                                                             <img id="${type}_image_profile_preview" src="" alt="Image Preview">
                                                             <div class="image-actions">
-                                                                <a href="#" onclick="previewImage('${type}_image_profile_preview');" class="preview-btn">View</a>
+                                                                
                                                                 <a href="#" onclick="removeImage('${type}_image_profile_preview', '${type}_image_profile');" class="remove-btn">Remove</a>
                                                             </div>
                                                         </div>
@@ -122,7 +122,7 @@
                                                     <div class="image-preview" style="display: none;">
                                                         <img id="${type}_card_front_preview" src="" alt="Front Name Card Preview">
                                                         <div class="image-actions">
-                                                            <a href="#" onclick="previewImage('${type}_card_front_preview');" class="preview-btn">View</a>
+                                                            
                                                             <a href="#" onclick="removeImage('${type}_card_front_preview', '${type}_card_front');" class="remove-btn">Remove</a>
                                                         </div>
                                                     </div>
@@ -140,7 +140,7 @@
                                                     <div class="image-preview" style="display: none;">
                                                         <img id="${type}_card_back_preview" src="" alt="Back Name Card Preview">
                                                         <div class="image-actions">
-                                                            <a href="#" onclick="previewImage('${type}_card_back_preview');" class="preview-btn">View</a>
+                                                            
                                                             <a href="#" onclick="removeImage('${type}_card_back_preview', '${type}_card_back');" class="remove-btn">Remove</a>
                                                         </div>
                                                     </div>
@@ -289,7 +289,7 @@
                         </div>
                     </div>
                     <div class="card-footer text-right" style="padding: 1em;">
-                        <button type="button" class="btn btn-white" onclick="window.history.back()">Close</button>
+                        <button type="button" class="btn btn-white" onclick="window.location.href = '/classroom/management/'">Close</button>
                         <button type="button" class="btn btn-primary" id="saveBtn" style="    background-color: #ff9900;">Save</button>
                     </div>
                 </div>
