@@ -144,7 +144,10 @@ function fetchData($type, $id) {
         if (isset($data[$type . '_attach_document']) && !empty($data[$type . '_attach_document'])) {
             $docs_str = $data[$type . '_attach_document'];
             $docs_arr = explode('|', $docs_str);
-            $full_paths = array_map('GetUrl', $docs_arr);
+            
+            // Now convert each relative path to a full URL
+            $full_paths = array_map('GetUrl', $docs_arr); 
+            
             // Re-join the array into a string with '|' for JS to split easily
             $data[$type . '_attach_document'] = implode('|', array_filter($full_paths));
         }
@@ -193,10 +196,12 @@ function saveData($post) {
 
         // Handle attached documents
         $attached_docs = [];
-        // Add new uploaded documents
+
+        // 1. Add new uploaded documents
         if (isset($_FILES[$type . '_attach_document']['tmp_name']) && is_array($_FILES[$type . '_attach_document']['tmp_name'])) {
             foreach ($_FILES[$type . '_attach_document']['tmp_name'] as $key => $tmp_name) {
                 if ($tmp_name) {
+                    // Your upload function should handle this correctly
                     $new_file_path = uploadFile($_FILES, $type . '_attach_document', '', $key);
                     if ($new_file_path) {
                         $attached_docs[] = $new_file_path;
@@ -205,21 +210,24 @@ function saveData($post) {
             }
         }
 
-        // Add existing documents that were not removed
+        // 2. Add existing documents that were not removed
         if (isset($post[$type . '_attach_document_current']) && is_array($post[$type . '_attach_document_current'])) {
             foreach ($post[$type . '_attach_document_current'] as $doc_url) {
                 if (!empty(trim($doc_url))) {
-                    $path_to_save = extractPathFromUrl($doc_url);
+                    // You need a function to convert the full URL back to the relative path
+                    $path_to_save = extractPathFromUrl($doc_url); 
                     if (!empty($path_to_save)) {
                         $attached_docs[] = $path_to_save;
                     }
                 }
             }
         }
-        
+
+        // 3. Combine and save to database
+        // Use array_unique to remove duplicates (if any)
         $attached_docs_unique = array_unique(array_filter($attached_docs));
         $attached_docs_str = implode('|', $attached_docs_unique);
-        
+
         $gender_for_db = isset($post[$type . '_gender']) ? $post[$type . '_gender'] : 'N'; // รับค่า M, F, N ที่แปลงมาจาก JS แล้ว
 
         $data = [

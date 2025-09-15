@@ -244,7 +244,7 @@
                                         </div>
                                         <button type="button" class="btn btn-default mt-2" onclick="addDocumentField('', '${type}', true)"><i class="fas fa-plus"></i> Add Document</button>
                                     </div>
-                                    <input type="hidden" name="${type}_attach_document_current" id="${type}_attach_document_current" value="">
+                                    <input type="hidden" name="${type}_attach_document_current[]" > 
                                 </div>
                             </form>
                         </div>
@@ -415,36 +415,31 @@ function removeImage(previewId, inputName) {
 }
 
 // **New/Modified Function for Attach Documents**
- function addDocumentField(docUrl = '', type, isNew = true) {
-        const documentContainer = $(`#attach-document-fields`);
-        const docId = `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const fileName = docUrl ? docUrl.substring(docUrl.lastIndexOf('/') + 1) : '';
+function addDocumentField(docUrl = '', type, isNew = true) {
+    const documentContainer = $(`#attach-document-fields`);
+    const docId = `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const fileName = docUrl ? docUrl.substring(docUrl.lastIndexOf('/') + 1) : '';
 
-        const newFieldHtml = `
-            <div class="input-group mb-2 document-field" id="${docId}">
-                ${docUrl ? `
-                    <a href="${docUrl}" target="_blank" class="form-control btn btn-link text-left">
-                        <i class="fas fa-file document-file-icon"></i>
-                        <span class="document-file-link">${fileName}</span>
-                    </a>
-                ` : `
-                    <input type="file" class="form-control" name="${type}_attach_document[]" multiple>
-                `}
-                <div class="input-group-append">
-                    <button class="btn btn-danger" type="button" style="margin-top:5px" onclick="removeDocumentField('${docId}', '${docUrl}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+    const newFieldHtml = `
+        <div class="input-group mb-2 document-field" id="${docId}">
+            ${docUrl ? `
+                <a href="${docUrl}" target="_blank" class="form-control btn btn-link text-left">
+                    <i class="fas fa-file document-file-icon"></i>
+                    <span class="document-file-link">${fileName}</span>
+                </a>
+                <input type="hidden" name="${type}_attach_document_current[]" value="${docUrl}">
+            ` : `
+                <input type="file" class="form-control" name="${type}_attach_document[]" multiple>
+            `}
+            <div class="input-group-append">
+                <button class="btn btn-danger" type="button" style="margin-top:5px" onclick="removeDocumentField('${docId}', '${docUrl}')">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
-        `;
-
-        documentContainer.append(newFieldHtml);
-
-        // If it's a new file upload field, add the 'multiple' attribute to the input
-        if (isNew) {
-            $(`#${docId} input[type="file"]`).attr('multiple', 'multiple');
-        }
-    }
+        </div>
+    `;
+    documentContainer.append(newFieldHtml);
+}
 
 function removeDocumentField(docId, docUrl) {
     // If a document URL is provided, we need to handle the deletion logic on the server
