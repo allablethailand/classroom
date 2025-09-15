@@ -5,13 +5,13 @@
         const formTemplate = `
            <div class="card">
                     <div class="card-header">
-                        <h5 class="modal-title">${formTitle}</h5>
+                        <h5 class="modal-title" style="color: #7a7a7a;">${formTitle}</h5>
                     </div>
                     <div class="card-body">
                         <ul class="nav nav-tabs nav-origami nav-contact " style="font-size:1.2em">
-                            <li class="nav active"><a href="#${type}_personal_contact_tab" data-toggle="tab"><i class="fas fa-user-circle" style="color: #87bdecff;"></i> Personal Contact </a></li>
-                            <li class="nav"><a href="#${type}_bio_tab" data-toggle="tab"><i class="fas fa-address-card" style="color: #44ad5aa6;"></i> Biography </a></li>
-                            <li class="nav"><a href="#${type}_favorite_tab" data-toggle="tab"><i class="fas fa-heart" style="color: #c26565ff;"></i> Favorite </a></li>
+                            <li class="nav active"><a href="#${type}_personal_contact_tab" data-toggle="tab"><i class="fas fa-user-circle" style="color: #0080ef;"></i> Personal Contact </a></li>
+                            <li class="nav"><a href="#${type}_bio_tab" data-toggle="tab"><i class="fas fa-address-card" style="color: #0fa22ea6;"></i> Biography </a></li>
+                            <li class="nav"><a href="#${type}_favorite_tab" data-toggle="tab"><i class="fas fa-heart" style="color: #e42c2c;"></i> Favorite </a></li>
                             <li class="nav"><a href="#${type}_setup_tab" data-toggle="tab"><i class="fas fa-cog" style="color: #6c757d;"></i> Login Setup </a></li>
                         </ul>
                         <div class="tab-content">
@@ -157,13 +157,13 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label for="${type}_email" class="control-label"><i class="fas fa-envelope" style="color: #da4636ff; margin-right: 5px;"></i> Email </label>
-                                                    <input type="email" name="${type}_email" id="${type}_email" class="form-control">
+                                                    <input type="email" name="${type}_email" id="${type}_email" class="form-control" style="padding: 2rem 1rem;">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label for="${type}_mobile" class="control-label"><i class="fas fa-phone-alt" style="color: #2c85d2ff; margin-right: 5px;"></i> เบอร์มือถือ </label>
-                                                    <input type="text" name="${type}_mobile" id="${type}_mobile" class="form-control">
+                                                    <input type="text" name="${type}_mobile" id="${type}_mobile" class="form-control" style="padding: 2rem 1rem;">
                                                 </div>
                                             </div>
                                         </div>
@@ -171,13 +171,13 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label for="${type}_facebook" class="control-label"><i class="fab fa-facebook" style="color: #4267B2; margin-right: 5px;"></i> Facebook </label>
-                                                    <input type="text" name="${type}_facebook" id="${type}_facebook" class="form-control">
+                                                    <input type="text" name="${type}_facebook" id="${type}_facebook" class="form-control" style="padding: 2rem 1rem;">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label for="${type}_line" class="control-label"><i class="fab fa-line" style="color: #00B900; margin-right: 5px;"></i> Line ID </label>
-                                                    <input type="text" name="${type}_line" id="${type}_line" class="form-control">
+                                                    <input type="text" name="${type}_line" id="${type}_line" class="form-control" style="padding: 2rem 1rem;">
                                                 </div>
                                             </div>
                                         </div>
@@ -185,12 +185,12 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label for="${type}_ig" class="control-label"><i class="fab fa-instagram" style="color: #E1306C; margin-right: 5px;"></i> Instagram </label>
-                                                    <input type="text" name="${type}_ig" id="${type}_ig" class="form-control">
+                                                    <input type="text" name="${type}_ig" id="${type}_ig" class="form-control" style="padding: 2rem 1rem;">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label for="${type}_address" class="control-label"><i class="fas fa-map-marker-alt" style="color: #e48903a6; margin-right: 5px;"></i> ที่อยู่</label>
+                                                    <label for="${type}_address" class="control-label"><i class="fas fa-map-marker-alt" style="color: #ff9801; margin-right: 5px;"></i> ที่อยู่</label>
                                                     <textarea name="${type}_address" id="${type}_address" class="form-control" rows="2"></textarea>
                                                 </div>
                                             </div>
@@ -203,35 +203,35 @@
                                 <form id="frm_${type}_bio" class="mt-3">
                                     <div class="form-box">
                                         <div class="form-group">
-                                            <label for="${type}_bio" class="control-label"><i class="fas fa-book-open" style="color: #44ad5aa6; margin-right: 5px;"></i> Biography </label>
+                                            <label for="${type}_bio" class="control-label"><i class="fas fa-book-open" style="color: #0fa22ea6; margin-right: 5px;"></i> Biography </label>
                                             <textarea name="${type}_bio" id="${type}_bio" class="form-control" rows="3"></textarea>
                                         </div>
                                         <div class="form-group">
-                                            <label for="${type}_education" class="control-label"><i class="fas fa-graduation-cap" style="color: #87bdecff; margin-right: 5px;"></i> Education </label>
+                                            <label for="${type}_education" class="control-label"><i class="fas fa-graduation-cap" style="color: #0080ef; margin-right: 5px;"></i> Education </label>
                                             <textarea name="${type}_education" id="${type}_education" class="form-control" rows="3"></textarea>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group" style="margin-bottom: 3.5em;">
                                             <label for="${type}_experience" class="control-label"><i class="fas fa-briefcase" style="color: #ea6523; margin-right: 5px;"></i> Experience </label>
                                             <textarea name="${type}_experience" id="${type}_experience" class="form-control" rows="3"></textarea>
                                         </div>
                                         <div class="form-group g-4 row">
                                             <div class="col-sm-6">
                                                 <label for="${type}_company" class="control-label"><i class="fas fa-building" style="color: #6c757d; margin-right: 5px;"></i> Workplace/School </label>
-                                                <input type="text" name="${type}_company" id="${type}_company" class="form-control">
+                                                <input type="text" name="${type}_company" id="${type}_company" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                             <div class="col-sm-6">
                                                 <label for="${type}_position" class="control-label"><i class="fas fa-user-tag" style="color: #6c757d; margin-right: 5px;"></i> Position </label>
-                                                <input type="text" name="${type}_position" id="${type}_position" class="form-control">
+                                                <input type="text" name="${type}_position" id="${type}_position" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                         </div>
                                         <div class="form-group g-4 row" style="margin-bottom:4.5em;">
                                             <div class="col-sm-6">
                                                 <label for="${type}_religion" class="control-label"><i class="fas fa-hand-holding-heart" style="color: #ecc379; margin-right: 5px;"></i> Religion </label>
-                                                <input type="text" name="${type}_religion" id="${type}_religion" class="form-control">
+                                                <input type="text" name="${type}_religion" id="${type}_religion" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                             <div class="col-sm-6">
                                                 <label for="${type}_bloodgroup" class="control-label"><i class="" style="color: #6c757d; margin-right: 5px;"></i> Blood Group </label>
-                                                <input type="text" name="${type}_bloodgroup" id="${type}_bloodgroup" class="form-control">
+                                                <input type="text" name="${type}_bloodgroup" id="${type}_bloodgroup" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -249,22 +249,22 @@
                                     <div class="form-box">
                                         <div class="form-group g-4 row">
                                             <div class="col-sm-6">
-                                                <label for="${type}_hobby" class="control-label"><i class="fas fa-palette" style="color: #af6accad; margin-right: 5px;"></i> Hobby </label>
-                                                <input type="text" name="${type}_hobby" id="${type}_hobby" class="form-control">
+                                                <label for="${type}_hobby" class="control-label"><i class="fas fa-palette" style="color: #d179f5; margin-right: 5px;"></i> Hobby </label>
+                                                <input type="text" name="${type}_hobby" id="${type}_hobby" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                             <div class="col-sm-6">
-                                                <label for="${type}_music" class="control-label"><i class="fas fa-music" style="color: #5f82eb; margin-right: 5px;"></i> Favorite Music </label>
-                                                <input type="text" name="${type}_music" id="${type}_music" class="form-control">
+                                                <label for="${type}_music" class="control-label"><i class="fas fa-music" style="color: #0080ef; margin-right: 5px;"></i> Favorite Music </label>
+                                                <input type="text" name="${type}_music" id="${type}_music" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                         </div>
                                         <div class="form-group g-4 row">
                                             <div class="col-sm-6">
                                                 <label for="${type}_movie" class="control-label"><i class="fas fa-film" style="color: #a23131; margin-right: 5px;"></i> Favorite Movies </label>
-                                                <input type="text" name="${type}_movie" id="${type}_movie" class="form-control">
+                                                <input type="text" name="${type}_movie" id="${type}_movie" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                             <div class="col-sm-6">
-                                                <label for="${type}_goal" class="control-label"><i class="fas fa-bullseye" style="color: #55a356; margin-right: 5px;"></i> Life Goal </label>
-                                                <input type="text" name="${type}_goal" id="${type}_goal" class="form-control">
+                                                <label for="${type}_goal" class="control-label"><i class="fas fa-bullseye" style="color: #ffc800; margin-right: 5px;"></i> Life Goal </label>
+                                                <input type="text" name="${type}_goal" id="${type}_goal" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                         </div>
                                     </div>
@@ -290,7 +290,7 @@
                     </div>
                     <div class="card-footer text-right" style="padding: 1em;">
                         <button type="button" class="btn btn-white" onclick="window.history.back()">Close</button>
-                        <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+                        <button type="button" class="btn btn-primary" id="saveBtn" style="    background-color: #ff9900;">Save</button>
                     </div>
                 </div>
         `;
