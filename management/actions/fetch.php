@@ -220,9 +220,7 @@ function saveData($post) {
         $attached_docs_unique = array_unique(array_filter($attached_docs));
         $attached_docs_str = implode('|', $attached_docs_unique);
         
-        $gender_input = isset($post[$type . '_gender']) ? $post[$type . '_gender'] : null;
-        $gender_map_to_db = ['ชาย' => 'M', 'หญิง' => 'F', 'M' => 'M', 'F' => 'F'];
-        $gender_for_db = isset($gender_map_to_db[$gender_input]) ? $gender_map_to_db[$gender_input] : $gender_input;
+        $gender_for_db = isset($post[$type . '_gender']) ? $post[$type . '_gender'] : 'N'; // รับค่า M, F, N ที่แปลงมาจาก JS แล้ว
 
         $data = [
             $type . '_perfix' => isset($post[$type . '_perfix']) ? $post[$type . '_perfix'] : null,
