@@ -18,8 +18,9 @@
 
     // --- 2. Build the query to fetch students and their course name and GROUP NAME ---
     // เพิ่ม group_color เข้ามาใน SELECT statement
+    // เพิ่ม group_logo เข้ามาใน SELECT statement
     $query_parts = [
-        "SELECT cs.student_id, cs.student_firstname_th, cs.student_lastname_th, cs.student_image_profile, cs.student_mobile, cs.student_email, cs.student_company, cs.student_position, ct.classroom_name, cg.group_name, cg.group_color", 
+        "SELECT cs.student_id, cs.student_firstname_th, cs.student_lastname_th, cs.student_image_profile, cs.student_mobile, cs.student_email, cs.student_company, cs.student_position, ct.classroom_name, cg.group_name, cg.group_color, cg.group_logo", 
         "FROM classroom_student cs",
         "INNER JOIN classroom_student_join csj ON cs.student_id = csj.student_id",
         "LEFT JOIN classroom_template ct ON csj.classroom_id = ct.classroom_id",
@@ -233,26 +234,26 @@
       .student-card {
           background: #fff;
           border-radius: 20px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.1); /* เพิ่มเงาให้กล่อง */
           padding: 20px;
           display: flex;
-          align-items: center;
+          align-items: center; /* แก้เป็น center เพื่อจัดรูปภาพให้อยู่ตรงกลางแกน Y */
           transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
       .student-card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.15); /* เพิ่มเงาเมื่อ hover */
           text-decoration: none;
           color: inherit;
       }
       .student-avatar {
-          width: 60px;
-          height: 60px;
+          width: 100px; /* เพิ่มขนาดรูปโปรไฟล์ */
+          height: 100px; /* เพิ่มขนาดรูปโปรไฟล์ */
           border-radius: 50%;
           overflow: hidden;
           margin-right: 20px;
           flex-shrink: 0;
-          border: 3px solid #ff8c00;
+          border: 4px solid #ff8c00; /* เพิ่มขนาดขอบรูป */
       }
       .student-avatar img {
           width: 100%;
@@ -263,27 +264,62 @@
           flex-grow: 1;
       }
       .student-name {
-          font-size: 1.2em;
+          font-size: 1.3em; /* เพิ่มขนาดฟอนต์ชื่อ */
           font-weight: 700;
           margin: 0 0 5px 0;
           color: #2c3e50;
       }
       .student-details {
-          font-size: 0.85em;
+          font-size: 0.9em; /* เพิ่มขนาดฟอนต์รายละเอียด */
           color: #7f8c8d;
           margin: 2px 0 0;
           display: flex;
           align-items: center;
       }
+      /* ปรับสีไอคอนตามประเภทข้อมูล */
       .student-details i {
           margin-right: 8px;
-          color: #ff8c00;
           min-width: 20px;
           text-align: center;
       }
+      .student-details i.fa-graduation-cap {
+        color: #3498db; /* Blue */
+      }
+      .student-details i.fa-building {
+        color: #95a5a6; /* Gray */
+      }
+      .student-details i.fa-briefcase {
+        color: #a0522d; /* Brown */
+      }
+      .student-details i.fa-phone {
+        color: #27ae60; /* Green */
+      }
+      .student-details i.fa-envelope {
+        color: #e74c3c; /* Red */
+      }
+
       .highlight-text {
-          font-size: 1em;
+          font-size: 1.1em; /* เพิ่มขนาดฟอนต์หัวข้อหลัก */
           font-weight: bold;
+      }
+      
+      /* เพิ่ม CSS สำหรับ Student ID และ Group Name */
+      .student-id-display {
+          font-size: 1.3em; /* ขนาดเท่ากับชื่อ */
+          font-weight: 700;
+          color: #ff8c00; /* ใช้สีส้มเพื่อเน้น */
+          margin-bottom: 5px;
+      }
+      .group-name-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .group-name-container img {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
       }
 </style>
 </head>
@@ -334,6 +370,7 @@
                 if ($num_rows > 0) {
                     foreach ($students as $row) {
                         $student_pic = !empty($row['student_image_profile']) ? GetUrl($row['student_image_profile'] ): '../../../images/default.png';
+                        $group_logo = !empty($row['group_logo']) ? GetUrl($row['group_logo']) : '../../../images/default.png';
                         // กำหนดสีขอบรูปภาพเริ่มต้นเป็นสีส้ม ถ้าไม่มี group_color
                         $border_color = !empty($row['group_color']) ? htmlspecialchars($row['group_color']) : '#ff8c00';
             ?>
@@ -342,14 +379,15 @@
         <img src="<?= htmlspecialchars($student_pic); ?>" alt="Student Avatar" onerror="this.src='../../../images/default.png'">
     </div>
     <div class="student-info">
+    <p class="student-id-display"><span style="margin-right:.5em;">ID:</span> <?= htmlspecialchars($row['student_id']); ?></p> 
     <h4 class="student-name">
         <?= htmlspecialchars($row['student_firstname_th'] . " " . $row['student_lastname_th']); ?>
     </h4>
     <p class="student-details highlight-text">
         <i class="fas fa-graduation-cap"></i> <?= !empty($row['classroom_name']) ? htmlspecialchars($row['classroom_name']) : "-"; ?>
     </p>
-    <p class="student-details highlight-text">
-        <i class="fas fa-users"></i> <?= !empty($row['group_name']) ? htmlspecialchars($row['group_name']) : "-"; ?>
+    <p class="student-details highlight-text group-name-container">
+        <img src="<?= htmlspecialchars($group_logo); ?>" alt="Group Logo"> <?= !empty($row['group_name']) ? htmlspecialchars($row['group_name']) : "-"; ?>
     </p>
     <p class="student-details">
         <i class="fas fa-building"></i> <?= !empty($row['student_company']) ? htmlspecialchars($row['student_company']) : "-"; ?>
@@ -386,8 +424,10 @@
             cards = document.getElementsByClassName('student-card');
             for (i = 0; i < cards.length; i++) {
                 a = cards[i];
-                txtValue = a.querySelector('.student-name').textContent || a.querySelector('.student-name').innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                // ค้นหาทั้งจากชื่อนักเรียนและ Student ID
+                var studentName = a.querySelector('.student-name').textContent || a.querySelector('.student-name').innerText;
+                var studentId = a.querySelector('.student-id-display').textContent || a.querySelector('.student-id-display').innerText;
+                if (studentName.toUpperCase().indexOf(filter) > -1 || studentId.toUpperCase().indexOf(filter) > -1) {
                     cards[i].style.display = "";
                 } else {
                     cards[i].style.display = "none";
@@ -407,6 +447,6 @@
             this.classList.remove('show');
         });
     </script>
-   
+    
 </body>
 </html>
