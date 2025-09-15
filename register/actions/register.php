@@ -33,15 +33,12 @@
             ]);
             exit;
         }
-        $channel_id = '';
-        if (!$channel) {
-            $channels = select_data(
-                "channel_id",
-                "classroom_channel",
-                "where md5(channel_id) = '{$channel}'"
-            );
-            $channel_id = $channels[0]['channel_id'];
-        }
+        $channels = select_data(
+            "channel_id",
+            "classroom_channel",
+            "where md5(channel_id) = '{$channel}'"
+        );
+        $channel_id = $channels[0]['channel_id'];
         $classrooms = select_data(
             "
                 template.classroom_id, 
@@ -171,7 +168,7 @@
             'register_require' => $register_require,
             'consent_status' => $consent_status,
             'form_data' => $form_data,
-            'channel_id' => $channel_id
+            'channel_id' => ($channel_id) ? $channel_id : ''
         ]);
         exit;
     }

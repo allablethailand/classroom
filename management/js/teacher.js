@@ -142,7 +142,7 @@ function manageTeacher(teacher_id) {
     
     
     // window.location.href = `/classroom/management/form?type=teacher&id=${teacher_id}`;
-    $.redirect(`form?type=teacher&id=${teacher_id}`,{classroom_id: classroom_id},'post','_self');
+    $.redirect(`form?type=teacher&id=${teacher_id}`,{classroom_id: classroom_id},'post','_blank');
 }
 
 function setupAddressAutocomplete() {

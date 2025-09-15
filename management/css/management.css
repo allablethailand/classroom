@@ -47,7 +47,6 @@ div#AvatarFileUpload > .avatar-selector > .avatar-selector-btn{
     background: #f5f5f59e;
     padding: 5px 7px;
     border-radius: 50% 50%;
-    font-size: 20px;
     color: #FF9900;
 }
 div#AvatarFileUpload > .avatar-selector > .avatar-selector-btn>img{
@@ -100,7 +99,6 @@ div#Avatar > .avatar-selector > .avatar-selector-btn{
     background: #f5f5f59e;
     padding: 5px 7px;
     border-radius: 50% 50%;
-    font-size: 20px;
     color: #FF9900;
 }
 div#Avatar > .avatar-selector > .avatar-selector-btn>img{
@@ -179,14 +177,13 @@ div#Avatar > .avatar-selector > .avatar-selector-btn>img{
 .badge {
     cursor: pointer;
 }
-a.badge{
+a.badge, a.share-link{
     position:relative;
 }
-.notofication-share{
+.notofication-share {
     position:absolute;
     top:25px;
     left:-15px;
-    font-size:11px;
     background:#555555;
     padding: 5px 10px 5px 10px;
     border-radius:5px;
@@ -214,9 +211,6 @@ a:hover .notofication-share{
     border-left: 7px solid transparent;
     content: '';
 }
-/* .modal.systemModal {
-    z-index: 9999999999 !important;
-} */
  .preview-uploads {
     border: 2px dashed #ccc;
     border-radius: 8px;
@@ -229,36 +223,29 @@ a:hover .notofication-share{
     justify-content: center;
     align-items: center;
 }
-
 .preview-uploads .image-placeholder {
     color: #999;
 }
-
 .preview-uploads .image-preview {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
 }
-
 .preview-uploads .image-preview img {
     max-width: 100%;
     max-height: 250px;
     border-radius: 6px;
     border: 1px solid #ddd;
 }
-
 .preview-uploads .image-actions {
     display: flex;
     gap: 15px;
 }
-
-.preview-uploads .preview-btn,
-.preview-uploads .remove-btn {
+.preview-uploads .preview-btn, .preview-uploads .remove-btn {
     color: #337ab7;
     text-decoration: none;
 }
-
 .preview-uploads .remove-btn {
     color: #ff9900;
 }
@@ -294,11 +281,11 @@ a:hover .notofication-share{
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     .control-label {
-         /* font-size: 1.4rem; */
-     /* font-weight: 600;  */
-    /* color: #333;  */
+         font-size: 1.4rem;
+    /* font-weight: 600;
+    color: #333; */
     display: block; /* ทำให้ label ขึ้นบรรทัดใหม่ เพื่อไม่ให้ติดกับ input */
-    /* margin-bottom: .5rem; เพิ่มระยะห่างด้านล่างของ label */
+    margin-bottom: .5rem; /* เพิ่มระยะห่างด้านล่างของ label */
     }
     .form-control {
         font-size: 1rem;
@@ -334,11 +321,11 @@ a:hover .notofication-share{
         padding-top: 2rem;
     }
     .input-group-addon {
-        /* background-color: #ff9800;
+        background-color: #ff9800;
         border: 1px solid #ff9800;
         color: white;
         padding: 0.75rem 1rem;
-        border-radius: 0 8px 8px 0; */
+        border-radius: 0 8px 8px 0;
     }
     .input-group-addon i {
         font-size: 1.2rem;
