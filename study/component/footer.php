@@ -21,7 +21,7 @@
 
             <!-- Alumni -->
             <div class="nav-item-wrapper">
-                <a class="nav-button" href="group">
+                <a class="nav-button" href="alumni">
                     <svg width="50px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" transform="matrix(-1, 0, 0, 1, 0, 0)" fill="currentColor">
                         <polygon points="32 192 256 64 480 192 256 320 32 192" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" fill="none" />
                         <polyline points="112 240 112 368 256 448 400 368 400 240" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" fill="none" />

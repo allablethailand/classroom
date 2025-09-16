@@ -157,12 +157,17 @@ html, body {
   color: #44AA44;
 }
 
+
+.bg-element-earth {
+  background-color: #967f55;
+}
+
 .element-wind {
   color: #AAAAAA;
 }
 
 .bg-element-fire {
-  background-color: rgba(255, 68, 68, 0.1);
+  background-color: rgba(249, 109, 109, 0.837);
 }
 
 .bg-element-fire-two {
@@ -171,7 +176,7 @@ html, body {
 }
 
 .bg-element-water {
-  background-color: rgba(68, 68, 255, 0.1);
+  background-color: rgba(163, 163, 163, 0.79);
 }
 
 .bg-element-water-two  {
@@ -179,9 +184,9 @@ html, body {
   color: white;
 }
 
-.bg-element-earth {
+/* .bg-element-earth {
   background-color: rgba(68, 170, 68, 0.1);
-}
+} */
 
 .bg-element-earth-two {
   background: linear-gradient(135deg, #6bcf7f, #44aa44);
@@ -250,3 +255,33 @@ html, body {
 .mb-bs-3 { margin-bottom: 1.5rem  !important; }
 
 .mb-bs-5  { margin-bottom: 3rem  !important; }
+
+
+.transparent-bg {
+  mix-blend-mode: multiply;
+}
+
+
+.heading-1 {
+		/* font-family: 'Roboto Slab', serif; */
+		font-size: 1.5em;
+		letter-spacing: 0.08em;
+		font-weight: 300;
+		color: #F60;
+		text-shadow: 0 1px 1px #FFFFFF;
+		text-transform: uppercase;
+}
+
+.divider-1 {
+		border-bottom: 1px solid #FFF;
+		background-color: #DADADA;
+		height: 1px;
+		margin: 0.5em 0px 1.5em;
+}
+
+.divider-1 span {
+		display: block;
+		width: 120px;
+		height: 1px;
+		background-color: #F60;
+}
