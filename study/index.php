@@ -23,9 +23,9 @@
         case '/classroom/study/document':
             require __DIR__.'/views/document.php';
         break;
-        case '/classroom/study/alarmni/':
-        case '/classroom/study/alarmni':
-            require __DIR__.'/views/alarmni.php';
+        case '/classroom/study/alumni/':
+        case '/classroom/study/alumni':
+            require __DIR__.'/views/alumni.php';
         break;
         case '/classroom/study/group/':
         case '/classroom/study/group':

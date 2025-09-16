@@ -21,13 +21,14 @@ require_once $base_include . '/actions/func.php';
 
 $std_id = $_SESSION['student_id'];
 
-$columnStudent  = "classroom_id";
+$columnStudent  = "classroom_id, group_id";
 $tableStudent = "classroom_student_join";
 $whereStudent = "where student_id = '{$std_id}'";
 
 $student_class = select_data($columnStudent, $tableStudent, $whereStudent);
 
 $our_class = $student_class[0]["classroom_id"];
+$our_group = $student_class[0]["group_id"];
 
 // var_dump($our_class);
 
@@ -42,13 +43,13 @@ $our_class = $student_class[0]["classroom_id"];
 // $whereGroup = "where classroom_id = '{$our_class}'";
 // $whereGroup = "where classroom_id = '1' AND status = 0";
 
-$columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
-$tableCourseGroup = "classroom_template";
-$whereCourseGroup = "where classroom_id = '{$our_class}'";
+$columnCourseGroup  = "group_id, group_name, group_logo, group_description, group_color";
+$tableCourseGroup = "classroom_group";
+$whereCourseGroup = "where classroom_id = '{$our_class}' AND group_id = '{$our_group}'";
 
 $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
 
-// var_dump($course);
+// var_dump($our_class);
 
 
 // $classroom_group = select_data($columnGroup, $tableGroup, $whereGroup);
@@ -116,6 +117,23 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                     <!-- Element Group -->
                 </h1>
             </div>
+            <div class="justify-content-center mb-bs-3" style="display: flex; direction: rtl;">
+                <div class="" style="margin-left: 10px;">
+                    <button class="btn btn-default" id="toggleStudent">
+                       <i class="fas fa-address-book"></i>
+                    </button>
+                </div>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter"></i><span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="#">1</a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">4</a></li>
+                        </ul>
+                </div>
+            </div>
 
 
             <?php
@@ -126,36 +144,91 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             }
             foreach ($classroom_group as $item): {
             ?>
-                <div class="g-4 justify-content-center mb-bs-3 ">
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
-                        <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 10px;">
-                            <div class="panel-heading border-0" style="padding:0;">
-                                <div class="d-flex-bs align-items-center gap-3">
-                                        <div class="group-icon-large" style="color: #FFF;">
-                                            <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                            <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"  alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
-                                        </div>
-                                        <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
-                                            <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                                <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["classroom_name"] ?></h4>
+                    <div id="rowData" class="g-4 justify-content-center mb-bs-3 ">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
+                                <div class="card group-card h-100 bg-element-earth rounded-small" style="padding: 10px;">
+                                    <div class="panel-heading border-0" style="padding:0;">
+                                        <div class="d-flex-bs align-items-center gap-3">
+                                            <div class="group-icon-large" style="color: #FFF;">
+                                                <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
+                                                <img src="<?php echo $item['group_logo']; ?>" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
                                             </div>
-                                            <p class="text-secondary mb-0 small text-truncate-2" >
-                                                สมาชิกปัจจุบัน <?php echo $item['classroom_student']; ?> คน
-                                            </p>
+                                            <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
+                                                <div class="d-flex-bs align-items-center gap-2 mb-1">
+                                                    <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["group_name"] ?></h4>
+                                                </div>
+                                                <p class="text-secondary mb-0 small text-truncate-2">
+                                                    สมาชิกปัจจุบัน 5 คน
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
-                </div>
             <?php
                 }
             endforeach; ?>
 
+            <div id="menu"></div>
 
-            <!-- <div class="g-4 justify-content-center bg-element-fire-two mx-3 mb-bs-3 rounded-small">
+            <h1 class="heading-1" style="margin-top: 3rem;">คณะกรรมการ</h1>
+            <div class="divider-1"> 
+                <span></span>
+            </div>
+            <div class="g-4 justify-content-center mb-bs-3 ">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <a href="teacher?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
+                        <div class="card group-card h-100 bg-element-water rounded-small" style="padding: 10px;">
+                            <div class="panel-heading border-0" style="padding:0;">
+                                <div class="d-flex-bs align-items-center gap-3">
+                                    <div class="group-icon-large" style="color: #FFF;">
+                                        <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
+                                        <img src="" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                                    </div>
+                                    <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
+                                        <div class="d-flex-bs align-items-center gap-2 mb-1">
+                                            <h4 class="panel-title mb-0 text-truncate d-flex-bs ">อาจารย์ผู้สอน</h4>
+                                        </div>
+                                        <p class="text-secondary mb-0 small text-truncate-2">
+                                            สมาชิกปัจจุบัน 1 คน
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="g-4 justify-content-center mb-bs-3 ">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <a href="staff?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
+                        <div class="card group-card h-100 bg-element-fire rounded-small" style="padding: 10px;">
+                            <div class="panel-heading border-0" style="padding:0;">
+                                <div class="d-flex-bs align-items-center gap-3">
+                                    <div class="group-icon-large" style="color: #FFF;">
+                                        <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
+                                        <img src="" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                                    </div>
+                                    <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
+                                        <div class="d-flex-bs align-items-center gap-2 mb-1">
+                                            <h4 class="panel-title mb-0 text-truncate d-flex-bs ">Staff</h4>
+                                        </div>
+                                        <p class="text-secondary mb-0 small text-truncate-2">
+                                            สมาชิกปัจจุบัน 3 คน
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+
+                    <!-- <div class="g-4 justify-content-center bg-element-fire-two mx-3 mb-bs-3 rounded-small">
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="card group-card h-100 ">
                         <div class="panel-heading border-0">
@@ -236,9 +309,9 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
 
                 </div>
             </div> -->
-        </div>
-    </div>
-    <?php require_once 'component/footer.php'; ?>
+                </div>
+            </div>
+            <?php require_once 'component/footer.php'; ?>
 
 
 </body>
