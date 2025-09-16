@@ -29,9 +29,9 @@ if (strpos($uriPath, $basePath) === 0) {
 $segments = explode('/', $relativePath);
 $currentScreen = isset($segments[0]) && $segments[0] !== '' ? $segments[0] : 'menu';
 
-if ($currentScreen == 'group') {
-    $currentScreen = 'academy';
-}
+// if ($currentScreen == 'group') {
+//     $currentScreen = 'academy';
+// }
 
 if (!isset($_SESSION['student_id'])) {
     header("Location: /classroom/study/login");
