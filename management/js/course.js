@@ -7,6 +7,7 @@ function getCoursetTemplate() {
         <table class="table table-border" id="tb_course">
             <thead>
                 <tr>
+                    <th></th>
                     <th style="width: 100px;"></th>
                     <th lang="en">Course</th>
                     <th lang="en">Create Date</th>
@@ -46,17 +47,22 @@ function buildCourse() {
 					defaultLang: 'en'
 				});
 			},
-			"order": [[4,'desc']],
+			"order": [[0,'asc']],
 			"columns": [{ 
                 "targets": 0,
+                "data": "course_id",
+                "visible": false
+            },{ 
+                "targets": 1,
                 "data": "course_cover",
+                "orderable": false,
                 "render": function (data,type,row,meta) {	
 					return `
                         <img src="${data}" style="width: 100px; border-radius: 5px; border: 3px solid #FFFFFF; box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.16);" onerror="this.src='/images/training.jpg'">
                     `;
                 }
             },{ 
-                "targets": 1,
+                "targets": 2,
                 "data": "course_name",
                 "render": function (data,type,row,meta) {	
 					return `
@@ -65,14 +71,16 @@ function buildCourse() {
                     `;
                 }
             },{ 
-                "targets": 2,
+                "targets": 3,
                 "data": "date_create",
             },{ 
-                "targets": 3,
+                "targets": 4,
                 "data": "emp_create",
             },{ 
-                "targets": 4,
+                "targets": 5,
                 "data": "course_id",
+                "className": "text-center",
+                "orderable": false,
                 "render": function (data,type,row,meta) {	
                     let course_ref_id = row['course_ref_id'];
 					return `

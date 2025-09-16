@@ -353,3 +353,24 @@ a:hover .notofication-share{
         min-width: 40px; /* Ensure trash icon button has a fixed width */
     }
     
+
+    .nav-origami.nav-tabs>li.active>a, .nav-origami.nav-tabs>li.active>a:focus, .nav-origami.nav-tabs>li.active>a:hover {
+    /* color: #333 !important; */
+    cursor: default !important;
+    background-color: #fff !important;
+    border: none !important;
+    border-bottom: 1.5px solid #fff !important;
+    padding-bottom: 7.5px !important;
+    margin-bottom: 0px !important;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    color: #555;
+    cursor: default;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+}
+.nav-origami >li>a {
+    color: #555 !important;
+}
