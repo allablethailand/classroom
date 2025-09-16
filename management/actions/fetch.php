@@ -263,6 +263,7 @@ function saveData($post) {
             $type . '_position' => isset($post[$type . '_position']) ? $post[$type . '_position'] : null,
             $type . '_hobby' => isset($post[$type . '_hobby']) ? $post[$type . '_hobby'] : null,
             $type . '_music' => isset($post[$type . '_music']) ? $post[$type . '_music'] : null,
+            $type . '_drink' => isset($post[$type . '_drink']) ? $post[$type . '_drink'] : null,
             $type . '_movie' => isset($post[$type . '_movie']) ? $post[$type . '_movie'] : null,
             $type . '_goal' => isset($post[$type . '_goal']) ? $post[$type . '_goal'] : null,
             $type . '_religion' => isset($post[$type . '_religion']) ? $post[$type . '_religion'] : null,
@@ -325,11 +326,11 @@ function saveData($post) {
                     $params_join = [$emp_id, $id, $classroom_id];
                     $types_join = 'sis';
                 }
-                 if ($type === 'student') {
-                     $update_join_sql .= ", `approve_status` = 1, `approve_by` = ?, `approve_date` = ?";
-                     $params_join = [$emp_id, $current_datetime, $id, $classroom_id];
-                     $types_join = 'sissis';
-                }
+                //  if ($type === 'student') {
+                //      $update_join_sql .= ", `approve_status` = 1, `approve_by` = ?, `approve_date` = ?";
+                //      $params_join = [$emp_id, $current_datetime, $id, $classroom_id];
+                //      $types_join = 'sissis';
+                // }
                 
                 $update_join_stmt = $mysqli->prepare($update_join_sql);
                 if (!$update_join_stmt) {
