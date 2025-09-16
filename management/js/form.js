@@ -249,7 +249,7 @@
                                     <div class="form-box">
                                         <div class="form-group g-4 row">
                                             <div class="col-sm-6">
-                                                <label for="${type}_hobby" class="control-label"><i class="fas fa-palette" style="color: #d179f5; margin-right: 5px;"></i> Hobby </label>
+                                                <label for="${type}_hobby" class="control-label"><i class="fas fa-palette" style="color: #19ff00; margin-right: 5px;"></i> Hobby </label>
                                                 <input type="text" name="${type}_hobby" id="${type}_hobby" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                             <div class="col-sm-6">
@@ -259,11 +259,18 @@
                                         </div>
                                         <div class="form-group g-4 row">
                                             <div class="col-sm-6">
+                                                    <label for="${type}_drink" class="control-label"><i class="fas fa-glass-cheers" style="color: #a60efd; margin-right: 5px;"></i> Favorite Drink </label>
+                                                    <input type="text" name="${type}_drink" id="${type}_drink" class="form-control" style="padding: 2rem 1rem;">
+                                                </div>
+                                            <div class="col-sm-6">
                                                 <label for="${type}_movie" class="control-label"><i class="fas fa-film" style="color: #a23131; margin-right: 5px;"></i> Favorite Movies </label>
                                                 <input type="text" name="${type}_movie" id="${type}_movie" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
-                                            <div class="col-sm-6">
-                                                <label for="${type}_goal" class="control-label"><i class="fas fa-bullseye" style="color: #ffc800; margin-right: 5px;"></i> Life Goal </label>
+                                           
+                                        </div>
+                                        <div class="form-group g-4 row">
+                                             <div class="col-sm-6">
+                                                <label for="${type}_goal" class="control-label"><i class="fas fa-bullseye" style="color: #ff9900; margin-right: 5px;"></i> Life Goal </label>
                                                 <input type="text" name="${type}_goal" id="${type}_goal" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                         </div>
@@ -324,31 +331,6 @@
         });
 
         
-
-        // เปลี่ยนการเรียกใช้งาน datepicker
-        // $('.datepicker').each(function() {
-        //     flatpickr(this, {
-        //         dateFormat: "Y/m/d", // กำหนดรูปแบบวันที่เป็น ปี/เดือน/วัน (yyyy/mm/dd)
-        //         altFormat: "Y/m/d",
-        //         altInput: true,
-        //         allowInput: true, // อนุญาตให้พิมพ์วันที่เองได้
-        //         enableTime: false, // ปิดการเลือกเวลา
-        //         // เพิ่มตัวเลือกเพื่อให้สามารถเลือกปีได้ง่ายขึ้น
-        //         // นี่คือส่วนที่ Flatpickr เหนือกว่า Bootstrap Datepicker เดิม
-        //         static: true,
-        //         clickOpens: true,
-        //         parseDate: (datestr, format) => {
-        //             if (datestr.includes('/')) {
-        //                 const parts = datestr.split('/');
-        //                 if (parts.length === 3) {
-        //                     return new Date(parts[0], parts[1] - 1, parts[2]);
-        //                 }
-        //             }
-        //             return flatpickr.parseDate(datestr, format);
-        //         }
-        //     });
-        // });
-
         if (id) {
             await loadData(type, id);
         }
@@ -541,6 +523,7 @@ function loadData(type, id) {
                     // Favorite Tab
                     $(`#${type}_hobby`).val(data[`${type}_hobby`]);
                     $(`#${type}_music`).val(data[`${type}_music`]);
+                    $(`#${type}_drink`).val(data[`${type}_drink`]);
                     $(`#${type}_movie`).val(data[`${type}_movie`]);
                     $(`#${type}_goal`).val(data[`${type}_goal`]);
 
