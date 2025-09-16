@@ -28,7 +28,7 @@ $whereStudent = "where student_id = '{$std_id}'";
 $student_class = select_data($columnStudent, $tableStudent, $whereStudent);
 
 $our_class = $student_class[0]["classroom_id"];
-$our_group = $student_class[0]["classroom_id"];
+$our_group = $student_class[0]["group_id"];
 
 // var_dump($our_class);
 
@@ -119,17 +119,18 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             </div>
             <div class="justify-content-center mb-bs-3" style="display: flex; direction: rtl;">
                 <div class="" style="margin-left: 10px;">
-                    <button class="btn btn-default" >
-                        <i class="fas fa-th-large"></i></button>
+                    <button class="btn btn-default" id="toggleStudent">
+                       <i class="fas fa-address-book"></i>
+                    </button>
                 </div>
                 <div class="dropdown">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter"></i><span class="caret"></span></button>
                         <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href="#">filter 1</a></li>
+                        <li><a href="#">1</a></li>
                         <li><a href="#">2</a></li>
                         <li><a href="#">3</a></li>
                         <li role="separator" class="divider"></li>
-                        <li><a href="#">S4</a></li>
+                        <li><a href="#">4</a></li>
                         </ul>
                 </div>
             </div>
@@ -143,7 +144,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             }
             foreach ($classroom_group as $item): {
             ?>
-                    <div class="g-4 justify-content-center mb-bs-3 ">
+                    <div id="rowData" class="g-4 justify-content-center mb-bs-3 ">
                         <div class="col-12 col-md-6 col-lg-3">
                             <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
                                 <div class="card group-card h-100 bg-element-earth rounded-small" style="padding: 10px;">
@@ -170,6 +171,8 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             <?php
                 }
             endforeach; ?>
+
+            <div id="menu"></div>
 
             <h1 class="heading-1" style="margin-top: 3rem;">คณะกรรมการ</h1>
             <div class="divider-1"> 
