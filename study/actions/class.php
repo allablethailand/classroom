@@ -29,10 +29,18 @@
         "cc.course_type,
         c.trn_id AS course_id,
         c.trn_subject AS course_name,
-        c.picture_title AS course_cover",
+        c.picture_title AS course_cover,
+        c.trn_location AS course_location,
+        c.trn_from_time AS course_timestart,
+        c.trn_to_time AS course_timeend,
+        c.trn_by AS course_instructor,
+        FORMAT(c.trn_date, '%d/%m/%Y') AS course_date,
+        LENGTH(REPLACE(trn_by, ' ', '')) - LENGTH(REPLACE(REPLACE(trn_by, ' ', ''), ',', '')) + 1 AS trn_count_by
+        ",
         "classroom_course AS cc JOIN ot_training_list AS c on cc.course_ref_id = c.trn_id",
         "WHERE cc.classroom_id = '{$class_id}' 
             AND cc.status = 0"
         );
         echo json_encode($course_data);
+
     }
