@@ -9,9 +9,9 @@ function getChannelTemplate() {
                 <tr>
                     <th lang="en">Logo</th>
                     <th lang="en">Chennel</th>
-                    <th lang="en">Register</th>
                     <th lang="en">Create Date</th>
                     <th lang="en">Create By</th>
+                    <th lang="en">Register</th>
                     <th></th>
                 </tr>
             </thead>
@@ -67,14 +67,14 @@ function buildChannel() {
                 }
             },{ 
                 "targets": 2,
-                "data": "channel_student",
-                "className": "text-right",
-            },{ 
-                "targets": 3,
                 "data": "date_create",
             },{ 
-                "targets": 4,
+                "targets": 3,
                 "data": "emp_create",
+            },{ 
+                "targets": 4,
+                "data": "channel_student",
+                "className": "text-right",
             },{ 
                 "targets": 5,
                 "data": "channel_id",
@@ -83,7 +83,7 @@ function buildChannel() {
                     let classroom_link = row['classroom_link'];
 					return `
                         <div class="nowarp">
-                            <a type="button" class="btn btn-circle btn-info share-link copy-1" onclick="copyLink(1)" data-clipboard-text="${classroom_link}">
+                            <a type="button" class="btn btn-circle btn-info share-link copy-${data}" onclick="copyLink(${data})" data-clipboard-text="${classroom_link}">
                                 <i class="fa fa-link"></i>
                                 <span class="notofication-share"><i class="fa fa-check"></i> 
                                 <label lang="en">Copy Link</label></span>
