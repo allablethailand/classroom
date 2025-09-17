@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="/dist/css/jquery-ui.css">
     <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/classroom/study/css/menu.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/classroom/study/css/class.css?v=<?php echo time(); ?>">
     <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
     <script src="/bootstrap/3.3.6/js/jquery-2.2.3.min.js" type="text/javascript"></script>
     <script src="/dist/js/sweetalert.min.js"></script>
@@ -30,9 +31,11 @@
     <script src="/classroom/study/js/class.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 
+
 <body>
     <?php require_once 'component/header.php'; ?>
     <div class="min-vh-100 bg-ori-gray">
+
         <div class="container-fluid" style="margin-bottom: 7rem;">
             <div class="text-center mb-4 course-class" style="margin-top: 2rem; margin: 1rem">
             </div>
@@ -42,6 +45,5 @@
     <?php require_once 'component/footer.php'; ?>
 
 </body>
-
 
 </html>
