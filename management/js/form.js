@@ -235,11 +235,14 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="${type}_attach_document" class="control-label"><i class="fas fa-paperclip" style="color: #ff9900; margin-right: 5px;"></i> Other Attachments </label>
-                                            <div id="attach-document-fields"></div>
+                                            <label for="${type}_attach_document" class="control-label"><i class="fas fa-paperclip" style="color: #ff9900; margin-right: 5px;"></i> Other Attachments</label>
+                                            
+                                            <div class="file-gallery-wrapper">
+                                                <div id="attach-document-fields" class="row"></div>
+                                            </div>
+                                            
                                             <button type="button" class="btn btn-default mt-2" onclick="addDocumentField('', '${type}', true)"><i class="fas fa-plus"></i> Add Document</button>
                                         </div>
-                                        <input type="hidden" name="${type}_attach_document_current[]">
                                     </div>
                                 </form>
                             </div>
@@ -379,7 +382,7 @@ function getGenderMap() {
     };
 }
 
-// Helper Functions (Same as yours, but adding new ones)
+// Helper Functions
 function readURL(input, previewId) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -408,44 +411,121 @@ function removeImage(previewId, inputName) {
     $(`#${inputName}`).val('');
     $(`#${inputName}_current`).val('');
 }
+// แก้ไขฟังก์ชัน removeDocumentField
+function removeDocumentField(docId, fileId, type) {
+    if (fileId) {
+        // If fileId exists, it means the file is already saved in the database
+        // Send an AJAX request to delete the file from the server
+        $.ajax({
+            url: 'actions/fetch.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'deleteFile',
+                type: type, // Pass the type (e.g., 'teacher')
+                file_id: fileId
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $(`#${docId}`).remove(); // Remove the field from the UI
+                    swal("Success!", "File removed successfully.", "success");
+                } else {
+                    swal("Error!", response.message, "error");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                swal("Error!", "Failed to remove file from server.", "error");
+            }
+        });
+    } else {
+        // If there's no fileId, it's a new file not yet saved to the database.
+        // Just remove the field from the UI.
+        $(`#${docId}`).remove();
+        console.log(`Removed new document field with ID: ${docId}`);
+    }
+}
 
-// **New/Modified Function for Attach Documents**
-function addDocumentField(docUrl = '', type, isNew = true) {
+
+// แก้ไข HTML ในฟังก์ชัน addDocumentField เพื่อรองรับการแสดงผล Preview และโครงสร้างใหม่
+function addDocumentField(docUrl = '', type, fileId = null) {
     const documentContainer = $(`#attach-document-fields`);
     const docId = `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const fileName = docUrl ? docUrl.substring(docUrl.lastIndexOf('/') + 1) : '';
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+    const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension);
+    const isPdf = fileExtension === 'pdf';
+
+    let previewContent = '';
+    if (docUrl) {
+        if (isImage) {
+            previewContent = `<img src="${docUrl}" class="img-fluid document-preview" alt="Attachment Preview">`;
+        } else if (isPdf) {
+            // Using iframe to display PDF preview
+            previewContent = `<iframe src="${docUrl}" class="document-preview-iframe" style="width:100%; height:200px; border:none;"></iframe>`;
+        } else {
+            previewContent = `<a href="${docUrl}" target="_blank" class="document-file-link"><i class="fas fa-file document-file-icon"></i> <span class="document-file-name">${fileName}</span></a>`;
+        }
+    } else {
+        previewContent = `<div class="image-placeholder"><i class="fas fa-file-upload"></i> <p>Click to add file</p></div><input type="file" class="file-input" name="${type}_attach_document[]" accept="image/*,.pdf" multiple>`;
+    }
 
     const newFieldHtml = `
-        <div class="input-group mb-2 document-field" id="${docId}">
-            ${docUrl ? `
-                <a href="${docUrl}" target="_blank" class="form-control btn btn-link text-left">
-                    <i class="fas fa-file document-file-icon"></i>
-                    <span class="document-file-link">${fileName}</span>
-                </a>
-                <input type="hidden" name="${type}_attach_document_current[]" value="${docUrl}">
-            ` : `
-                <input type="file" class="form-control" name="${type}_attach_document[]" multiple>
-            `}
-            <div class="input-group-append">
-                <button class="btn btn-danger" type="button" style="margin-top:5px" onclick="removeDocumentField('${docId}', '${docUrl}')">
-                    <i class="fas fa-trash"></i>
-                </button>
+        <div class="col-6 col-md-2 mb-3">
+            <div class="file-item-box" id="${docId}" data-file-id="${fileId}">
+                <div class="file-preview-container">
+                    ${previewContent}
+                    ${docUrl ? `<input type="hidden" name="${type}_attach_document_current[]" value="${docUrl}">` : ''}
+                </div>
+                <div class="file-actions">
+                    <button class="btn btn-danger btn-sm" type="button" onclick="removeDocumentField('${docId}', ${fileId}, '${type}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    ${docUrl ? `<a href="${docUrl}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></a>` : ''}
+                </div>
             </div>
         </div>
     `;
+
     documentContainer.append(newFieldHtml);
 }
 
-function removeDocumentField(docId, docUrl) {
-    // If a document URL is provided, we need to handle the deletion logic on the server
-    // For now, we'll just remove the element from the DOM
-    $(`#${docId}`).remove();
+// เพิ่มฟังก์ชันสำหรับจัดการการแสดงตัวอย่างไฟล์ที่เลือก
+$(document).on('change', 'input[name$="_attach_document[]"]', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const docId = $(this).closest('.file-item-box').attr('id');
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension);
+        const isPdf = fileExtension === 'pdf';
+        
+        const previewUrl = URL.createObjectURL(file);
+        
+        let previewHtml = '';
+        if (isImage) {
+            previewHtml = `<img src="${previewUrl}" class="img-fluid document-preview" alt="Attachment Preview">`;
+        } else if (isPdf) {
+            previewHtml = `<iframe src="${previewUrl}" class="document-preview-iframe" style="width:100%; height:200px; border:none;"></iframe>`;
+        } else {
+            previewHtml = `<a href="#" class="document-file-link"><i class="fas fa-file document-file-icon"></i> <span class="document-file-name">${file.name}</span></a>`;
+        }
+        
+        $(`#${docId} .file-preview-container`).html(previewHtml);
 
-    // You can add a new hidden input here to tell the server which file to delete if needed
-    // Example: <input type="hidden" name="docs_to_delete[]" value="${docUrl}">
-    console.log(`Removed document field with ID: ${docId}, URL: ${docUrl}`);
-}
+        const newFileInput = document.createElement('input');
+        newFileInput.type = 'file';
+        newFileInput.name = event.target.name;
+        newFileInput.style.display = 'none';
+        newFileInput.files = event.target.files;
+        $(`#${docId} .file-preview-container`).append(newFileInput);
 
+        $(`#${docId} .file-actions a.btn`).remove();
+        $(`#${docId} .file-actions`).append(`<a href="${previewUrl}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></a>`);
+        
+    }
+});
+
+// ✨ แก้ไข: ฟังก์ชัน loadData เพื่อรองรับการดึงรูปโปรไฟล์และไฟล์แนบจากตารางอื่น
 function loadData(type, id) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -462,24 +542,18 @@ function loadData(type, id) {
                     const data = response.data;
                     console.log('Data loaded:', data);
 
-
-
                     const prefixMap = getPrefixMap();
                     const perfixValue = data[`${type}_perfix`];
                     const perfixText = prefixMap[perfixValue] || '';
                     $(`#${type}_perfix`).val(perfixText);
 
-                      // แก้ไข: เพิ่มการแปลงค่าเพศจากฐานข้อมูลมาแสดงผลในฟอร์ม
                     const genderMap = getGenderMap();
                     const genderValue = data[`${type}_gender`];
                     const genderText = genderMap[genderValue] || '';
                     $(`#${type}_gender`).val(genderText);
 
-               
-
                     // Personal Information Tab
                     $(`#${type}_id`).val(data[`${type}_id`]);
-                    // $(`#${type}_perfix`).val(data[`${type}_perfix_text`] || '');
                     $(`#${type}_firstname_th`).val(data[`${type}_firstname_th`]);
                     $(`#${type}_lastname_th`).val(data[`${type}_lastname_th`]);
                     $(`#${type}_firstname_en`).val(data[`${type}_firstname_en`]);
@@ -488,9 +562,8 @@ function loadData(type, id) {
                     $(`#${type}_nickname_en`).val(data[`${type}_nickname_en`]);
                     $(`#${type}_idcard`).val(data[`${type}_idcard`]);
                     $(`#${type}_passport`).val(data[`${type}_passport`]);
-                    // $(`#${type}_gender`).val(data[`${type}_gender_text`] || '');
 
-                    // ✨ แก้ไขใหม่: จัดการการแสดงผลวันเกิด
+                    // ✨ แก้ไข: จัดการการแสดงผลวันเกิด
                     if (data[`${type}_birth_date`] && data[`${type}_birth_date`] !== '0000-00-00') {
                         const dateParts = data[`${type}_birth_date`].split('-');
                         const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
@@ -499,10 +572,24 @@ function loadData(type, id) {
                         $(`#${type}_birth_date`).val('');
                     }
 
-                    showFilePreview(`${type}_image_profile`, data[`${type}_image_profile`]);
+                    // ✨ แก้ไข: ดึงรูปโปรไฟล์จากตารางใหม่
+                    if (data.all_profile_images && data.all_profile_images.length > 0) {
+                        // ดึงเฉพาะรูปหลัก (index 0) ที่มี file_status = 1
+                        const mainProfile = data.all_profile_images.find(img => img.file_status === '1');
+                        if (mainProfile) {
+                            showFilePreview(`${type}_image_profile`, mainProfile.file_path);
+                        } else {
+                            // ถ้าไม่มีรูปหลัก ให้ดึงรูปแรก
+                            showFilePreview(`${type}_image_profile`, data.all_profile_images[0].file_path);
+                        }
+                    } else {
+                        removeImage(`${type}_image_profile_preview`, `${type}_image_profile`);
+                    }
+
+                    // ดึงรูปบัตรประชาชนตามเดิม
                     showFilePreview(`${type}_card_front`, data[`${type}_card_front`]);
                     showFilePreview(`${type}_card_back`, data[`${type}_card_back`]);
-
+                    
                     // Contact fields
                     $(`#${type}_email`).val(data[`${type}_email`]);
                     $(`#${type}_mobile`).val(data[`${type}_mobile`]);
@@ -527,14 +614,12 @@ function loadData(type, id) {
                     $(`#${type}_movie`).val(data[`${type}_movie`]);
                     $(`#${type}_goal`).val(data[`${type}_goal`]);
 
-                    // Attach Documents
+                    // ✨ แก้ไข: ดึงไฟล์แนบจากตารางใหม่ (แก้ชื่อ key)
                     const documentContainer = $(`#attach-document-fields`);
                     documentContainer.empty();
-                    if (data[`${type}_attach_document`]) {
-                        const documents = data[`${type}_attach_document`].split('|').filter(Boolean);
-                        console.log('Documents to load:', documents);
-                        documents.forEach(docUrl => {
-                            addDocumentField(docUrl, type, false);
+                    if (data.attached_documents && data.attached_documents.length > 0) {
+                        data.attached_documents.forEach(doc => {
+                            addDocumentField(doc.file_path, type, doc.file_id, false); // ส่ง file_id ไปด้วย
                         });
                     }
 
@@ -543,15 +628,11 @@ function loadData(type, id) {
 
                     resolve(data);
                 } else {
-                    console.error('Error loading data:', response.message);
-                    swal("Error!", response.message, "error");
-                    reject();
+                    reject(response.message);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('AJAX Error:', status, error);
-                swal("Error!", "Failed to fetch data.", "error");
-                reject();
+                reject(error);
             }
         });
     });
@@ -569,11 +650,11 @@ function validateForm(type) {
         { id: `${type}_firstname_en`, tab: `${type}_personal_contact_tab`, message: 'Please enter a first name in English.', pattern: /^[A-Za-z\s]+$/ },
         { id: `${type}_lastname_en`, tab: `${type}_personal_contact_tab`, message: 'Please enter a last name in English.', pattern: /^[A-Za-z\s]+$/ },
         { id: `${type}_idcard`, tab: `${type}_personal_contact_tab`, message: 'ID card number must be 13 digits.', pattern: /^[0-9]{13}$/ },
-        { id: `${type}_passport`, tab: `${type}_personal_contact_tab`, message: 'Please enter a passport number.', optional: true }, // Optional but still checked
+        { id: `${type}_passport`, tab: `${type}_personal_contact_tab`, message: 'Please enter a passport number.', optional: true },
         { id: `${type}_gender`, tab: `${type}_personal_contact_tab`, message: 'Please select a gender.' },
         { id: `${type}_birth_date`, tab: `${type}_personal_contact_tab`, message: 'Please select a date of birth.' },
         { id: `${type}_email`, tab: `${type}_personal_contact_tab`, message: 'Please enter a valid email address.', pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
-        { id: `${type}_mobile`, tab: `${type}_personal_contact_tab`, message: 'Please enter a mobile number.', optional: true }, // Assuming mobile is not always required
+        { id: `${type}_mobile`, tab: `${type}_personal_contact_tab`, message: 'Please enter a mobile number.', optional: true },
         { id: `${type}_address`, tab: `${type}_personal_contact_tab`, message: 'Please enter an address.' },
         
         // Biography Tab
@@ -585,35 +666,29 @@ function validateForm(type) {
 
         // Login Setup Tab
         { id: `${type}_username`, tab: `${type}_setup_tab`, message: 'Username must be at least 6 characters.', pattern: /^.{6,}$/ },
-        { id: `${type}_password`, tab: `${type}_setup_tab`, message: 'Password must be at least 6 characters.', pattern: /^.{6,}$/, conditional: true } // Conditional field, required only when creating new user
+        { id: `${type}_password`, tab: `${type}_setup_tab`, message: 'Password must be at least 6 characters.', pattern: /^.{6,}$/, conditional: true }
     ];
 
-    // Reset all previous error states
     $(`.form-control`).removeClass('required-field-input-invalid');
     $('.alert-danger').remove();
 
-    // Loop through each field to perform validation
     for (const field of fieldsToValidate) {
         const $input = $(`#${field.id}`);
         const value = $input.val().trim();
         let currentFieldIsValid = true;
 
-        // Check for required fields
         if (!field.optional && value === '') {
             currentFieldIsValid = false;
         }
 
-        // Check for specific patterns (e.g., English alphabet, numbers)
         if (value !== '' && field.pattern && !field.pattern.test(value)) {
             currentFieldIsValid = false;
         }
 
-        // Handle specific conditions
         if (field.id === `${type}_password` && ($(`#${type}_id`).val() && value === '')) {
-            currentFieldIsValid = true; // Don't require password on edit if not changed
+            currentFieldIsValid = true;
         }
         
-        // If a field is not valid, mark it and break the loop
         if (!currentFieldIsValid) {
             isValid = false;
             $input.addClass('required-field-input-invalid');
@@ -626,27 +701,24 @@ function validateForm(type) {
     }
 
     if (!isValid) {
-        // Show an error message at the top of the form
         $('#form-container .card-header').after(`
             <div class="alert alert-danger mx-3" role="alert">
                 <i class="fas fa-exclamation-triangle"></i> <strong>Validation Error!</strong> Please fill in all required fields and correct any formatting errors.
             </div>
         `);
         
-        // Switch to the correct tab and focus on the first invalid field
         $(`a[href="#${firstInvalidField.tab}"]`).tab('show');
         firstInvalidField.input.focus();
         
-        // Add a tooltip or message near the input
         if (firstInvalidField.message) {
              console.log(`Validation Error: ${firstInvalidField.message}`);
-             // Note: For a more advanced UI, you would add a tooltip here.
         }
     }
 
     return isValid;
 }
 
+// ✨ แก้ไข: ฟังก์ชัน handleFormSubmission เพื่อรองรับการส่งรูปโปรไฟล์และไฟล์แนบ
 function handleFormSubmission(type, id) {
 
     if (!validateForm(type)) {
@@ -668,7 +740,7 @@ function handleFormSubmission(type, id) {
     const classroom_id = $('#classroom_id').val();
     formData.append('classroom_id', classroom_id);
 
-    // ✨ แก้ไขใหม่: แปลง format วันเกิดจาก YYYY/MM/DD กลับเป็น YYYY-MM-DD
+    // Convert birth date format from YYYY/MM/DD back to YYYY-MM-DD
     const birthDateValue = $(`#${type}_birth_date`).val();
     if (birthDateValue) {
         const dateParts = birthDateValue.split('-');
@@ -679,10 +751,10 @@ function handleFormSubmission(type, id) {
             console.warn('Invalid date format:', birthDateValue);
         }
     } else {
-        formData.set(`${type}_birth_date`, ''); // ส่งค่าว่างไปถ้าไม่มีข้อมูล
+        formData.set(`${type}_birth_date`, '');
     }
 
-    // Append single file data
+    // Append image files (except attached documents)
     $(`input[type="file"]:not([name*="_attach_document"])`).each(function() {
         if (this.files.length > 0) {
             formData.append(this.name, this.files[0]);
@@ -708,13 +780,12 @@ function handleFormSubmission(type, id) {
         formData.append(this.name, this.value);
     });
 
-     // เพิ่มการแปลงคำนำหน้าจากข้อความเป็นตัวเลข
+    // Convert prefix text to numeric value
     const reversePrefixMap = {};
     const prefixMap = getPrefixMap();
     for (const key in prefixMap) {
         reversePrefixMap[prefixMap[key]] = key;
     }
-
     const perfixValue = formData.get(`${type}_perfix`);
     if (perfixValue) {
         const newPerfixValue = reversePrefixMap[perfixValue] || '0';
@@ -722,13 +793,12 @@ function handleFormSubmission(type, id) {
         console.log(`แปลงคำนำหน้า: '${perfixValue}' -> '${newPerfixValue}'`);
     }
 
-    // แก้ไข: เพิ่มการแปลงค่าเพศจากข้อความเป็นตัวย่อ
+    // Convert gender text to abbreviation
     const reverseGenderMap = {};
     const genderMap = getGenderMap();
     for (const key in genderMap) {
         reverseGenderMap[genderMap[key]] = key;
     }
-
     const genderValue = formData.get(`${type}_gender`);
     if (genderValue) {
         const newGenderValue = reverseGenderMap[genderValue] || 'N';
@@ -736,28 +806,10 @@ function handleFormSubmission(type, id) {
         console.log(`แปลงเพศ: '${genderValue}' -> '${newGenderValue}'`);
     }
 
-
-   
     // Append static data
     formData.append('action', 'saveData');
     formData.append('type', type);
     formData.append('id', id);
-
-    // Validate form fields
-    $form.find("[required]").each(function () {
-        if (!$(this).val() || $(this).val().trim() === "") {
-            isValid = false;
-            errorMessage = "Please fill in all required fields.";
-            $(this).addClass("is-invalid");
-        } else {
-            $(this).removeClass("is-invalid");
-        }
-    });
-
-    if (!isValid) {
-        swal("Warning", errorMessage, "warning");
-        return;
-    }
 
     $.ajax({
         url: 'actions/fetch.php',
