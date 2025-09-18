@@ -161,6 +161,9 @@ function buildPage(page) {
         case 'email':
             buildEmailPage();
             break;
+        case 'pricing':
+            buildPricingPage();
+            break;
         default:
             console.warn('Unknown page type:', page);
     }
