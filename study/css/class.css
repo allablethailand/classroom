@@ -262,6 +262,7 @@ main {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
+  gap: 5px
 }
 
   .instructor-photo {
@@ -271,10 +272,6 @@ main {
     margin-right: 8px;
   }
 
-  
-  .instructor-name {
-    font-weight: bold;
-  }
 
   .progress-header-flex {
     display: flex;
@@ -283,4 +280,21 @@ main {
   .small-text-gray{
     font-size: 0.875rem;
     color: #6b7280;
+  }
+
+  .location-info{
+     color: #6b7280;
+    font-size: 0.85rem;
+  }
+
+  .instructor-name{
+     font-size: 0.9rem;
+     color: #6b7280;
+     font-weight: 300;
+     text-overflow: ellipsis;
+     margin-left: 0.6rem;
+     display: -webkit-box; 
+     -webkit-box-orient: vertical; 
+     -webkit-line-clamp: 2; 
+     overflow: hidden;
   }

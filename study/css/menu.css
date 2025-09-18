@@ -234,8 +234,9 @@ body {
   border-radius: 20px;
   padding: 22px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  text-align: left;
+  text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-items: center; 
   cursor: pointer;
 }
 
