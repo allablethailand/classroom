@@ -86,6 +86,7 @@ function buildGroup() {
                 "render": function (data,type,row,meta) {	
 					return `
                         <div class="nowarp">
+                            <button type="button" class="btn btn-info btn-circle" onclick="configGroup(${data})"><i class="fas fa-user-cog"></i></button> 
                             <button type="button" class="btn btn-orange btn-circle" onclick="manageGroup(${data})"><i class="fas fa-pencil-alt"></i></button> 
                             <button type="button" class="btn btn-red btn-circle" onclick="delGroup(${data})"><i class="fas fa-trash-alt"></i></button>
                         </div>
@@ -118,6 +119,9 @@ function buildGroup() {
             }
         });
     }
+}
+function configGroup(group_id) {
+    $.redirect("group",{classroom_id: classroom_id, group_id: group_id},'post','_blank');
 }
 function manageGroup(group_id) {
     $(".systemModal").modal();
