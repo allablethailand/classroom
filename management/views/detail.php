@@ -66,6 +66,7 @@
 <script src="/classroom/management/js/student.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/teacher.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/email.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="/classroom/management/js/pricing.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <?php
     $dev_host = array('dev.origami.life','origami.local','origami-dev.net','localhost','video.origami.life');
     if(in_array($_SERVER['HTTP_HOST'],$dev_host)){
@@ -125,6 +126,10 @@
             <a href=".management_tab" class="get-management edit-mode" data-page="channel" data-toggle="tab">
                 <i class="fas fa-cubes"></i>
                 <span lang="en">Channel</span>
+            </a>
+            <a href=".management_tab" class="get-management edit-mode" data-page="pricing" data-toggle="tab">
+                <i class="fas fa-dollar-sign"></i>
+                <span lang="en">Pricing</span>
             </a>
             <a href=".management_tab" class="get-management edit-mode" data-page="teacher" data-toggle="tab">
                 <i class="fas fa-chalkboard-teacher"></i>
