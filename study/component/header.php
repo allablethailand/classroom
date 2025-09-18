@@ -38,45 +38,76 @@ if (!isset($_SESSION['student_id'])) {
     exit();
 }
 
-// *** ส่วนที่แก้ไข: ดึง group_color เฉพาะสำหรับนักเรียนที่ล็อกอินอยู่ ***
+$studentId = (int)$_SESSION['student_id'];
+
+// *** ส่วนที่แก้ไข: ดึงรูปภาพจาก classroom_file_student และดึง group_color ***
+$student_image_profile = '/images/default.png'; // ตั้งค่ารูปเริ่มต้น
 $profile_border_color = '#ff8c00'; // ตั้งค่าสีเริ่มต้น
 
-$studentId = (int)$_SESSION['student_id'];
-$sql = "
+// 1. ดึงข้อมูล group_color
+$sql_color = "
     SELECT 
-        cs.student_id, 
-        cs.comp_id, 
-        cs.student_image_profile, 
-        IFNULL(cs.student_firstname_en, cs.student_firstname_th) AS student_name,
         cg.group_color
-    FROM `classroom_student` cs
-    LEFT JOIN `classroom_student_join` csj ON cs.student_id = csj.student_id
+    FROM `classroom_student_join` csj
     LEFT JOIN `classroom_group` cg ON csj.group_id = cg.group_id
-    WHERE cs.student_id = ?
+    WHERE csj.student_id = ?
 ";
-
-$stmt = $mysqli->prepare($sql);
-
-if ($stmt === false) {
-    // จัดการข้อผิดพลาดในการเตรียมคำสั่ง SQL
-    // สามารถ log ข้อผิดพลาดหรือแสดงข้อความที่เหมาะสมได้
-} else {
-    $stmt->bind_param("i", $studentId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $student_image_profile = GetUrl($row['student_image_profile']);
-        $student_name = $row['student_name'];
-        // กำหนดสีขอบรูปภาพจากฐานข้อมูล ถ้าไม่มีให้ใช้สีเริ่มต้น #ff8c00
-        $profile_border_color = !empty($row['group_color']) ? htmlspecialchars($row['group_color']) : '#ff8c00';
-    } else {
-        // หากไม่พบข้อมูล ให้ใช้สีเริ่มต้นตามที่ตั้งไว้
-        $profile_border_color = '#ff8c00';
-    }
-    $stmt->close();
+$stmt_color = $mysqli->prepare($sql_color);
+$stmt_color->bind_param("i", $studentId);
+$stmt_color->execute();
+$result_color = $stmt_color->get_result();
+$row_color = $result_color->fetch_assoc();
+if ($row_color && !empty($row_color['group_color'])) {
+    $profile_border_color = htmlspecialchars($row_color['group_color']);
 }
+$stmt_color->close();
+
+// 2. ดึงรูปโปรไฟล์หลักจาก classroom_file_student
+$sql_image = "
+    SELECT file_path
+    FROM `classroom_file_student`
+    WHERE student_id = ? AND file_type = 'profile_image' AND file_status = 1 AND is_deleted = 0
+    ORDER BY file_order ASC
+    LIMIT 1
+";
+$stmt_image = $mysqli->prepare($sql_image);
+$stmt_image->bind_param("i", $studentId);
+$stmt_image->execute();
+$result_image = $stmt_image->get_result();
+$row_image = $result_image->fetch_assoc();
+
+if ($row_image && !empty($row_image['file_path'])) {
+    $student_image_profile = GetUrl($row_image['file_path']);
+} else {
+    // ถ้าไม่พบรูปในตาราง classroom_file_student ให้ใช้รูปจากตาราง classroom_student แทน
+    $sql_fallback = "SELECT student_image_profile FROM `classroom_student` WHERE student_id = ?";
+    $stmt_fallback = $mysqli->prepare($sql_fallback);
+    $stmt_fallback->bind_param("i", $studentId);
+    $stmt_fallback->execute();
+    $result_fallback = $stmt_fallback->get_result();
+    $row_fallback = $result_fallback->fetch_assoc();
+    if ($row_fallback && !empty($row_fallback['student_image_profile'])) {
+        $student_image_profile = GetUrl($row_fallback['student_image_profile']);
+    }
+    $stmt_fallback->close();
+}
+$stmt_image->close();
+
+
+// 3. ดึงชื่อนักเรียนเพื่อแสดงผล
+$sql_name = "
+    SELECT IFNULL(student_firstname_en, student_firstname_th) AS student_name
+    FROM `classroom_student`
+    WHERE student_id = ?
+";
+$stmt_name = $mysqli->prepare($sql_name);
+$stmt_name->bind_param("i", $studentId);
+$stmt_name->execute();
+$result_name = $stmt_name->get_result();
+$row_name = $result_name->fetch_assoc();
+$student_name = $row_name['student_name'] ? $row_name['student_name'] : "User";
+$stmt_name->close();
+
 $hide_profile = ["profile", "edit_profile", "setting"];
 ?>
 
@@ -116,7 +147,7 @@ $hide_profile = ["profile", "edit_profile", "setting"];
                     </span>
                     <div class="">
                         <h1>Green Tech</h1>
-                        <p>Hello ! <?php echo ($student_name) ? $student_name : "User"; ?></p>
+                        <p>Hello ! <?php echo $student_name; ?></p>
                     </div>
                 </div>
                 <div class="icons">
@@ -126,23 +157,22 @@ $hide_profile = ["profile", "edit_profile", "setting"];
                         </span>
                     </button>
                     <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>;">
-                        <img style=" border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
+                        <img style=" border-radius: 100%; object-fit: cover;"height="30" width="30" id="avatar_h" name="avatar_h"  title="test" src="<?php echo $student_image_profile; ?>">
                     </a>
                 </div>
             </div>
         </div>
         <script>
-        $('#bellButton').on('click', function() {
-            $('#notificationModal').modal('show');
-        });
-    </script>
+            $('#bellButton').on('click', function() {
+                $('#notificationModal').modal('show');
+            });
+        </script>
 
     <?php
     } else {
     ?>
         <div class="header">
             <button class="back-button" onclick="window.history.back();">
-                <!-- <span class="back-arrow">←</span> -->
                 <span>
                     <i class="fas fa-long-arrow-alt-left"></i>
                 </span>
@@ -176,9 +206,3 @@ $hide_profile = ["profile", "edit_profile", "setting"];
         </div>
     </div>
 </div>
-
-<!-- <script>
-    $('#bellButton').on('click', function() {
-        $('#notificationModal').modal('show');
-    });
-</script> -->

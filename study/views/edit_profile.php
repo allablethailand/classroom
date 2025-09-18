@@ -1,27 +1,75 @@
 <?php
+// แก้ไขและตั้งค่า Timezone ให้เป็นเวลากรุงเทพฯ (Asia/Bangkok)
+date_default_timezone_set('Asia/Bangkok'); 
 session_start();
 $base_include = $_SERVER['DOCUMENT_ROOT'];
 $base_path = '';
-if($_SERVER['HTTP_HOST'] == 'localhost'){
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
     $request_uri = $_SERVER['REQUEST_URI'];
-    $exl_path = explode('/',$request_uri);
-    if(!file_exists($base_include."/dashboard.php")){
-        $base_path .= "/".$exl_path[1];
+    $exl_path = explode('/', $request_uri);
+    if (!file_exists($base_include . "/dashboard.php")) {
+        $base_path .= "/" . $exl_path[1];
     }
-    $base_include .= "/".$exl_path[1];
+    $base_include .= "/" . $exl_path[1];
 }
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
-require_once $base_include.'/lib/connect_sqli.php';
+require_once $base_include . '/lib/connect_sqli.php';
 
 global $mysqli;
 
-// แก้ไข: ดึงข้อมูลจากตาราง classroom_student และ group_color
-// ตรวจสอบว่ามี session id ของนักเรียนหรือไม่
+function extractPathFromUrl($url)
+{
+    if (strpos($url, '://') === false) {
+        return cleanPath($url);
+    }
+    $parsed_url = parse_url($url);
+    if (isset($parsed_url['path'])) {
+        $path = $parsed_url['path'];
+        $path = strtok($path, '?');
+        return cleanPath($path);
+    }
+    return '';
+}
+
+function cleanPath($path)
+{
+    return ltrim($path, '/');
+}
+
+function uploadFile($file, $name, $key)
+{
+    global $base_path;
+    $target_dir = $_SERVER['DOCUMENT_ROOT'] . $base_path . "/uploads/classroom/";
+    if (!is_dir($target_dir)) {
+        mkdir($target_dir, 0755, true);
+    }
+
+    if (!isset($file[$name]['tmp_name']) || !isset($file[$name]['tmp_name'][$key]) || empty($file[$name]['tmp_name'][$key])) {
+        return null;
+    }
+
+    $tmp_name = $file[$name]['tmp_name'][$key];
+    $file_name = $file[$name]['name'][$key];
+    $file_error = $file[$name]['error'][$key];
+
+    if ($tmp_name && $file_error == UPLOAD_ERR_OK) {
+        $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
+        $new_file_name = uniqid() . '.' . $file_extension;
+        $target_file = $target_dir . $new_file_name;
+
+        if (move_uploaded_file($tmp_name, $target_file)) {
+            $new_file_path = "uploads/classroom/" . $new_file_name;
+            return $new_file_path;
+        } else {
+            return null;
+        }
+    }
+    return null;
+}
+
 if (!isset($_SESSION['student_id'])) {
-    // กรณีที่ไม่มี session ให้ redirect หรือแสดงข้อความแจ้งเตือน
-    // หรือใช้ค่าเริ่มต้น
-    $student_id = 1; // หรือค่าเริ่มต้นอื่นๆ
+    $student_id = 1;
 } else {
     $student_id = $_SESSION['student_id'];
 }
@@ -42,149 +90,229 @@ $result_student = $stmt->get_result();
 $row_student = $result_student->fetch_assoc();
 $stmt->close();
 
-$image_profile_path = ($row_student["student_image_profile"]) ? GetUrl($row_student["student_image_profile"]) : "";
+$sql_files = "
+    SELECT file_id, file_path, file_status, file_order
+    FROM classroom_file_student
+    WHERE student_id = ? AND file_type = 'profile_image' AND is_deleted = 0
+    ORDER BY file_status DESC, file_order ASC
+";
+$stmt_files = $mysqli->prepare($sql_files);
+$stmt_files->bind_param("i", $student_id);
+$stmt_files->execute();
+$result_files = $stmt_files->get_result();
+$student_images = $result_files->fetch_all(MYSQLI_ASSOC);
+$stmt_files->close();
 
-// ตั้งค่า session สำหรับรูปโปรไฟล์และชื่อ
 $_SESSION["user"] = $row_student["student_firstname_th"] . " " . $row_student["student_lastname_th"];
-$_SESSION["emp_pic"] = $row_student["student_image_profile"];
-$comp_id = $_SESSION['comp_id'] ? $_SESSION['comp_id']: null; // ใช้ Null Coalescing Operator เพื่อป้องกัน error ถ้าไม่มี session
+$_SESSION["emp_pic"] = isset($student_images[0]) ? $student_images[0]['file_path'] : null;
 
-// กำหนดสีขอบรูปภาพ
 $profile_border_color = !empty($row_student['group_color']) ? htmlspecialchars($row_student['group_color']) : '#ff8c00';
 
-// ตรวจสอบว่ามีการส่งข้อมูลแบบ POST มาหรือไม่
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // ตั้งค่าให้ return เป็น JSON
     header('Content-Type: application/json');
-
-    // ตรวจสอบว่ามี session id ของนักเรียนหรือไม่ (เพื่อความปลอดภัย)
     if (!isset($_SESSION['student_id'])) {
         $response['status'] = 'error';
         $response['message'] = 'Session expired. Please log in again.';
         echo json_encode($response);
         exit;
     }
-
-    // ดึงค่า student_id จาก session
-    $student_id = (int)$_SESSION['student_id'];
-
-    // เตรียมตัวแปรสำหรับเก็บข้อมูลที่รับมา
-    $bio = $_POST['bio'] ?  $_POST['bio']: '';
-    $mobile = $_POST['mobile'] ?  $_POST['mobile']: '';
-    $email = $_POST['email'] ?  $_POST['email']: '';
-    $line = $_POST['line'] ?  $_POST['line']: '';
-    $ig = $_POST['ig'] ?  $_POST['ig']: '';
-    $facebook = $_POST['facebook'] ?  $_POST['facebook']: '';
-    $hobby = $_POST['hobby'] ?  $_POST['hobby']: '';
-    $favorite_music = $_POST['favorite_music'] ?  $_POST['favorite_music']: '';
-    $favorite_movie = $_POST['favorite_movie'] ?  $_POST['favorite_movie']: '';
-    $goal = $_POST['goal'] ?  $_POST['goal']: '';
-    $emp_modify = $student_id;
-    $date_modify = date("Y-m-d H:i:s");
-
-    // สร้าง SQL query สำหรับอัปเดตข้อมูล Text
-    $sql_update = "UPDATE `classroom_student` SET 
-        `student_bio` = ?,
-        `student_mobile` = ?,
-        `student_email` = ?,
-        `student_line` = ?,
-        `student_ig` = ?,
-        `student_facebook` = ?,
-        `student_hobby` = ?,
-        `student_music` = ?,
-        `student_movie` = ?,
-        `student_goal` = ?,
-        `comp_id` = ?,
-        `emp_modify` = ?,
-        `date_modify` = ?
-        WHERE `student_id` = ?";
+    $student_id = (int) $_SESSION['student_id'];
+    $response = ['status' => 'success', 'message' => 'บันทึกการเปลี่ยนแปลงโปรไฟล์สำเร็จ'];
     
-    // ใช้ prepared statement เพื่อป้องกัน SQL Injection
-    $stmt = $mysqli->prepare($sql_update);
-    if ($stmt === false) {
-        $response['status'] = 'error';
-        $response['message'] = 'Prepare failed: ' . $mysqli->error;
+    // ตั้งค่า Timezone ก่อนใช้งาน date() ทุกครั้ง
+    date_default_timezone_set('Asia/Bangkok');
+    $current_datetime = date("Y-m-d H:i:s");
+
+    if (isset($_POST['update_type']) && $_POST['update_type'] == 'text') {
+        $bio = $_POST['bio'] ? $_POST['bio'] : '';
+        $mobile = $_POST['mobile'] ? $_POST['mobile'] : '';
+        $email = $_POST['email'] ? $_POST['email'] : '';
+        $line = $_POST['line'] ? $_POST['line'] : '';
+        $ig = $_POST['ig'] ? $_POST['ig'] : '';
+        $facebook = $_POST['facebook'] ? $_POST['facebook'] : '';
+        $hobby = $_POST['hobby'] ? $_POST['hobby'] : '';
+        $favorite_music = $_POST['favorite_music'] ? $_POST['favorite_music'] : '';
+        $favorite_drink = $_POST['favorite_drink'] ? $_POST['favorite_drink'] : '';
+        $favorite_movie = $_POST['favorite_movie'] ? $_POST['favorite_movie'] : '';
+        $goal = $_POST['goal'] ? $_POST['goal'] : '';
+        $emp_modify = $student_id;
+        // ใช้ตัวแปร $current_datetime ที่กำหนดไว้ตอนต้นแล้ว
+
+        $sql_update = "UPDATE `classroom_student` SET 
+            `student_bio` = ?, `student_mobile` = ?, `student_email` = ?, `student_line` = ?, `student_ig` = ?,
+            `student_facebook` = ?, `student_hobby` = ?, `student_music` = ?, `student_drink` = ?,
+            `student_movie` = ?, `student_goal` = ?, `emp_modify` = ?, `date_modify` = ?
+            WHERE `student_id` = ?";
+
+        $stmt = $mysqli->prepare($sql_update);
+        if ($stmt === false) {
+            $response = ['status' => 'error', 'message' => 'Prepare failed: ' . $mysqli->error];
+            echo json_encode($response);
+            exit;
+        }
+        $stmt->bind_param("sssssssssssssi", $bio, $mobile, $email, $line, $ig, $facebook, $hobby, $favorite_music, $favorite_drink, $favorite_movie, $goal, $emp_modify, $current_datetime, $student_id);
+        if (!$stmt->execute()) {
+            $response = ['status' => 'error', 'message' => 'อัปเดตข้อมูล Text ไม่สำเร็จ: ' . $stmt->error];
+        }
+        $stmt->close();
         echo json_encode($response);
         exit;
     }
 
-    $stmt->bind_param(
-        "sssssssssssssi",
-        $bio,
-        $mobile,
-        $email,
-        $line,
-        $ig,
-        $facebook,
-        $hobby,
-        $favorite_music,
-        $favorite_movie,
-        $goal,
-        $comp_id,
-        $emp_modify,
-        $date_modify,
-        $student_id
-    );
+    if (isset($_POST['update_type']) && $_POST['update_type'] == 'file') {
+        $file_action = $_POST['file_action'] ? $_POST['file_action'] : '';
+        $file_id = isset($_POST['file_id']) && $_POST['file_id'] !== '' ? $_POST['file_id'] : null;
+        $file_index = isset($_POST['file_index']) ? $_POST['file_index'] : null;
+        $response = ['status' => 'success', 'message' => 'ดำเนินการสำเร็จ'];
 
-    $is_updated = false;
-    if ($stmt->execute()) {
-        $is_updated = true;
-    }
+        switch ($file_action) {
+            case 'add':
+                if (isset($_FILES['file_upload'])) {
+                    $new_file_path = uploadFile($_FILES, 'file_upload', $file_index);
+                    if ($new_file_path) {
+                        $emp_create = $student_id;
+                        
+                        $sql_count_active = "SELECT COUNT(*) AS total FROM classroom_file_student WHERE student_id = ? AND file_type = 'profile_image' AND is_deleted = 0";
+                        $stmt_count = $mysqli->prepare($sql_count_active);
+                        $stmt_count->bind_param("i", $student_id);
+                        $stmt_count->execute();
+                        $total_active = $stmt_count->get_result()->fetch_assoc()['total'];
+                        $stmt_count->close();
 
-    $stmt->close();
+                        if ($total_active >= 4) {
+                            $response = ['status' => 'error', 'message' => 'คุณสามารถมีรูปโปรไฟล์ได้สูงสุด 4 รูป'];
+                            $full_path_to_delete = $_SERVER['DOCUMENT_ROOT'] . BASE_PATH . '/' . $new_file_path;
+                            if (file_exists($full_path_to_delete)) {
+                                unlink($full_path_to_delete);
+                            }
+                            echo json_encode($response);
+                            exit;
+                        }
+                        $file_order = $total_active + 1;
+                        $file_status = ($total_active == 0) ? 1 : 0;
+                        
+                        // แก้ไข: ใช้ NOW() โดยตรงใน SQL เพื่อความแม่นยำของเวลาเซิร์ฟเวอร์
+                        $sql_insert = "INSERT INTO classroom_file_student (`student_id`, `file_path`, `file_type`, `file_status`, `file_order`, `date_create`, `emp_create`) VALUES (?, ?, 'profile_image', ?, ?, NOW(), ?)";
+                        $stmt_insert = $mysqli->prepare($sql_insert);
+                        if (!$stmt_insert) {
+                             $response = ['status' => 'error', 'message' => 'เพิ่มรูปภาพไม่สำเร็จ: ' . $mysqli->error];
+                             echo json_encode($response);
+                             exit;
+                        }
+                        $stmt_insert->bind_param("isiii", $student_id, $new_file_path, $file_status, $file_order, $emp_create);
+                        if (!$stmt_insert->execute()) {
+                            $response = ['status' => 'error', 'message' => 'เพิ่มรูปภาพไม่สำเร็จ: ' . $stmt_insert->error];
+                        }
+                        $stmt_insert->close();
+                        $response['file_id'] = $mysqli->insert_id;
+                    } else {
+                        $response = ['status' => 'error', 'message' => 'อัปโหลดไฟล์ไม่สำเร็จ'];
+                    }
+                }
+                echo json_encode($response);
+                exit;
+                break;
+            case 'replace':
+                if (isset($_FILES['file_upload'])) {
+                    $new_file_path = uploadFile($_FILES, 'file_upload', $file_index);
+                    if ($new_file_path) {
+                        // แก้ไข: ใช้ NOW() สำหรับ date_modify
+                        $sql_update_path = "UPDATE classroom_file_student SET file_path = ?, date_modify = NOW(), emp_modify = ? WHERE file_id = ?";
+                        $stmt_update_path = $mysqli->prepare($sql_update_path);
+                        $emp_modify = $student_id;
+                        $stmt_update_path->bind_param("sii", $new_file_path, $emp_modify, $file_id);
+                        if (!$stmt_update_path->execute()) {
+                            $response = ['status' => 'error', 'message' => 'เปลี่ยนรูปภาพไม่สำเร็จ: ' . $stmt_update_path->error];
+                        }
+                        $stmt_update_path->close();
+                    } else {
+                        $response = ['status' => 'error', 'message' => 'อัปโหลดไฟล์ไม่สำเร็จ'];
+                    }
+                }
+                echo json_encode($response);
+                exit;
+                break;
 
-    // ส่วนจัดการการอัปโหลดไฟล์รูปภาพ
-    if (isset($_FILES['image_name']) && $_FILES['image_name']['error'] == UPLOAD_ERR_OK) {
-        $upload_dir = 'classroom/uploads/profile/'; // กำหนด path สำหรับบันทึกรูปภาพ
-        
-        // ตรวจสอบและสร้างโฟลเดอร์ถ้าไม่มี
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+            case 'delete':
+                if ($file_id) {
+                    // แก้ไข: ใช้ NOW() สำหรับ date_modify
+                    $sql_delete = "UPDATE classroom_file_student SET is_deleted = 1, date_modify = NOW(), emp_modify = ? WHERE file_id = ?";
+                    $stmt_delete = $mysqli->prepare($sql_delete);
+                    $emp_modify = $student_id;
+                    $stmt_delete->bind_param("ii", $emp_modify, $file_id);
+                    if (!$stmt_delete->execute()) {
+                        $response = ['status' => 'error', 'message' => 'ลบรูปภาพไม่สำเร็จ: ' . $stmt_delete->error];
+                    }
+                    $stmt_delete->close();
+                }
+                echo json_encode($response);
+                exit;
+                break;
+
+            case 'set_main':
+                if ($file_id) {
+                    $mysqli->begin_transaction();
+                    try {
+                        // แก้ไข: ใช้ NOW() สำหรับ date_modify
+                        $sql_reset_main = "UPDATE classroom_file_student SET file_status = 0, file_order = 0, date_modify = NOW(), emp_modify = ? WHERE student_id = ? AND file_type = 'profile_image' AND is_deleted = 0";
+                        $stmt_reset = $mysqli->prepare($sql_reset_main);
+                        $stmt_reset->bind_param("ii", $student_id, $student_id);
+                        $stmt_reset->execute();
+                        $stmt_reset->close();
+
+                        // แก้ไข: ใช้ NOW() สำหรับ date_modify
+                        $sql_set_main = "UPDATE classroom_file_student SET file_status = 1, file_order = 1, date_modify = NOW(), emp_modify = ? WHERE file_id = ?";
+                        $stmt_set_main = $mysqli->prepare($sql_set_main);
+                        $emp_modify = $student_id;
+                        $stmt_set_main->bind_param("ii", $emp_modify, $file_id);
+                        $stmt_set_main->execute();
+                        $stmt_set_main->close();
+
+                        $sql_reorder = "SELECT file_id FROM classroom_file_student WHERE student_id = ? AND file_type = 'profile_image' AND is_deleted = 0 AND file_id != ? ORDER BY date_create ASC";
+                        $stmt_reorder_select = $mysqli->prepare($sql_reorder);
+                        $stmt_reorder_select->bind_param("ii", $student_id, $file_id);
+                        $stmt_reorder_select->execute();
+                        $result_reorder = $stmt_reorder_select->get_result();
+                        $order_counter = 2;
+                        while ($row = $result_reorder->fetch_assoc()) {
+                            // แก้ไข: ใช้ NOW() สำหรับ date_modify
+                            $sql_update_order = "UPDATE classroom_file_student SET file_order = ?, date_modify = NOW(), emp_modify = ? WHERE file_id = ?";
+                            $stmt_update_order = $mysqli->prepare($sql_update_order);
+                            $stmt_update_order->bind_param("iii", $order_counter, $student_id, $row['file_id']);
+                            $stmt_update_order->execute();
+                            $stmt_update_order->close();
+                            $order_counter++;
+                        }
+                        $stmt_reorder_select->close();
+
+                        $mysqli->commit();
+                        $response = ['status' => 'success', 'message' => 'ตั้งค่ารูปหลักสำเร็จ'];
+                    } catch (mysqli_sql_exception $e) {
+                        $mysqli->rollback();
+                        $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการตั้งค่ารูปหลัก: ' . $e->getMessage()];
+                    }
+                }
+                echo json_encode($response);
+                exit;
+                break;
         }
-
-        $image_ext = pathinfo($_FILES['image_name']['name'], PATHINFO_EXTENSION);
-        $new_image_name = 'profile_' . $student_id . '_' . time() . '.' . $image_ext;
-        $target_file = $upload_dir . $new_image_name;
-
-        // ย้ายไฟล์ที่อัปโหลด
-        if (SaveFile($_FILES['image_name']['tmp_name'], $target_file)) {
-            // อัปเดต path ของรูปภาพในฐานข้อมูล
-            $sql_update_image = "UPDATE `classroom_student` SET `student_image_profile` = ? WHERE `student_id` = ?";
-            $stmt_image = $mysqli->prepare($sql_update_image);
-            if ($stmt_image === false) {
-                 $response['status'] = 'error';
-                 $response['message'] = 'Prepare image update failed: ' . $mysqli->error;
-                 echo json_encode($response);
-                 exit;
-            }
-            $stmt_image->bind_param("si", $target_file, $student_id);
-            
-            if ($stmt_image->execute()) {
-                // อัปเดต session สำหรับรูปโปรไฟล์ใหม่
-                $_SESSION['student_image_profile'] = $target_file;
-            }
-            $stmt_image->close();
-        } else {
-            // ถ้าอัปโหลดรูปไม่สำเร็จ
-            $response['status'] = 'error';
-            $response['message'] = 'ไม่สามารถอัปโหลดรูปภาพได้';
-            echo json_encode($response);
-            exit;
-        }
     }
-
-    // ตรวจสอบผลลัพธ์สุดท้ายของการอัปเดต
-    if ($is_updated) {
-        $response['status'] = 'success';
-        $response['message'] = 'บันทึกการเปลี่ยนแปลงโปรไฟล์สำเร็จ';
-    } else {
-        $response['status'] = 'error';
-        $response['message'] = 'ไม่สามารถบันทึกข้อมูลได้: ' . $mysqli->error;
-    }
-
-    echo json_encode($response);
     $mysqli->close();
     exit;
+}
+
+function thaidate($value)
+{
+    return empty($value) ? "" : substr($value, 8, 2) . "/" . substr($value, 5, 2) . "/" . substr($value, 0, 4);
+}
+function find_birth($birthday, $today)
+{
+    list($byear, $bmonth, $bday) = explode("-", $birthday);
+    list($tyear, $tmonth, $tday) = explode("-", $today);
+    $u_y = date("Y", mktime(0, 0, 0, $tmonth, $tday, $tyear) - mktime(0, 0, 0, $bmonth, $bday, $byear)) - 1970;
+    $u_m = date("m", mktime(0, 0, 0, $tmonth, $tday, $tyear) - mktime(0, 0, 0, $bmonth, $bday, $byear)) - 1;
+    $u_d = date("d", mktime(0, 0, 0, $tmonth, $tday, $tyear) - mktime(0, 0, 0, $bmonth, $bday, $byear)) - 1;
+    return "$u_y ปี $u_m เดือน $u_d วัน";
 }
 ?>
 
@@ -219,344 +347,177 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8"
         type="text/javascript"></script>
 
-
-    <script src="/classroom/study/js/setting.js?v=<?php echo time(); ?>" type="text/javascript"></script>
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $(".avatar.avatar-profile").css("border", "5px solid <?php echo $dna_color; ?>");
-            $('input[type=file]').change(function () {
-                var input = this;
-                if (input.files && input.files[0]) {
-                    var fileTypes = ['jpg', 'jpeg', 'png', 'gif'];
-                    var extension = input.files[0].name.split('.').pop().toLowerCase(),
-                        isSuccess = fileTypes.indexOf(extension) > -1;
-                    if (isSuccess) {
-                        var reader = new FileReader();
-                        reader.onload = function (e) {
-                            console.log(e.target.result);
-                            var img = e.target.result;
-                            var data = e.target.result.replace("data:", "");
-                            var w_user = '300px';
-                            var h_user = '100px';
-                            $("#docsign").empty();
-                            $("#docsign").append('<i class="fa fa-undo reset_signature_img" onclick="reset_signature_img(\'docsign\');"></i>');
-                            $("#docsign").append('<img name="imgsign" id="imgsign" src="' + img + '" width="' + w_user + '" height="' + h_user + '" />');
-                            $("#docsign").removeClass('signature');
-                            $("#docsign").addClass('signature_img');
-                            $('#signature_drawing').val(data);
-                        };
-                        reader.readAsDataURL(input.files[0]);
-                    } else {
-                        swal({
-                            type: 'warning',
-                            title: window.lang.translate('Please Use only File such as .jpeg, .jpg, .gif, .png'),
-                            showConfirmButton: true,
-                            timer: 3500
-                        });
-                    }
-                }
-            });
-            $('#elementsToOperateOn input, #elementsToOperateOn textarea, #elementsToOperateOn select, #elementsToOperateOn checkbox').attr('disabled', true);
-            $('#elementsToOperateOn .fa-remove,#elementsToOperateOn .btn-warning').hide();
-            var get_datascource = load_datascource(<?php echo $_SESSION['student_id']; ?>);
-            var ajaxURLs = {
-                'children': function (nodeData) {
-                    return 'orgchart/children.php?id=' + nodeData.id;
-                }
-            };
-            // $('#chart-orgami').orgchart({
-            //     'data': get_datascource,
-            //     'ajaxURL': ajaxURLs,
-            //     'nodeContent': 'name',
-            //     'parentNodeSymbol': '',
-            //     'pan': true,
-            //     'zoom': true,
-            //     'createNode': function ($node, data) {
-            //         $node.children('.title').html('<img src="' + ((data.pic) ? '../' + data.pic : '../' + 'images/default.png') + '" onerror="this.src=\'../images/default.png\'" class="bxtCXs dqIZME">');
-            //         var nickname = (data.nickname) ? ' (' + data.nickname + ')' : '';
-            //         $node.children('.content').append('<div class="kydEot"><b>' + data.name + ' ' + data.lastname + nickname + '</b></div>');
-            //         if (data.position) {
-            //             $node.children('.content').append('<div class="ebDfCA">' + data.position + '</div>');
-            //         }
-            //         if (data.dept) {
-            //             $node.children('.content').append('<div class="ebDfCA">' + data.dept + '</div>');
-            //         }
-            //         if (data.division) {
-            //             $node.children('.content').append('<div class="ebDfCA">' + data.division + '</div>');
-            //         }
-            //     }
-            // });
-            get_select();
-            $('table.display').DataTable({
-                "lengthMenu": [25, 50, 100],
-                "language": {
-                    "decimal": "",
-                    "emptyTable": "<span lang='en'>No data available in table</span>",
-                    "info": "<span lang='en'>Showing</span> _START_ <span lang='en'>to</span> _END_ <span lang='en'>of</span> _TOTAL_ <span lang='en'>entries</span>",
-                    "infoEmpty": "<span lang='en'><span lang='en'>Showing</span> 0 <span lang='en'>to</span> 0 <span lang='en'>of</span> 0 <span lang='en'>entries</span>",
-                    "infoFiltered": "(<span lang='en'>filtered from</span> _MAX_ <span lang='en'>total entries</span>)",
-                    "infoPostFix": "",
-                    "thousands": ",",
-                    "lengthMenu": "<span lang='en'>Show</span> _MENU_ <span lang='en'>entries</span>",
-                    "loadingRecords": "<span lang='en'>Loading...</span>",
-                    "processing": "<span lang='en'>Processing...</span>",
-                    "search": "<span lang='en'>Search:</span>",
-                    "zeroRecords": "<span lang='en'>No matching records found</span>",
-                    "paginate": {
-                        "first": "<span lang='en'>First</span>",
-                        "last": "<span lang='en'>Last</span>",
-                        "next": "<span lang='en'>Next</span>",
-                        "previous": "<span lang='en'>Previous</span>"
-                    },
-                    "aria": {
-                        "sortAscending": ": <span lang='en'>activate to sort column ascending</span>",
-                        "sortDescending": ": <span lang='en'>activate to sort column descending</span>"
-                    }
-                },
-            });
-        });
-        $('body').bind('DOMNodeInserted', function (e) {
-            if (e.target.tagName == 'select') {
-                bind_select(this);
-            } else {
-                $(e.target).find('select').each(function () {
-                    bind_select(this);
-                });
-            }
-        });
-        function load_datascource(id) {
-            var datascource_json;
-            $.ajax({
-                url: '../../orgchart/datasource.php',
-                data: {
-                    id: id
-                },
-                type: 'post',
-                dataType: 'JSON',
-                async: false,
-                success: function (result) {
-                    datascource_json = result;
-                }
-            });
-            return datascource_json;
-        }
-    </script>
-    <script>
-        $(document).ready(function () {
-            // ส่วนนี้จะจัดการ active class เมื่อคลิกที่เมนู
-            $('.top-nav a').on('click', function (e) {
-                $('.top-nav a').removeClass('active');
-                $(this).addClass('active');
-            });
-
-            // กำหนดให้เมนูแรกเป็น active ตั้งแต่แรกที่โหลดหน้า
-            $('.top-nav a[href="#A"]').addClass('active');
-
-              // ดักจับการคลิกที่ปุ่มบันทึก
-            $("#saveBtn").on("click", function (e) {
-                e.preventDefault(); // ป้องกันการ submit ฟอร์มแบบปกติ
-                
-                // ดึงข้อมูลจากฟอร์มทั้งหมดด้วย FormData
-                var formData = new FormData($("#editProfileForm")[0]);
-                
-                // ส่งข้อมูลด้วย AJAX
-                $.ajax({
-                    url: "views/edit_profile.php", // **สำคัญ: ต้องเปลี่ยนเป็นชื่อไฟล์ PHP ของคุณ**
-                    type: "POST",
-                    data: formData,
-                    processData: false, // จำเป็นสำหรับ FormData
-                    contentType: false, // จำเป็นสำหรับ FormData
-                    dataType: 'JSON',
-                    success: function (response) {
-                        // response คือค่าที่ส่งกลับมาจากไฟล์ PHP
-                        if (response.status === 'success') {
-                            swal({
-                                title: "บันทึกสำเร็จ",
-                                text: response.message, // ข้อความจาก PHP
-                                type: "success",
-                                showCancelButton: false,
-                                confirmButtonColor: "#ff6600",
-                                confirmButtonText: "ตกลง",
-                                closeOnConfirm: false
-                            }, function () {
-                                location.reload(); // รีเฟรชหน้าเว็บเมื่อกดตกลง
-                            });
-                        } else {
-                            // ถ้าบันทึกไม่สำเร็จ
-                            swal({
-                                title: "เกิดข้อผิดพลาด",
-                                text: response.message, // ข้อความจาก PHP
-                                type: "error",
-                                showCancelButton: false,
-                                confirmButtonColor: "#ff6600",
-                                confirmButtonText: "ตกลง",
-                            });
-                        }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        // กรณีเกิดข้อผิดพลาดในการเชื่อมต่อ
-                        console.error("AJAX Error:", textStatus, errorThrown);
-                        swal({
-                            title: "เกิดข้อผิดพลาด",
-                            text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ หรือมีข้อผิดพลาดในการประมวลผล",
-                            type: "error",
-                            showCancelButton: false,
-                            confirmButtonColor: "#ff6600",
-                            confirmButtonText: "ตกลง",
-                        });
-                    }
-                });
-            });
-        });
-      
-    </script>
     <style>
-        /* --- New Style for a modern, flat UI --- */
-        body {
-            background-color: #f0f2f5;
-            /* Light gray background */
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #333;
-        }
-
-        .top-nav-container {
-            width: 100%;
+        .profile-image-gallery {
             display: flex;
             justify-content: center;
-            /* ให้อยู่กลาง */
-            background: #ffc27c;
-            ;
-            padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            /* margin-top: 35px; */
-            /* border-radius: 0 0 20px 20px; มุมโค้งล่าง */
-        }
-
-        .top-nav {
-            list-style: none;
-            display: flex;
-            gap: 25px;
-            /* ระยะห่าง icon */
-            margin: 0;
-            padding: 0;
-        }
-
-        .top-nav li a {
-            display: flex;
             align-items: center;
-            justify-content: center;
-            width: 55px;
-            height: 55px;
-            border-radius: 15px;
-            background: #ffe5cc;
-            /* พื้นหลังอ่อนโทนส้ม */
-            color: #ff6600;
-            /* ไอคอนส้ม */
-            font-size: 22px;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .profile-image-item,
+        .profile-image-placeholder,
+        .image-preview-container {
+            /* รวม selector เพื่อกำหนดขนาดเดียวกัน */
+            position: relative;
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+            border-radius: 50%;
+            /* เพื่อให้ทุกองค์ประกอบเป็นวงกลม */
+        }
+
+        /* .profile-image-item {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+        } */
+        .profile-image-item img {
+            width: 100%;
+            /* ใช้ 100% เพื่อให้ปรับขนาดตาม container */
+            height: 150px;
+            /* ใช้ 100% เพื่อให้ปรับขนาดตาม container */
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #ddd;
             transition: all 0.3s ease;
         }
 
-        .top-nav li a:hover {
-            background: #ff6600;
-            color: #fff;
-            transform: translateY(-4px);
-            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+        .profile-image-item.is-main img {
+            border-color:
+                <?= $profile_border_color; ?>
+            ;
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
         }
 
-        .top-nav li a.active,
-        .top-nav li a.active:hover {
-            background: #ff6600;
-            /* พื้นหลังสีส้มเข้ม */
-            color: #fff;
-            /* ตัวอักษรและไอคอนสีขาว */
-            transform: translateY(0);
-            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
-        }
-
-        /* ปรับขนาด icon ใน contact-grid */
-        .contact-grid {
-            display: flex;
-            flex-wrap: wrap;
-            /* ให้บรรทัดขึ้นใหม่ได้ */
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .contact-item {
-            text-align: center;
-            flex-basis: 100px;
-            /* กำหนดขนาดพื้นฐานให้แต่ละไอเทม */
-            flex-grow: 1;
-            /* ให้แต่ละไอเทมขยายได้ */
-        }
-
-        .contact-item a {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #7f8c8d;
-            font-size: 1.1em;
-            /* เพิ่มขนาดฟอนต์ข้อความ */
-            transition: transform 0.2s ease;
-        }
-
-        .contact-item a span {
-            font-size: 1.1em;
-            /* เพิ่มขนาดฟอนต์ข้อความ */
-        }
-
-        .contact-icon-circle {
-            width: 70px;
-            height: 70px;
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 8px;
-            font-size: 32px;
-            /* ขนาดไอคอนในวงกลมใหญ่ขึ้น */
-            color: #fff;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
-            /* เพิ่ม transition ให้การเปลี่ยนสีดูนุ่มนวลขึ้น */
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
+        .profile-image-item:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .overlay-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .overlay-btn {
+            background: #fff;
+            color: #333;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .overlay-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .profile-image-placeholder {
+            /* width: 100%; */
+            /* ใช้ 100% เพื่อให้ปรับขนาดตาม container */
+            /* height: 100%; */
+            /* ใช้ 100% เพื่อให้ปรับขนาดตาม container */
+            border: 4px dashed #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #aaa;
+            font-size: 3em;
+            transition: border-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .profile-image-placeholder:hover {
+            border-color: #ff8c00;
+            color: #ff8c00;
+        }
+
+        /* New styles for mobile responsiveness */
         @media (max-width: 768px) {
-            .top-nav {
-                gap: 10px;
-                /* ลดช่องว่างระหว่างเมนูบนมือถือ */
-                justify-content: space-around;
-                /* ให้กระจายตัวเท่าๆ กัน */
+            .profile-image-gallery {
+                flex-direction: column;
+                /* เปลี่ยน layout เป็นแนวตั้ง */
+                gap: 20px;
             }
 
-            .top-nav li a {
-                width: 50px;
-                height: 50px;
+            .profile-image-item,
+            .profile-image-placeholder,
+            .image-preview-container {
+                width: 120px;
+                /* ลดขนาดวงกลมให้เล็กลง */
+                height: 120px;
             }
 
-            .top-nav li a i {
-                font-size: 20px;
-                /* ปรับขนาดไอคอนให้เล็กลงเล็กน้อย */
-            }
-
-            .contact-grid {
-                grid-template-columns: repeat(3, 1fr);
-                /* แสดง 3 คอลัมน์บนมือถือ */
-            }
-
-            .contact-icon-circle {
-                width: 55px;
-                /* ปรับขนาดเล็กน้อยสำหรับมือถือ */
-                height: 55px;
-                /* font-size: 50px; ปรับขนาดไอคอนให้เหมาะสม */
-            }
-
-            .contact-item a span {
+            .overlay-btn {
+                width: 35px;
+                /* ลดขนาดปุ่มเครื่องมือ */
+                height: 35px;
                 font-size: 1em;
-                /* ปรับขนาดฟอนต์ให้เหมาะสมกับมือถือ */
+                /* ลดขนาด icon */
             }
+
+            .profile-image-item img {
+                width: 100%;
+                /* ใช้ 100% เพื่อให้ปรับขนาดตาม container */
+                height: 120px;
+                /* ใช้ 100% เพื่อให้ปรับขนาดตาม container */
+                object-fit: cover;
+                border-radius: 50%;
+                border: 4px solid #ddd;
+                transition: all 0.3s ease;
+            }
+        }
+
+        /* .image-preview-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        } */
+        .image-preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #ddd;
+        }
+
+        .image-preview-container .preview-action-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: #ff6600;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 1.2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         /* The rest of your styles from the original code */
@@ -566,71 +527,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             padding: 0 20px;
         }
 
-        .profile-card {
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-            /* margin-bottom: 30px; */
-            padding: 40px;
-            text-align: center;
-            position: relative;
-            top: -50px;
-        }
-
-        .profile-avatar-square {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            /* Square with rounded corners */
-            border: 5px solid #ff8c00;
-            /* Orange border */
-            overflow: hidden;
-            margin: 0 auto 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-avatar-square img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .profile-name {
-            font-size: 2.2em;
-            font-weight: 800;
-            color: #2c3e50;
-            /* Dark blue-gray */
-            margin-bottom: 8px;
-        }
-
-        .profile-bio {
-            font-size: 1.1em;
-            color: #7f8c8d;
-            /* Grayish blue */
-            margin-bottom: 25px;
-        }
-
-        .divider {
-            height: 2px;
-            width: 80px;
-            background-color: #ff8c00;
-            margin: 20px auto;
-        }
-
-        .contact-section-card {
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
         .section-header-icon {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-bottom: 25px;
-             color: #ff9900;
+            color: #ff9900;
         }
 
         .section-header-icon i {
@@ -640,85 +542,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .section-title {
-            /* font-size: 1.8em; */
             font-weight: 700;
             color: #333;
             margin: 0;
         }
 
-        .contact-icon-circle.phone {
-            background-color: #2ecc71;
-        }
-
-        /* สีเดิม */
-        .contact-icon-circle.mail {
-            background-color: #D44638;
-        }
-
-        /* Gmail/Email Red */
-        .contact-icon-circle.line {
-            background-color: #00B900;
-        }
-
-        /* Line Green */
-        .contact-icon-circle.ig {
-            background-color: #e4405f;
-        }
-
-        /* Instagram Purple-Red */
-        .contact-icon-circle.fb {
-            background-color: #3b5998;
-        }
-
-        /* Facebook Blue */
-        .info-grid-section {
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-        }
-
-        .info-item-box {
-            background-color: #f7f9fc;
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            transition: transform 0.2s ease;
-        }
-
-        .info-item-box:hover {
-            transform: translateY(-5px);
-        }
-
-        .info-item-box i {
-            font-size: 22px;
-            color: #ff8c00;
-            margin-right: 15px;
-        }
-
-        .info-text strong {
-            display: block;
-            font-size: 1.1em;
-            font-weight: 700;
-            color: #555;
-            margin-bottom: 4px;
-        }
-
-        .info-text span {
-            font-size: 1em;
-            color: #888;
-        }
-
-        /* New CSS for the buttons */
         .btn-save-changes {
             padding: 15px 40px;
             background-color: #ff6600;
@@ -740,32 +568,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             box-shadow: 0 6px 20px rgba(255, 102, 0, 0.5);
         }
 
-        .profile-course-container {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #f0f7ff;
-            border-radius: 10px;
-            display: inline-block;
-        }
-
-        .preview-header-bar {
-            width: 100%;
-            padding: 15px 20px;
-            background-color: #bcbcbcb8;
-            /* สีพื้นหลังแถบ */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border-radius: 0 0 20px 20px;
-        }
-
-        .preview-header-bar a {
-            color: #555;
-            font-size: 20px;
-        }
-
-        /* New CSS for Edit Profile Page */
         .edit-profile-card {
             background: #fff;
             border-radius: 20px;
@@ -800,33 +602,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             box-shadow: 0 0 5px rgba(255, 140, 0, 0.3);
         }
 
-        .input-group {
-            display: flex;
-            align-items: center;
-        }
-
-        .input-group .form-control-edit {
-            flex-grow: 1;
-        }
-
-        .input-group-btn {
-            margin-left: 10px;
-        }
-
-        .btn-upload-pic {
-            background-color: #2ecc71;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-upload-pic:hover {
-            background-color: #27ae60;
-        }
-
         .profile-img-preview {
             width: 150px;
             height: 150px;
@@ -836,350 +611,406 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             display: block;
             margin: 0 auto 20px;
         }
-
-        .preview-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin: 0;
-        }
-
-        /* Styling for the eye icon in the title */
-        .preview-title .fa-eye {
-            margin-left: 8px;
-            /* เพิ่มระยะห่างระหว่างข้อความกับไอคอน */
-            /*color: #ff6600; /* สีไอคอนให้เข้ากับโทนส้ม */
-            font-size: 1.2em;
-            /* เพิ่มขนาดเล็กน้อยให้ดูเด่น */
-        }
-
-        .page-container {
-            padding-top: 100px;
-        }
-
-        /* เพิ่ม Media Query สำหรับอุปกรณ์มือถือโดยเฉพาะ */
-        @media (max-width: 379px) {
-            .top-nav-container {
-                padding-top: 60px;
-            }
-
-        }
-
-        @media (max-width: 420px) {
-
-            .top-nav li a {
-                width: 40px;
-                height: 40px;
-            }
-        }
     </style>
     <title>Profile • ORIGAMI SYSTEM</title>
 </head>
 
 <body>
-
-
-    <!-- <div class="top-nav-container">
-
-    <ul class="top-nav">
-        <li>
-            <a href="#A" onclick="hideborder();" data-toggle="tab">
-                <i class="fa fa-user"></i>
-            </a>
-        </li>
-        <li>
-            <a href="#B" onclick="hideborder(); buildPassword();" data-toggle="tab">
-                <i class="fas fa-cog"></i>
-            </a>
-        </li>
-        <li>
-    <a href="#C" onclick="hideborder();" data-toggle="tab">
-        <i class="fa fa-calendar-alt"></i>
-    </a>
-</li>
-<li>
-    <a href="#G" data-toggle="tab" onclick="hideborder();">
-        <i class="fa fa-chalkboard"></i>
-    </a>
-</li>
-<li>
-    <a href="#E" onclick="hideborder();" data-toggle="tab">
-        <i class="fa fa-image"></i>
-    </a>
-</li>
-<li>
-    <a href="#F" data-toggle="tab" onclick="hideborder();">
-        <i class="fa fa-file-alt"></i>
-    </a>
-</li>
-        <li>
-            <a href="#I" onclick="hideborder();" data-toggle="tab">
-                <i class="fa fa-heart" style="color:red;"></i>
-            </a>
-        </li>
-    </ul>
-</div> -->
-    <?php
-    require_once("component/header.php")
-        ?>
+    <?php require_once("component/header.php") ?>
 
     <div class="main-container" style="margin-bottom: 4rem;">
-
         <div class="tab-content">
-
-<div class="edit-profile-card">
-    <div class="section-header-icon">
-        <i class="fas fa-edit" style="font-size: 25px;"></i>
-        <h3 class="section-title" style="padding-left:10px;">แก้ไขข้อมูลโปรไฟล์</h3>
-    </div>
-    <hr>
-    <form id="editProfileForm" enctype="multipart/form-data">
-        <div class="row">
-    <div class="col-md-6 col-md-offset-3 text-center">
-        <img src="<?= $image_profile_path; ?>"
-            onerror="this.src='../../../images/default.png'" alt="Profile Picture"
-            class="profile-img-preview" style="border: 4px solid <?= $profile_border_color; ?>;">
-        <div class="form-group">
-            <label for="image_name">รูปโปรไฟล์</label>
-            <input type="file" name="image_name" id="image_name" class="form-control-file"
-                accept="image/*">
-            <small class="text-muted">เลือกรูปภาพเพื่อเปลี่ยนรูปโปรไฟล์ (นามสกุลไฟล์ที่รองรับ:
-                .jpeg, .jpg, .png, .gif)</small>
-        </div>
-    </div>
-</div>
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="firstname">ชื่อ</label>
-                    <input type="text" id="firstname" name="firstname" class="form-control-edit"
-                        value="<?= $row_student["student_firstname_th"]; ?>" disabled>
+            <div class="edit-profile-card">
+                <div class="section-header-icon">
+                    <i class="fas fa-edit" style="font-size: 25px;"></i>
+                    <h3 class="section-title" style="padding-left:10px;">แก้ไขข้อมูลโปรไฟล์</h3>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="lastname">นามสกุล</label>
-                    <input type="text" id="lastname" name="lastname" class="form-control-edit"
-                        value="<?= $row_student["student_lastname_th"]; ?>" disabled>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label for="bio">Bio</label>
-                    <textarea name="bio" id="bio" class="form-control-edit"
-                        rows="3"><?= $row_student["student_bio"]; ?></textarea>
-                </div>
-            </div>
-        </div>
-        <div class="section-header-icon">
-            <i class="fas fa-address-book" style="font-size: 25px; "></i>
-            <h3 style="padding-left:10px;" class="section-title">ช่องทางการติดต่อ</h3>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="mobile">เบอร์โทรศัพท์</label>
-                    <input type="text" name="mobile" id="mobile" class="form-control-edit"
-                        value="<?= $row_student['student_mobile']; ?>">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="email">อีเมล</label>
-                    <input type="email" name="email" id="email" class="form-control-edit"
-                        value="<?= $row_student['student_email']; ?>">
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="line">Line</label>
-                    <input type="text" name="line" id="line" class="form-control-edit"
-                        value="<?= $row_student['student_line']; ?>">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="ig">ig</label>
-                    <input type="text" name="ig" id="ig" class="form-control-edit"
-                        value="<?= $row_student['student_ig']; ?>">
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="facebook">facebook</label>
-                    <input type="text" name="facebook" id="facebook" class="form-control-edit"
-                        value="<?= $row_student['student_facebook']; ?>">
-                </div>
-            </div>
-        </div>
-        <div class="section-header-icon" style="font-size: 25px; ">
-            <i class="fas fa-heartbeat"></i>
-            <h3 class="section-title" style="padding-left:10px;">ไลฟ์สไตล์</h3>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="hobby">งานอดิเรก</label>
-                    <input type="text" name="hobby" id="hobby" class="form-control-edit"
-                        value="<?= $row_student["student_hobby"]; ?>">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="favorite_music">ดนตรีที่ชอบ</label>
-                    <input type="text" name="favorite_music" id="favorite_music" class="form-control-edit"
-                        value="<?= $row_student["student_music"]; ?>">
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="favorite_movie">หนังที่ชอบ</label>
-                    <input type="text" name="favorite_movie" id="favorite_movie" class="form-control-edit"
-                        value="<?= $row_student["student_movie"]; ?>">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="goal">เป้าหมาย</label>
-                    <input type="text" name="goal" id="goal" class="form-control-edit"
-                        value="<?= $row_student["student_goal"]; ?>">
-                </div>
-            </div>
-        </div>
-        <div class="text-center">
-            <button type="button" name="submit_edit_profile" class="btn-save-changes"
-                id="saveBtn">บันทึกการเปลี่ยนแปลง</button>
-        </div>
-    </form>
-</div>
+                <hr>
+                <form id="editProfileForm" enctype="multipart/form-data">
+                    <div class="row">
+    <div class="col-md-12 text-center">
+        <div class="profile-image-gallery" id="imageGallery">
+            <?php
+            $img_count = count($student_images);
             
-
-
-
-
-
-
-
-
-
-
-
+            // วนลูปเพื่อแสดงรูปภาพที่มีอยู่แล้ว
+            foreach ($student_images as $index => $image) {
+                $file_url = GetUrl($image['file_path']);
+                $is_main = $image['file_status'] == 1;
+            ?>
+                <div class="profile-image-item" data-file-id="<?= htmlspecialchars($image['file_id']); ?>" data-file-path="<?= htmlspecialchars($image['file_path']); ?>" data-file-index="<?= $index; ?>">
+                    <div class="image-wrapper">
+                        <img src="<?= $file_url; ?>" alt="Profile Image <?= $index + 1; ?>" class="profile-image <?= $is_main ? 'is-main' : ''; ?>">
+                    </div>
+                    <div class="image-overlay">
+                        <div class="overlay-actions">
+                            <button type="button" class="overlay-btn btn-delete-image" title="ลบรูปภาพ">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                            <label for="replace-file-<?= $index; ?>" class="overlay-btn" title="เปลี่ยนรูปภาพ">
+                                <i class="fas fa-exchange-alt"></i>
+                            </label>
+                            <?php if (!$is_main) { ?>
+                                <button type="button" class="overlay-btn btn-set-main" title="ตั้งเป็นรูปหลัก">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <input type="file" id="replace-file-<?= $index; ?>" class="file-input-handler" style="display: none;" accept="image/*">
+                </div>
+            <?php
+            }
+            
+            // ตรวจสอบว่าจำนวนรูปภาพที่มีอยู่ไม่เกิน 4 รูป
+            if ($img_count < 4) {
+            ?>
+                <div class="profile-image-item profile-image-placeholder">
+                    <label for="add-file" style="cursor: pointer;">
+                        <i class="fas fa-plus"></i>
+                    </label>
+                    <input type="file" id="add-file" class="file-input-handler" style="display: none;" accept="image/*">
+                </div>
+            <?php
+            }
+            ?>
+        </div>
+        <small class="text-muted">คุณสามารถอัปโหลดรูปโปรไฟล์ได้สูงสุด 4 รูป</small>
+    </div>
+</div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="firstname">ชื่อ</label>
+                                <input type="text" id="firstname" name="firstname" class="form-control-edit"
+                                    value="<?= $row_student["student_firstname_th"]; ?>" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="lastname">นามสกุล</label>
+                                <input type="text" id="lastname" name="lastname" class="form-control-edit"
+                                    value="<?= $row_student["student_lastname_th"]; ?>" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="bio">Bio</label>
+                                <textarea name="bio" id="bio" class="form-control-edit"
+                                    rows="3"><?= $row_student["student_bio"]; ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header-icon">
+                        <i class="fas fa-address-book" style="font-size: 25px; "></i>
+                        <h3 style="padding-left:10px;" class="section-title">ช่องทางการติดต่อ</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="mobile">เบอร์โทรศัพท์</label>
+                                <input type="text" name="mobile" id="mobile" class="form-control-edit"
+                                    value="<?= $row_student['student_mobile']; ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email">อีเมล</label>
+                                <input type="email" name="email" id="email" class="form-control-edit"
+                                    value="<?= $row_student['student_email']; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="line">Line</label>
+                                <input type="text" name="line" id="line" class="form-control-edit"
+                                    value="<?= $row_student['student_line']; ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ig">ig</label>
+                                <input type="text" name="ig" id="ig" class="form-control-edit"
+                                    value="<?= $row_student['student_ig']; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="facebook">facebook</label>
+                                <input type="text" name="facebook" id="facebook" class="form-control-edit"
+                                    value="<?= $row_student['student_facebook']; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header-icon" style="font-size: 25px; ">
+                        <i class="fas fa-heartbeat"></i>
+                        <h3 class="section-title" style="padding-left:10px;">ไลฟ์สไตล์</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="hobby">งานอดิเรก</label>
+                                <input type="text" name="hobby" id="hobby" class="form-control-edit"
+                                    value="<?= $row_student["student_hobby"]; ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="favorite_music">ดนตรีที่ชอบ</label>
+                                <input type="text" name="favorite_music" id="favorite_music" class="form-control-edit"
+                                    value="<?= $row_student["student_music"]; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="favorite_drink">เครื่องดื่มที่ชื่นชอบ</label>
+                                <input type="text" name="favorite_drink" id="favorite_drink" class="form-control-edit"
+                                    value="<?= $row_student["student_drink"]; ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="favorite_movie">หนังที่ชอบ</label>
+                                <input type="text" name="favorite_movie" id="favorite_movie" class="form-control-edit"
+                                    value="<?= $row_student["student_movie"]; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="goal">เป้าหมาย</label>
+                                <input type="text" name="goal" id="goal" class="form-control-edit"
+                                    value="<?= $row_student["student_goal"]; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="button" name="submit_edit_profile" class="btn-save-changes"
+                            id="saveBtn">บันทึกการเปลี่ยนแปลง</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-     <?php
-    require_once("component/footer.php")
-        ?>
+    <?php require_once("component/footer.php") ?>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Function to handle the file upload and preview
+            function handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) { return; }
+
+                const parentItem = $(this).closest('.profile-image-item');
+                const fileId = parentItem.data('file-id') || '';
+                const fileIndex = parentItem.data('file-index');
+                const fileAction = fileId ? 'replace' : 'add';
+
+                // Create a new FormData object for the file upload
+                const fileFormData = new FormData();
+                fileFormData.append('update_type', 'file');
+                fileFormData.append('file_action', fileAction);
+                if (fileAction === 'replace') {
+                    fileFormData.append('file_id', fileId);
+                }
+                fileFormData.append('file_index', fileIndex);
+                fileFormData.append(`file_upload[${fileIndex}]`, file);
+
+                // Send the file data via AJAX
+                $.ajax({
+                    url: window.location.href,
+                    type: "POST",
+                    data: fileFormData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'JSON',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            // After successful upload, update the fileId data attribute for 'add' action
+                            if (fileAction === 'add' && response.file_id) {
+                                parentItem.data('file-id', response.file_id);
+                            }
+                            swal({ title: "อัปโหลดสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
+                        } else {
+                            swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("AJAX Error:", textStatus, errorThrown);
+                        swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์เพื่ออัปโหลดไฟล์ได้", type: "error" });
+                    }
+                });
+
+                // Real-time Preview
+const reader = new FileReader();
+reader.onload = function (e) {
+    const parentItem = $(event.target).closest('.profile-image-item');
+    const imageElement = parentItem.find('.profile-image');
+    const placeholder = parentItem.find('.profile-image-placeholder');
+
+    if (placeholder.length) {
+        // กรณีอัปโหลดรูปภาพใหม่
+        placeholder.hide(); // ซ่อนไอคอน +
+        
+        const newImage = $('<img>').attr({
+            src: e.target.result,
+            alt: 'Preview Image',
+            class: 'profile-image'
+        });
+        const imageWrapper = $('<div>').addClass('image-wrapper');
+        imageWrapper.append(newImage);
+        parentItem.prepend(imageWrapper);
+
+        const newOverlay = `
+        <div class="image-overlay">
+            <div class="overlay-actions">
+                <button type="button" class="overlay-btn btn-delete-image" title="ลบรูปภาพ">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+                <label for="replace-file-${fileIndex}" class="overlay-btn" title="เปลี่ยนรูปภาพ">
+                    <i class="fas fa-exchange-alt"></i>
+                </label>
+                <button type="button" class="overlay-btn btn-set-main" title="ตั้งเป็นรูปหลัก">
+                    <i class="fas fa-star"></i>
+                </button>
+            </div>
+        </div>`;
+        parentItem.append(newOverlay);
+        
+        // กำหนด data-file-id และ data-file-index ให้กับ parentItem เพื่อให้ทำงานกับปุ่มอื่นๆ ได้
+        parentItem.attr('data-file-id', 'temp'); // ใช้ค่าชั่วคราว
+        parentItem.attr('data-file-index', fileIndex);
+    } else {
+        // กรณีเปลี่ยนรูปภาพเดิม
+        imageElement.attr('src', e.target.result).show();
+    }
+    
+    // ตั้งค่า input file ให้มี id ที่ถูกต้อง
+    $(event.target).attr('id', 'replace-file-' + fileIndex).removeClass('file-add-input').addClass('file-replace-input');
+
+};
+reader.readAsDataURL(file);
+            }
+
+            $(document).on('change', '.file-input-handler', handleFileSelect);
+
+            // Handle Save Action (for text data only)
+            $("#saveBtn").on("click", function (e) {
+                e.preventDefault();
+                const formData = new FormData($("#editProfileForm")[0]);
+                formData.append('update_type', 'text');
+
+                $.ajax({
+                    url: window.location.href,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'JSON',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            swal({ title: "บันทึกสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
+                        } else {
+                            swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("AJAX Error:", textStatus, errorThrown);
+                        swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้", type: "error" });
+                    }
+                });
+            });
+
+            $(document).on('click', '.btn-delete-image', function () {
+                const parentItem = $(this).closest('.profile-image-item');
+                const fileId = parentItem.data('file-id');
+                if (!fileId) {
+                    swal({ title: "ข้อผิดพลาด", text: "ไม่พบข้อมูลรูปภาพที่ต้องการลบ", type: "error" });
+                    return;
+                }
+
+                swal({
+                    title: "ยืนยันการลบรูปภาพ?",
+                    text: "รูปภาพจะถูกลบออกจากโปรไฟล์ของคุณ",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "ใช่, ลบเลย",
+                    cancelButtonText: "ยกเลิก",
+                    closeOnConfirm: false
+                }, function () {
+                    const formData = new FormData();
+                    formData.append('update_type', 'file');
+                    formData.append('file_action', 'delete');
+                    formData.append('file_id', fileId);
+
+                    $.ajax({
+                        url: window.location.href,
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'JSON',
+                        success: function (response) {
+                            if (response.status === 'success') {
+                                swal({ title: "ลบสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
+                            } else {
+                                swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
+                            }
+                        },
+                        error: function () {
+                            swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถลบรูปภาพได้", type: "error" });
+                        }
+                    });
+                });
+            });
+
+            $(document).on('click', '.btn-set-main', function () {
+                const parentItem = $(this).closest('.profile-image-item');
+                const fileId = parentItem.data('file-id');
+                if (!fileId) {
+                    swal({ title: "ข้อผิดพลาด", text: "ไม่พบข้อมูลรูปภาพที่ต้องการตั้งเป็นรูปหลัก", type: "error" });
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('update_type', 'file');
+                formData.append('file_action', 'set_main');
+                formData.append('file_id', fileId);
+
+                $.ajax({
+                    url: window.location.href,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'JSON',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            swal({ title: "ตั้งค่าสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
+                        } else {
+                            swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
+                        }
+                    },
+                    error: function () {
+                        swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถตั้งค่ารูปหลักได้", type: "error" });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
-<script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzxc7D9o3CcmSyLWVo6h4rCxS0yL_wB2k&libraries=places"></script>
 
-<script language="javascript">
-    function buildHealth() {
-        $(".loader").addClass("active");
-        $(".health_area").load("hrm/library/template/health.php");
-    }
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader2 = new FileReader();
-            $('.preview-uploads img.avatar-uploads').css("display", "block");
-            $('.preview-uploads span').css("display", "none");
-            reader2.onload = function (e) {
-                $('.preview-uploads img.avatar-uploads').attr('src', e.target.result);
-            };
-            reader2.readAsDataURL(input.files[0]);
-            $(".upload-img").attr("disabled", false);
-        } else {
-            $('.preview-uploads img.avatar-uploads').css("display", "none");
-            $('.preview-uploads span').css("display", "block");
-            $(".upload-img").attr("disabled", true);
-        }
-    }
-    function chk_submit_info() {
-        var d = $('#docsign.signature').jSignature("getData", "native");
-        if (d.length > 0 || (d.length === 1 && d[0].x.length > 0)) {
-            var sign = $('#docsign.signature').jSignature("getData", "image");
-            $('#signature_drawing').val(sign);
-        }
-    }
-    function chk_submit() {
-        var pass_old = document.getElementById("old_pass");
-        var pass_new = document.getElementById("new_pass");
-        var pass_firm = document.getElementById("firm_pass");
-        if (pass_old.value == "") {
-            alert('Please Insert Old Password');
-            pass_old.focus();
-            return false;
-        }
-        if (pass_new.value == "") {
-            alert('Please Insert New Password');
-            pass_new.focus();
-            return false;
-        }
-        if (pass_firm.value == "") {
-            alert('Please Insert Confirm Password');
-            pass_firm.focus();
-            return false;
-        }
-        if (pass_new.value != pass_firm.value) {
-            alert('Password does not match. Please renew Password');
-            pass_new.value = "";
-            pass_firm.value = "";
-            pass_new.focus();
-            return false;
-        }
-    }
-    function reset_signature(id) {
-        $('#' + id).jSignature("clear");
-        $('#signature_drawing').val('');
-        return true;
-    }
-    function reset_signature_img(id) {
-        var w_user = '300px';
-        var h_user = '100px';
-        $("#docsign").empty();
-        $("#docsign").append('<i class="fa fa-undo reset_signature" onclick="reset_signature(\'docsign\');"></i>');
-        $("#docsign").removeClass('signature_img');
-        $("#docsign").addClass('signature');
-        $("#docsign").jSignature({
-            'width': w_user,
-            'height': h_user,
-            'decor-color': 'transparent'
-        });
-        $("#docsign").jSignature("clear");
-        $('#signature_drawing').val('');
-        return true;
-    }
 
-</script>
-<?php
-function thaidate($value)
-{
-    if (empty($value)) {
-        return "";
-    }
-    return substr($value, 8, 2) . "/" . substr($value, 5, 2) . "/" . substr($value, 0, 4);
-}
-function find_birth($birthday, $today)
-{
-    list($byear, $bmonth, $bday) = explode("-", $birthday);
-    list($tyear, $tmonth, $tday) = explode("-", $today);
-    $mbirthday = mktime(0, 0, 0, $bmonth, $bday, $byear);
-    $mnow = mktime(0, 0, 0, $tmonth, $tday, $tyear);
-    $mage = ($mnow - $mbirthday);
-    $u_y = date("Y", $mage) - 1970;
-    $u_m = date("m", $mage) - 1;
-    $u_d = date("d", $mage) - 1;
-    return "$u_y   ปี    $u_m เดือน      $u_d  วัน";
-}
-?>
