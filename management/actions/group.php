@@ -31,13 +31,18 @@
             g.group_description,
             date_format(g.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
             CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
-            g.group_color
+            g.group_color,
+            count(sj.student_id) as group_student
         FROM 
             classroom_group g 
         LEFT JOIN 
             m_employee_info i on i.emp_id = g.emp_create
+        LEFT JOIN 
+            classroom_student_join sj on sj.group_id = g.group_id and sj.status = 0
         WHERE 
-            g.classroom_id = '{$classroom_id}' and g.status = 0";
+            g.classroom_id = '{$classroom_id}' and g.status = 0 
+        GROUP BY 
+            g.group_id";
         $primaryKey = 'group_id';
         $columns = array(
             array('db' => 'group_id', 'dt' => 'group_id'),
@@ -49,6 +54,9 @@
                 } else {
                     return '/images/noimage.jpg';
                 }
+			}),
+            array('db' => 'group_student', 'dt' => 'group_student','formatter' => function ($d, $row) {
+				return number_format($d);
 			}),
             array('db' => 'date_create', 'dt' => 'date_create'),
             array('db' => 'emp_create', 'dt' => 'emp_create'),
