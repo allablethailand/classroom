@@ -64,7 +64,7 @@ function renderCourseCard(course) {
     ? `<img src="${course.course_cover}" alt="${course.course_name}" class="transparent-bg" style="width: 50px; height: 50px; border-radius: 100%;">`
     : "";
 
-    const courseCoverGT = ` <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="" style="width: 50px; height: 50px; border-radius: 100%;" >`
+  const courseCoverGT = ` <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="" style="width: 50px; height: 50px; border-radius: 100%;" >`
   return `
     <div class="row" onclick="loadClass('${course.classroom_id}')"
       <div class="row">
@@ -109,25 +109,24 @@ function renderClass(courses, classroom_id) {
   });
 }
 
-// trn_picture_title_20180228133107.JPG
+
 function renderClassCard(course, classroom_id) {
   const safeText = (text) => text ? text : "ไม่ระบุ";
   const courseCover = course.course_cover
     ? `<img src="/${course.course_cover}" alt="${course.course_name}" style="width: 70px; height: 70px; margin-bottom: 1rem; border-radius: 10px;" onerror="this.src='/images/training.jpg'">`
     : "";
 
-    let instructorsHtml = "";
-  
+  let instructorsHtml = "";
+
   const courseLoca = safeText(course.course_location);
   const courseStart = safeText(course.course_timestart);
   const courseEnd = course.course_timeend;
   const displayTime = courseEnd ? `${courseStart} - ${courseEnd}` : courseStart || "ไม่ระบุ";
   const courseInstr = safeText(course.course_instructor);
   const courseName = safeText(course.course_name);
-  const courseDate  = safeText(course.courseDate);
+  const courseDate = safeText(course.course_date);
 
-  if (course.trn_count_by != null && course.trn_count_by > 1 )
-  {
+  if (course.trn_count_by != null && course.trn_count_by > 1) {
 
     let cleaned = courseInstr.replace(/\s*,\s*/g, ',');
     let namesArray = cleaned.split(',');
@@ -135,14 +134,14 @@ function renderClassCard(course, classroom_id) {
     let namesCount = namesArray.length;
     // Loop to get each name
     namesArray.forEach(name => {
-        console.log(name.trim());
+      console.log(name.trim());
     });
 
 
     let maxVisible = 3;
 
     if (namesArray.length <= maxVisible) {
-    // Show all if 3 or less
+      // Show all if 3 or less
       namesArray.forEach(name => {
         instructorsHtml += `
           <div class="member-avatar avatar-orange" title="${name.trim()}">
@@ -173,7 +172,7 @@ function renderClassCard(course, classroom_id) {
           </div>
         </div>`;
     }
-  }else{
+  } else {
 
     instructorsHtml += `
       <div class="member-avatar avatar-orange" title="more">
@@ -182,7 +181,7 @@ function renderClassCard(course, classroom_id) {
         </div>
       </div>`;
   }
-  
+
 
   return `
     <div class="row" onclick="redirectCurreculum('${course.course_id}', '${course.course_type
@@ -195,24 +194,23 @@ function renderClassCard(course, classroom_id) {
                ${courseCover}
             </div>
             <div class="class-menu">
-            <span class="title-menu-sec" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden;">${course.course_name}</span>
+            <span class="title-menu-sec" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;">${course.course_name}</span>
               <div class="progress-section">
-                <div class="progress-header">
-                  <span class="progress-text" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;">${course.course_name}</span>
-                </div>
-               
-                 <div class="instructor-info">
-                  ${instructorsHtml}
-                  <p>${courseInstr}</p>
-                </div>
-                <div class="progress-text">
-                  
+                 <div>
+                  <div class="instructor-name">
+                    <b>ผู้สอน:</b> ${courseInstr}
                   </div>
-                <div class="progress-header-flex">
-                  <span class="small-text-gray">${displayTime}</span>
-                  <span class="small-text-gray">${courseDate}</span>
+                  <div class="instructor-info" style="margin-left: 0.5rem;">
+                  ${instructorsHtml}
+                  </div>
                 </div>
-              
+                <div class="location-info">
+                  สถานที่: โรงเรียน 1
+                </div>
+                 <div class="time-schedule-class">
+                  <span class="small-text-gray">${courseDate}</span>
+                  <span class="small-text-gray">| ${displayTime}</span>
+                </div>
               </div>
             </div>
           </div>

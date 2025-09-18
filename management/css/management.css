@@ -252,3 +252,8 @@ a:hover .notofication-share{
 form p {
     margin: 10px auto;
 }
+.label-title {
+    background-color: #FF9900;
+    font-size: 13px;
+    margin-top: 25px;
+}

@@ -333,24 +333,7 @@ if (isset($_SESSION['student_id'])) {
     <div class="settings-container">
         <div class="settings-card" style="margin-top: 10px;">
             <div class="settings-header">
-                <div class="profile-card" style="margin-top: 50px;">
-                    <div class="profile-avatar-square" style="border-color: <?= $profile_border_color; ?>;">
-                        <img src="<?php echo GetUrl($_SESSION["student_image_profile"]); ?>" onerror="this.src='../../../images/default.png'" alt="Profile Picture">
-                    </div>
-                    <h2 class="profile-name">
-                        <?= htmlspecialchars($row_all["student_firstname_th"]) . " " . htmlspecialchars($row_all["student_lastname_th"]); ?>
-                    </h2>
-                    <p class="profile-bio">
-                        <?= !empty($row_all["student_bio"]) ? htmlspecialchars($row_all["student_bio"]) : "ยังไม่ได้เขียน Bio"; ?>
-                    </p>
-                    <div class="profile-course-container">
-    <p class="profile-course" style="margin: 0px; font-size: 14px;">
-        <i class="fas fa-graduation-cap" style="color: #0089ff;"></i>
-        <span  style="font-size: 16px; font-weight: bold; padding-right: .3em;">หลักสูตร:</span> <span><?= !empty($classroom_name) ? htmlspecialchars($classroom_name) : "ยังไม่ได้ระบุ"; ?></span>
-    </p>
-</div>
-                </div>
-                
+             
                 <div class="settings-list">
                     <a href="edit_profile" class="setting-item">
                         <div class="setting-icon">
