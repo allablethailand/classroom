@@ -12,6 +12,7 @@ function getGroupTemplate() {
                     <th lang="en">Color</th>
                     <th lang="en">Create Date</th>
                     <th lang="en">Create By</th>
+                    <th lang="en">Student</th>
                     <th></th>
                 </tr>
             </thead>
@@ -81,6 +82,10 @@ function buildGroup() {
                 "data": "emp_create",
             },{ 
                 "targets": 5,
+                "data": "group_student",
+                "className": "text-right",
+            },{ 
+                "targets": 6,
                 "data": "group_id",
                 "className": "text-center",
                 "render": function (data,type,row,meta) {	
