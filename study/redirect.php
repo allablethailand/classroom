@@ -49,7 +49,7 @@
             $lastname_th = escape_string($students[0]['student_lastname_th']);
             $email = escape_string($students[0]['student_email']);
             $emp_id = insert_data(
-                "m_employee", "(email, comp_id, emp_type)", "('{$email}', '{$comp_id}', 'student')"
+                "m_employee", "(email, comp_id, emp_type, system_type)", "('{$email}', '{$comp_id}', 'student', 4)"
             );
             if($emp_id) {
                 insert_data(
