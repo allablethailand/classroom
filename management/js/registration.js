@@ -56,7 +56,7 @@ function buildRegistrationPage() {
 		buildRegistration();
 	});	
     buildRegistration();
-    buildSummaryRegistration();
+    buildChannelSelected();
 }
 function cb(start, end) {
 	var st = start;
@@ -80,6 +80,13 @@ function getRegistrationTemplate() {
                         <span lang="en">Register Date</span>
                     </p>
                     <input type="text" id="filter_date" class="form-control filter-object" placeholder="All">
+                </div>
+                <div class="col-md-5ths col-sm-4 col-xs-12">
+                    <p style="margin:10px auto;">
+                        <i class="fas fa-cubes"></i>
+                        <span lang="en">Channel</span>
+                    </p>
+                    <select class="form-control" id="filter_channel" onchange="buildRegistration();"></select>
                 </div>
             </div>
         </div>
@@ -144,6 +151,7 @@ function getRegistrationTemplate() {
                     </th>
                     <th lang="en">Register Date</th>
                     <th lang="en">Student</th>
+                    <th lang="en">Channel</th>
                     <th lang="en">Lead</th>
                     <th lang="en">Approve</th>
                     <th lang="en">Payment</th>
@@ -191,6 +199,7 @@ function buildRegistration() {
                     data.classroom_id = classroom_id;
                     data.filter_status = $("#filter_status").val();
                     data.filter_date = $("#filter_date").val();
+                    data.filter_channel = $("#filter_channel").val();
 				}
 			},
 			"language": default_language,
@@ -203,10 +212,8 @@ function buildRegistration() {
 				lang.init({
 					defaultLang: 'en'
 				});
-			},
-            "createdRow": function(row,data,dataIndex,meta) {
                 buildSummaryRegistration();
-            },
+			},
 			"order": [[2,'desc']],
 			"columns": [{ 
                 "targets": 0,
@@ -321,12 +328,19 @@ function buildRegistration() {
                 }
             },{ 
                 "targets": 4,
+                "data": "channel_name",
+                "render": function (data,type,row,meta) {	
+                    let channel_name = row['channel_name'] || "";
+                    return channel_name;
+                }
+            },{ 
+                "targets": 5,
                 "data": "invite_status",
                 "render": function (data,type,row,meta) {	
-                    let invite_status = row['invite_status'];
-                    let invite_date = row['invite_date'];
-                    let invite_by = row['invite_by'];
-                    let join_id = row['join_id'];
+                    let invite_status = row['invite_status'] || "-";
+                    let invite_date = row['invite_date'] || "-";
+                    let invite_by = row['invite_by'] || "-";
+                    let join_id = row['join_id'] || "-";
                     let mockup = "";
                     if(invite_status == 0) {
                         mockup += `
@@ -371,14 +385,14 @@ function buildRegistration() {
 					return mockup;
                 }
             },{ 
-                "targets": 5,
+                "targets": 6,
                 "data": "approve_status",
                 "render": function (data,type,row,meta) {	
-					let approve_status = row['approve_status'];
-                    let approve_date = row['approve_date'];
-                    let approve_by = row['approve_by'];
-                    let join_id = row['join_id'];
-                    let invite_status = row['invite_status'];
+					let approve_status = row['approve_status'] || "-";
+                    let approve_date = row['approve_date'] || "-";
+                    let approve_by = row['approve_by'] || "-";
+                    let join_id = row['join_id'] || "-";
+                    let invite_status = row['invite_status'] || "-";
                     let mockup = "";
                     if(invite_status == 1) {
                         if(approve_status == 0) {
@@ -425,14 +439,14 @@ function buildRegistration() {
 					return mockup;
                 }
             },{ 
-                "targets": 6,
+                "targets": 7,
                 "data": "payment_status",
                 "render": function (data,type,row,meta) {	
-					let payment_status = row['payment_status'];
-                    let payment_status_date = row['payment_status_date'];
-                    let payment_status_by = row['payment_status_by'];
-                    let join_id = row['join_id'];
-                    let approve_status = row['approve_status'];
+					let payment_status = row['payment_status'] || "-";
+                    let payment_status_date = row['payment_status_date'] || "-";
+                    let payment_status_by = row['payment_status_by'] || "-";
+                    let join_id = row['join_id'] || "-";
+                    let approve_status = row['approve_status'] || "-";
                     let mockup = "";
                     if(approve_status == 1) {
                         if(payment_status == 0) {
@@ -479,12 +493,12 @@ function buildRegistration() {
 					return mockup;
                 }
             },{ 
-                "targets": 7,
+                "targets": 8,
                 "render": function (data,type,row,meta) {	
 					return ``;
                 }
             },{ 
-                "targets": 8,
+                "targets": 9,
                 "data": "join_id",
                 "render": function (data,type,row,meta) {	
 					return `
@@ -494,51 +508,51 @@ function buildRegistration() {
                     `;
                 }
             },{ 
-                "targets": 9,
+                "targets": 10,
                 "data": "student_firstname_en",
                 "visible": false,
             },{ 
-                "targets": 10,
+                "targets": 11,
                 "data": "student_lastname_en",
                 "visible": false,
             },{ 
-                "targets": 11,
+                "targets": 12,
                 "data": "student_firstname_th",
                 "visible": false,
             },{ 
-                "targets": 12,
+                "targets": 13,
                 "data": "student_lastname_th",
                 "visible": false,
             },{ 
-                "targets": 13,
+                "targets": 14,
                 "data": "student_nickname_en",
                 "visible": false,
             },{ 
-                "targets": 14,
+                "targets": 15,
                 "data": "student_nickname_th",
                 "visible": false,
             },{ 
-                "targets": 15,
+                "targets": 16,
                 "data": "student_mobile",
                 "visible": false,
             },{ 
-                "targets": 16,
+                "targets": 17,
                 "data": "student_email",
                 "visible": false,
             },{ 
-                "targets": 17,
+                "targets": 18,
                 "data": "student_idcard",
                 "visible": false,
             },{ 
-                "targets": 18,
+                "targets": 19,
                 "data": "student_passport",
                 "visible": false,
             },{ 
-                "targets": 19,
+                "targets": 20,
                 "data": "student_company",
                 "visible": false,
             },{ 
-                "targets": 20,
+                "targets": 21,
                 "data": "student_position",
                 "visible": false,
             }]
@@ -548,7 +562,6 @@ function buildRegistration() {
         var template = `
             <input type="search" class="form-control input-sm search-datatable" placeholder="" autocomplete="off" style="margin-bottom:0px !important;">
             <button type="button" class="btn btn-white text-green" style="font-size:12px;" onclick="importStudent('')"><i class="fas fa-file-excel"></i> <span lang="en">Import</span></button> 
-            <button type="button" class="btn btn-green" style="font-size:12px;" onclick="registerStudent()"><i class="fas fa-plus"></i> <span lang="en">Register</span></button> 
         `;
         $('div#tb_registration_filter.dataTables_filter input').hide();
         $('div#tb_registration_filter.dataTables_filter label').append(template);
@@ -886,7 +899,8 @@ function buildSummaryRegistration() {
         data: {
             action: 'buildSummaryRegistration',
             classroom_id: classroom_id,
-            filter_date: $("#filter_date").val()
+            filter_date: $("#filter_date").val(),
+            filter_channel: $("#filter_channel").val(),
         },
         dataType: "JSON",
         success: function(result) {
@@ -904,4 +918,49 @@ function buildSummaryRegistration() {
             }
         }
     });
+}
+function buildChannelSelected() {
+    try {
+        $("#filter_channel").select2({
+            theme: "bootstrap",
+            placeholder: "All Channel",
+            minimumInputLength: -1,
+            allowClear: true,
+            ajax: {
+                url: "/classroom/management/actions/registration.php",
+                dataType: 'json',
+                delay: 250,
+                cache: false,
+                data: function(params) {
+                    return {
+                        term: params.term,
+                        page: params.page || 1,
+                        action: 'buildChannel',
+                        classroom_id: classroom_id
+                    };
+                },
+                processResults: function(data, params) {
+                    const page = params.page || 1;
+                    return {
+                        results: $.map(data, function(item) {
+                            return {
+                                id: item.id,
+                                text: item.col,
+                                code: item.code,
+                                desc: item.desc,
+                            };
+                        }),
+                        pagination: {
+                            more: (page * 10) <= (data[0] ? data[0].total_count : 0)
+                        }
+                    };
+                },
+            },
+            templateSelection: function(data) {
+                return data.text;
+            },
+        });
+    } catch (error) {
+        console.error('Error building department dropdown:', error);
+    }
 }

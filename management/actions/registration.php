@@ -25,6 +25,7 @@
         $classroom_id = $_POST['classroom_id'];
         $filter_status = $_POST['filter_status'];
         $filter_date = $_POST['filter_date'];
+        $filter_channel = $_POST['filter_channel'];
         $filter = "";
         if($filter_date) {
             $date = explode('-',$filter_date);
@@ -60,6 +61,9 @@
                 $filter .= " and cjoin.invite_status = 2 ";
             break;
         }
+        if($filter_channel) {
+            $filter .= " and cjoin.channel_id = '{$filter_channel}' ";
+        }
         $table = "SELECT 
             cjoin.join_id,
             date_format(cjoin.register_date, '%Y/%m/%d %H:%i:%s') as register_date,
@@ -84,7 +88,7 @@
             stu.student_passport,
             stu.student_image_profile,
             stu.student_email,
-            stu.student_mobile,
+            concat(stu.dial_code,'',stu.student_mobile) as student_mobile,
             date_format(stu.student_birth_date, '%Y/%m/%d') as student_birth_date,
             CASE  WHEN stu.student_birth_date IS NULL OR stu.student_birth_date = '' THEN ''
             ELSE CONCAT(TIMESTAMPDIFF(YEAR, stu.student_birth_date, CURDATE()), ' Yrs.') END as student_age,
@@ -92,7 +96,8 @@
             stu.student_password,
             stu.student_password_key,
             stu.student_company,
-            stu.student_position
+            stu.student_position,
+            c.channel_name
         FROM 
             classroom_student_join cjoin
         LEFT JOIN 
@@ -103,6 +108,8 @@
             m_employee_info i_approve on i_approve.emp_id = cjoin.approve_by
         LEFT JOIN 
             m_employee_info i_payment on i_payment.emp_id = cjoin.payment_status_by
+        LEFT JOIN 
+            classroom_channel c on c.channel_id = cjoin.channel_id
         WHERE 
             cjoin.classroom_id = '{$classroom_id}' and cjoin.status = 0 $filter";
         $primaryKey = 'join_id';
@@ -137,6 +144,7 @@
             array('db' => 'student_age', 'dt' => 'student_age'),
             array('db' => 'student_company', 'dt' => 'student_company'),
             array('db' => 'student_position', 'dt' => 'student_position'),
+            array('db' => 'channel_name', 'dt' => 'channel_name'),
             array('db' => 'student_username', 'dt' => 'student_username'),
             array('db' => 'student_password_key', 'dt' => 'student_password_key'),
             array('db' => 'student_password', 'dt' => 'student_password','formatter' => function ($d, $row) {
@@ -462,6 +470,7 @@
     }
     if (isset($_POST['action']) && $_POST['action'] === 'buildSummaryRegistration') {
         $classroom_id = $_POST['classroom_id'];
+        $filter_channel = $_POST['filter_channel'];
         $filter_date  = !empty($_POST['filter_date']) ? $_POST['filter_date'] : '';
         $filter = '';
         if ($filter_date) {
@@ -470,7 +479,10 @@
             $date_ed  = !empty($date[1]) ? trim($date[1]) : $date_st;
             $data_st  = substr($date_st, -4) . '-' . substr($date_st, 3, 2) . '-' . substr($date_st, 0, 2);
             $data_ed  = substr($date_ed, -4) . '-' . substr($date_ed, 3, 2) . '-' . substr($date_ed, 0, 2);
-            $filter   = " AND DATE(cjoin.register_date) BETWEEN DATE('{$data_st}') AND DATE('{$data_ed}')";
+            $filter .= " AND DATE(cjoin.register_date) BETWEEN DATE('{$data_st}') AND DATE('{$data_ed}')";
+        }
+        if($filter_channel) {
+            $filter .= " and cjoin.channel_id = '{$filter_channel}' ";
         }
         $queries = [
             'lead'       => "invite_status = 0",
@@ -508,4 +520,34 @@
             'classroom_key' => $classroom[0]['classroom_key']
         ]);
     }
+    if(isset($_GET['action']) && $_GET['action'] == 'buildChannel') {
+		$classroom_id = trim($_GET['classroom_id']);
+		$keyword = trim($_GET['term']);
+		$search = ($keyword) ? " and channel_name like '%{$keyword}%' " : "";
+		$resultCount = 10;
+		$end = ($_GET['page'] - 1) * $resultCount;
+		$start = $end + $resultCount;
+        $columnData = "*";
+        $tableData = "(
+            select 
+                channel_id as data_code,
+                channel_name as data_desc 
+            from 
+                classroom_channel 
+            where 
+                classroom_id = '{$classroom_id}' and status = 0 $search
+        ) data_table";
+        $whereData = (($_GET['page']) ? "LIMIT ".$end.",".$start : "")."";
+        $Data = select_data($columnData,$tableData,$whereData);
+		$count_data = count($Data);
+		$i = 0;
+		while($i < $count_data) {
+			$data[] = ['id' => $Data[$i]['data_code'],'col' => $Data[$i]['data_desc'],'total_count' => $count_data,'code' => $Data[$i]['data_code'],'desc' => $Data[$i]['data_desc'],];
+			++$i;
+		}
+		if (empty($data)) {
+			$data[] = ['id' => '','col' => '', 'total_count' => ''];
+		}
+        echo json_encode($data);
+	}
 ?>
