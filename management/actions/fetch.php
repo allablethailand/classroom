@@ -16,6 +16,7 @@ if($_SERVER['HTTP_HOST'] == 'localhost'){
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include.'/lib/connect_sqli.php';
+require_once $base_include.'/lib/config.php';
 global $mysqli;
 $fsData = getBucketMaster();
 $filesystem_user = $fsData['fs_access_user'];
@@ -42,9 +43,6 @@ if (isset($_POST['action'])) {
         case 'deleteFile':
             $response = deleteFile($_POST['type'], $_POST['file_id']);
             break;
-        // case 'setProfileMain':
-        //     $response = setProfileMain($_POST['type'], $_POST['user_id'], $_POST['file_id']);
-        //     break;
         default:
             $response = ['status' => 'error', 'message' => 'Unknown action.'];
             break;
@@ -54,7 +52,6 @@ if (isset($_POST['action'])) {
 echo json_encode($response);
 exit();
 
-// ✨ เพิ่มฟังก์ชันใหม่สำหรับดึง Path ออกจาก URL
 function extractPathFromUrl($url) {
     if (strpos($url, '://') === false) {
         return cleanPath($url);
@@ -68,13 +65,10 @@ function extractPathFromUrl($url) {
     return '';
 }
 
-// ✨ ฟังก์ชันใหม่สำหรับทำให้ Path สะอาด (ไม่มี / นำหน้า)
 function cleanPath($path) {
     return ltrim($path, '/');
 }
 
-// Corrected `uploadFile` function for better multi-file handling.
-// Corrected `uploadFile` function for better multi-file handling.
 function uploadFile($file, $name, $currentFile = '', $key = null) {
     global $base_path;
     $target_dir = $_SERVER['DOCUMENT_ROOT'] . $base_path . "/uploads/classroom/";
@@ -82,17 +76,15 @@ function uploadFile($file, $name, $currentFile = '', $key = null) {
         mkdir($target_dir, 0755, true);
     }
     
-    // Check if the file was uploaded
     if (!isset($file[$name]['tmp_name']) || (is_array($file[$name]['tmp_name']) && !isset($file[$name]['tmp_name'][$key])) || (!is_array($file[$name]['tmp_name']) && empty($file[$name]['tmp_name']))) {
-        return extractPathFromUrl($currentFile); // Return existing path if no new file is uploaded
+        return extractPathFromUrl($currentFile);
     }
     
-    // Determine if it's a single or multi-file upload
-    if ($key !== null) { // Multi-file
+    if ($key !== null) {
         $tmp_name = $file[$name]['tmp_name'][$key];
         $file_name = $file[$name]['name'][$key];
         $file_error = $file[$name]['error'][$key];
-    } else { // Single file
+    } else {
         $tmp_name = $file[$name]['tmp_name'];
         $file_name = $file[$name]['name'];
         $file_error = $file[$name]['error'];
@@ -103,7 +95,6 @@ function uploadFile($file, $name, $currentFile = '', $key = null) {
         $new_file_name = uniqid() . '.' . $file_extension;
         $target_file = $target_dir . $new_file_name;
 
-        // Delete old file if it exists and is not a default/system path
         $currentPath = extractPathFromUrl($currentFile);
         if ($currentPath && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $currentPath) && !strpos($currentPath, 'default')) {
             unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $currentPath);
@@ -113,7 +104,7 @@ function uploadFile($file, $name, $currentFile = '', $key = null) {
             $new_file_path = cleanPath("uploads/classroom/" . $new_file_name);
             return $new_file_path;
         } else {
-            return null; // Handle upload error
+            return null;
         }
     }
     return null;
@@ -124,7 +115,7 @@ function fetchData($type, $id) {
     $table = "classroom_" . $type;
     $id_col = $type . "_id";
     $file_table = "classroom_file_" . $type;
-
+    $company_photo_table = "classroom_" . $type . "_company_photo"; // ตารางรูปภาพบริษัท
     $join_table = "classroom_" . $type . "_join";
     
     $sql = "SELECT t.*, j.classroom_id FROM `$table` AS t LEFT JOIN `$join_table` AS j ON t.`$id_col` = j.`$id_col` WHERE t.`$id_col` = ? LIMIT 1";
@@ -170,6 +161,22 @@ function fetchData($type, $id) {
                 ];
             }
         }
+
+        // --- เพิ่มส่วนดึงรูปภาพบริษัทใหม่ ---
+        $company_photo_sql = "SELECT `file_id`, `file_path` FROM `$company_photo_table` WHERE `" . $type . "_id` = ? AND `is_deleted` = 0 ORDER BY `file_id` ASC";
+        $company_photo_stmt = $mysqli->prepare($company_photo_sql);
+        $data['company_photos'] = [];
+        if ($company_photo_stmt) {
+            $company_photo_stmt->bind_param("s", $id);
+            $company_photo_stmt->execute();
+            $company_photo_result = $company_photo_stmt->get_result();
+            while ($row = $company_photo_result->fetch_assoc()) {
+                $data['company_photos'][] = [
+                    'file_id' => $row['file_id'],
+                    'file_path' => GetUrl($row['file_path'])
+                ];
+            }
+        }
         
         // Add full path for other image fields
         if (isset($data[$type . '_card_front'])) {
@@ -177,6 +184,9 @@ function fetchData($type, $id) {
         }
         if (isset($data[$type . '_card_back'])) {
             $data[$type . '_card_back'] = GetUrl($data[$type . '_card_back']);
+        }
+        if (isset($data[$type . '_company_logo'])) {
+            $data[$type . '_company_logo'] = GetUrl($data[$type . '_company_logo']);
         }
         
         return ['status' => 'success', 'data' => $data];
@@ -192,6 +202,7 @@ function saveData($post) {
     $table = "classroom_" . $type;
     $id_col = $type . "_id";
     $file_table = "classroom_file_" . $type;
+    $company_photo_table = "classroom_" . $type . "_company_photo"; // ตารางรูปภาพบริษัท
     $classroom_id = isset($post['classroom_id']) ? $post['classroom_id'] : null;
     $comp_id = isset($_SESSION['comp_id']) ? $_SESSION['comp_id'] : null;
     $emp_id = isset($_SESSION['emp_id']) ? $_SESSION['emp_id'] : 1;
@@ -206,9 +217,11 @@ function saveData($post) {
         // Handle card front and back uploads
         $current_card_front = isset($post[$type . '_card_front_current']) ? extractPathFromUrl($post[$type . '_card_front_current']) : '';
         $current_card_back = isset($post[$type . '_card_back_current']) ? extractPathFromUrl($post[$type . '_card_back_current']) : '';
+        $current_company_logo = isset($post[$type . '_company_logo_current']) ? extractPathFromUrl($post[$type . '_company_logo_current']) : '';
         
         $card_front = uploadFile($_FILES, $type . '_card_front', $current_card_front);
         $card_back = uploadFile($_FILES, $type . '_card_back', $current_card_back);
+        $company_logo = uploadFile($_FILES, $type . '_company_logo', $current_company_logo);
 
         $gender_for_db = isset($post[$type . '_gender']) ? $post[$type . '_gender'] : 'N';
         
@@ -247,6 +260,11 @@ function saveData($post) {
             $type . '_goal' => isset($post[$type . '_goal']) ? $post[$type . '_goal'] : null,
             $type . '_religion' => isset($post[$type . '_religion']) ? $post[$type . '_religion'] : null,
             $type . '_bloodgroup' => isset($post[$type . '_bloodgroup']) ? $post[$type . '_bloodgroup'] : null,
+            
+            // --- เพิ่มคอลัมน์ใหม่สำหรับข้อมูลบริษัท ---
+            $type . '_company_detail' => isset($post[$type . '_company_detail']) ? $post[$type . '_company_detail'] : null,
+            $type . '_company_url' => isset($post[$type . '_company_url']) ? $post[$type . '_company_url'] : null,
+            $type . '_company_logo' => $company_logo,
         ];
         
         if ($type === 'teacher') {
@@ -283,7 +301,6 @@ function saveData($post) {
             $stmt_update->bind_param($types, ...$params);
             $stmt_update->execute();
             
-            // ... (เดิม)
             $join_table = "classroom_" . $type . "_join";
             $join_id_col = $type . "_id";
             $check_sql = "SELECT * FROM `$join_table` WHERE `$join_id_col` = ? AND `classroom_id` = ?";
@@ -360,7 +377,7 @@ function saveData($post) {
             if ($new_id === 0) {
                 throw new Exception("Failed to get last inserted ID.");
             }
-                
+            
             $join_table = "classroom_" . $type . "_join";
             $join_id_col = $type . "_id";
             $insert_join_sql = "INSERT INTO `$join_table` (`classroom_id`, `$join_id_col`, `comp_id`, `status`, `emp_create`, `date_create`";
@@ -385,13 +402,11 @@ function saveData($post) {
             $insert_join_stmt->execute();
         }
 
-        // --- เริ่มส่วนการจัดการไฟล์ใหม่ทั้งหมด ---
-        // 1. จัดการรูปโปรไฟล์ (แก้ไขเพื่อให้บันทึกได้แค่รูปเดียว)
+        // 1. จัดการรูปโปรไฟล์
         $profile_file_name = $type . '_image_profile';
         if (isset($_FILES[$profile_file_name]) && $_FILES[$profile_file_name]['tmp_name']) {
             $current_file_path = isset($post[$profile_file_name . '_current']) ? $post[$profile_file_name . '_current'] : '';
             
-            // ลบรูปโปรไฟล์เก่าก่อน (soft delete โดยการอัปเดต is_deleted)
             $delete_old_profile_sql = "UPDATE `$file_table` SET `is_deleted` = 1, `emp_modify` = ?, `date_modify` = NOW() WHERE `$id_col` = ? AND `file_type` = 'profile_image' AND `is_deleted` = 0";
             $delete_old_stmt = $mysqli->prepare($delete_old_profile_sql);
             if (!$delete_old_stmt) {
@@ -400,7 +415,6 @@ function saveData($post) {
             $delete_old_stmt->bind_param("ii", $emp_id, $new_id);
             $delete_old_stmt->execute();
             
-            // อัปโหลดและบันทึกรูปโปรไฟล์ใหม่
             $file_path = uploadFile($_FILES, $profile_file_name, $current_file_path);
             if ($file_path) {
                 $insert_file_sql = "INSERT INTO `$file_table` (`$id_col`, `file_path`, `file_type`, `file_status`, `file_order`, `emp_create`, `date_create`) VALUES (?, ?, 'profile_image', 1, 1, ?, NOW())";
@@ -413,7 +427,7 @@ function saveData($post) {
             }
         }
         
-        // 2. จัดการไฟล์แนบ (เหมือนเดิม)
+        // 2. จัดการไฟล์แนบ
         if (isset($_FILES[$type . '_attach_document']['tmp_name']) && is_array($_FILES[$type . '_attach_document']['tmp_name'])) {
             foreach ($_FILES[$type . '_attach_document']['tmp_name'] as $key => $tmp_name) {
                 if ($tmp_name) {
@@ -423,6 +437,27 @@ function saveData($post) {
                         $insert_file_stmt = $mysqli->prepare($insert_file_sql);
                         if (!$insert_file_stmt) {
                             throw new Exception("Insert attached document prepare statement failed: " . $mysqli->error);
+                        }
+                        $insert_file_stmt->bind_param("isi", $new_id, $file_path, $emp_id);
+                        $insert_file_stmt->execute();
+                    }
+                }
+            }
+        }
+
+        // 3. เพิ่มการจัดการรูปภาพบริษัท
+        // ตรวจสอบว่ามีไฟล์รูปภาพบริษัทใหม่ถูกอัปโหลดหรือไม่
+        if (isset($_FILES[$type . '_company_photos']) && is_array($_FILES[$type . '_company_photos']['tmp_name'])) {
+            // ลูปผ่านไฟล์ทั้งหมดที่ถูกอัปโหลด
+            foreach ($_FILES[$type . '_company_photos']['tmp_name'] as $key => $tmp_name) {
+                // ตรวจสอบว่ามีไฟล์ถูกเลือกจริง
+                if ($tmp_name) {
+                    $file_path = uploadFile($_FILES, $type . '_company_photos', '', $key);
+                    if ($file_path) {
+                        $insert_file_sql = "INSERT INTO `$company_photo_table` (`" . $type . "_id`, `file_path`, `emp_create`, `date_create`) VALUES (?, ?, ?, NOW())";
+                        $insert_file_stmt = $mysqli->prepare($insert_file_sql);
+                        if (!$insert_file_stmt) {
+                            throw new Exception("Insert company photo prepare statement failed: " . $mysqli->error);
                         }
                         $insert_file_stmt->bind_param("isi", $new_id, $file_path, $emp_id);
                         $insert_file_stmt->execute();
@@ -440,11 +475,21 @@ function saveData($post) {
     }
 }
 
-// เพิ่มฟังก์ชันสำหรับลบไฟล์
-// เพิ่มฟังก์ชันสำหรับลบไฟล์
 function deleteFile($type, $file_id) {
     global $mysqli;
-    $file_table = "classroom_file_" . $type;
+    $file_table = "";
+    
+    // ✨ แก้ไขส่วนนี้: ระบุตารางให้ถูกต้องตามประเภทของไฟล์ที่ส่งมา
+    if (isset($_POST['file_type']) && $_POST['file_type'] === 'company_photos') {
+        $file_table = "classroom_" . $type . "_company_photo";
+    } else {
+        $file_table = "classroom_file_" . $type;
+    }
+
+    if (empty($file_table)) {
+        return ['status' => 'error', 'message' => 'Invalid file type specified.'];
+    }
+    
     $emp_id = isset($_SESSION['emp_id']) ? $_SESSION['emp_id'] : 1;
 
     $mysqli->begin_transaction();
