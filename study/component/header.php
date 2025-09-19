@@ -32,8 +32,8 @@ $currentScreen = str_replace('_', ' ', $currentScreen);
 // Insert space before 'info' if attached directly to other words
 $currentScreen = preg_replace('/([a-z])info/i', '$1 info', $currentScreen);
 
-// Convert to uppercase
-$currentScreen = strtoupper($currentScreen);
+// Convert to first letter to uppercase
+$currentScreen = ucfirst($currentScreen);
 
 // if ($currentScreen == 'group') {
 //     $currentScreen = 'academy';
@@ -114,7 +114,7 @@ $row_name = $result_name->fetch_assoc();
 $student_name = $row_name['student_name'] ? $row_name['student_name'] : "User";
 $stmt_name->close();
 
-$hide_profile = ["PROFILE", "EDIT PROFILE", "SETTING"];
+$hide_profile = ["Profile", "Edit Profile", "Setting"];
 ?>
 
 <head>
@@ -144,7 +144,7 @@ $hide_profile = ["PROFILE", "EDIT PROFILE", "SETTING"];
 </head>
 
 <div class="orange-header">
-    <?php if ($currentScreen == 'MENU') { ?>
+    <?php if ($currentScreen == 'Menu') { ?>
         <div class="container-topnav">
             <div class="header-topnav">
                 <div class="title-group-topnav">
@@ -183,7 +183,7 @@ $hide_profile = ["PROFILE", "EDIT PROFILE", "SETTING"];
                     <i class="fas fa-long-arrow-alt-left"></i>
                 </span>
             </button>
-            <h1 class="header-title"><?php echo strtoupper($currentScreen); ?></h1>
+            <h1 class="header-title"><?php echo $currentScreen ?></h1>
             <?php 
             if(!in_array($currentScreen, $hide_profile)): ?>
             <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>;">
