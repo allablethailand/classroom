@@ -57,7 +57,8 @@ main {
   border-radius: 1rem;
   border: none;
   box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  /* overflow: hidden; */
+  padding: 3rem;
 }
 
 /* Banner image */
@@ -298,3 +299,8 @@ main {
      -webkit-line-clamp: 2; 
      overflow: hidden;
   }
+
+  
+
+
+  

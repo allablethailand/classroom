@@ -25,17 +25,17 @@ $columnStudent  = "classroom_id, group_id";
 $tableStudent = "classroom_student_join";
 $whereStudent = "where student_id = '{$std_id}'";
 
+
 $student_class = select_data($columnStudent, $tableStudent, $whereStudent);
 
 $our_class = $student_class[0]["classroom_id"];
 $our_group = $student_class[0]["group_id"];
 
+
+
 // var_dump($our_class);
 
 
-//  $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
-// $tableGroup = "classroom_template";
-// $whereGroup = "where classroom_id = '{$std_id}'";
 
 // $class_generation_id = $_POST['class_gen_id'];
 // $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
@@ -55,12 +55,14 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
 // $classroom_group = select_data($columnGroup, $tableGroup, $whereGroup);
 
 // var_dump($classroom_group["classroom_id"]);
-
 // $class_id = $classroom_group['classroom_id'];
-// var_dump($class_id);
 
+$columnCount  = "COUNT(student_id) AS total_student";
+$tableCount = "classroom_student_join";
+$whereCount = "where classroom_id = '{$our_class}' AND group_id = '{$our_group}'";
 
-// var_dump($userGroup);
+$count_total = select_data($columnCount, $tableCount, $whereCount);
+$count_student = $count_total[0]['total_student'];
 ?>
 
 <!doctype html>
@@ -152,14 +154,14 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                         <div class="d-flex-bs align-items-center gap-3">
                                             <div class="group-icon-large" style="color: #FFF;">
                                                 <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                                <img src="<?php echo $item['group_logo']; ?>" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                                                <img src="<?php echo $item['group_logo']; ?>"  class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
                                             </div>
                                             <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
                                                 <div class="d-flex-bs align-items-center gap-2 mb-1">
                                                     <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["group_name"] ?></h4>
                                                 </div>
-                                                <p class="text-secondary mb-0 small text-truncate-2">
-                                                    สมาชิกปัจจุบัน 5 คน
+                                                <p class="text-secondary mb-0 small text-truncate-2"> 
+                                                    <?php echo "สมาชิกปัจจุบัน " . $count_student . " คน" ?>
                                                 </p>
                                             </div>
                                         </div>
@@ -186,14 +188,14 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                 <div class="d-flex-bs align-items-center gap-3">
                                     <div class="group-icon-large" style="color: #FFF;">
                                         <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                        <img src="" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                                        <img src="" onerror="this.src='/images/online-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
                                     </div>
                                     <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
                                         <div class="d-flex-bs align-items-center gap-2 mb-1">
                                             <h4 class="panel-title mb-0 text-truncate d-flex-bs ">อาจารย์ผู้สอน</h4>
                                         </div>
                                         <p class="text-secondary mb-0 small text-truncate-2">
-                                            สมาชิกปัจจุบัน 1 คน
+                                            สมาชิกปัจจุบัน 3 คน
                                         </p>
                                     </div>
                                 </div>
@@ -210,7 +212,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                 <div class="d-flex-bs align-items-center gap-3">
                                     <div class="group-icon-large" style="color: #FFF;">
                                         <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                        <img src="" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                                        <img src="" onerror="this.src='/images/offline-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
                                     </div>
                                     <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
                                         <div class="d-flex-bs align-items-center gap-2 mb-1">
