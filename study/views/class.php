@@ -1,3 +1,43 @@
+<?php
+
+$base_include = $_SERVER['DOCUMENT_ROOT'];
+$base_path = '';
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $exl_path = explode('/', $request_uri);
+    if (!file_exists($base_include . "/dashboard.php")) {
+        $base_path .= "/" . $exl_path[1];
+    }
+    $base_include .= "/" . $exl_path[1];
+}
+define('BASE_PATH', $base_path);
+define('BASE_INCLUDE', $base_include);
+require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/actions/func.php';
+
+
+$std_id = $_SESSION['student_id'];
+
+$columnStudent  = "classroom_id, group_id";
+$tableStudent = "classroom_student_join";
+$whereStudent = "where student_id = '{$std_id}'";
+
+
+$student_class = select_data($columnStudent, $tableStudent, $whereStudent);
+
+$our_class = $student_class[0]["classroom_id"];
+$our_group = $student_class[0]["group_id"];
+
+$columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_bg";
+$tableCourseGroup = "classroom_template";
+$whereCourseGroup = "where classroom_id = '{$our_class}'";
+
+$classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
+
+// var_dump($classroom_group);
+?>
+
+
 <!doctype html>
 <html>
 
@@ -36,11 +76,41 @@
     <?php require_once 'component/header.php'; ?>
     <div class="min-vh-100 bg-ori-gray">
 
-        <div class="container-fluid" style="margin-bottom: 7rem;">
-            <div class="text-center mb-4 course-class" style="margin-top: 2rem; margin: 1rem">
-            </div>
-        </div>
+        <div class="container-fluid px-4 py-2" style="margin-bottom: 20rem;">
 
+            <?php foreach ($classroom_group as $item):  ?>
+
+            <div class="g-4 justify-content-center mb-bs-3 " style="margin-top: 2rem;">
+                <div class="col-12">
+                    <a href="classinfo?classroom_id=<?php echo $item['classroom_id']; ?>" style="font-family: 'Kanit', sans-serif !important;">
+                        <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 1.8rem">
+                             <div class="flex-box-container">
+                                <div class="header-menu">
+                                    <div class="img-banner">
+                                     <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="" style="width: 50px; height: 50px; border-radius: 100%;" >
+                                    </div>
+                                    <div class="class-menu">
+                                    <span class="title-menu" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden;"><?php echo $item['classroom_name']; ?></span>
+                                    <div class="progress-section">
+                                        <div class="progress-header">
+                                        <span class="progress-text" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;"><?php echo $item['classroom_information']; ?></span>
+                                        </div>
+                                        <div class="progress-header-flex">
+                                        <span class="progress-text-end"></span>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="next-icon-box">
+                                    <i class="fas fa-chevron-right"></i>
+                                    </div>
+                                </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <?php endforeach ?>
+        </div>
     </div>
     <?php require_once 'component/footer.php'; ?>
 

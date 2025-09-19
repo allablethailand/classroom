@@ -58,6 +58,8 @@ function renderCourses(courses) {
   });
 }
 
+// ${course.classroom_id}
+
 function renderCourseCard(course) {
   const initial = course.instructor ? course.instructor.charAt(0) : "";
   const courseCover = course.course_cover
@@ -66,9 +68,9 @@ function renderCourseCard(course) {
 
   const courseCoverGT = ` <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="" style="width: 50px; height: 50px; border-radius: 100%;" >`
   return `
-    <div class="row" onclick="loadClass('${course.classroom_id}')"
-      <div class="row">
-        <div class="container-menu" style="margin-top: 10px; padding: 2rem;">
+    
+<div class="row" onclick="loadClass('${course.classroom_id}')">
+        <a href="classinfo" class="container-menu" style="margin-top: 10px; padding: 2rem;">
         <div class="flex-box-container">
           <div class="header-menu">
             <div class="img-banner">
@@ -90,9 +92,8 @@ function renderCourseCard(course) {
             <i class="fas fa-chevron-right"></i>
             </div>
         </div>
-        </div>
+        </a>
       </div>
-    </div>
   `;
 }
 
@@ -146,9 +147,9 @@ function renderClassCard(course, classroom_id) {
         instructorsHtml += `
           <div class="member-avatar avatar-orange" title="${name.trim()}">
             <img src="" 
-                onerror="this.src='/images/default.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
+                onerror="this.src='/images/origami-academy-logo.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
                 alt="${name.trim()}" 
-                style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill; border: 3px solid red;">
+                style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill; border: 3px solid orange;">
           </div>`;
       });
     } else {
@@ -157,9 +158,9 @@ function renderClassCard(course, classroom_id) {
         instructorsHtml += `
           <div class="member-avatar avatar-orange" title="${name.trim()}">
             <img src="" 
-                onerror="this.src='/images/default.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
+                onerror="this.src='/images/origami-academy-logo.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
                 alt="${name.trim()}" 
-                style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill">
+                style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill; border: 3px solid orange;">
           </div>`;
       });
 
@@ -167,7 +168,7 @@ function renderClassCard(course, classroom_id) {
       const remainingCount = namesArray.length - maxVisible;
       instructorsHtml += `
         <div class="member-avatar avatar-orange" title="and ${remainingCount} more">
-          <div class="avatar-counter" style="width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; border: 3px solid red;">
+          <div class="avatar-counter" style="margin-left: 1rem; width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
             +${remainingCount}
           </div>
         </div>`;
@@ -175,12 +176,13 @@ function renderClassCard(course, classroom_id) {
   } else {
 
     instructorsHtml += `
-      <div class="member-avatar avatar-orange" title="more">
-        <div class="avatar-counter" style="width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
-          <img src="/${courseInstr}" alt="Instructor" class="instructor-photo" onerror="this.src='/images/default.png'" style="border: 3px solid red;" />
-        </div>
+      <div class="member-avatar avatar-orange" title="more" style="display: flex;">
+        <img src="/${courseInstr}" alt="Instructor" class="instructor-photo" onerror="this.src='/images/origami-academy-logo.png'" style="border: 3px solid orange;" />
       </div>`;
   }
+
+  // <div class="avatar-counter" style="width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
+  // </div>
 
 
   return `
@@ -204,10 +206,10 @@ function renderClassCard(course, classroom_id) {
                   ${instructorsHtml}
                   </div>
                 </div>
-                <div class="location-info">
-                  สถานที่: โรงเรียน 1
+                <div class="location-info" style="margin-left: 0.5rem;">
+                  สถานที่: ${courseLoca}
                 </div>
-                 <div class="time-schedule-class">
+                 <div class="time-schedule-class" style="margin-left: 0.5rem;">
                   <span class="small-text-gray">${courseDate}</span>
                   <span class="small-text-gray">| ${displayTime}</span>
                 </div>
@@ -228,5 +230,5 @@ function redirectCurreculum(course_id, course_type, classroom_id) {
   let url = `/classroom/study/redirect.php?id=${window.btoa(
     new_path
   )}&cid=${window.btoa(classroom_id)}`;
-  window.open(url, "_blank");
+  window.open(url, "_self");
 }

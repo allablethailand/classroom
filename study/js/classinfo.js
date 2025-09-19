@@ -1,361 +1,163 @@
-document.addEventListener("DOMContentLoaded", function () {
-  var timestamp = {
-    timestatus: null,
-    loading: false,
-    timeserver_origin: null,
-    timeserver: null,
-    timestamp_update: null,
-  };
-  var usergeo = { };
-  var useragent = { device: null, os: null, browser: null };
+$(document).ready(function () {
+  loadClass(classroomId);
 
-  const is_browser_support = true;
-
-  const timestampButton = document.getElementById("timestamp-button");
-  const timestampImg = document.getElementById("timestamp-img");
-  const stampPhotoInput = document.getElementById("stamp_photo");
-  const timeServerDiv = document.getElementById("time-server");
-
-  function updateUI() {
-    if (!is_browser_support) {
-      timestampButton.classList.add("center-box");
-    } else {
-      timestampButton.classList.remove("center-box");
-    }
-
-    if (timestamp.timestatus === "out") {
-      timestampButton.style.pointerEvents = "none";
-      timestampButton.style.cursor = "default";
-    } else {
-      timestampButton.style.pointerEvents = null;
-      timestampButton.style.cursor = "pointer";
-    }
-
-    timeServerDiv.textContent = timestamp.timeserver || "";
-
-    if (!timestamp.timestatus) {
-      timestampImg.src = "images/stamp_in_button.png";
-      timestampImg.style.display = "";
-      timestampImg.alt = "Stamp In Button";
-    } else if (timestamp.timestatus === "in") {
-      timestampImg.src = "images/stamp_out_button.png";
-      timestampImg.style.display = "";
-      timestampImg.alt = "Stamp Out Button";
-    } else if (timestamp.timestatus === "out") {
-      timestampImg.src = "images/stamp_disable_button.png";
-      timestampImg.style.display = "";
-      timestampImg.alt = "Stamp Disabled Button";
-    } else {
-      timestampImg.style.display = "none";
-      if (!document.getElementById("unsupported-span")) {
-        const span = document.createElement("span");
-        span.id = "unsupported-span";
-        span.textContent = "Sorry your browser does not support";
-        timestampButton.appendChild(span);
-      }
-      return;
-    }
-
-    const unsupportedSpan = document.getElementById("unsupported-span");
-    if (unsupportedSpan) {
-      unsupportedSpan.remove();
-    }
-  }
-
-  function updateClock() {
-     if (timestamp.timestamp_update) {
-    clearInterval(timestamp.timestamp_update);
-  }
-  if (timestamp.timeserver_origin) {
-    timestamp.timeserver_origin = new Date(timestamp.timeserver_origin.getTime() + 1000);
-    timestamp.timeserver = timestamp.timeserver_origin.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    updateUI();
-  }
-  timestamp.timestamp_update = setInterval(() => {
-    if (timestamp.timeserver_origin) {
-      timestamp.timeserver_origin = new Date(timestamp.timeserver_origin.getTime() + 1000);
-      timestamp.timeserver = timestamp.timeserver_origin.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-      updateUI();
-    }
-  }, 1000);
-  }
-
-  async function initializeUserData() {
-    if (typeof UAParser === "function") {
-      var parser = new UAParser();
-      useragent = parser.getResult();
-
-      if (useragent.device && useragent.device.type === "mobile") {
-        document.body.classList.add("is-device");
-        var browser = useragent.browser;
-        if (browser) {
-          var browserName = browser.name ? browser.name.toLowerCase() : "";
-          if (browserName !== "line" && browserName !== "facebook") {
-            if (navigator.geolocation) {
-              try {
-                await new Promise((resolve, reject) => {
-                  navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                      usergeo.lat = position.coords.latitude;
-                      usergeo.lng = position.coords.longitude;
-                      usergeo.accuracy = position.coords.accuracy;
-                      resolve();
-                    },
-                    (error) => reject(error),
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                  );
-                });
-                // Fetch initial stamp time from server here if needed...
-                // Example:
-                /*
-                              const response = await fetchData("_");
-                              if (response && response.stamptime) {
-                                  const s = response.stamptime;
-                                  timestamp.timeserver_origin = new Date(s.timeserver);
-                                  timestamp.timeserver = timestamp.timeserver_origin.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-                                  timestamp.timestatus = s.status || null;
-                                  updateClock();
-                              }
-                              */
-              } catch (err) {
-                console.warn("Geolocation error:", err);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  function resizeImage(file, maxSize) {
-    // var file = settings.file;
-    var maxSize = file.maxSize;
-
-    // console.log(settings);
-    console.log(file);
-    //     console.log("file type", file.type);
-
-    return new Promise((resolve, reject) => {
-      if (!file.type.match(/image.*/)) {
-        reject(new Error("Not an image"));
-        return;
-      }
-
-      var reader = new FileReader();
-      var image = new Image();
-      var canvas = document.createElement("canvas");
-
-      function dataURItoBlob(dataURI) {
-        const byteString =
-          dataURI.split(",")[0].indexOf("base64") >= 0
-            ? atob(dataURI.split(",")[1])
-            : decodeURI(dataURI.split(",")[1]);
-        const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
-        const arrayBuffer = new Uint8Array(byteString.length);
-        for (let i = 0; i < byteString.length; i++) {
-          arrayBuffer[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([arrayBuffer], { type: mimeString });
-      }
-
-      function resize() {
-        let width = image.width;
-        let height = image.height;
-
-        if (width > height) {
-          if (width > maxSize) {
-            height *= maxSize / width;
-            width = maxSize;
-          }
-        } else {
-          if (height > maxSize) {
-            width *= maxSize / height;
-            height = maxSize;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, width, height);
-        ctx.drawImage(image, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL("image/jpeg");
-        return dataURItoBlob(dataUrl);
-      }
-
-      reader.onload = function (e) {
-        image.onload = function () {
-          resolve(resize());
-        };
-        image.src = e.target.result;
-      };
-
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function storeBlob(blob) {
-    return new Promise((resolve, reject) => {
-      var reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  }
-
-  function getOrientation(file, callback) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      var view = new DataView(e.target.result);
-      if (view.getUint16(0, false) != 0xffd8) {
-        return callback(-2);
-      }
-      var length = view.byteLength,
-        offset = 2;
-      while (offset < length) {
-        if (view.getUint16(offset + 2, false) <= 8) return callback(-1);
-        var marker = view.getUint16(offset, false);
-        offset += 2;
-        if (marker == 0xffe1) {
-          if (view.getUint32((offset += 2), false) != 0x45786966) {
-            return callback(-1);
-          }
-          var little = view.getUint16((offset += 6), false) == 0x4949;
-          offset += view.getUint32(offset + 4, little);
-          var tags = view.getUint16(offset, little);
-          offset += 2;
-          for (var i = 0; i < tags; i++) {
-            if (view.getUint16(offset + i * 12, little) == 0x0112) {
-              return callback(view.getUint16(offset + i * 12 + 8, little));
-            }
-          }
-        } else if ((marker & 0xff00) != 0xff00) {
-          break;
-        } else {
-          offset += view.getUint16(offset, false);
-        }
-      }
-      return callback(-1);
-    };
-    reader.readAsArrayBuffer(file);
-  }
-
-  async function onStampPhoto(e) {
-    var files = e.target.files;
-    if (files && files.length > 0) {
-      var file = files[0];
-
-      try {
-        const resizedImageBlob = await resizeImage(file, 300);
-        const photoDataUrl = await storeBlob(resizedImageBlob);
-        const photoExif = await new Promise((resolve) => {
-          getOrientation(file, (result) => {
-            resolve(result === -2 ? 8 : result);
-          });
-        });
-        // Call stampTime with photo data
-        console.log("usergeo:", usergeo);
-        stampTime({ photo: photoDataUrl, photo_exif: photoExif });
-      } catch (err) {
-        alert("ON STAMP ERROR!");
-        console.error("Error processing photo:", err);
-      }
-    }
-    forceUpdate();
-  }
-
-  function openTimeStamp() {
-    if (timestamp.timestatus !== "out") {
-      var message =
-        timestamp.timestatus !== "in"
-          ? "พร้อมที่จะเข้าเรียนแล้วใช่มั้ย?"
-          : "ต้องการ check out ออก class แล้วใช่มั้ย?";
-      if (confirm(message)) {
-        var stampPhoto = document.getElementById("stamp_photo");
-        if (stampPhoto) {
-          stampPhoto.click();
-        }
-      }
-    }
-  }
-
-  function forceUpdate() {
-    updateUI();
-  }
-
-  function fetchData(actions, data = {}, endpoint, method) {
-    return fetch(endpoint || "/classroom/study/actions/classinfo.php", {
-      method: method || "POST",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        action: actions,
-        data: data,
-      }),
-    })
-      .then(async (response) => {
-        var result = await response.json();
-        return result;
-      })
-      .catch((err) => {});
-  }
-
-  async function stampTime(stampPhotoData) {
-    if (!usergeo.lat || !usergeo.lng) {
-      alert("Your location can't be found");
-      return;
-    }
-    timestamp.loading = true;
-
-    const payload = {
-      lat: usergeo.lat,
-      lng: usergeo.lng,
-      device: useragent.device ? useragent.device.type : null,
-      os: useragent.os ? useragent.os.name : null,
-      browser: useragent.browser ? useragent.browser.name : null,
-      stamp_status: timestamp.timestatus,
-      stamp_photo: stampPhotoData,
-    };
-    try {
-      // console.log("HELLO");
-      const response = await fetchData("stamptime", payload);
-      console.log(response);
-      if (response && response.status) {
-        timestamp.timestatus = response.stampstatus;
-        timestamp.timeserver_origin = new Date(response.timeserver);
-        timestamp.timeserver = timestamp.timeserver_origin.toLocaleTimeString(
-          [],
-          { hour: "2-digit", minute: "2-digit" }
-        );
-        updateClock();
-        alert("You already stamp time");
-        location.reload();
-      } else {
-        alert("Can't stamp");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error during stamping");
-    } finally {
-      timestamp.loading = false;
-    }
-  }
-
-  (async () => {
-    await initializeUserData();
-    updateUI(); 
-
-    if (usergeo.lat && usergeo.lng) {
-    timestampButton.disabled = false;
-    } else {
-      timestampButton.disabled = true;
-    }
-  })();
-
-  timestampButton.addEventListener("click", openTimeStamp);
-  stampPhotoInput.addEventListener("change", onStampPhoto);
+  console.log(classroomId);
 });
+
+function loadClass(classroomId) {
+  $.ajax({
+    url: "/classroom/study/actions/class.php",
+    data: {
+      action: "loadClass",
+      classroom_id: classroomId,
+    },
+    dataType: "JSON",
+    type: "POST",
+    success: function (result) {
+      if (Array.isArray(result)) {
+        renderClass(result, classroomId);
+      } else {
+        console.error("Expected an array of courses but got:", result);
+      }
+    },
+    error: function (xhr, status, error) {
+      console.log(error);
+      console.error("Failed to load courses:", error);
+    },
+  });
+}
+
+function renderClass(courses, classroomId) {
+  console.log(courses);
+  const container = document.querySelector(".course-class-info");
+  container.innerHTML = "";
+  courses.forEach((course) => {
+    container.insertAdjacentHTML(
+      "beforeend",
+      renderClassCard(course, classroomId)
+    );
+  });
+}
+
+
+function renderClassCard(course, classroomId) {
+  const safeText = (text) => text ? text : "ไม่ระบุ";
+  const courseCover = course.course_cover
+    ? `<img src="/${course.course_cover}" alt="${course.course_name}" style="width: 70px; height: 70px; margin-bottom: 1rem; border-radius: 10px;" onerror="this.src='/images/training.jpg'">`
+    : "";
+
+  let instructorsHtml = "";
+
+  const courseLoca = safeText(course.course_location);
+  const courseStart = safeText(course.course_timestart);
+  const courseEnd = course.course_timeend;
+  const displayTime = courseEnd ? `${courseStart} - ${courseEnd}` : courseStart || "ไม่ระบุ";
+  const courseInstr = safeText(course.course_instructor);
+  const courseName = safeText(course.course_name);
+  const courseDate = safeText(course.course_date);
+
+  if (course.trn_count_by != null && course.trn_count_by > 1) {
+
+    let cleaned = courseInstr.replace(/\s*,\s*/g, ',');
+    let namesArray = cleaned.split(',');
+    // Count the elements
+    let namesCount = namesArray.length;
+    // Loop to get each name
+    namesArray.forEach(name => {
+      console.log(name.trim());
+    });
+
+
+    let maxVisible = 3;
+
+    if (namesArray.length <= maxVisible) {
+      // Show all if 3 or less
+      namesArray.forEach(name => {
+        instructorsHtml += `
+          <div class="member-avatar avatar-orange" title="${name.trim()}">
+            <img src="" 
+                onerror="this.src='/images/origami-academy-logo.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
+                alt="${name.trim()}" 
+                style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill; border: 3px solid orange;">
+          </div>`;
+      });
+    } else {
+      // Show only first 3
+      namesArray.slice(0, maxVisible).forEach(name => {
+        instructorsHtml += `
+          <div class="member-avatar avatar-orange" title="${name.trim()}">
+            <img src="" 
+                onerror="this.src='/images/origami-academy-logo.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
+                alt="${name.trim()}" 
+                style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill; border: 3px solid orange;">
+          </div>`;
+      });
+
+      // Add count +N for the remaining
+      const remainingCount = namesArray.length - maxVisible;
+      instructorsHtml += `
+        <div class="member-avatar avatar-orange" title="and ${remainingCount} more">
+          <div class="avatar-counter" style="margin-left: 1rem; width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
+            +${remainingCount}
+          </div>
+        </div>`;
+    }
+  } else {
+
+    instructorsHtml += `
+      <div class="member-avatar avatar-orange" title="more" style="display: flex;">
+        <img src="/${courseInstr}" alt="Instructor" class="instructor-photo" onerror="this.src='/images/origami-academy-logo.png'" style="border: 3px solid orange;" />
+      </div>`;
+  }
+
+  // <div class="avatar-counter" style="width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
+  // </div>
+
+
+  return `
+    <div class="row" onclick="redirectCurreculum('${course.course_id}', '${course.course_type
+    }', ${classroomId})">
+      <div class="container-menu" style="margin-top: 10px; padding: 2rem;">
+
+        <div class="flex-box-container">
+          <div class="header-menu">
+            <div class="small-img-banner">
+               ${courseCover}
+            </div>
+            <div class="class-menu">
+            <span class="title-menu-sec" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;">${course.course_name}</span>
+              <div class="progress-section">
+                 <div>
+                  <div class="instructor-name">
+                    <b>ผู้สอน:</b> ${courseInstr}
+                  </div>
+                  <div class="instructor-info" style="margin-left: 0.5rem;">
+                  ${instructorsHtml}
+                  </div>
+                </div>
+                <div class="location-info" style="margin-left: 0.5rem;">
+                  สถานที่: ${courseLoca}
+                </div>
+                 <div class="time-schedule-class" style="margin-left: 0.5rem;">
+                  <span class="small-text-gray">${courseDate}</span>
+                  <span class="small-text-gray">| ${displayTime}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="next-icon-box">
+            <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+function redirectCurreculum(course_id, course_type, classroomId) {
+  let new_path = course_type + "_" + course_id;
+  let url = `/classroom/study/redirect.php?id=${window.btoa(
+    new_path
+  )}&cid=${window.btoa(classroomId)}`;
+  window.open(url, "_self");
+}
