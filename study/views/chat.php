@@ -39,10 +39,6 @@
     <div class="text-center space-y-8 max-w-4xl mx-auto">
       <div class="relative mx-auto w-32 h-32 md:w-40 md:h-40 mb-8" style="margin-bottom: 2rem;">
         <div class="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full animate-ping opacity-75"></div>
-        <div class="relative bg-white rounded-full p-8 shadow-2xl">
-          <Rocket class="w-full h-full text-purple-600 animate-bounce" />
-        </div>
-        <Sparkles class="absolute -top-2 -right-2 w-8 h-8 text-yellow-400 animate-spin" />
       </div>
       <div class="container-fluid px-4 py-2" style="margin-bottom: 1rem;">
         <div class="space-y-4">
@@ -58,7 +54,10 @@
         </div>
       </div>
       <div class="relative" style="margin-bottom: 13rem;">
-        <div class="robot-container">
+        <div  style="display: flex;">
+          <img src="" alt="" onerror="this.src='/images/origami-logo-robot.png'" class="img-rounded img-contain">
+        </div>
+        <!-- <div class="robot-container">
           <div class="robot-head">
 
             <div class="eye eye-left">
@@ -105,7 +104,7 @@
               <div class="foot foot-right"></div>
             </div>
           </div>
-        </div>
+        </div> -->
 
 
       </div>

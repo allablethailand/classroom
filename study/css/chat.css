@@ -281,3 +281,10 @@
     left: -2.5px;
     border: 2px solid #1a202c;
 }
+
+
+.img-contain {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
