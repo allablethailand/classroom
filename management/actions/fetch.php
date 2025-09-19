@@ -274,12 +274,39 @@ function saveData($post) {
             $data['teacher_position'] = isset($post['teacher_position']) ? $post['teacher_position'] : null;
         }
 
+        // **ส่วนที่เพิ่มเข้ามาเพื่อตรวจสอบ Username และ Password **
+        $username_input = isset($post[$type . '_username']) ? $post[$type . '_username'] : null;
+        $plain_password = isset($post[$type . '_password']) ? $post[$type . '_password'] : null;
+        $confirm_password = isset($post[$type . '_confirm_password']) ? $post[$type . '_confirm_password'] : null;
+
+        // **Step 1: ตรวจสอบ username ห้ามซ้ำ**
+        if ($username_input) {
+            $check_username_sql = "SELECT `".$id_col."` FROM `".$table."` WHERE `".$type."_username` = ? AND `".$id_col."` != ?";
+            $check_username_stmt = $mysqli->prepare($check_username_sql);
+            if (!$check_username_stmt) {
+                throw new Exception("Check username prepare statement failed: " . $mysqli->error);
+            }
+            $check_username_stmt->bind_param('si', $username_input, $id);
+            $check_username_stmt->execute();
+            $check_username_result = $check_username_stmt->get_result();
+
+            if ($check_username_result->num_rows > 0) {
+                return ['status' => 'error', 'message' => 'Username already exists. Please choose a different one.'];
+            }
+        }
+        
+        // **Step 2: ตรวจสอบ Password ที่กรอก 2 รอบ**
+        // ถ้ามีการกรอกรหัสผ่านใหม่
         if (isset($post[$type . '_password']) && !empty($post[$type . '_password'])) {
-            $plain_password = $post[$type . '_password'];
+            if ($plain_password !== $confirm_password) {
+                return ['status' => 'error', 'message' => 'Passwords do not match. Please try again.'];
+            }
+            
             $password_key = bin2hex(openssl_random_pseudo_bytes(16));
             $data[$type . '_password'] = encryptToken($plain_password, $password_key);
             $data[$type . '_password_key'] = $password_key;
         }
+
 
         $new_id = $id;
 

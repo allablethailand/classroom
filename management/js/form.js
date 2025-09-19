@@ -326,6 +326,10 @@
                                             <input type="password" name="${type}_password" id="${type}_password" class="form-control">
                                             <small class="text-muted">Fill in only if you want to change the password</small>
                                         </div>
+                                        <div class="form-group">
+                                            <label for="${type}_confirm_password" class="control-label"><i class="fas fa-lock" style="color: #6c757d; margin-right: 5px;"></i> Confirm Password </label>
+                                            <input type="password" name="${type}_confirm_password" id="${type}_confirm_password" class="form-control">
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -807,7 +811,8 @@ function validateForm(type) {
 
         // Login Setup Tab
         { id: `${type}_username`, tab: `${type}_setup_tab`, message: 'Username must be at least 6 characters.', pattern: /^.{6,}$/ },
-        { id: `${type}_password`, tab: `${type}_setup_tab`, message: 'Password must be at least 6 characters.', pattern: /^.{6,}$/, conditional: true }
+        { id: `${type}_password`, tab: `${type}_setup_tab`, message: 'Password must be at least 6 characters.', pattern: /^.{6,}$/, conditional: true },
+        { id: `${type}_confirm_password`, tab: `${type}_setup_tab`, message: 'Passwords do not match.', conditional: true }
     ];
 
     $(`.form-control`).removeClass('required-field-input-invalid');
@@ -817,19 +822,39 @@ function validateForm(type) {
         const $input = $(`#${field.id}`);
         const value = $input.val().trim();
         let currentFieldIsValid = true;
-
+        const currentId = $(`#${type}_id`).val();
+        
+        // Check for required fields (optional fields are skipped)
         if (!field.optional && value === '') {
             currentFieldIsValid = false;
         }
 
+        // Check against patterns
         if (value !== '' && field.pattern && !field.pattern.test(value)) {
             currentFieldIsValid = false;
         }
 
-        if (field.id === `${type}_password` && ($(`#${type}_id`).val() && value === '')) {
-            currentFieldIsValid = true;
+        // Password validation logic
+        if (field.id === `${type}_password`) {
+            // If it's an update and no password is entered, it's valid
+            if (currentId && value === '') {
+                currentFieldIsValid = true;
+            } else if (value === '') {
+                // If it's a new entry and no password is provided, it's invalid
+                currentFieldIsValid = false;
+            }
         }
-        
+
+        // Confirm Password validation
+        if (field.id === `${type}_confirm_password`) {
+            const passwordValue = $(`#${type}_password`).val().trim();
+            if (passwordValue !== '' && value !== passwordValue) {
+                currentFieldIsValid = false;
+            } else if (passwordValue !== '' && value === '') {
+                currentFieldIsValid = false;
+            }
+        }
+
         if (!currentFieldIsValid) {
             isValid = false;
             $input.addClass('required-field-input-invalid');
@@ -979,11 +1004,12 @@ $(`input[name="${type}_company_photos_current[]"]`).each(function() {
                 swal("Success!", response.message, "success");
                 setTimeout(() => {
                     const newId = response.id || id;
-                    if (newId) {
-                        window.location.href = `?type=${type}&id=${newId}`;
-                    } else {
-                        window.location.reload();
-                    }
+                    window.location.href='/classroom/management/';
+                    // if (newId) {
+                    //     window.location.href = `?type=${type}&id=${newId}`;
+                    // } else {
+                    //     window.location.reload();
+                    // }
                 }, 1500);
             } else {
                 swal("Error!", response.message, "error");
