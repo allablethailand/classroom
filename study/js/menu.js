@@ -2,39 +2,44 @@ $(document).ready(function () {
     load_nextclass();
 });
 
-function view_group(class_id) {
-    $.ajax({
-        url: "/classroom/study/actions/group.php",
-        type: "POST",
-        data: {
-            action: "view_group",
-            class_gen_id: class_id,
-        },
-        dataType: "JSON",
-        success: function (result) {
-            $.redirect("group", { classroom_group: result }, "post");
-            // $.redirect("detail",{classroom_id: result.classroom_id}, 'post');
-            //    console.log(result);
-        },
-        error: function (xhr, status, error) {
-            console.error("Error loading management data:", error);
-        },
-    });
-}
+// let htmldata = `
+//     <div class="row">
+//         <p class="menu-title">Upcoming Class</p>
+//     </div>
+//     <div class="container-menu" style="margin-top: 10px;">
+//         <div class="header-menu">
+//             <span class="title-menu">${soonClass.schedule_name}</span>
+//             <span class="progress-text-end">
+//                 <span class="label label-default pill pill-icon-before">${soonClass.stamp_in_status}</span>
+//                 </span>
+//         </div>
+//         <div class="usage-menu">
+//             <div class="progress-section">
+//             <div class="progress-header-flex">
+//                 <span class="progress-text">
+//                 ${newDate}     
+//                 </span>
+//                 <span class="progress-text">${timeSchedule}</span>
+//             </div>
+//             <div class="progress-header-flex">
+//             <span id="countdown" class="progress-text-bottom"></span>       
+//             </div>
+//             </div>
+//         </div>
+//     </div>
+//     `;
 
 function load_nextclass() {
     $.ajax({
         url: "/classroom/study/actions/menu.php", // your PHP file
         type: "POST", // send JSON
         data: {
-            action: "getUpcomingClass",
+            action: "get_upcoming_class",
         },
         success: function (response) {
-            console.log("HTML", response);
-
             const nextClass = response.soon_class;
-            console.log("HTML1", nextClass.date_start);
-            console.log("HTML1", `${nextClass.date_start}T${nextClass.time_start}`);
+            // console.log("HTML1", nextClass.date_start);
+            // console.log("HTML1", `${nextClass.date_start}T${nextClass.time_start}`);
 
 
             const otherClass = response.other_classes;
@@ -157,6 +162,7 @@ function getUpcomingClass(soonClass, otherClasses) {
     }
     $("#otherUpClass").html(html);
 }
+
 function startCountdown(targetStartTime) {
     const countdownElem = document.getElementById("countdown");
     if (!countdownElem) return;

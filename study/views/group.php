@@ -98,20 +98,12 @@ $count_student = $count_total[0]['total_student'];
     <script src="/classroom/study/js/group.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 
 </head>
-
-<style>
-    body {
-        font-family: 'Kanit', sans-serif !important;
-    }
-</style>
-
-
 <body>
 
     <?php require_once 'component/header.php'; ?>
 
     <!-- work ON mobile screen ONLY -->
-    <div class="min-vh-100 bg-ori-gray">
+    <div class="main-content">
         <div class="container-fluid px-4 py-2">
             <div class="text-center mb-4">
                 <h1 class="display-4 fw-bold text-dark mb-bs-5 text-center">

@@ -49,25 +49,13 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 
-    <style>
-        .sweet-alert h2 {
-            font-family: 'Kanit', sans-serif !important;
-        }
 
-        .sweet-alert p {
-            font-family: 'Kanit', sans-serif !important;
-        }
-
-        .sa-confirm-button-container button {
-            font-family: 'Kanit', sans-serif !important;
-        }
-    </style>
 </head>
 
 <body>
     <?php require_once("component/header.php"); ?>
 
-    <div style="min-height:140vh;">
+    <div class="main-transparent-content">
         <div class="container-fluid" style="margin-top: 1rem;">
             <div class="schedule-section">
                 <!-- <div class="schedule-header">

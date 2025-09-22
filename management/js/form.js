@@ -123,7 +123,7 @@
                                                         <img id="${type}_card_front_preview" src="" alt="Front Name Card Preview">
                                                         <div class="image-actions">
                                                             
-                                                            <a href="#" onclick="removeImage('${type}_card_front_preview', '${type}_card_front');" class="remove-btn">Remove</a>
+                                                            <a  onclick="removeImage('${type}_card_front_preview', '${type}_card_front');" class="remove-btn">Remove</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -141,7 +141,7 @@
                                                         <img id="${type}_card_back_preview" src="" alt="Back Name Card Preview">
                                                         <div class="image-actions">
                                                             
-                                                            <a href="#" onclick="removeImage('${type}_card_back_preview', '${type}_card_back');" class="remove-btn">Remove</a>
+                                                            <a  onclick="removeImage('${type}_card_back_preview', '${type}_card_back');" class="remove-btn">Remove</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -224,6 +224,39 @@
                                                 <input type="text" name="${type}_position" id="${type}_position" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <label for="${type}_company_detail" class="control-label"><i class="fas fa-info-circle" style="color: #6c757d; margin-right: 5px;"></i> Company Detail </label>
+                                            <textarea name="${type}_company_detail" id="${type}_company_detail" class="form-control" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="${type}_company_url" class="control-label"><i class="fas fa-link" style="color: #6c757d; margin-right: 5px;"></i> Company URL </label>
+                                            <input type="url" name="${type}_company_url" id="${type}_company_url" class="form-control" style="padding: 2rem 1rem;">
+                                        </div>
+                                        <div class="form-group g-4 row">
+                                            <div class="col-sm-6" style="width:100%;">
+                                                <label for="${type}_company_logo" class="control-label"><i class="fas fa-image" style="color: #6c757d; margin-right: 5px;"></i> Company Logo</label>
+                                                <div class="preview-uploads">
+                                                    <input type="file" class="file-input" name="${type}_company_logo" id="${type}_company_logo" accept="image/*" onchange="readURL(this, '${type}_company_logo_preview')">
+                                                    <div class="image-placeholder">
+                                                        <i class="fas fa-image"></i>
+                                                        <p>Click to add logo</p>
+                                                    </div>
+                                                    <div class="image-preview" style="display:none;">
+                                                        <img id="${type}_company_logo_preview" src="#" alt="Company Logo Preview" />
+                                                    </div>
+                                                    <input type="hidden" id="${type}_company_logo_current" name="${type}_company_logo_current">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group g-4 row">
+                                            <div class="col-sm-6" style="width:100%;">
+                                                <label for="${type}_company_photos" class="control-label"><i class="fas fa-images" style="color: #6c757d; margin-right: 5px;"></i> Company Photos</label>
+                                                <div class="file-gallery-wrapper">
+                                                    <div id="company-photos-fields" class="row"></div>
+                                                </div>
+                                                <button type="button" class="btn btn-default mt-2" onclick="addCompanyPhotoField('', '${type}', true)"><i class="fas fa-plus"></i> Add Photo</button>
+                                            </div>
+                                        </div>
                                         <div class="form-group g-4 row" style="margin-bottom:4.5em;">
                                             <div class="col-sm-6">
                                                 <label for="${type}_religion" class="control-label"><i class="fas fa-hand-holding-heart" style="color: #ecc379; margin-right: 5px;"></i> Religion </label>
@@ -292,6 +325,10 @@
                                             <label for="${type}_password" class="control-label"><i class="fas fa-lock" style="color: #6c757d; margin-right: 5px;"></i> Password </label>
                                             <input type="password" name="${type}_password" id="${type}_password" class="form-control">
                                             <small class="text-muted">Fill in only if you want to change the password</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="${type}_confirm_password" class="control-label"><i class="fas fa-lock" style="color: #6c757d; margin-right: 5px;"></i> Confirm Password </label>
+                                            <input type="password" name="${type}_confirm_password" id="${type}_confirm_password" class="form-control">
                                         </div>
                                     </div>
                                 </form>
@@ -525,6 +562,98 @@ $(document).on('change', 'input[name$="_attach_document[]"]', function(event) {
     }
 });
 
+// ฟังก์ชันสำหรับเพิ่มช่องอัปโหลดรูปภาพบริษัท
+function addCompanyPhotoField(photoUrl = '', type, fileId = null) {
+    const photoContainer = $(`#company-photos-fields`);
+    const photoId = `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    let previewContent = '';
+    let fileInputHtml = '';
+    
+    // หากมี URL รูปภาพอยู่แล้ว
+    if (photoUrl) {
+        previewContent = `<img src="${photoUrl}" class="img-fluid document-preview" alt="Company Photo Preview">`;
+        fileInputHtml = `<input type="hidden" name="${type}_company_photos_current[]" value="${photoUrl}">`;
+    } else {
+        // หากเป็นการเพิ่มรูปภาพใหม่
+        previewContent = `<div class="image-placeholder"><i class="fas fa-file-image"></i> <p>Click to add photo</p></div>`;
+        fileInputHtml = `<input type="file" class="file-input" name="${type}_company_photos[]" accept="image/*">`;
+    }
+
+    const newFieldHtml = `
+        <div class="col-6 col-md-2 mb-3">
+            <div class="file-item-box" id="${photoId}" data-file-id="${fileId}">
+                <div class="file-preview-container">
+                    ${previewContent}
+                </div>
+                ${fileInputHtml}
+                <div class="file-actions">
+                    <button class="btn btn-danger btn-sm" type="button" onclick="removeCompanyPhotoField('${photoId}', ${fileId}, '${type}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    ${photoUrl ? `<a href="${photoUrl}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></a>` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+
+    const newField = $(newFieldHtml);
+    photoContainer.append(newField);
+
+    // ✨ เพิ่มโค้ดส่วนนี้เพื่อจัดการพรีวิวรูปภาพ
+    const fileInput = newField.find('.file-input');
+    const previewContainer = newField.find('.file-preview-container');
+
+    previewContainer.on('click', function() {
+        if (!photoUrl) {
+            fileInput.trigger('click');
+        }
+    });
+
+    fileInput.on('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewContainer.html(`<img src="${e.target.result}" class="img-fluid document-preview" alt="Company Photo Preview">`);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// ฟังก์ชันสำหรับลบรูปภาพบริษัท
+function removeCompanyPhotoField(photoId, fileId, type) {
+    if (fileId) {
+        $.ajax({
+            url: 'actions/fetch.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'deleteFile',
+                type: type,
+                file_id: fileId,
+                file_type: 'company_photos' // ระบุ file_type ใหม่
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $(`#${photoId}`).remove();
+                    swal("Success!", "Company photo removed successfully.", "success");
+                } else {
+                    swal("Error!", response.message, "error");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                swal("Error!", "Failed to remove company photo from server.", "error");
+            }
+        });
+    } else {
+        $(`#${photoId}`).remove();
+        console.log(`Removed new company photo field with ID: ${photoId}`);
+    }
+}
+
 // ✨ แก้ไข: ฟังก์ชัน loadData เพื่อรองรับการดึงรูปโปรไฟล์และไฟล์แนบจากตารางอื่น
 function loadData(type, id) {
     return new Promise((resolve, reject) => {
@@ -606,6 +735,22 @@ function loadData(type, id) {
                     $(`#${type}_position`).val(data[`${type}_position`]);
                     $(`#${type}_religion`).val(data[`${type}_religion`]);
                     $(`#${type}_bloodgroup`).val(data[`${type}_bloodgroup`]);
+                    // ✨ เพิ่มโค้ดใหม่ตรงนี้
+// Company fields
+$(`#${type}_company_detail`).val(data[`${type}_company_detail`]);
+$(`#${type}_company_url`).val(data[`${type}_company_url`]);
+
+// ดึงและแสดงผลโลโก้บริษัท
+showFilePreview(`${type}_company_logo`, data[`${type}_company_logo`]);
+
+// ดึงและแสดงผลรูปภาพบริษัทหลายรูป
+const companyPhotosContainer = $(`#company-photos-fields`);
+companyPhotosContainer.empty();
+if (data.company_photos && data.company_photos.length > 0) {
+    data.company_photos.forEach(photo => {
+        addCompanyPhotoField(photo.file_path, type, photo.file_id);
+    });
+}
 
                     // Favorite Tab
                     $(`#${type}_hobby`).val(data[`${type}_hobby`]);
@@ -666,7 +811,8 @@ function validateForm(type) {
 
         // Login Setup Tab
         { id: `${type}_username`, tab: `${type}_setup_tab`, message: 'Username must be at least 6 characters.', pattern: /^.{6,}$/ },
-        { id: `${type}_password`, tab: `${type}_setup_tab`, message: 'Password must be at least 6 characters.', pattern: /^.{6,}$/, conditional: true }
+        { id: `${type}_password`, tab: `${type}_setup_tab`, message: 'Password must be at least 6 characters.', pattern: /^.{6,}$/, conditional: true },
+        { id: `${type}_confirm_password`, tab: `${type}_setup_tab`, message: 'Passwords do not match.', conditional: true }
     ];
 
     $(`.form-control`).removeClass('required-field-input-invalid');
@@ -676,19 +822,39 @@ function validateForm(type) {
         const $input = $(`#${field.id}`);
         const value = $input.val().trim();
         let currentFieldIsValid = true;
-
+        const currentId = $(`#${type}_id`).val();
+        
+        // Check for required fields (optional fields are skipped)
         if (!field.optional && value === '') {
             currentFieldIsValid = false;
         }
 
+        // Check against patterns
         if (value !== '' && field.pattern && !field.pattern.test(value)) {
             currentFieldIsValid = false;
         }
 
-        if (field.id === `${type}_password` && ($(`#${type}_id`).val() && value === '')) {
-            currentFieldIsValid = true;
+        // Password validation logic
+        if (field.id === `${type}_password`) {
+            // If it's an update and no password is entered, it's valid
+            if (currentId && value === '') {
+                currentFieldIsValid = true;
+            } else if (value === '') {
+                // If it's a new entry and no password is provided, it's invalid
+                currentFieldIsValid = false;
+            }
         }
-        
+
+        // Confirm Password validation
+        if (field.id === `${type}_confirm_password`) {
+            const passwordValue = $(`#${type}_password`).val().trim();
+            if (passwordValue !== '' && value !== passwordValue) {
+                currentFieldIsValid = false;
+            } else if (passwordValue !== '' && value === '') {
+                currentFieldIsValid = false;
+            }
+        }
+
         if (!currentFieldIsValid) {
             isValid = false;
             $input.addClass('required-field-input-invalid');
@@ -754,13 +920,22 @@ function handleFormSubmission(type, id) {
         formData.set(`${type}_birth_date`, '');
     }
 
-    // Append image files (except attached documents)
-    $(`input[type="file"]:not([name*="_attach_document"])`).each(function() {
-        if (this.files.length > 0) {
-            formData.append(this.name, this.files[0]);
-        }
-    });
+    // Append image files (except attached documents and company photos)
+$(`input[type="file"]:not([name*="_attach_document"]):not([name*="_company_photos"])`).each(function() {
+    if (this.files.length > 0) {
+        formData.append(this.name, this.files[0]);
+    }
+});
 
+// ✨ เพิ่มโค้ดใหม่ตรงนี้
+// Append multiple company photos
+$(`input[name="${type}_company_photos[]"]`).each(function() {
+    if (this.files.length > 0) {
+        for (let i = 0; i < this.files.length; i++) {
+            formData.append(this.name, this.files[i]);
+        }
+    }
+});
     // Append multiple attached documents
     $(`input[name="${type}_attach_document[]"]`).each(function() {
         if (this.files.length > 0) {
@@ -779,6 +954,12 @@ function handleFormSubmission(type, id) {
     $(`input[name="${type}_attach_document_current[]"]`).each(function() {
         formData.append(this.name, this.value);
     });
+
+    // ✨ เพิ่มโค้ดใหม่ตรงนี้
+// Append company photos that are already saved and not removed
+$(`input[name="${type}_company_photos_current[]"]`).each(function() {
+    formData.append(this.name, this.value);
+});
 
     // Convert prefix text to numeric value
     const reversePrefixMap = {};
@@ -823,11 +1004,12 @@ function handleFormSubmission(type, id) {
                 swal("Success!", response.message, "success");
                 setTimeout(() => {
                     const newId = response.id || id;
-                    if (newId) {
-                        window.location.href = `?type=${type}&id=${newId}`;
-                    } else {
-                        window.location.reload();
-                    }
+                    window.location.href='/classroom/management/';
+                    // if (newId) {
+                    //     window.location.href = `?type=${type}&id=${newId}`;
+                    // } else {
+                    //     window.location.reload();
+                    // }
                 }, 1500);
             } else {
                 swal("Error!", response.message, "error");

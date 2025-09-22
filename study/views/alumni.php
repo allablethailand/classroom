@@ -42,9 +42,9 @@ $our_class = $student_class[0]["classroom_id"];
 // $whereGroup = "where classroom_id = '{$our_class}'";
 // $whereGroup = "where classroom_id = '1' AND status = 0";
 
-$columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
-$tableCourseGroup = "classroom_template";
-$whereCourseGroup = "where classroom_id = '{$our_class}'";
+$columnCourseGroup  = "COUNT(cg.group_id) AS group_count, ctp.classroom_id, ctp.classroom_name, ctp.classroom_information, ctp.classroom_poster, ctp.classroom_student";
+$tableCourseGroup = "classroom_template ctp";
+$whereCourseGroup = "LEFT JOIN classroom_group cg ON ctp.classroom_id = cg.classroom_id WHERE ctp.classroom_id = '{$our_class}'";
 
 $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
 
@@ -96,19 +96,12 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
 
 </head>
 
-<style>
-    body {
-        font-family: 'Kanit', sans-serif !important;
-    }
-</style>
-
-
 <body>
 
     <?php require_once 'component/header.php'; ?>
 
     <!-- work ON mobile screen ONLY -->
-    <div class="min-vh-100 bg-ori-gray">
+    <div class="main-transparent-content" >
         <div class="container-fluid px-4 py-2">
             <div class="text-center mb-4">
                 <h1 class="display-4 fw-bold text-dark mb-bs-5 text-center">
@@ -142,6 +135,16 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                             <p class="text-secondary mb-0 small text-truncate-2" >
                                                 สมาชิกปัจจุบัน <?php echo $item['classroom_student']; ?> คน
                                             </p>
+                                        </div>
+                                        <div class="flex-right-alum" style="align-content: center; text-align:center;">
+                                            <p style="font-size: 9px; text-align:center;">
+                                                มีทั้งหมด <?php echo $item['group_count']; ?> <br>
+                                                <!-- <br> -->
+                                                กลุ่ม
+                                            </p>
+                                            <div class="">
+                                               <i style="font-size: 20px;" class="fas fa-chevron-circle-right"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

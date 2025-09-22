@@ -1,7 +1,6 @@
 <?php
 // บรรทัดแรกสุดของไฟล์
 session_start();
-
 // โค้ดส่วนอื่นๆ ของหน้าจะเริ่มที่นี่
 ?>
 <!doctype html>
@@ -39,29 +38,24 @@ session_start();
 
 <body>
     <?php require_once 'component/header.php'; ?>
-    <?php
-    $segments = ['complete', 'complete', 'complete', 'complete', 'complete', 'upcoming', 'upcoming', 'upcoming',];
-    $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming',];
-    $old_segment = '<div class="progress-container">
-                                <div class="progress-bar-new">
-                                    <?php foreach ($segments as $index => $segmentType): ?>
-                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>';
-    ?>
-    <div class="main-content" style="margin-top: 10px;  margin-bottom: 5rem;">
-        <!-- <h2 class="menu-section-title">เมนู</h2> -->
+  
+    <div class="main-content">
         <div class="container-fluid" style="margin: 0 1rem;">
-            <!-- <div class="row">Upcoming Class</div> -->
+            <!-- <div class="" id="upcomingclass"></div> -->
+            <div class="row">
+                <div class="head-flex-menu">
+                    <p class="menu-title">Upcoming Class</p>
+                    <a href="schedule" class="menu-title-button">
+                        <svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set-Filled" sketch:type="MSLayerGroup" transform="translate(-310.000000, -1089.000000)" fill="currentColor"> <path d="M332.535,1105.88 L326.879,1111.54 C326.488,1111.93 325.855,1111.93 325.465,1111.54 C325.074,1111.15 325.074,1110.51 325.465,1110.12 L329.586,1106 L319,1106 C318.447,1106 318,1105.55 318,1105 C318,1104.45 318.447,1104 319,1104 L329.586,1104 L325.465,1099.88 C325.074,1099.49 325.074,1098.86 325.465,1098.46 C325.855,1098.07 326.488,1098.07 326.879,1098.46 L332.535,1104.12 C332.775,1104.36 332.85,1104.69 332.795,1105 C332.85,1105.31 332.775,1105.64 332.535,1105.88 L332.535,1105.88 Z M326,1089 C317.163,1089 310,1096.16 310,1105 C310,1113.84 317.163,1121 326,1121 C334.837,1121 342,1113.84 342,1105 C342,1096.16 334.837,1089 326,1089 L326,1089 Z" id="arrow-right-circle" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>
+                    </a>
+                </div>
+            </div>
 
-            <div class="row" id="upcomingClass"></div>
+            <!-- <div class="row" id="upcomingClass"></div>
 
-            <div class="row" id="otherUpClass"></div>
-
-                
-                                        
-                <!-- <div class="row">
+            <div class="row" id="otherUpClass"></div> -->
+    
+                <div class="row" >
                     <div class="container-menu" style="margin-top: 10px;">
                         <div class="header-menu">
                             <span class="title-menu">Opening Ceremony</span>
@@ -79,13 +73,11 @@ session_start();
                                         1:00 - 5:00 P.M.
                                     </span>
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" style="margin-bottom: 10px;">
                     <div class="container-menu" style="margin-top: 10px;">
                         <div class="header-menu">
                             <span class="title-menu">Dinner</span>
@@ -105,11 +97,14 @@ session_start();
                             </div>
                         </div>
                     </div>
-                </div> -->
+                </div>
+
+            <div class="row">
+                <p class="menu-title">Academy Menu</p>
+            </div>
             <div class="row" style="margin-top: 1rem; ">
                 <div class="actions-grid">
-
-                    <!-- schedule -->
+                    <!-- Schedule -->
                     <a class="action-card" href="schedule">
                         <svg width="80" height="80" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect y="0.00012207" width="48" height="48" rx="9.99999" fill="url(#paint0_linear_204_460)" />
@@ -160,8 +155,8 @@ session_start();
                         <h4 style="margin-top: 10px;">CALENDAR</h4>
                     </a>
 
-                    <!-- Histroy -->
-                    <a class="action-card" href="#">
+                    <!-- History -->
+                    <a class="action-card" href="history">
                         <svg width="80" height="80" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="48" height="48" rx="9.99999" fill="url(#paint0_linear_226_27)"/>
                         <path d="M31 18C23.837 18 18 23.837 18 31C18 38.163 23.837 44 31 44C38.163 44 44 38.163 44 31C44 23.837 38.163 18 31 18ZM36.655 35.641C36.473 35.953 36.148 36.122 35.81 36.122C35.641 36.122 35.472 36.083 35.316 35.979L31.286 33.574C30.285 32.976 29.544 31.663 29.544 30.506V25.176C29.544 24.643 29.986 24.201 30.519 24.201C31.052 24.201 31.494 24.643 31.494 25.176V30.506C31.494 30.974 31.884 31.663 32.287 31.897L36.317 34.302C36.785 34.575 36.941 35.173 36.655 35.641Z" fill="white"/>
@@ -175,8 +170,6 @@ session_start();
                         </svg>
                         <h4 style="margin-top: 10px;">HISTORY</h4>
                     </a>
-
-
                 </div>
             </div>
         </div>
