@@ -18,14 +18,13 @@ date_default_timezone_set('Asia/Bangkok');
 $timeserver = date("Y-m-d H:i:s");
 $dateSchedule = date('Y-m-d');
 
+$student_id = $_SESSION['student_id'];
 
-if (!isset($_SESSION['student_id'])) {
+
+if (!isset($student_id)) {
     echo json_encode(['error' => 'Unauthorized']);
     exit();
 }
-
-$student_id = $_SESSION['student_id'];
-$dateSchedule = date('Y-m-d');
 
 $student_classroom_id = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
 
