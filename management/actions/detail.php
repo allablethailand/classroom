@@ -95,7 +95,7 @@
                 'classroom_key' => $classroom['classroom_key'],
                 'classroom_name' => $classroom['classroom_name'],
                 'classroom_information' => $classroom['classroom_information'],
-                'classroom_poster' => ($classroom['classroom_poster']) ? GetUrl($classroom['classroom_poster']) : '',
+                'classroom_poster' => ($classroom['classroom_poster']) ? GetPublicUrl($classroom['classroom_poster']) : '',
                 'classroom_start_date' => $classroom['classroom_start_date'],
                 'classroom_start_time' => $classroom['classroom_start_time'],
                 'classroom_end_date' => $classroom['classroom_end_date'],
