@@ -1,9 +1,79 @@
 html,body {
     color:#555555;
-    font-family: 'Roboto', 'Kanit' !important;
+    font-family: 'Kanit', 'Roboto', sans-serif !important;
     font-size: 13px;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    min-width: 375px;
+    min-width: 342px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%);
 }
 
+
+body {
+  /* width: 100vw; */
+  /* height: 120vh; */
+  background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%);
+  /* background-color: var(--ori-gray); */
+}
+
+:root {
+  /* Custom theme colors */
+  --bs-primary: #EF8A1F;
+  --bs-primary-rgb: 239, 138, 31;
+  --bs-secondary: #FFF7F0;
+  --bs-secondary-rgb: 255, 247, 240;
+  --bs-success: #198754;
+  --bs-info: #0dcaf0;
+  --bs-warning: #ffc107;
+  --bs-danger: #dc3545;
+  --bs-light: #f8f9fa;
+  --bs-dark: #212529;
+  
+  /* Custom orange variations */
+  --orange-primary: #EF8A1F;
+  --orange-light: #FFF7F0;
+  --orange-lighter: rgba(239, 138, 31, 0.1);
+  --orange-border: rgba(239, 138, 31, 0.2);
+  --white-bg: #FFF;
+
+  /* Origami Theme */
+  --ori-gray-onerror: #FAFAFA;
+  --ori-gray: #ECECEC;
+
+}
+
+/* Container for main content that grows */
+.main-content {
+  height: auto !important;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%);
+  padding-bottom: 10dvh !important; 
+}
+
+/* Container for main content that grows */
+.main-transparent-content {
+  height: auto !important;
+  margin-top: 10px;
+  padding-bottom: 10dvh !important; 
+}
+/* 
+@media (min-width: 345px) and (max-width: 380px) {
+  .main-content  {
+    min-height: 60vh !important;
+  }
+} */
+
+.sweet-alert h2 {
+    font-family: 'Kanit', sans-serif !important;
+}
+
+.sweet-alert p {
+    font-family: 'Kanit', sans-serif !important;
+}
+
+.sa-confirm-button-container button {
+    font-family: 'Kanit', sans-serif !important;
+}

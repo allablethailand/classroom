@@ -35,6 +35,17 @@ $whereCourseGroup = "where classroom_id = '{$our_class}'";
 $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
 
 // var_dump($classroom_group);
+
+    $segments = ['complete', 'complete', 'complete', 'complete', 'complete', 'upcoming', 'upcoming', 'upcoming',];
+    $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming',];
+    $old_segment = '<div class="progress-container">
+                                <div class="progress-bar-new">
+                                    <?php foreach ($segments as $index => $segmentType): ?>
+                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>';
+    
 ?>
 
 

@@ -33,7 +33,7 @@ $currentScreen = str_replace('_', ' ', $currentScreen);
 $currentScreen = preg_replace('/([a-z])info/i', '$1 info', $currentScreen);
 
 // Convert to first letter to uppercase
-$currentScreen = ucfirst($currentScreen);
+$currentScreen = ucwords($currentScreen);
 
 // if ($currentScreen == 'group') {
 //     $currentScreen = 'academy';
@@ -102,7 +102,10 @@ $stmt_image->close();
 
 // 3. ดึงชื่อนักเรียนเพื่อแสดงผล
 $sql_name = "
-    SELECT IFNULL(student_firstname_en, student_firstname_th) AS student_name
+    SELECT CONCAT(
+    IFNULL(student_firstname_en, student_firstname_th),
+    ' ',
+    IFNULL(student_lastname_en, student_firstname_th)) AS student_name
     FROM `classroom_student`
     WHERE student_id = ?
 ";
@@ -157,11 +160,17 @@ $hide_profile = ["Profile", "Edit Profile", "Setting"];
                     </div>
                 </div>
                 <div class="icons">
-                    <button class="bell-button" id="bellButton">
-                        <span>
+                    <!-- Dropdown wrapper -->
+                    <div class="dropdown" style="display: inline-block;">
+                        <button class="bell-button btn btn-default dropdown-toggle" type="button" id="bellDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background: none; border: none; padding: 0;">
                             <i class="far fa-bell" style="font-size: 20px;"></i>
-                        </span>
-                    </button>
+                        </button>
+                       <ul class="dropdown-menu centered" aria-labelledby="bellDropdown">
+                            <li><a href="#" class="notification-item" data-message="แจ้งเตือนเวอร์ชั่นปัจจุบัน คือ BETA 1.1">Version alert: New!</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#" class="notification-item" data-message="ข้อความแจ้งเตือนอื่น ๆ">Other notification</a></li>
+                        </ul>
+                    </div>
                     <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>;">
                         <img style=" border-radius: 100%; object-fit: cover;"height="30" width="30" id="avatar_h" name="avatar_h"  title="test" src="<?php echo $student_image_profile; ?>">
                     </a>
@@ -169,9 +178,20 @@ $hide_profile = ["Profile", "Edit Profile", "Setting"];
             </div>
         </div>
         <script>
-            $('#bellButton').on('click', function() {
-                $('#notificationModal').modal('show');
-            });
+            // $('#bellButton').on('click', function() {
+            //     $('#notificationModal').modal('show');
+            // });
+            $(document).ready(function() {
+                    // When dropdown item clicked, set modal message and show modal
+                    $('.notification-item').on('click', function(e) {
+                        e.preventDefault();
+                        var message = $(this).data('message');
+                        $('#modalMessage').text(message);
+                        $('#notificationModal').modal('show');
+                        // Optionally, close dropdown after click
+                        $('.dropdown.open .dropdown-toggle').dropdown('toggle');
+                    });
+                });
         </script>
 
     <?php
@@ -183,8 +203,11 @@ $hide_profile = ["Profile", "Edit Profile", "Setting"];
                     <i class="fas fa-long-arrow-alt-left"></i>
                 </span>
             </button>
-            <h1 class="header-title"><?php echo $currentScreen ?></h1>
             <?php 
+            $marginClass = in_array($currentScreen, $hide_profile) ? ' add-margin-right' : '';
+            ?>
+            <h1 class="header-title<?php echo $marginClass; ?>"><?php echo $currentScreen ?></h1>
+            <?php
             if(!in_array($currentScreen, $hide_profile)): ?>
             <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>;">
                 <img style=" border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
@@ -205,7 +228,7 @@ $hide_profile = ["Profile", "Edit Profile", "Setting"];
                 <div class="modal-body">
                     <p>แจ้งเตือนเวอร์ชั่นปัจจุบัน คือ BETA 1.1</p>
                     <div class="" style="text-align: right;">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">รับทราบ</button>
                     </div>
                 </div>
             </div>

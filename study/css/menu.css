@@ -1,9 +1,3 @@
-/* Custom styles for our app */
-body {
-  /* background-color: #f5f5f5; */
-  background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%);
-  font-family: 'Kanit', sans-serif !important;
-}
 
 .header-topnav {
   display: flex;
@@ -82,7 +76,6 @@ body {
 
 
 
-
 /* Orange header styles */
 .orange-header {
   /* background: linear-gradient(135deg, #FFA726 0%, #FF7043 50%, #f37650 100%); */
@@ -148,6 +141,22 @@ body {
     color: #fff;
 }
 
+.bell-button:focus, 
+.bell-button:active,
+.bell-button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.dropdown.open > .bell-button, 
+.dropdown.open > .bell-button > i {
+  color: #fff !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 .header-title {
   margin: 0;
   font-size: 20px;
@@ -206,12 +215,15 @@ body {
   margin: 0 auto 15px auto;
 }
 
-.menu-title {
-  color: #333;
-  font-size: 16px;
-  margin: 0;
-}
 
+
+
+.menu-title {
+  color: #7d7c7c;
+  font-size: 1.4rem;
+  margin: 0;
+  font-weight: 500;
+}
 
 .menu-section-title {
   font-size: 24px;
@@ -219,7 +231,36 @@ body {
   margin-bottom: 30px;
 }
 
+.head-flex-menu {
+  display: flex;
+  justify-content: space-between;
+  width: 100%; /* Make sure container is full width */
+  align-items: center; /* Vertically center text and button */
+  margin: 0; /* Remove if row adds margin */
+  padding: 0; /* Remove if row adds padding */
+}
 
+.menu-title-button {
+  
+  font-size: 1.6rem;
+  margin: 0;
+  transition: transform 1s ease, fill 1s ease;
+  color: #999898;
+
+  /* font-weight: 500; */
+}
+
+.menu-title-button svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.3rem;
+}
+
+.menu-title-button:active {
+  fill: #646464;
+  transform: scale(1.4);
+  transition: transform 1s ease;
+}
 
 /* Actions Grid */
 .actions-grid {
@@ -292,8 +333,6 @@ body {
   font-weight: 400;
 }
 
-
-
 .container-menu {
   background-color: white;
   border-radius: 1rem; /* rounded-2xl */
@@ -353,8 +392,6 @@ body {
   font-size: 0.75rem; /* text-xs */
   margin: 0;
 }
-
-
 
 .progress-section {
   margin-bottom: 2.5rem;
@@ -482,3 +519,12 @@ body {
     background-color: #CCCCCC; /* Gray background */
     color: white;
   }
+
+/* 
+  .bell-button {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: none !important;
+  color: inherit !important; 
+} */

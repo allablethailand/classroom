@@ -1,37 +1,4 @@
 
-
-html, body {
-  font-family: 'Kanit', sans-serif  !important;
-}
-
-
-/* Custom theme colors */
-:root {
-  --bs-primary: #EF8A1F;
-  --bs-primary-rgb: 239, 138, 31;
-  --bs-secondary: #FFF7F0;
-  --bs-secondary-rgb: 255, 247, 240;
-  --bs-success: #198754;
-  --bs-info: #0dcaf0;
-  --bs-warning: #ffc107;
-  --bs-danger: #dc3545;
-  --bs-light: #f8f9fa;
-  --bs-dark: #212529;
-  
-  /* Custom orange variations */
-  --orange-primary: #EF8A1F;
-  --orange-light: #FFF7F0;
-  --orange-lighter: rgba(239, 138, 31, 0.1);
-  --orange-border: rgba(239, 138, 31, 0.2);
-  --white-bg: #FFF;
-
-  /* Origami Theme */
-  /* --ori-gray1: #FAFAFA;
-   */
-  --ori-gray: #ECECEC;
-
-}
-
 .bg-white{
   background-color: var(--white-bg);
 }
@@ -387,3 +354,23 @@ html, body {
         border-radius: 50%;
         object-fit: cover;
       }
+
+
+/* Container that wraps both icon and text */
+.flex-right-alum{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* or use flex-end if only want to push bottom text down */
+}
+
+/* Optional to center icon horizontally */
+.flex-right-alum > div:first-child {
+  text-align: center;
+}
+
+/* Bottom text styling */
+.flex-right-alum > p {
+  font-size: 8px;
+  text-align: right;
+  margin: 0;
+}
