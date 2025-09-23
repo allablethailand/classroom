@@ -102,6 +102,7 @@
                                     <option value="Miss" data-lang="miss"></option>
                                     <option value="Other" data-lang="other"></option>
                                 </select>
+                                <input type="text" class="form-control prefix-other hidden" id="student_perfix_other" name="student_perfix_other" style="margin-top: 10px;">
                             </div>
                             <div class="form-group form-input input-1 hidden">
                                 <label class="register-form" for="student_firstname_en" data-lang="firstname_en"></label>
@@ -156,6 +157,26 @@
                             <div class="form-group form-input input-11 hidden">
                                 <label class="register-form" for="student_position" data-lang="position"></label>
                                 <input type="text" class="form-control" id="student_position" name="student_position" autocomplete="off">
+                            </div>
+                            <div class="form-group form-input input-19 hidden">
+                                <label class="register-form" for="copy_of_idcard" data-lang="copy_of_idcard"></label>
+                                <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
+                                <input type="file" class="form-control input-file" id="copy_of_idcard" name="copy_of_idcard" accept="image/*,.pdf">
+                            </div>
+                            <div class="form-group form-input input-22 hidden">
+                                <label class="register-form" for="copy_of_passport" data-lang="copy_of_passport"></label>
+                                <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
+                                <input type="file" class="form-control input-file" id="copy_of_passport" name="copy_of_passport" accept="image/*,.pdf">
+                            </div>
+                            <div class="form-group form-input input-20 hidden">
+                                <label class="register-form" for="work_certificate" data-lang="work_certificate"></label>
+                                <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
+                                <input type="file" class="form-control input-file" id="work_certificate" name="work_certificate" accept="image/*,.pdf">
+                            </div>
+                            <div class="form-group form-input input-21 hidden">
+                                <label class="register-form" for="company_certificate" data-lang="company_certificate"></label>
+                                <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
+                                <input type="file" class="form-control input-file" id="company_certificate" name="company_certificate" accept="image/*,.pdf">
                             </div>
                             <div class="form-group form-input input-12 hidden">
                                 <label class="register-form" for="student_username" data-lang="username"></label>

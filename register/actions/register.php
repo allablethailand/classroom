@@ -214,6 +214,7 @@
         $student_username = isset($_POST['student_username']) ? initVal(trim($_POST['student_username'])) : '';
         $student_birth_date = isset($_POST['student_birth_date']) ? initVal(trim(str_replace('/', '-', $_POST['student_birth_date']))) : '';
         $student_perfix = isset($_POST['student_perfix']) ? initVal(trim($_POST['student_perfix'])) : '';
+        $student_perfix_other = isset($_POST['student_perfix_other']) ? initVal(trim($_POST['student_perfix_other'])) : '';
         $student_idcard = isset($_POST['student_idcard']) ? initVal(trim($_POST['student_idcard'])) : '';
         $student_passport = isset($_POST['student_passport']) ? initVal(trim($_POST['student_passport'])) : '';
         $student_image_name = isset($_FILES['student_image_profile']['name']) ? $_FILES['student_image_profile']['name'] : '';
@@ -227,6 +228,54 @@
             $upload = $student_image_dir . $strname . '.' . $student_image_ext;
             SaveFile($student_image_tmp, $upload);
             $student_image_profile = "'{$upload}'";
+        }
+        $copy_of_idcard_name = isset($_FILES['copy_of_idcard']['name']) ? $_FILES['copy_of_idcard']['name'] : '';
+        $copy_of_idcard = "null";
+        if($copy_of_idcard_name) {
+            $copy_of_idcard_tmp = $_FILES['copy_of_idcard']['tmp_name'];
+            $strname = md5($classroom_id . microtime(true) . rand(1000,9999));
+            $copy_of_idcard_dir = 'uploads/classroom/' . $comp_id . '/student/idcard/';
+            $path_info = pathinfo($copy_of_idcard_name);
+            $copy_of_idcard_ext = strtolower($path_info['extension']);
+            $upload = $copy_of_idcard_dir . $strname . '.' . $copy_of_idcard_ext;
+            SaveFile($copy_of_idcard_tmp, $upload);
+            $copy_of_idcard = "'{$upload}'";
+        }
+        $copy_of_passport_name = isset($_FILES['copy_of_passport']['name']) ? $_FILES['copy_of_passport']['name'] : '';
+        $copy_of_passport = "null";
+        if($copy_of_passport_name) {
+            $copy_of_passport_tmp = $_FILES['copy_of_passport']['tmp_name'];
+            $strname = md5($classroom_id . microtime(true) . rand(1000,9999));
+            $copy_of_passport_dir = 'uploads/classroom/' . $comp_id . '/student/passport/';
+            $path_info = pathinfo($copy_of_passport_name);
+            $copy_of_passport_ext = strtolower($path_info['extension']);
+            $upload = $copy_of_passport_dir . $strname . '.' . $copy_of_passport_ext;
+            SaveFile($copy_of_passport_tmp, $upload);
+            $copy_of_passport = "'{$upload}'";
+        }
+        $work_certificate_name = isset($_FILES['work_certificate']['name']) ? $_FILES['work_certificate']['name'] : '';
+        $work_certificate = "null";
+        if($work_certificate_name) {
+            $work_certificate_tmp = $_FILES['work_certificate']['tmp_name'];
+            $strname = md5($classroom_id . microtime(true) . rand(1000,9999));
+            $work_certificate_dir = 'uploads/classroom/' . $comp_id . '/student/work_certificate/';
+            $path_info = pathinfo($work_certificate_name);
+            $work_certificate_ext = strtolower($path_info['extension']);
+            $upload = $work_certificate_dir . $strname . '.' . $work_certificate_ext;
+            SaveFile($work_certificate_tmp, $upload);
+            $work_certificate = "'{$upload}'";
+        }
+        $company_certificate_name = isset($_FILES['company_certificate']['name']) ? $_FILES['company_certificate']['name'] : '';
+        $company_certificate = "null";
+        if($company_certificate_name) {
+            $company_certificate_tmp = $_FILES['company_certificate']['tmp_name'];
+            $strname = md5($classroom_id . microtime(true) . rand(1000,9999));
+            $company_certificate_dir = 'uploads/classroom/' . $comp_id . '/student/company_certificate/';
+            $path_info = pathinfo($company_certificate_name);
+            $company_certificate_ext = strtolower($path_info['extension']);
+            $upload = $company_certificate_dir . $strname . '.' . $company_certificate_ext;
+            SaveFile($company_certificate_tmp, $upload);
+            $company_certificate = "'{$upload}'";
         }
         if($student_email !== "null" || $student_mobile !== "null") {
             $exits_email = select_data(
@@ -283,8 +332,13 @@
                 student_birth_date,
                 student_image_profile,
                 student_perfix,
+                student_perfix_other,
                 student_idcard,
                 student_passport,
+                copy_of_idcard,
+                copy_of_passport,
+                work_certificate,
+                company_certificate,
                 status,
                 date_create,
                 date_modify
@@ -308,8 +362,13 @@
                 $student_birth_date,
                 $student_image_profile,
                 $student_perfix,
+                $student_perfix_other,
                 $student_idcard,
                 $student_passport,
+                $copy_of_idcard,
+                $copy_of_passport,
+                $work_certificate,
+                $company_certificate,
                 0,
                 NOW(),
                 NOW()

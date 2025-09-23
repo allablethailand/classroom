@@ -416,3 +416,6 @@ input[type="radio"]:checked + .radio-label::before {
 input[type="radio"]:checked + .radio-label::after {
     opacity: 1;
 }
+.text-orange {
+    color: #FF9900;
+}
