@@ -354,8 +354,8 @@ function populateFormData(data) {
         if (data.classroom_poster) {
             $("#classroom_poster").attr("data-default-file", data.classroom_poster);
             $("#ex_classroom_poster").val(data.classroom_poster);
-            initializeDropify();
         }
+        initializeDropify();
         $("#classroom_name").val(data.classroom_name || '');
         $("#classroom_student").val(data.classroom_student || '0');
         setDatePickerValue("#classroom_start_date", data.classroom_start_date);
