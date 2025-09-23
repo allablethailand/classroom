@@ -9,6 +9,7 @@ const translations = {
         contact_us: "Contact Information", registration_form: "Registration Form",
         idcard: "ID Card", passport: "Passport", prefix: "Prefix",
         mr: "Mr.", mrs: "Mrs.", miss: "Miss", other: "Other",
+        male: "Male", female: "Female",
         firstname_en: "First Name (EN)", lastname_en: "Last Name (EN)",
         firstname_th: "First Name (TH)", lastname_th: "Last Name (TH)",
         nickname_en: "Nickname (EN)", nickname_th: "Nickname (TH)",
@@ -24,13 +25,19 @@ const translations = {
         once: "Once your registration is reviewed and approved, you will receive a notification via email.",
         registered_login: "You can now log in to the system using your registered username and password.",
         please_login: "Please proceed by clicking the \"Login\" button below.",
-        accept_register: "Accept and register"
+        accept_register: "Accept and register",
+        copy_of_idcard: "Copy of ID card",
+        copy_of_passport: "Passport",
+        work_certificate: "Work certificate",
+        company_certificate: "Company Certificate (for business owners)",
+        support_upload: "Supports only image files or PDF.",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
         contact_us: "ข้อมูลการติดต่อ", registration_form: "แบบฟอร์มลงทะเบียน",
         idcard: "รหัสประจำตัวประชาชน", passport: "พาสปอร์ต", prefix: "คำนำหน้าชื่อ",
         mr: "นาย", mrs: "นาง", miss: "นางสาว", other: "อื่นๆ",
+        male: "ชาย", female: "หญิง",
         firstname_en: "ชื่อ (ภาษาอังกฤษ)", lastname_en: "นามสกุล (ภาษาอังกฤษ)",
         firstname_th: "ชื่อ (ภาษาไทย)", lastname_th: "นามสกุล (ภาษาไทย)",
         nickname_en: "ชื่อเล่น (ภาษาอังกฤษ)", nickname_th: "ชื่อเล่น (ภาษาไทย)",
@@ -46,7 +53,12 @@ const translations = {
         once: "เมื่อการลงทะเบียนของคุณได้รับการตรวจสอบและอนุมัติแล้ว คุณจะได้รับการแจ้งเตือนทางอีเมล",
         registered_login: "คุณสามารถเข้าสู่ระบบโดยใช้ชื่อผู้ใช้และรหัสผ่านที่คุณลงทะเบียนไว้ได้แล้ว",
         please_login: "กรุณาดำเนินการต่อโดยคลิกปุ่ม \"เข้าสู่ระบบ\" ด้านล่าง",
-        accept_register: "ยอมรับและลงทะเบียน"
+        accept_register: "ยอมรับและลงทะเบียน",
+        copy_of_idcard: "สำเนาบัตรประชาชน",
+        copy_of_passport: "หนังสือเดินทาง",
+        work_certificate: "หนังสือรับรองการทำงาน",
+        company_certificate: "หนังสือรับรองของบริษัท (สำหรับเจ้าของกิจการ)",
+        support_upload: "รองรับไฟล์รูปภาพหรือ pdf เท่านั้น",
     }
 };
 $(document).ready(function () {
@@ -220,6 +232,19 @@ $(document).ready(function () {
             const $group = $field.closest(".form-group");
             if ($group.hasClass("hidden")) return;
             let val = $field.val();
+            if ($field.attr("id") === "student_idcard") {
+                const val = $field.val().trim();
+                if (!isValidThaiID(val)) {
+                    isValid = false;
+                    if (!firstInvalidField) firstInvalidField = $field;
+                    $field.addClass("has-error");
+                    $group.find("label").addClass("has-error-text");
+                } else {
+                    $field.removeClass("has-error");
+                    $group.find("label").removeClass("has-error-text");
+                }
+                return;
+            }
             if ($field.attr("type") === "file") {
                 if ($field[0].files.length === 0) {
                     isValid = false;
@@ -351,7 +376,57 @@ $(document).ready(function () {
         }
         saveRegister();
     });
+    $(".input-file").change(function() {
+        var file = this.files[0];
+        if (file) {
+            var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
+            if (allowedTypes.indexOf(file.type) === -1) {
+                swal({
+                    type: 'warning',
+                    title: "Warning",
+                    text: "Please select only an image or PDF file.",
+                    confirmButtonColor: '#FF9900'
+                });
+                $(this).val('');
+            }
+        }
+    });
+    $("#student_idcard").on("blur", function() {
+        var $this = $(this);
+        var id = $this.val().trim();
+        if (id.length === 0) return;
+        if (!isValidThaiID(id)) {
+            $this.addClass("has-error");
+            swal({
+                type: 'warning',
+                title: 'Warning',
+                text: 'Invalid ID card number',
+                confirmButtonColor: '#FF9900'
+            });
+            setTimeout(function() {
+                $this.focus();
+            }, 0);
+        } else {
+            $this.removeClass("has-error");
+        }
+    });
+    $("#student_perfix").on("change", function() {
+        if($(this).val() == "Other") {
+            $(".prefix-other").removeClass("hidden");
+        } else {
+            $(".prefix-other").addClass("hidden");
+        }
+    });
 });
+function isValidThaiID(id) {
+    if (!/^\d{13}$/.test(id)) return false;
+    let sum = 0;
+    for (let i = 0; i < 12; i++) {
+        sum += parseInt(id.charAt(i)) * (13 - i);
+    }
+    let checkDigit = (11 - (sum % 11)) % 10;
+    return checkDigit === parseInt(id.charAt(12));
+}
 function saveRegister() {
     const $form = $('#registrationForm');
     const $btn = $form.find('button[type="submit"]');
