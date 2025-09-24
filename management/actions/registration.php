@@ -97,7 +97,8 @@
             stu.student_password_key,
             stu.student_company,
             stu.student_position,
-            c.channel_name
+            c.channel_name,
+            cjoin.student_id 
         FROM 
             classroom_student_join cjoin
         LEFT JOIN 
@@ -115,6 +116,7 @@
         $primaryKey = 'join_id';
         $columns = array(
             array('db' => 'join_id', 'dt' => 'join_id'),
+            array('db' => 'student_id', 'dt' => 'student_id'),
             array('db' => 'register_date', 'dt' => 'register_date'),
             array('db' => 'register_by', 'dt' => 'register_by'),
             array('db' => 'invite_status', 'dt' => 'invite_status'),
@@ -516,7 +518,7 @@
             "where classroom_id = '{$classroom_id}'"
         );
         echo json_encode([
-            'status'       => true,
+            'status'        => true,
             'classroom_key' => $classroom[0]['classroom_key']
         ]);
     }
