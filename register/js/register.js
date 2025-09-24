@@ -31,6 +31,7 @@ const translations = {
         work_certificate: "Work certificate",
         company_certificate: "Company Certificate (for business owners)",
         support_upload: "Supports only image files or PDF.",
+        nationality: "Nationality",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
@@ -59,6 +60,7 @@ const translations = {
         work_certificate: "หนังสือรับรองการทำงาน",
         company_certificate: "หนังสือรับรองของบริษัท (สำหรับเจ้าของกิจการ)",
         support_upload: "รองรับไฟล์รูปภาพหรือ pdf เท่านั้น",
+        nationality: "สัญชาติ",
     }
 };
 $(document).ready(function () {
@@ -199,6 +201,13 @@ $(document).ready(function () {
         consent_status = response.consent_status;
         if(consent_status == 'Y') {
             $(".input-consent").removeClass("hidden");
+        }
+        if (response.register_template.includes("23")) {
+            let nationality = response.nationality;
+            $("#student_nationality").append($('<option>', { 
+                value: nationality.nationality_id, 
+                text: nationality.nationality_name 
+            }));
         }
         $(".login").attr("href", "/" + tenant_key);
     }, 'json').fail(() => window.location.href = '/');
@@ -417,7 +426,52 @@ $(document).ready(function () {
             $(".prefix-other").addClass("hidden");
         }
     });
+    buildNationality();
 });
+function buildNationality() {
+    try {
+        $("#student_nationality").select2({
+            theme: "bootstrap",
+            placeholder: "",
+            minimumInputLength: -1,
+            allowClear: true,
+            ajax: {
+                url: "/classroom/register/actions/register.php",
+                dataType: 'json',
+                delay: 250,
+                cache: false,
+                data: function(params) {
+                    return {
+                        term: params.term,
+                        page: params.page || 1,
+                        action: 'buildNationality'
+                    };
+                },
+                processResults: function(data, params) {
+                    const page = params.page || 1;
+                    return {
+                        results: $.map(data, function(item) {
+                            return {
+                                id: item.id,
+                                text: item.col,
+                                code: item.code,
+                                desc: item.desc,
+                            };
+                        }),
+                        pagination: {
+                            more: (page * 10) <= (data[0] ? data[0].total_count : 0)
+                        }
+                    };
+                },
+            },
+            templateSelection: function(data) {
+                return data.text;
+            },
+        });
+    } catch (error) {
+        console.error('Error building department dropdown:', error);
+    }
+}
 function isValidThaiID(id) {
     if (!/^\d{13}$/.test(id)) return false;
     let sum = 0;

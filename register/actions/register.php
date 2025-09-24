@@ -161,6 +161,13 @@
             "where classroom_id = '{$classroom['classroom_id']}' and consent_use = 0 and status = 0"
         );
         $consent_status = (!empty($consents)) ? 'Y' : 'N';
+        $nationals = select_data(
+            "nationality_id, nationality_name", "m_nationality", "where LOWER(nationality_name) = LOWER('Thai')"
+        );
+        $nationality = [
+            'nationality_id' => $nationals[0]['nationality_id'],
+            'nationality_name' => $nationals[0]['nationality_name'],
+        ];
         echo json_encode([
             'status' => true,
             'classroom_data' => $classroom_data,
@@ -168,7 +175,8 @@
             'register_require' => $register_require,
             'consent_status' => $consent_status,
             'form_data' => $form_data,
-            'channel_id' => ($channel_id) ? $channel_id : ''
+            'channel_id' => ($channel_id) ? $channel_id : '',
+            'nationality' => $nationality
         ]);
         exit;
     }
@@ -217,6 +225,7 @@
         $student_perfix_other = isset($_POST['student_perfix_other']) ? initVal(trim($_POST['student_perfix_other'])) : '';
         $student_idcard = isset($_POST['student_idcard']) ? initVal(trim($_POST['student_idcard'])) : '';
         $student_passport = isset($_POST['student_passport']) ? initVal(trim($_POST['student_passport'])) : '';
+        $student_nationality = isset($_POST['student_nationality']) ? initVal(trim($_POST['student_nationality'])) : '';
         $student_image_name = isset($_FILES['student_image_profile']['name']) ? $_FILES['student_image_profile']['name'] : '';
         $student_image_profile = "null";
         if($student_image_name) {
@@ -339,6 +348,7 @@
                 copy_of_passport,
                 work_certificate,
                 company_certificate,
+                student_nationality,
                 status,
                 date_create,
                 date_modify
@@ -369,6 +379,7 @@
                 $copy_of_passport,
                 $work_certificate,
                 $company_certificate,
+                $student_nationality,
                 0,
                 NOW(),
                 NOW()
@@ -514,5 +525,33 @@
         } else {
             return "null";
         }
+    }
+    if(isset($_GET) && $_GET['action'] == 'buildNationality') {
+        $keyword = trim($_GET['term']);
+		$search = ($keyword) ? " where nationality_name like '%{$keyword}%' " : "";
+		$resultCount = 10;
+		$end = ($_GET['page'] - 1) * $resultCount;
+		$start = $end + $resultCount;
+        $columnData = "*";
+        $tableData = "(
+            select 
+                nationality_id as data_code,
+                nationality_name as data_desc 
+            from 
+                m_nationality 
+            $search
+        ) data_table";
+        $whereData = (($_GET['page']) ? "LIMIT ".$end.",".$start : "")."";
+        $Data = select_data($columnData,$tableData,$whereData);
+		$count_data = count($Data);
+		$i = 0;
+		while($i < $count_data) {
+			$data[] = ['id' => $Data[$i]['data_code'],'col' => $Data[$i]['data_desc'],'total_count' => $count_data,'code' => $Data[$i]['data_code'],'desc' => $Data[$i]['data_desc'],];
+			++$i;
+		}
+		if (empty($data)) {
+			$data[] = ['id' => '','col' => '', 'total_count' => ''];
+		}
+        echo json_encode($data);
     }
 ?>
