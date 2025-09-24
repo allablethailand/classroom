@@ -367,234 +367,185 @@
         );
         echo json_encode(['status' => true]);
     }
-
-// ส่วนที่ 1: ดึงข้อมูล Employee สำหรับแสดงใน Pop-up
-if(isset($_POST['action']) && $_POST['action'] == 'getEmployees') {
-    $table = "SELECT 
-        e.emp_id, 
-        ei.firstname_th, 
-        ei.lastname_th,
-        ei.tel_office,
-        e.email,
-        CONCAT(ei.firstname_th, ' ', ei.lastname_th) AS full_name
-    FROM m_employee e
-    LEFT JOIN m_employee_info ei ON ei.emp_id = e.emp_id
-    WHERE e.emp_del = 0
-    AND e.emp_id NOT IN (SELECT student_ref_id FROM classroom_student WHERE student_ref_type = 'employee')";
-    
-    $primaryKey = 'emp_id';
-    $columns = array(
-        array('db' => 'emp_id', 'dt' => 'emp_id'),
-        array('db' => 'full_name', 'dt' => 'full_name'),
-        array('db' => 'tel_office', 'dt' => 'tel_office'),
-        array('db' => 'email', 'dt' => 'email'),
-    );
-    
-    $sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db' => $db_name,'host' => $db_host);
-    require($base_include.'/lib/ssp-subquery.class.php');
-    echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
-    exit();
-}
-
-// ส่วนที่ 2: ดึงข้อมูล Customer สำหรับแสดงใน Pop-up
-if(isset($_POST['action']) && $_POST['action'] == 'getCustomers') {
-    $table = "SELECT
-        cus_id,
-        cus_name_th,
-        cus_tel_no,
-        cus_email
-    FROM m_customer c
-    WHERE c.cus_del = 0
-    AND c.cus_id NOT IN (SELECT student_ref_id FROM classroom_student WHERE student_ref_type = 'customer')";
-    
-    $primaryKey = 'cus_id';
-    $columns = array(
-        array('db' => 'cus_id', 'dt' => 'cus_id'),
-        array('db' => 'cus_name_th', 'dt' => 'cus_name_th'),
-        array('db' => 'cus_tel_no', 'dt' => 'cus_tel_no'),
-        array('db' => 'cus_email', 'dt' => 'cus_email'),
-    );
-    
-    $sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db' => $db_name,'host' => $db_host);
-    require($base_include.'/lib/ssp-subquery.class.php');
-    echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
-    exit();
-}
-
-// ส่วนที่ 3: บันทึกข้อมูลนักเรียนจาก Employee หรือ Customer (แก้ไขแล้ว)
-// ส่วนที่ 3: บันทึกข้อมูลนักเรียนจาก Employee หรือ Customer (แก้ไขแล้ว)
-if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
-    global $mysqli;
-    $ref_id = $_POST['ref_id'];
-    $ref_type = $_POST['ref_type'];
-    $classroom_id = $_POST['classroom_id'];
-    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
-    $date_create = date('Y-m-d H:i:s');
-
-    // ตรวจสอบว่ามีข้อมูลนักเรียนคนนี้อยู่ในตารางอยู่แล้วหรือไม่
-    $check_sql = "SELECT student_id FROM classroom_student WHERE student_ref_id = ? AND student_ref_type = ?";
-    $check_stmt = $mysqli->prepare($check_sql);
-    $check_stmt->bind_param("ss", $ref_id, $ref_type);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
-
-    if ($check_result->num_rows > 0) {
-        $existing_student = $check_result->fetch_assoc();
-        $student_id = $existing_student['student_id'];
-
-        // ถ้ามีอยู่แล้วให้ตรวจสอบว่าได้มีการ join กับ classroom นี้แล้วหรือยัง
-        $check_join_sql = "SELECT join_id FROM classroom_student_join WHERE classroom_id = ? AND student_id = ?";
-        $check_join_stmt = $mysqli->prepare($check_join_sql);
-        $check_join_stmt->bind_param("ss", $classroom_id, $student_id);
-        $check_join_stmt->execute();
-        $check_join_result = $check_join_stmt->get_result();
-
-        if ($check_join_result->num_rows > 0) {
-            echo json_encode(array('status' => 'error', 'message' => 'Student is already linked to this classroom.'));
-            exit();
-        }
-
-        // ดึง comp_id จากตารางต้นทางเพื่อใช้ในการ join
-        $comp_id = null;
-        if ($ref_type === 'employee') {
-            $sql_comp = "SELECT comp_id FROM m_employee WHERE emp_id = ?";
-        } elseif ($ref_type === 'customer') {
-            $sql_comp = "SELECT comp_id FROM m_customer WHERE cus_id = ?";
-        }
-        if (isset($sql_comp)) {
-            $stmt_comp = $mysqli->prepare($sql_comp);
-            $stmt_comp->bind_param("s", $ref_id);
-            $stmt_comp->execute();
-            $result_comp = $stmt_comp->get_result();
-            $data_comp = $result_comp->fetch_assoc();
-            $comp_id = $data_comp['comp_id'];
-            $stmt_comp->close();
-        }
-        
-        // ถ้ายังไม่มีการ join ก็ให้เพิ่มข้อมูลใน classroom_student_join
-        $join_sql = "INSERT INTO classroom_student_join (classroom_id, student_id, comp_id, status, emp_create, date_create) 
-                     VALUES (?, ?, ?, 0, ?, ?)";
-        $join_stmt = $mysqli->prepare($join_sql);
-        $join_stmt->bind_param("sssss", $classroom_id, $student_id, $comp_id, $user_id, $date_create);
-        if ($join_stmt->execute()) {
-            echo json_encode(array('status' => 'success', 'message' => 'Student successfully linked to this classroom.'));
-        } else {
-            echo json_encode(array('status' => 'error', 'message' => 'Error linking student: ' . $join_stmt->error));
-        }
-        $join_stmt->close();
-        $check_stmt->close();
-        exit();
-    }
-
-    // ถ้ายังไม่มีในตาราง classroom_student ให้ดึงข้อมูลมาสร้าง
-    $data = null;
-    if ($ref_type === 'employee') {
-        $sql = "SELECT 
-            ei.firstname_th AS student_firstname_th,
-            ei.lastname_th AS student_lastname_th,
-            ei.firstname AS student_firstname_en,
-            ei.lastname AS student_lastname_en,
-            ei.nickname AS student_nickname_th,
-            ei.title AS student_perfix,
-            ei.idcard AS student_idcard,
-            e.email AS student_email,
-            ei.tel_office AS student_mobile,
-            ei.date_birth AS student_birth_date,
-            ei.gender AS student_gender,
-            e.comp_id,
-            ei.emp_pic AS student_image_profile,
-            e.emp_username AS student_username,
-            '' AS student_position,
-            '' AS student_company
-        FROM m_employee e
-        LEFT JOIN m_employee_info ei ON ei.emp_id = e.emp_id
-        WHERE e.emp_id = ?";
-    } elseif ($ref_type === 'customer') {
-        $sql = "SELECT
-            c.cus_name_th AS student_firstname_th,
-            '' AS student_lastname_th,
-            c.cus_email AS student_email,
-            c.cus_tel_no AS student_mobile,
-            c.comp_id,
-            c.cus_official_name AS student_company,
-            '' AS student_position
-        FROM m_customer c
-        WHERE c.cus_id = ?";
-    } else {
-        echo json_encode(array('status' => 'error', 'message' => 'Invalid reference type.'));
-        exit();
-    }
-
-    $stmt = $mysqli->prepare($sql);
-    if ($stmt === false) {
-        die(json_encode(array('status' => 'error', 'message' => "Prepare failed: " . $mysqli->error)));
-    }
-    $stmt->bind_param("s", $ref_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $data = $result->fetch_assoc();
-    $stmt->close();
-
-    if ($data) {
-        $insert_data = array(
-            'student_ref_id' => $ref_id,
-            'student_ref_type' => $ref_type,
-            'student_firstname_th' => isset($data['student_firstname_th']) ? $data['student_firstname_th'] : '',
-            'student_lastname_th' => isset($data['student_lastname_th']) ? $data['student_lastname_th'] : '',
-            'student_firstname_en' => isset($data['student_firstname_en']) ? $data['student_firstname_en'] : '',
-            'student_lastname_en' => isset($data['student_lastname_en']) ? $data['student_lastname_en'] : '',
-            'student_nickname_th' => isset($data['student_nickname_th']) ? $data['student_nickname_th'] : '',
-            'student_gender' => isset($data['student_gender']) ? $data['student_gender'] : '',
-            'student_idcard' => isset($data['student_idcard']) ? $data['student_idcard'] : null,
-            'student_email' => isset($data['student_email']) ? $data['student_email'] : '',
-            'student_mobile' => isset($data['student_mobile']) ? $data['student_mobile'] : '',
-            'student_birth_date' => isset($data['student_birth_date']) ? $data['student_birth_date'] : '0000-00-00',
-            'student_company' => isset($data['student_company']) ? $data['student_company'] : '',
-            'student_position' => isset($data['student_position']) ? $data['student_position'] : '',
-            'student_username' => isset($data['student_username']) ? $data['student_username'] : null,
-            'student_image_profile' => isset($data['student_image_profile']) ? $data['student_image_profile'] : '',
-            // 'comp_id' => isset($data['comp_id']) ? $data['comp_id'] : null, // ดึงจาก $data
-            'emp_create' => $user_id,
-            'date_create' => $date_create
+    if(isset($_POST['action']) && $_POST['action'] == 'getEmployees') {
+        $table = "SELECT e.emp_id, ei.firstname_th, ei.lastname_th,ei.tel_office,e.email,CONCAT(ei.firstname_th, ' ', ei.lastname_th) AS full_name FROM m_employee e LEFT JOIN m_employee_info ei ON ei.emp_id = e.emp_id WHERE e.emp_del = 0 AND e.emp_id NOT IN (SELECT student_ref_id FROM classroom_student WHERE student_ref_type = 'employee')";
+        $primaryKey = 'emp_id';
+        $columns = array(
+            array('db' => 'emp_id', 'dt' => 'emp_id'),
+            array('db' => 'full_name', 'dt' => 'full_name'),
+            array('db' => 'tel_office', 'dt' => 'tel_office'),
+            array('db' => 'email', 'dt' => 'email'),
         );
-
-        $fields = implode(", ", array_keys($insert_data));
-        $placeholders = implode(", ", array_fill(0, count($insert_data), '?'));
-        $insert_sql = "INSERT INTO classroom_student ($fields) VALUES ($placeholders)";
-        $insert_stmt = $mysqli->prepare($insert_sql);
-        if ($insert_stmt === false) {
-            die(json_encode(array('status' => 'error', 'message' => "Prepare failed: " . $mysqli->error)));
-        }
-        $types = str_repeat('s', count($insert_data));
-        $values = array_values($insert_data);
-        $bind_values = array($types);
-        for ($i = 0; $i < count($values); $i++) {
-            $bind_values[] = &$values[$i];
-        }
-        call_user_func_array(array($insert_stmt, 'bind_param'), $bind_values);
-
-        if ($insert_stmt->execute()) {
-            $new_student_id = $mysqli->insert_id;
-            
-            // เพิ่มข้อมูลลงใน classroom_student_join
+        $sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db' => $db_name,'host' => $db_host);
+        require($base_include.'/lib/ssp-subquery.class.php');
+        echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
+        exit();
+    }
+    if(isset($_POST['action']) && $_POST['action'] == 'getCustomers') {
+        $table = "SELECT cus_id,cus_name_th,cus_tel_no,cus_email FROM m_customer c WHERE c.cus_del = 0 AND c.cus_id NOT IN (SELECT student_ref_id FROM classroom_student WHERE student_ref_type = 'customer')";
+        $primaryKey = 'cus_id';
+        $columns = array(
+            array('db' => 'cus_id', 'dt' => 'cus_id'),
+            array('db' => 'cus_name_th', 'dt' => 'cus_name_th'),
+            array('db' => 'cus_tel_no', 'dt' => 'cus_tel_no'),
+            array('db' => 'cus_email', 'dt' => 'cus_email'),
+        );
+        $sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db' => $db_name,'host' => $db_host);
+        require($base_include.'/lib/ssp-subquery.class.php');
+        echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
+        exit();
+    }
+    if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
+        global $mysqli;
+        $ref_id = $_POST['ref_id'];
+        $ref_type = $_POST['ref_type'];
+        $classroom_id = $_POST['classroom_id'];
+        $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+        $date_create = date('Y-m-d H:i:s');
+        $check_sql = "SELECT student_id FROM classroom_student WHERE student_ref_id = ? AND student_ref_type = ?";
+        $check_stmt = $mysqli->prepare($check_sql);
+        $check_stmt->bind_param("ss", $ref_id, $ref_type);
+        $check_stmt->execute();
+        $check_result = $check_stmt->get_result();
+        if ($check_result->num_rows > 0) {
+            $existing_student = $check_result->fetch_assoc();
+            $student_id = $existing_student['student_id'];
+            $check_join_sql = "SELECT join_id FROM classroom_student_join WHERE classroom_id = ? AND student_id = ?";
+            $check_join_stmt = $mysqli->prepare($check_join_sql);
+            $check_join_stmt->bind_param("ss", $classroom_id, $student_id);
+            $check_join_stmt->execute();
+            $check_join_result = $check_join_stmt->get_result();
+            if ($check_join_result->num_rows > 0) {
+                echo json_encode(array('status' => 'error', 'message' => 'Student is already linked to this classroom.'));
+                exit();
+            }
+            $comp_id = null;
+            if ($ref_type === 'employee') {
+                $sql_comp = "SELECT comp_id FROM m_employee WHERE emp_id = ?";
+            } elseif ($ref_type === 'customer') {
+                $sql_comp = "SELECT comp_id FROM m_customer WHERE cus_id = ?";
+            }
+            if (isset($sql_comp)) {
+                $stmt_comp = $mysqli->prepare($sql_comp);
+                $stmt_comp->bind_param("s", $ref_id);
+                $stmt_comp->execute();
+                $result_comp = $stmt_comp->get_result();
+                $data_comp = $result_comp->fetch_assoc();
+                $comp_id = $data_comp['comp_id'];
+                $stmt_comp->close();
+            }
             $join_sql = "INSERT INTO classroom_student_join (classroom_id, student_id, comp_id, status, emp_create, date_create) VALUES (?, ?, ?, 0, ?, ?)";
             $join_stmt = $mysqli->prepare($join_sql);
-            $join_stmt->bind_param('sssss', $classroom_id, $new_student_id, $data['comp_id'], $user_id, $date_create); // ดึงจาก $data
-            
+            $join_stmt->bind_param("sssss", $classroom_id, $student_id, $comp_id, $user_id, $date_create);
             if ($join_stmt->execute()) {
-                echo json_encode(array('status' => 'success', 'message' => 'New student added from ' . $ref_type . ' successfully.'));
+                echo json_encode(array('status' => 'success', 'message' => 'Student successfully linked to this classroom.'));
             } else {
-                echo json_encode(array('status' => 'error', 'message' => "Error inserting into join table: " . $join_stmt->error));
+                echo json_encode(array('status' => 'error', 'message' => 'Error linking student: ' . $join_stmt->error));
             }
             $join_stmt->close();
-        } else {
-            echo json_encode(array('status' => 'error', 'message' => "Error inserting into student table: " . $insert_stmt->error));
+            $check_stmt->close();
+            exit();
         }
-        $insert_stmt->close();
-    } else {
-        echo json_encode(array('status' => 'error', 'message' => 'Data not found for the selected ' . $ref_type . '.'));
+        $data = null;
+        if ($ref_type === 'employee') {
+            $sql = "SELECT 
+                ei.firstname_th AS student_firstname_th,
+                ei.lastname_th AS student_lastname_th,
+                ei.firstname AS student_firstname_en,
+                ei.lastname AS student_lastname_en,
+                ei.nickname AS student_nickname_th,
+                ei.title AS student_perfix,
+                ei.idcard AS student_idcard,
+                e.email AS student_email,
+                ei.tel_office AS student_mobile,
+                ei.date_birth AS student_birth_date,
+                ei.gender AS student_gender,
+                e.comp_id,
+                ei.emp_pic AS student_image_profile,
+                e.emp_username AS student_username,
+                '' AS student_position,
+                '' AS student_company
+            FROM m_employee e
+            LEFT JOIN m_employee_info ei ON ei.emp_id = e.emp_id
+            WHERE e.emp_id = ?";
+        } elseif ($ref_type === 'customer') {
+            $sql = "SELECT
+                c.cus_name_th AS student_firstname_th,
+                '' AS student_lastname_th,
+                c.cus_email AS student_email,
+                c.cus_tel_no AS student_mobile,
+                c.comp_id,
+                c.cus_official_name AS student_company,
+                '' AS student_position
+            FROM m_customer c
+            WHERE c.cus_id = ?";
+        } else {
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid reference type.'));
+            exit();
+        }
+        $stmt = $mysqli->prepare($sql);
+        if ($stmt === false) {
+            die(json_encode(array('status' => 'error', 'message' => "Prepare failed: " . $mysqli->error)));
+        }
+        $stmt->bind_param("s", $ref_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+        $stmt->close();
+        if ($data) {
+            $insert_data = array(
+                'student_ref_id' => $ref_id,
+                'student_ref_type' => $ref_type,
+                'student_firstname_th' => isset($data['student_firstname_th']) ? $data['student_firstname_th'] : '',
+                'student_lastname_th' => isset($data['student_lastname_th']) ? $data['student_lastname_th'] : '',
+                'student_firstname_en' => isset($data['student_firstname_en']) ? $data['student_firstname_en'] : '',
+                'student_lastname_en' => isset($data['student_lastname_en']) ? $data['student_lastname_en'] : '',
+                'student_nickname_th' => isset($data['student_nickname_th']) ? $data['student_nickname_th'] : '',
+                'student_gender' => isset($data['student_gender']) ? $data['student_gender'] : '',
+                'student_idcard' => isset($data['student_idcard']) ? $data['student_idcard'] : null,
+                'student_email' => isset($data['student_email']) ? $data['student_email'] : '',
+                'student_mobile' => isset($data['student_mobile']) ? $data['student_mobile'] : '',
+                'student_birth_date' => isset($data['student_birth_date']) ? $data['student_birth_date'] : '0000-00-00',
+                'student_company' => isset($data['student_company']) ? $data['student_company'] : '',
+                'student_position' => isset($data['student_position']) ? $data['student_position'] : '',
+                'student_username' => isset($data['student_username']) ? $data['student_username'] : null,
+                'student_image_profile' => isset($data['student_image_profile']) ? $data['student_image_profile'] : '',
+                'emp_create' => $user_id,
+                'date_create' => $date_create
+            );
+            $fields = implode(", ", array_keys($insert_data));
+            $placeholders = implode(", ", array_fill(0, count($insert_data), '?'));
+            $insert_sql = "INSERT INTO classroom_student ($fields) VALUES ($placeholders)";
+            $insert_stmt = $mysqli->prepare($insert_sql);
+            if ($insert_stmt === false) {
+                die(json_encode(array('status' => 'error', 'message' => "Prepare failed: " . $mysqli->error)));
+            }
+            $types = str_repeat('s', count($insert_data));
+            $values = array_values($insert_data);
+            $bind_values = array($types);
+            for ($i = 0; $i < count($values); $i++) {
+                $bind_values[] = &$values[$i];
+            }
+            call_user_func_array(array($insert_stmt, 'bind_param'), $bind_values);
+            if ($insert_stmt->execute()) {
+                $new_student_id = $mysqli->insert_id;
+                $join_sql = "INSERT INTO classroom_student_join (classroom_id, student_id, comp_id, status, emp_create, date_create) VALUES (?, ?, ?, 0, ?, ?)";
+                $join_stmt = $mysqli->prepare($join_sql);
+                $join_stmt->bind_param('sssss', $classroom_id, $new_student_id, $data['comp_id'], $user_id, $date_create); 
+                if ($join_stmt->execute()) {
+                    echo json_encode(array('status' => 'success', 'message' => 'New student added from ' . $ref_type . ' successfully.'));
+                } else {
+                    echo json_encode(array('status' => 'error', 'message' => "Error inserting into join table: " . $join_stmt->error));
+                }
+                $join_stmt->close();
+            } else {
+                echo json_encode(array('status' => 'error', 'message' => "Error inserting into student table: " . $insert_stmt->error));
+            }
+            $insert_stmt->close();
+        } else {
+            echo json_encode(array('status' => 'error', 'message' => 'Data not found for the selected ' . $ref_type . '.'));
+        }
+        $mysqli->close();
+        exit();
     }
-    $mysqli->close();
-    exit();
-}
 ?>

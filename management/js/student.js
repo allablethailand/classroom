@@ -55,7 +55,7 @@ function buildStudent() {
                     defaultLang: 'en'
                 });
             },
-            "order": [[9,'desc']],
+            "order": [[10,'desc']],
             "columns": [{ 
                 "targets": 0,
                 "data": "student_image_profile",
@@ -134,14 +134,13 @@ function buildStudent() {
                 "targets": 10,
                 "data": "date_create"
             },{
-                // เพิ่มคอลัมน์ Action
                 "targets": 11,
                 "data": "student_id",
                 "orderable": false,
                 "render": function (data, type, row, meta) {
                     return `
-                        <button class="btn btn-warning btn-circle" onclick="manageStudent('${data}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-circle" onclick="deleteStudent('${data}')"><i class="fas fa-trash-alt"></i></button>
+                        <button class="btn btn-orange btn-circle" onclick="manageStudent('${data}')"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn btn-red btn-circle" onclick="deleteStudent('${data}')"><i class="fas fa-trash-alt"></i></button>
                     `;
                 }
             }]
@@ -172,30 +171,18 @@ function buildStudent() {
         });
     }
 }
-
-// --- ฟังก์ชันหลักสำหรับเปิด Modal และสร้างฟอร์ม ---
 function manageStudent(student_id){
-     let classroom_id = $("#classroom_id").val();
-    // console.log(classroom_id);
-    
-    
-    // window.location.href = `/classroom/management/form?type=teacher&id=${teacher_id}`;
-    $.redirect(`form?type=student&id=${student_id}`,{classroom_id: classroom_id},'post','_self');
+    let classroom_id = $("#classroom_id").val();
+    $.redirect(`form?type=student&id=${student_id}`,{classroom_id: classroom_id},'post','_vlank');
 }
-
-// ฟังก์ชันสำหรับเลือกและบันทึกข้อมูลนักเรียน
 function selectStudent(id, type) {
     const classroom_id = $("#classroom_id").val();
-
-    // กำหนดว่า Modal ไหนที่จะถูกซ่อน
     const modalToHide = (type === 'employee') ? $('#employeeStudentModal') : $('#customerStudentModal');
     modalToHide.modal('hide');
-
-    // เปลี่ยน Swal.fire เป็น swal (รุ่นเก่า)
     swal({
         title: 'ยืนยันการเพิ่มข้อมูล',
         text: `คุณต้องการเพิ่ม ${type} นี้เป็นนักเรียนใช่หรือไม่?`,
-        type: 'info', // ใช้ 'info' แทน 'question' เพื่อให้รองรับ SweetAlert รุ่นเก่า
+        type: 'info', 
         showCancelButton: true,
         confirmButtonText: 'ใช่',
         cancelButtonText: 'ยกเลิก',
@@ -203,7 +190,6 @@ function selectStudent(id, type) {
         closeOnCancel: true,
         customClass: 'swal-high-zindex'
     },
-    // ใช้ callback function แทน .then()
     function(isConfirm) {
         if (isConfirm) {
             $.ajax({
@@ -219,13 +205,9 @@ function selectStudent(id, type) {
                 success: function(response) {
                     if (response.status === 'success') {
                         swal('สำเร็จ', response.message, 'success');
-                        
-                        // Reload ตารางหลักนักเรียน
                         if (window.tb_student) {
                             window.tb_student.ajax.reload(null, false);
                         }
-                        
-                        // เปิด Modal ที่ถูกต้องกลับมาหลังจากดีเลย์สั้นๆ
                         setTimeout(() => {
                             if (type === 'employee') {
                                 showAddEmployeeStudentPopup();
@@ -233,9 +215,7 @@ function selectStudent(id, type) {
                                 showAddCustomerStudentPopup();
                             }
                         }, 500);
-                        
                     } else {
-                        // เปิด Modal กลับมาเมื่อเกิดข้อผิดพลาด
                         if (type === 'employee') {
                             showAddEmployeeStudentPopup();
                         } else if (type === 'customer') {
@@ -243,9 +223,7 @@ function selectStudent(id, type) {
                         }
                         swal('เกิดข้อผิดพลาด', response.message, 'error');
                     }
-                },
-                error: function(xhr, status, error) {
-                    // เปิด Modal กลับมาเมื่อเกิดข้อผิดพลาดจากเซิร์ฟเวอร์
+                },error: function(xhr, status, error) {
                     if (type === 'employee') {
                         showAddEmployeeStudentPopup();
                     } else if (type === 'customer') {
@@ -257,10 +235,7 @@ function selectStudent(id, type) {
         }
     });
 }
-
-// ฟังก์ชันสำหรับแสดง Pop-up และตาราง Employee เพื่อเพิ่มเป็นนักเรียน
 function showAddEmployeeStudentPopup() {
-    // HTML string สำหรับ Modal component
     const employeeStudentModalHtml = `
         <div class="modal fade" id="employeeStudentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
@@ -292,19 +267,10 @@ function showAddEmployeeStudentPopup() {
             </div>
         </div>
     `;
-
-    // เพิ่ม Modal HTML ลงใน body
     $('body').append(employeeStudentModalHtml);
-
-    // รับ element ของ Modal
     const employeeStudentModal = $('#employeeStudentModal');
-
-    // แสดง Modal
     employeeStudentModal.modal('show');
-
-    // จัดการ events ของ Modal
     employeeStudentModal.on('shown.bs.modal', function() {
-        // Initialize DataTables ภายใน Modal
         const employeeStudentTable = $('#tb_employees_student').DataTable({
             "processing": true,
             "serverSide": true,
@@ -313,40 +279,35 @@ function showAddEmployeeStudentPopup() {
                 "type": "POST",
                 "data": { action: "getEmployees" }
             },
-            "columns": [
-                { "data": "emp_id" },
-                { "data": "full_name" },
-                { "data": "tel_office" },
-                { "data": "email" },
-                {
-                    "data": "emp_id",
-                    "render": function(data, type, row) {
-                        return `<button class="btn btn-success btn-circle add-from-emp" data-id="${data}" data-type="employee"><i class="fas fa-check"></i></button>`;
-                    }
+            "columns": [{ 
+                "data": "emp_id" 
+            },{ 
+                "data": "full_name" 
+            },{ 
+                "data": "tel_office" 
+            },{ 
+                "data": "email" 
+            },{
+                "data": "emp_id",
+                "render": function(data, type, row) {
+                    return `<button class="btn btn-success btn-circle add-from-emp" data-id="${data}" data-type="employee"><i class="fas fa-check"></i></button>`;
                 }
-            ],
+            }],
             "language": default_language,
             "responsive": true,
             "deferRender": true
         });
-
-        // เพิ่ม Event listener สำหรับปุ่ม "เพิ่ม"
         employeeStudentTable.on('click', '.add-from-emp', function() {
             const ref_id = $(this).data('id');
             const ref_type = $(this).data('type');
             selectStudent(ref_id, ref_type);
         });
     });
-
-    // ล้าง element Modal ออกจาก DOM เมื่อปิด
     employeeStudentModal.on('hidden.bs.modal', function() {
         $(this).remove();
     });
 }
-
-// ฟังก์ชันสำหรับแสดง Pop-up และตาราง Customer เพื่อเพิ่มเป็นนักเรียน
 function showAddCustomerStudentPopup() {
-    // HTML string สำหรับ Modal component
     const customerStudentModalHtml = `
         <div class="modal fade" id="customerStudentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
@@ -378,19 +339,10 @@ function showAddCustomerStudentPopup() {
             </div>
         </div>
     `;
-
-    // เพิ่ม Modal HTML ลงใน body
     $('body').append(customerStudentModalHtml);
-
-    // รับ element ของ Modal
     const customerStudentModal = $('#customerStudentModal');
-
-    // แสดง Modal
     customerStudentModal.modal('show');
-
-    // จัดการ events ของ Modal
     customerStudentModal.on('shown.bs.modal', function() {
-        // Initialize DataTables ภายใน Modal
         const customerStudentTable = $('#tb_customers_student').DataTable({
             "processing": true,
             "serverSide": true,
@@ -399,38 +351,34 @@ function showAddCustomerStudentPopup() {
                 "type": "POST",
                 "data": { action: "getCustomers" }
             },
-            "columns": [
-                { "data": "cus_id" },
-                { "data": "cus_name_th" },
-                { "data": "cus_tel_no" },
-                { "data": "cus_email" },
-                {
-                    "data": "cus_id",
-                    "render": function(data, type, row) {
-                        return `<button class="btn btn-success btn-circle add-from-cus" data-id="${data}" data-type="customer"><i class="fas fa-check"></i></button>`;
-                    }
+            "columns": [{ 
+                "data": "cus_id" 
+            },{ 
+                "data": "cus_name_th" 
+            },{ 
+                "data": "cus_tel_no" 
+            },{ 
+                "data": "cus_email" 
+            },{
+                "data": "cus_id",
+                "render": function(data, type, row) {
+                    return `<button class="btn btn-success btn-circle add-from-cus" data-id="${data}" data-type="customer"><i class="fas fa-check"></i></button>`;
                 }
-            ],
+            }],
             "language": default_language,
             "responsive": true,
             "deferRender": true
         });
-
-        // เพิ่ม Event listener สำหรับปุ่ม "เพิ่ม"
         customerStudentTable.on('click', '.add-from-cus', function() {
             const ref_id = $(this).data('id');
             const ref_type = $(this).data('type');
             selectStudent(ref_id, ref_type);
         });
     });
-
-    // ล้าง element Modal ออกจาก DOM เมื่อปิด
     customerStudentModal.on('hidden.bs.modal', function() {
         $(this).remove();
     });
 }
-
-// ฟังก์ชันใหม่สำหรับการแสดงตัวเลือกการเพิ่มนักเรียน
 function addStudentOptions() {
     swal({
         title: 'เลือกประเภทนักเรียนที่ต้องการเพิ่ม',
@@ -447,18 +395,15 @@ function addStudentOptions() {
             </div>
         `
     });
-
     setTimeout(function() {
         $('#add-employee-student').on('click', function() {
             swal.close();
             showAddEmployeeStudentPopup();
         });
-
         $('#add-customer-student').on('click', function() {
             swal.close();
             showAddCustomerStudentPopup();
         });
-
         $('#add-manual-student').on('click', function() {
             swal.close();
             let classroom_id = $("#classroom_id").val();
@@ -466,14 +411,11 @@ function addStudentOptions() {
         });
     }, 500); 
 }
-
-// --- ฟังก์ชันลบนักเรียน ---
 function deleteStudent(student_id) {
-    // เปลี่ยน Swal.fire เป็น swal (รุ่นเก่า)
     swal({
         title: 'คุณแน่ใจหรือไม่?',
         text: "คุณต้องการลบข้อมูลนักเรียนท่านนี้ใช่ไหม? การกระทำนี้ไม่สามารถย้อนกลับได้",
-        type: 'warning', // เปลี่ยน icon เป็น type
+        type: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
@@ -482,7 +424,6 @@ function deleteStudent(student_id) {
         closeOnConfirm: false,
         closeOnCancel: true
     },
-    // ใช้ callback function แทน .then()
     function(isConfirm) {
         if (isConfirm) {
             $.ajax({
@@ -494,7 +435,7 @@ function deleteStudent(student_id) {
                 },
                 dataType: 'json',
                 success: function(response) {
-                    if (response.status === 'success') { // เปลี่ยน response.success เป็น response.status === 'success' เพื่อให้เหมือนฝั่งครู
+                    if (response.status === 'success') {
                         swal(
                             'ลบเรียบร้อย!',
                             response.message,
@@ -510,8 +451,7 @@ function deleteStudent(student_id) {
                             'error'
                         );
                     }
-                },
-                error: function(xhr, status, error) {
+                },error: function(xhr, status, error) {
                     console.error(xhr.responseText);
                     swal(
                         'เกิดข้อผิดพลาด!',
