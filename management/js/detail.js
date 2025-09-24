@@ -178,6 +178,9 @@ function buildManagementPage() {
     bindFormEventHandlers();
     buildLineOA();
     buildPlatform();
+    if(!classroom_id) {
+        initializeDropify();
+    }
 }
 function initializeDropify() {
     try {

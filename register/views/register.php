@@ -10,6 +10,8 @@
 <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="/dist/css/sweetalert.css">
 <link rel="stylesheet" href="/dist/css/jquery-ui.css">
+<link rel="stylesheet" href="/dist/css/select2.min.css">
+<link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
 <link rel="stylesheet" href="/classroom/register/css/register.css?v=<?php echo time(); ?>">
 <script src="/dist/fontawesome-5.11.2/js/all.min.js"></script>
 <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js"></script>
@@ -19,6 +21,7 @@
 <script src="/dist/js/sweetalert.min.js"></script>
 <script src="/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
 <script src="/dist/js/jquery-ui.min.js"></script>
+<script src="/dist/js/select2-build.min.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/register/js/register.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
@@ -140,6 +143,10 @@
                             <div class="form-group form-input input-14 hidden">
                                 <label class="register-form" for="student_birth_date" data-lang="birthday"></label>
                                 <input type="text" class="form-control datepicker" id="student_birth_date" name="student_birth_date" autocomplete="off">
+                            </div>
+                            <div class="form-group form-input input-23 hidden">
+                                <label class="register-form" for="student_nationality" data-lang="nationality"></label>
+                                <select class="form-control" id="student_nationality" name="student_nationality"></select>
                             </div>
                             <div class="form-group form-input input-8 hidden">
                                 <label class="register-form" for="student_email" data-lang="email"></label>
