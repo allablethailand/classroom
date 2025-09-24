@@ -300,7 +300,7 @@ function buildRegistration() {
 								<span>${student_birth_date || '-'}</span>
 								<span lang="en" style="margin-left:6px;">Age</span> <span>${student_age || ''}</span>
 							</div>` : ''}
-						${(student_username || password_original) ? `
+						${(student_username || student_password) ? `
 							<div style="font-size:11px; margin-top:10px;">
 							${student_username ? `
 								<div style="display:flex; gap:6px; word-break: break-all;">

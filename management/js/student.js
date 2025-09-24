@@ -124,10 +124,10 @@ function buildStudent() {
                 }
             },{ 
                 "targets": 8,
-                "data": "student_mobile"
+                "data": "student_email"
             },{ 
                 "targets": 9,
-                "data": "student_email"
+                "data": "student_mobile"
             },{ 
                 "targets": 10,
                 "data": "date_create"
@@ -209,14 +209,14 @@ function selectStudent(id, type) {
                         setTimeout(() => {
                             if (type === 'employee') {
                                 showAddEmployeeStudentPopup();
-                            } else if (type === 'customer') {
+                            } else if (type === 'contact') {
                                 showAddCustomerStudentPopup();
                             }
                         }, 500);
                     } else {
                         if (type === 'employee') {
                             showAddEmployeeStudentPopup();
-                        } else if (type === 'customer') {
+                        } else if (type === 'contact') {
                             showAddCustomerStudentPopup();
                         }
                         swal('เกิดข้อผิดพลาด', response.message, 'error');
@@ -224,7 +224,7 @@ function selectStudent(id, type) {
                 },error: function(xhr, status, error) {
                     if (type === 'employee') {
                         showAddEmployeeStudentPopup();
-                    } else if (type === 'customer') {
+                    } else if (type === 'contact') {
                         showAddCustomerStudentPopup();
                     }
                     swal('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
@@ -312,7 +312,7 @@ function showAddCustomerStudentPopup() {
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">เพิ่มนักเรียนจาก Customer</h4>
+                        <h4 class="modal-title" id="myModalLabel">เพิ่มนักเรียนจาก Contact</h4>
                     </div>
                     <div class="modal-body">
                         <div class="table-responsive">
@@ -360,7 +360,7 @@ function showAddCustomerStudentPopup() {
             },{
                 "data": "cus_id",
                 "render": function(data, type, row) {
-                    return `<button class="btn btn-success btn-circle add-from-cus" data-id="${data}" data-type="customer"><i class="fas fa-check"></i></button>`;
+                    return `<button class="btn btn-success btn-circle add-from-cus" data-id="${data}" data-type="contact"><i class="fas fa-check"></i></button>`;
                 }
             }],
             "language": default_language,
@@ -388,7 +388,7 @@ function addStudentOptions() {
         text: `
             <div class="d-flex justify-content-around mt-3">
                 <button id="add-employee-student" class="btn btn-info mx-2" style="width:80%;"><i class="fas fa-users" ></i> เพิ่มจาก Employee</button>
-                <button id="add-customer-student" class="btn btn-primary mx-2" style="width:80%;"><i class="fas fa-user-tie" ></i> เพิ่มจาก Customer</button>
+                <button id="add-customer-student" class="btn btn-primary mx-2" style="width:80%;"><i class="fas fa-user-tie" ></i> เพิ่มจาก Contact</button>
                 <button id="add-manual-student" class="btn btn-success mx-2"><i class="fas fa-plus-circle"></i> กรอกข้อมูลเอง</button>
             </div>
         `
