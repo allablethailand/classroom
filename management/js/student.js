@@ -2,7 +2,6 @@ function buildStudentPage() {
     $(".content-container").html(getStudentTemplate());
     buildStudent();
 }
-
 function getStudentTemplate() {
     return `
         <table class="table table-border" id="tb_student">
@@ -26,7 +25,6 @@ function getStudentTemplate() {
         </table>
     `;
 }
-
 let tb_student;
 function buildStudent() {
     if ($.fn.DataTable.isDataTable('#tb_student')) {
@@ -81,8 +79,8 @@ function buildStudent() {
                     let student_firstname_th = row['student_firstname_th'];
                     let student_lastname_th = row['student_lastname_th'];
                     return `
-                        <p><b>${student_firstname_en} ${student_lastname_en}</b></p>
-                        <div>${student_firstname_th} ${student_lastname_th}</div>
+                        <p><b>${(student_firstname_en || "")} ${(student_lastname_en || "")}</b></p>
+                        <div>${(student_firstname_th || "")} ${(student_lastname_th || "")}</div>
                     `;
                 }
             },{ 

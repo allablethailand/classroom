@@ -271,7 +271,7 @@ function buildRegistration() {
 							</div>` : ''}
 							${(student_firstname_th || student_lastname_th) ? `
 							<div class="text-orange text-center" style="margin-bottom:10px;">
-								<b>${student_firstname_th || ''} ${student_lastname_th || ''}</b>
+								<b>${(student_firstname_th || '')} ${(student_lastname_th || '')}</b>
 							</div>` : ''}
 							<div class="text-center" style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; font-weight: 600;">
 								${student_nickname_en ? `<span><i class="fas fa-user-tag"></i> ${student_nickname_en}</span>` : ''}
