@@ -22,77 +22,83 @@
     $filesystem_type = $fsData['fs_type'];
     $fs_id = $fsData['fs_id'];
     setBucket($fsData);
-    if(isset($_POST) && $_POST['action'] == 'buildTeacher') {
-        $classroom_id = $_POST['classroom_id'] ? $_POST['classroom_id'] : null;
-        if ($classroom_id === null) {
-            echo json_encode(array('status' => 'error', 'message' => 'Classroom ID not found.'));
-            exit();
-        }
-        $table = "SELECT
-            t.teacher_id,
-            CASE t.teacher_perfix
-                WHEN 0 THEN 'นาย'
-                WHEN 1 THEN 'นาง'
-                WHEN 2 THEN 'นางสาว'
-                ELSE ''
-            END AS teacher_perfix,
-            CONCAT(
-                CASE 
-                    WHEN COALESCE(t.teacher_firstname_th, '') = '' OR COALESCE(t.teacher_lastname_th, '') = '' THEN
-                        CASE t.teacher_perfix
-                            WHEN 0 THEN 'Mr.'
-                            WHEN 1 THEN 'Mrs.'
-                            WHEN 2 THEN 'Ms.'
-                            ELSE ''
-                        END
-                    ELSE
-                        CASE t.teacher_perfix
-                            WHEN 0 THEN 'นาย'
-                            WHEN 1 THEN 'นาง'
-                            WHEN 2 THEN 'นางสาว'
-                            ELSE ''
-                        END
-                END,
-                COALESCE(t.teacher_firstname_th, t.teacher_firstname_en), 
-                ' ', 
-                COALESCE(t.teacher_lastname_th, t.teacher_lastname_en)
-            ) AS teacher_name,
-            p.position_name_en AS teacher_job_position,
-            t.teacher_company,
-            t.teacher_position,
-            date_format(t.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
-            CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
-            date_format(t.date_modify, '%Y/%m/%d %H:%i:%s') as date_modify,
-            CONCAT(IFNULL(i2.firstname,i2.firstname_th),' ',IFNULL(i2.lastname,i2.lastname_th)) AS emp_modify
-        FROM
-            classroom_teacher t
-        LEFT JOIN
-            classroom_teacher_join j ON j.teacher_id = t.teacher_id
-        LEFT JOIN
-            m_employee_info i on i.emp_id = t.emp_create
-        LEFT JOIN 
-            m_employee_info i2 on i2.emp_id = t.emp_modify
-        LEFT JOIN
-            classroom_position p ON p.position_id = t.position_id
-        WHERE
-            j.status = 0 AND j.classroom_id = '{$classroom_id}'";  
-        $primaryKey = 'teacher_id';
-        $columns = array(
-            array('db' => 'teacher_id', 'dt' => 'teacher_id'),
-            array('db' => 'teacher_name', 'dt' => 'teacher_name'),
-            array('db' => 'teacher_job_position', 'dt' => 'teacher_job_position'),
-            array('db' => 'teacher_company', 'dt' => 'teacher_company'),
-            array('db' => 'teacher_position', 'dt' => 'teacher_position'),
-            array('db' => 'date_create', 'dt' => 'date_create'),
-            array('db' => 'emp_create', 'dt' => 'emp_create'),
-            array('db' => 'date_modify', 'dt' => 'date_modify'),
-            array('db' => 'emp_modify', 'dt' => 'emp_modify'),
-        );
-        $sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db' => $db_name,'host' => $db_host);
-        require($base_include.'/lib/ssp-subquery.class.php');
-        echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
+if(isset($_POST) && $_POST['action'] == 'buildTeacher') {
+    $classroom_id = $_POST['classroom_id'] ? $_POST['classroom_id'] : null;
+    if ($classroom_id === null) {
+        echo json_encode(array('status' => 'error', 'message' => 'Classroom ID not found.'));
         exit();
     }
+    $table = "SELECT
+        t.teacher_id,
+        t.teacher_image_profile,
+        t.teacher_gender,
+        CASE t.teacher_perfix
+            WHEN 0 THEN 'นาย'
+            WHEN 1 THEN 'นาง'
+            WHEN 2 THEN 'นางสาว'
+            ELSE ''
+        END AS teacher_perfix,
+        CONCAT(
+            CASE 
+                WHEN COALESCE(t.teacher_firstname_th, '') = '' OR COALESCE(t.teacher_lastname_th, '') = '' THEN
+                    CASE t.teacher_perfix
+                        WHEN 0 THEN 'Mr.'
+                        WHEN 1 THEN 'Mrs.'
+                        WHEN 2 THEN 'Ms.'
+                        ELSE ''
+                    END
+                ELSE
+                    CASE t.teacher_perfix
+                        WHEN 0 THEN 'นาย'
+                        WHEN 1 THEN 'นาง'
+                        WHEN 2 THEN 'นางสาว'
+                        ELSE ''
+                    END
+            END,
+            COALESCE(t.teacher_firstname_th, t.teacher_firstname_en), 
+            ' ', 
+            COALESCE(t.teacher_lastname_th, t.teacher_lastname_en)
+        ) AS teacher_name,
+        p.position_name_en AS teacher_job_position,
+        t.teacher_company,
+        t.teacher_position,
+        date_format(t.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
+        CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
+        date_format(t.date_modify, '%Y/%m/%d %H:%i:%s') as date_modify,
+        CONCAT(IFNULL(i2.firstname,i2.firstname_th),' ',IFNULL(i2.lastname,i2.lastname_th)) AS emp_modify
+    FROM
+        classroom_teacher t
+    LEFT JOIN
+        classroom_teacher_join j ON j.teacher_id = t.teacher_id
+    LEFT JOIN
+        m_employee_info i on i.emp_id = t.emp_create
+    LEFT JOIN 
+        m_employee_info i2 on i2.emp_id = t.emp_modify
+    LEFT JOIN
+        classroom_position p ON p.position_id = t.position_id
+    WHERE
+        j.status = 0 AND j.classroom_id = '{$classroom_id}'";
+    $primaryKey = 'teacher_id';
+    $columns = array(
+        array('db' => 'teacher_id', 'dt' => 'teacher_id'),
+        array('db' => 'teacher_image_profile', 'dt' => 'teacher_image_profile','formatter' => function ($d, $row) {
+            return GetUrl($d);
+        }),
+        array('db' => 'teacher_gender', 'dt' => 'teacher_gender'),
+        array('db' => 'teacher_name', 'dt' => 'teacher_name'),
+        array('db' => 'teacher_job_position', 'dt' => 'teacher_job_position'),
+        array('db' => 'teacher_company', 'dt' => 'teacher_company'),
+        array('db' => 'teacher_position', 'dt' => 'teacher_position'),
+        array('db' => 'date_create', 'dt' => 'date_create'),
+        array('db' => 'emp_create', 'dt' => 'emp_create'),
+        array('db' => 'date_modify', 'dt' => 'date_modify'),
+        array('db' => 'emp_modify', 'dt' => 'emp_modify'),
+    );
+    $sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db' => $db_name,'host' => $db_host);
+    require($base_include.'/lib/ssp-subquery.class.php');
+    echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
+    exit();
+}
     if(isset($_POST['action']) && $_POST['action'] == 'saveTeacher') {
         global $mysqli;
         $comp_id = isset($_SESSION['comp_id']) ? $_SESSION['comp_id'] : null;
@@ -388,13 +394,13 @@ if(isset($_POST['action']) && $_POST['action'] == 'getEmployees') {
 // ส่วนที่แก้ไข: ดึงข้อมูล Customer
 if(isset($_POST['action']) && $_POST['action'] == 'getCustomers') {
     $table = "SELECT
-        cus_id,
-        cus_name_th,
-        cus_tel_no,
-        cus_email
-    FROM m_customer c
-    WHERE c.cus_del = 0
-    AND c.cus_id NOT IN (SELECT teacher_ref_id FROM classroom_teacher WHERE teacher_ref_type = 'customer')";
+        cus_cont_id as cus_id,
+        CONCAT(cus_cont_name, ' ', cus_cont_surname) AS cus_name_th,
+        cus_cont_mob AS cus_tel_no,
+        cus_cont_email AS cus_email
+    FROM m_customer_contact c
+    WHERE c.cus_cont_del = 0
+    AND c.cus_cont_id NOT IN (SELECT teacher_ref_id FROM classroom_teacher WHERE teacher_ref_type = 'contact')";
     
     $primaryKey = 'cus_id';
     $columns = array(
@@ -447,7 +453,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'addTeacherFromRef') {
         $comp_id = null;
         if ($ref_type === 'employee') {
             $sql_comp = "SELECT comp_id FROM m_employee WHERE emp_id = ?";
-        } elseif ($ref_type === 'customer') {
+        } elseif ($ref_type === 'contact') {
             $sql_comp = "SELECT comp_id FROM m_customer WHERE cus_id = ?";
         }
         if (isset($sql_comp)) {
@@ -495,17 +501,22 @@ if(isset($_POST['action']) && $_POST['action'] == 'addTeacherFromRef') {
         FROM m_employee e
         LEFT JOIN m_employee_info ei ON ei.emp_id = e.emp_id
         WHERE e.emp_id = ?";
-    } elseif ($ref_type === 'customer') {
+    } elseif ($ref_type === 'contact') {
         $sql = "SELECT
-            c.cus_name_th AS teacher_firstname_th,
-            '' AS teacher_lastname_th,
-            c.cus_email AS teacher_email,
-            c.cus_tel_no AS teacher_mobile,
-            c.comp_id,
-            c.cus_official_name AS teacher_company,
+            cus_cont_name AS teacher_firstname_th,
+            cus_cont_surname AS teacher_lastname_th,
+            '' AS teacher_firstname_en,
+            '' AS teacher_lastname_en,
+            '' AS teacher_nickname_th,
+            '' AS teacher_perfix,
+            cus_cont_idcard AS teacher_idcard,
+            cus_cont_email AS teacher_email,
+            cus_cont_mob AS teacher_mobile,
+            comp_id,
+            '' AS teacher_company,
             '' AS teacher_position
-        FROM m_customer c
-        WHERE c.cus_id = ?";
+        FROM m_customer_contact c
+        WHERE c.cus_cont_id = ?";
     } else {
         echo json_encode(array('status' => 'error', 'message' => 'Invalid reference type.'));
         exit();
