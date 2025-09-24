@@ -282,7 +282,7 @@ function buildRegistration() {
 							<i class="fas fa-building"></i>
 							<span>${student_company || '-'}</span>
 						</div>
-						<div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+						<div style="font-size:11px; display:flex; gap:6px; word-break: break-all;">
 							<i class="fas fa-briefcase"></i>
 							<span>${student_position || '-'}</span>
 						</div>
@@ -500,9 +500,11 @@ function buildRegistration() {
             },{ 
                 "targets": 9,
                 "data": "join_id",
+                "className": "text-center",
                 "render": function (data,type,row,meta) {	
 					return `
                         <div class="nowarp">
+                            <button type="button" class="btn btn-warning btn-circle" onclick="editRegistration(${row['student_id']})"><i class="fas fa-pencil-alt"></i></button> 
                             <button type="button" class="btn btn-red btn-circle" onclick="delRegistration(${data})"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     `;
@@ -583,21 +585,8 @@ function buildRegistration() {
         });
     }
 }
-function registerStudent() {
-   $.ajax({
-        url: "/classroom/management/actions/registration.php",
-        type: "POST",
-        data: {
-            action: 'getClassroomKey',
-            classroom_id: classroom_id
-        },
-        dataType: "JSON",
-        type: 'POST',
-        success: function(result) {
-            let classroom_key = result.classroom_key;
-            window.open(`/classroom/register/${classroom_key}`, '_blank');
-        }
-    }); 
+function editRegistration(student_id) {
+    $.redirect(`form?type=student&id=${student_id}`,{classroom_id: classroom_id},'post','_vlank');
 }
 function confirmRegistration(join_id, option) {
     event.stopPropagation();
