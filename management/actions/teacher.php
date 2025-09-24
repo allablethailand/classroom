@@ -139,7 +139,7 @@
             'นาง' => 1,
             'นางสาว' => 2
         );
-        $teacher_perfix = isset($perfix_map[$_POST['teacher_perfix']]) ? $perfix_map[$_POST['teacher_perfix']] : null;
+        $teacher_perfix = isset($perfix_map[$_POST['teacher_perfix']]) ? $perfix_map['teacher_perfix'] : null;
         $data = array(
             'teacher_perfix' => $teacher_perfix, 
             'teacher_firstname_en' => $_POST['teacher_firstname_en'] ? $_POST['teacher_firstname_en'] : null,
@@ -355,4 +355,228 @@
         $mysqli->close();
         exit();
     }
+
+// ส่วนที่แก้ไข: ดึงข้อมูล Employee
+if(isset($_POST['action']) && $_POST['action'] == 'getEmployees') {
+    $table = "SELECT 
+        e.emp_id, 
+        ei.firstname_th, 
+        ei.lastname_th,
+        ei.tel_office,
+        e.email,
+        CONCAT(ei.firstname_th, ' ', ei.lastname_th) AS full_name
+    FROM m_employee e
+    LEFT JOIN m_employee_info ei ON ei.emp_id = e.emp_id
+    WHERE e.emp_del = 0
+    AND e.emp_id NOT IN (SELECT teacher_ref_id FROM classroom_teacher WHERE teacher_ref_type = 'employee')";
+    
+    $primaryKey = 'emp_id';
+    $columns = array(
+        array('db' => 'emp_id', 'dt' => 'emp_id'),
+        array('db' => 'full_name', 'dt' => 'full_name'),
+        array('db' => 'tel_office', 'dt' => 'tel_office'),
+        array('db' => 'email', 'dt' => 'email'),
+    );
+    
+    $sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db' => $db_name,'host' => $db_host);
+    require($base_include.'/lib/ssp-subquery.class.php');
+    echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
+    exit();
+}
+
+
+// ส่วนที่แก้ไข: ดึงข้อมูล Customer
+if(isset($_POST['action']) && $_POST['action'] == 'getCustomers') {
+    $table = "SELECT
+        cus_id,
+        cus_name_th,
+        cus_tel_no,
+        cus_email
+    FROM m_customer c
+    WHERE c.cus_del = 0
+    AND c.cus_id NOT IN (SELECT teacher_ref_id FROM classroom_teacher WHERE teacher_ref_type = 'customer')";
+    
+    $primaryKey = 'cus_id';
+    $columns = array(
+        array('db' => 'cus_id', 'dt' => 'cus_id'),
+        array('db' => 'cus_name_th', 'dt' => 'cus_name_th'),
+        array('db' => 'cus_tel_no', 'dt' => 'cus_tel_no'),
+        array('db' => 'cus_email', 'dt' => 'cus_email'),
+    );
+    
+    $sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db' => $db_name,'host' => $db_host);
+    require($base_include.'/lib/ssp-subquery.class.php');
+    echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
+    exit();
+}
+
+
+// ส่วนที่ปรับปรุง: บันทึกข้อมูลครูจาก Employee หรือ Customer (แก้ไขแล้ว)
+if(isset($_POST['action']) && $_POST['action'] == 'addTeacherFromRef') {
+    global $mysqli;
+    $ref_id = $_POST['ref_id'];
+    $ref_type = $_POST['ref_type'];
+    $classroom_id = $_POST['classroom_id'];
+    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+    $date_create = date('Y-m-d H:i:s');
+
+    // ตรวจสอบว่ามีข้อมูลครูคนนี้อยู่ในตารางอยู่แล้วหรือไม่
+    $check_sql = "SELECT teacher_id FROM classroom_teacher WHERE teacher_ref_id = ? AND teacher_ref_type = ?";
+    $check_stmt = $mysqli->prepare($check_sql);
+    $check_stmt->bind_param("ss", $ref_id, $ref_type);
+    $check_stmt->execute();
+    $check_result = $check_stmt->get_result();
+
+    if ($check_result->num_rows > 0) {
+        $existing_teacher = $check_result->fetch_assoc();
+        $teacher_id = $existing_teacher['teacher_id'];
+
+        // ถ้ามีอยู่แล้วให้ตรวจสอบว่าได้มีการ join กับ classroom นี้แล้วหรือยัง
+        $check_join_sql = "SELECT id FROM classroom_teacher_join WHERE classroom_id = ? AND teacher_id = ?";
+        $check_join_stmt = $mysqli->prepare($check_join_sql);
+        $check_join_stmt->bind_param("ss", $classroom_id, $teacher_id);
+        $check_join_stmt->execute();
+        $check_join_result = $check_join_stmt->get_result();
+
+        if ($check_join_result->num_rows > 0) {
+            echo json_encode(array('status' => 'error', 'message' => 'Teacher is already linked to this classroom.'));
+            exit();
+        }
+
+        // ดึง comp_id จากตารางต้นทางเพื่อใช้ในการ join
+        $comp_id = null;
+        if ($ref_type === 'employee') {
+            $sql_comp = "SELECT comp_id FROM m_employee WHERE emp_id = ?";
+        } elseif ($ref_type === 'customer') {
+            $sql_comp = "SELECT comp_id FROM m_customer WHERE cus_id = ?";
+        }
+        if (isset($sql_comp)) {
+            $stmt_comp = $mysqli->prepare($sql_comp);
+            $stmt_comp->bind_param("s", $ref_id);
+            $stmt_comp->execute();
+            $result_comp = $stmt_comp->get_result();
+            $data_comp = $result_comp->fetch_assoc();
+            $comp_id = $data_comp['comp_id'];
+            $stmt_comp->close();
+        }
+        
+        // ถ้ายังไม่มีการ join ก็ให้เพิ่มข้อมูลใน classroom_teacher_join
+        $join_sql = "INSERT INTO classroom_teacher_join (classroom_id, teacher_id, comp_id, status, emp_create, date_create) 
+                     VALUES (?, ?, ?, 0, ?, ?)";
+        $join_stmt = $mysqli->prepare($join_sql);
+        $join_stmt->bind_param("sssss", $classroom_id, $teacher_id, $comp_id, $user_id, $date_create);
+        if ($join_stmt->execute()) {
+            echo json_encode(array('status' => 'success', 'message' => 'Teacher successfully linked to this classroom.'));
+        } else {
+            echo json_encode(array('status' => 'error', 'message' => 'Error linking teacher: ' . $join_stmt->error));
+        }
+        $join_stmt->close();
+        $check_stmt->close();
+        exit();
+    }
+
+    // ถ้ายังไม่มีในตาราง classroom_teacher ให้ดึงข้อมูลมาสร้าง
+    $data = null;
+    if ($ref_type === 'employee') {
+        $sql = "SELECT 
+            ei.firstname_th AS teacher_firstname_th,
+            ei.lastname_th AS teacher_lastname_th,
+            ei.firstname AS teacher_firstname_en,
+            ei.lastname AS teacher_lastname_en,
+            ei.nickname AS teacher_nickname_th,
+            ei.title AS teacher_perfix,
+            ei.idcard AS teacher_idcard,
+            e.email AS teacher_email,
+            ei.tel_office AS teacher_mobile,
+            e.comp_id,
+            e.emp_username AS teacher_username,
+            '' AS teacher_company,
+            '' AS teacher_position
+        FROM m_employee e
+        LEFT JOIN m_employee_info ei ON ei.emp_id = e.emp_id
+        WHERE e.emp_id = ?";
+    } elseif ($ref_type === 'customer') {
+        $sql = "SELECT
+            c.cus_name_th AS teacher_firstname_th,
+            '' AS teacher_lastname_th,
+            c.cus_email AS teacher_email,
+            c.cus_tel_no AS teacher_mobile,
+            c.comp_id,
+            c.cus_official_name AS teacher_company,
+            '' AS teacher_position
+        FROM m_customer c
+        WHERE c.cus_id = ?";
+    } else {
+        echo json_encode(array('status' => 'error', 'message' => 'Invalid reference type.'));
+        exit();
+    }
+
+    $stmt = $mysqli->prepare($sql);
+    if ($stmt === false) {
+        die(json_encode(array('status' => 'error', 'message' => "Prepare failed: " . $mysqli->error)));
+    }
+    $stmt->bind_param("s", $ref_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = $result->fetch_assoc();
+    $stmt->close();
+
+    if ($data) {
+        $insert_data = array(
+            'teacher_ref_id' => $ref_id,
+            'teacher_ref_type' => $ref_type,
+            'teacher_firstname_th' => $data['teacher_firstname_th'],
+            'teacher_lastname_th' => $data['teacher_lastname_th'],
+            'teacher_firstname_en' => isset($data['teacher_firstname_en']) ? $data['teacher_firstname_en'] : '',
+            'teacher_lastname_en' => isset($data['teacher_lastname_en']) ? $data['teacher_lastname_en'] : '',
+            'teacher_nickname_th' => isset($data['teacher_nickname_th']) ? $data['teacher_nickname_th'] : '',
+            'teacher_perfix' => isset($data['teacher_perfix']) ? $data['teacher_perfix'] : null,
+            'teacher_idcard' => isset($data['teacher_idcard']) ? $data['teacher_idcard'] : null,
+            'teacher_email' => $data['teacher_email'],
+            'teacher_mobile' => $data['teacher_mobile'],
+            'teacher_company' => isset($data['teacher_company']) ? $data['teacher_company'] : '',
+            'teacher_position' => isset($data['teacher_position']) ? $data['teacher_position'] : '',
+            'position_id' => isset($data['position_id']) ? $data['position_id'] : null,
+            'teacher_username' => isset($data['teacher_username']) ? $data['teacher_username'] : null,
+            'comp_id' => isset($data['comp_id']) ? $data['comp_id'] : null, // ดึงจาก $data
+            'emp_create' => $user_id,
+            'date_create' => $date_create
+        );
+
+        $fields = implode(", ", array_keys($insert_data));
+        $placeholders = implode(", ", array_fill(0, count($insert_data), '?'));
+        $insert_sql = "INSERT INTO classroom_teacher ($fields) VALUES ($placeholders)";
+        $insert_stmt = $mysqli->prepare($insert_sql);
+        if ($insert_stmt === false) {
+            die(json_encode(array('status' => 'error', 'message' => "Prepare failed: " . $mysqli->error)));
+        }
+        $types = str_repeat('s', count($insert_data));
+        $values = array_values($insert_data);
+        $bind_values = array($types);
+        for ($i = 0; $i < count($values); $i++) {
+            $bind_values[] = &$values[$i];
+        }
+        call_user_func_array(array($insert_stmt, 'bind_param'), $bind_values);
+
+        if ($insert_stmt->execute()) {
+            $new_teacher_id = $mysqli->insert_id;
+            $join_sql = "INSERT INTO classroom_teacher_join (classroom_id, teacher_id, comp_id, status, emp_create, date_create) VALUES (?, ?, ?, 0, ?, ?)";
+            $join_stmt = $mysqli->prepare($join_sql);
+            $join_stmt->bind_param('sssss', $classroom_id, $new_teacher_id, $data['comp_id'], $user_id, $date_create); // ดึงจาก $data
+            if ($join_stmt->execute()) {
+                echo json_encode(array('status' => 'success', 'message' => 'New teacher added from ' . $ref_type . ' successfully.'));
+            } else {
+                echo json_encode(array('status' => 'error', 'message' => "Error inserting into join table: " . $join_stmt->error));
+            }
+            $join_stmt->close();
+        } else {
+            echo json_encode(array('status' => 'error', 'message' => "Error inserting into teacher table: " . $insert_stmt->error));
+        }
+        $insert_stmt->close();
+    } else {
+        echo json_encode(array('status' => 'error', 'message' => 'Data not found for the selected ' . $ref_type . '.'));
+    }
+    $mysqli->close();
+    exit();
+}
 ?>

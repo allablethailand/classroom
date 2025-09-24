@@ -132,7 +132,7 @@ function buildStudent() {
                 "data": "student_email"
             },{ 
                 "targets": 10,
-                "data": "register_date"
+                "data": "date_create"
             },{
                 // เพิ่มคอลัมน์ Action
                 "targets": 11,
@@ -150,7 +150,7 @@ function buildStudent() {
         $('div#tb_student_filter.dataTables_filter label span').remove();
         var template = `
             <input type="search" class="form-control input-sm search-datatable" placeholder="" autocomplete="off" style="margin-bottom:0px !important;">
-             <button type="button" class="btn btn-green" style="font-size:12px;" onclick="manageStudent('')"><i class="fas fa-plus"></i> <span lang="en">Student</span></button>
+            <button type="button" class="btn btn-green" onclick="addStudentOptions()"><i class="fas fa-plus"></i> Student</button>
         `;
         $('div#tb_student_filter.dataTables_filter input').hide();
         $('div#tb_student_filter.dataTables_filter label').append(template);
@@ -183,412 +183,308 @@ function manageStudent(student_id){
     $.redirect(`form?type=student&id=${student_id}`,{classroom_id: classroom_id},'post','_self');
 }
 
-function setupAddressAutocomplete() {
-    // ใช้ debounce เพื่อลดการเรียก API เมื่อผู้ใช้พิมพ์
-    const debounce = (func, delay) => {
-        let timeoutId;
-        return (...args) => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                func.apply(null, args);
-            }, delay);
-        };
-    };
+// ฟังก์ชันสำหรับเลือกและบันทึกข้อมูลนักเรียน
+function selectStudent(id, type) {
+    const classroom_id = $("#classroom_id").val();
 
-    const handleSearch = debounce(async (event) => {
-        const target = $(event.target);
-        const term = target.val();
+    // กำหนดว่า Modal ไหนที่จะถูกซ่อน
+    const modalToHide = (type === 'employee') ? $('#employeeStudentModal') : $('#customerStudentModal');
+    modalToHide.modal('hide');
 
-        if (term.length >= 3) {
-            try {
-                // ตัวอย่างการดึงข้อมูลจาก API ไปรษณีย์
-                const result = await thailand.search(term);
-                if (result.length > 0) {
-                    const data = result[0];
-                    $('#student_address_subdistrict').val(data.subdistrict);
-                    $('#student_address_district').val(data.district);
-                    $('#student_address_province').val(data.province);
-                    $('#student_address_zipcode').val(data.zipcode);
-                }
-            } catch (error) {
-                console.error("Autocomplete failed:", error);
-            }
-        }
-    }, 500);
-
-    // ดักจับการเปลี่ยนแปลงในช่อง ตำบล, อำเภอ, จังหวัด และ รหัสไปรษณีย์
-    $('#student_address_subdistrict, #student_address_district, #student_address_province, #student_address_zipcode').on('input', handleSearch);
-}
-
- 
-let selectedStudentFiles = [];
-let currentStudentFiles = [];
-
-// Function สำหรับดึงข้อมูลเพื่อแก้ไข
-function fetchStudentData(student_id) {
-    $.ajax({
-        url: "/classroom/management/actions/student.php",
-        type: "POST",
-        data: {
-            action: "getStudentData",
-            student_id: student_id
-        },
-        dataType: 'json',
-        success: function(response) {
-            if (response) {
-                $('#student_id').val(response.student_id);
-                const perfix_map = ['นาย', 'นาง', 'นางสาว'];
-                $('#student_perfix').val(perfix_map[parseInt(response.student_perfix)]);
-                $('#student_firstname_th').val(response.student_firstname_th);
-                $('#student_lastname_th').val(response.student_lastname_th);
-                $('#student_firstname_en').val(response.student_firstname_en);
-                $('#student_lastname_en').val(response.student_lastname_en);
-                $('#student_nickname_th').val(response.student_nickname_th);
-                $('#student_nickname_en').val(response.student_nickname_en);
-                $('#student_idcard').val(response.student_idcard);
-                $('#student_passport').val(response.student_passport);
-                $('#student_birth_date').val(response.student_birth_date);
-                $('#student_mobile').val(response.student_mobile);
-                $('#student_email').val(response.student_email);
-                $('#student_gender').val(response.student_gender);
-                $('#student_company').val(response.student_company);
-                $('#student_position').val(response.student_position);
-                $('#student_experience').val(response.student_experience);
-                $('#student_username').val(response.student_username);
-                $('#student_bio').val(response.student_bio);
-                $('#student_password_key').val('');
-                
-                // 1. ไม่ต้องแสดงรหัสผ่านเมื่อดึงข้อมูลมา
-                $('#student_password').val('');
-
-                // จัดการที่อยู่
-                if (response.student_address) {
-                    const addressParts = response.student_address.split(',').map(part => part.trim());
-                    $('#student_address_house_no').val(addressParts[0] || '');
-                    $('#student_address_road').val(addressParts[1] || '');
-                    $('#student_address_subdistrict').val(addressParts[2] || '');
-                    $('#student_address_district').val(addressParts[3] || '');
-                    $('#student_address_province').val(addressParts[4] || '');
-                    $('#student_address_zipcode').val(addressParts[5] || '');
-                }
-
-                // จัดการประวัติการศึกษา
-                if (response.student_education) {
-                    try {
-                        const educationData = JSON.parse(response.student_education);
-                        $.each(educationData, function(level, data) {
-                            $(`.education-input[data-level="${level}"][data-field="school"]`).val(data.school);
-                            $(`.education-input[data-level="${level}"][data-field="major"]`).val(data.major);
-                        });
-                    } catch (e) {
-                        console.error("Failed to parse education JSON:", e);
+    // เปลี่ยน Swal.fire เป็น swal (รุ่นเก่า)
+    swal({
+        title: 'ยืนยันการเพิ่มข้อมูล',
+        text: `คุณต้องการเพิ่ม ${type} นี้เป็นนักเรียนใช่หรือไม่?`,
+        type: 'info', // ใช้ 'info' แทน 'question' เพื่อให้รองรับ SweetAlert รุ่นเก่า
+        showCancelButton: true,
+        confirmButtonText: 'ใช่',
+        cancelButtonText: 'ยกเลิก',
+        closeOnConfirm: false,
+        closeOnCancel: true,
+        customClass: 'swal-high-zindex'
+    },
+    // ใช้ callback function แทน .then()
+    function(isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: "/classroom/management/actions/student.php",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    action: "addStudentFromRef",
+                    ref_id: id,
+                    ref_type: type,
+                    classroom_id: classroom_id
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        swal('สำเร็จ', response.message, 'success');
+                        
+                        // Reload ตารางหลักนักเรียน
+                        if (window.tb_student) {
+                            window.tb_student.ajax.reload(null, false);
+                        }
+                        
+                        // เปิด Modal ที่ถูกต้องกลับมาหลังจากดีเลย์สั้นๆ
+                        setTimeout(() => {
+                            if (type === 'employee') {
+                                showAddEmployeeStudentPopup();
+                            } else if (type === 'customer') {
+                                showAddCustomerStudentPopup();
+                            }
+                        }, 500);
+                        
+                    } else {
+                        // เปิด Modal กลับมาเมื่อเกิดข้อผิดพลาด
+                        if (type === 'employee') {
+                            showAddEmployeeStudentPopup();
+                        } else if (type === 'customer') {
+                            showAddCustomerStudentPopup();
+                        }
+                        swal('เกิดข้อผิดพลาด', response.message, 'error');
                     }
+                },
+                error: function(xhr, status, error) {
+                    // เปิด Modal กลับมาเมื่อเกิดข้อผิดพลาดจากเซิร์ฟเวอร์
+                    if (type === 'employee') {
+                        showAddEmployeeStudentPopup();
+                    } else if (type === 'customer') {
+                        showAddCustomerStudentPopup();
+                    }
+                    swal('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
                 }
-
-                // จัดการไฟล์รูปภาพและเอกสารแนบ
-                if (response.student_image_profile) {
-                    showProfilePreview(response.student_image_profile);
-                }
-                if (response.student_card_front) {
-                    showCardPreview(response.student_card_front, '#current-card-front');
-                }
-                if (response.student_card_back) {
-                    showCardPreview(response.student_card_back, '#current-card-back');
-                }
-                
-                // ✅ แก้ไข: กำหนดค่า currentStudentFiles จาก response โดยตรง
-                if (response.student_attach_document && Array.isArray(response.student_attach_document)) {
-                    currentStudentFiles = response.student_attach_document;
-                    displaySelectedFiles1(); // เรียกใช้ฟังก์ชันแสดงผล
-                    $('#student_attach_document_current').val(response.student_attach_document.join('|'));
-                } else {
-                    currentStudentFiles = [];
-                    displaySelectedFiles1();
-                    $('#student_attach_document_current').val('');
-                }
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr.responseText);
-            swal({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'เกิดข้อผิดพลาดในการดึงข้อมูลนักเรียน'
             });
         }
     });
 }
 
-function saveStudent() {
-    // เพิ่มการตรวจสอบความถูกต้องของข้อมูลก่อนส่ง
-    if (!validateForm()) {
-        return;
-    }
+// ฟังก์ชันสำหรับแสดง Pop-up และตาราง Employee เพื่อเพิ่มเป็นนักเรียน
+function showAddEmployeeStudentPopup() {
+    // HTML string สำหรับ Modal component
+    const employeeStudentModalHtml = `
+        <div class="modal fade" id="employeeStudentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">เพิ่มนักเรียนจาก Employee</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="tb_employees_student">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>ชื่อ - นามสกุล</th>
+                                        <th>เบอร์โทร</th>
+                                        <th>อีเมล</th>
+                                        <th><i class="fas fa-check-circle"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 
-    const formData = new FormData($("#studentForm")[0]);
-    formData.append('action', 'saveStudent');
+    // เพิ่ม Modal HTML ลงใน body
+    $('body').append(employeeStudentModalHtml);
 
-    // 3. แปลงข้อมูลการศึกษาให้อยู่ในรูปแบบ JSON string
-    const education = {};
-    $('.education-input').each(function() {
-        const level = $(this).data('level');
-        const field = $(this).data('field');
-        if (!education[level]) {
-            education[level] = {};
-        }
-        education[level][field] = $(this).val();
-    });
-    formData.append('student_education', JSON.stringify(education));
+    // รับ element ของ Modal
+    const employeeStudentModal = $('#employeeStudentModal');
 
-    const address = [
-        $('#student_address_house_no').val(),
-        $('#student_address_road').val(),
-        $('#student_address_subdistrict').val(),
-        $('#student_address_district').val(),
-        $('#student_address_province').val(),
-        $('#student_address_zipcode').val()
-    ].join(', ');
-    formData.append('student_address', address);
+    // แสดง Modal
+    employeeStudentModal.modal('show');
 
-    // 2. เพิ่มไฟล์ที่เลือกใหม่เข้าไปใน FormData
-    selectedStudentFiles.forEach(file => {
-        formData.append('student_attach_document[]', file);
-    });
-    
-    // ส่งข้อมูลไปยังเซิร์ฟเวอร์
-    $.ajax({
-        url: "/classroom/management/actions/student.php",
-        type: "POST",
-        data: formData,
-        contentType: false,
-        processData: false,
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 'success') {
-                swal({
-                    icon: 'success',
-                    title: 'บันทึกข้อมูลสำเร็จ',
-                    text: response.message || 'บันทึกข้อมูลเรียบร้อย'
-                });
-                setTimeout(() => {
-                    $(".systemModal").modal('hide');
-                    if (window.tb_student) {
-                        window.tb_student.ajax.reload(null, false);
+    // จัดการ events ของ Modal
+    employeeStudentModal.on('shown.bs.modal', function() {
+        // Initialize DataTables ภายใน Modal
+        const employeeStudentTable = $('#tb_employees_student').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/classroom/management/actions/student.php",
+                "type": "POST",
+                "data": { action: "getEmployees" }
+            },
+            "columns": [
+                { "data": "emp_id" },
+                { "data": "full_name" },
+                { "data": "tel_office" },
+                { "data": "email" },
+                {
+                    "data": "emp_id",
+                    "render": function(data, type, row) {
+                        return `<button class="btn btn-success btn-circle add-from-emp" data-id="${data}" data-type="employee"><i class="fas fa-check"></i></button>`;
                     }
-                }, 2000);
-            } else {
-                swal({
-                    icon: 'error',
-                    title: 'บันทึกข้อมูลไม่สำเร็จ',
-                    text: response.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'
-                });
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr.responseText);
-            swal({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'เกิดข้อผิดพลาดในการส่งข้อมูล'
-            });
-        }
+                }
+            ],
+            "language": default_language,
+            "responsive": true,
+            "deferRender": true
+        });
+
+        // เพิ่ม Event listener สำหรับปุ่ม "เพิ่ม"
+        employeeStudentTable.on('click', '.add-from-emp', function() {
+            const ref_id = $(this).data('id');
+            const ref_type = $(this).data('type');
+            selectStudent(ref_id, ref_type);
+        });
+    });
+
+    // ล้าง element Modal ออกจาก DOM เมื่อปิด
+    employeeStudentModal.on('hidden.bs.modal', function() {
+        $(this).remove();
     });
 }
 
-// ฟังก์ชันสำหรับตรวจสอบความถูกต้องของฟอร์ม
-function validateForm() {
-    let isValid = true;
+// ฟังก์ชันสำหรับแสดง Pop-up และตาราง Customer เพื่อเพิ่มเป็นนักเรียน
+function showAddCustomerStudentPopup() {
+    // HTML string สำหรับ Modal component
+    const customerStudentModalHtml = `
+        <div class="modal fade" id="customerStudentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">เพิ่มนักเรียนจาก Customer</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="tb_customers_student">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>ชื่อ</th>
+                                        <th>เบอร์โทร</th>
+                                        <th>อีเมล</th>
+                                        <th><i class="fas fa-check-circle"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 
-    // ล้างสถานะ invalid เดิมทั้งหมด
-    $('#studentForm .form-control').removeClass('is-invalid');
-    $('#address-invalid-feedback').hide();
+    // เพิ่ม Modal HTML ลงใน body
+    $('body').append(customerStudentModalHtml);
 
-    // ข้อมูลส่วนตัว
-    const perfix = $('#student_perfix').val();
-    if (!perfix) {
-        $('#student_perfix').addClass('is-invalid');
-        isValid = false;
-    }
+    // รับ element ของ Modal
+    const customerStudentModal = $('#customerStudentModal');
 
-    const firstnameEn = $('#student_firstname_en').val();
-    if (!firstnameEn) {
-        $('#student_firstname_en').addClass('is-invalid');
-        isValid = false;
-    }
+    // แสดง Modal
+    customerStudentModal.modal('show');
 
-    const lastnameEn = $('#student_lastname_en').val();
-    if (!lastnameEn) {
-        $('#student_lastname_en').addClass('is-invalid');
-        isValid = false;
-    }
+    // จัดการ events ของ Modal
+    customerStudentModal.on('shown.bs.modal', function() {
+        // Initialize DataTables ภายใน Modal
+        const customerStudentTable = $('#tb_customers_student').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/classroom/management/actions/student.php",
+                "type": "POST",
+                "data": { action: "getCustomers" }
+            },
+            "columns": [
+                { "data": "cus_id" },
+                { "data": "cus_name_th" },
+                { "data": "cus_tel_no" },
+                { "data": "cus_email" },
+                {
+                    "data": "cus_id",
+                    "render": function(data, type, row) {
+                        return `<button class="btn btn-success btn-circle add-from-cus" data-id="${data}" data-type="customer"><i class="fas fa-check"></i></button>`;
+                    }
+                }
+            ],
+            "language": default_language,
+            "responsive": true,
+            "deferRender": true
+        });
 
-    const idcard = $('#student_idcard').val();
-    if (!idcard || idcard.length !== 13) {
-        $('#student_idcard').addClass('is-invalid');
-        isValid = false;
-    }
-
-    const mobile = $('#student_mobile').val();
-    if (!mobile || mobile.length !== 10) {
-        $('#student_mobile').addClass('is-invalid');
-        isValid = false;
-    }
-
-    const email = $('#student_email').val();
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-        $('#student_email').addClass('is-invalid');
-        isValid = false;
-    }
-
-    const gender = $('#student_gender').val();
-    if (!gender) {
-        $('#student_gender').addClass('is-invalid');
-        isValid = false;
-    }
-    
-    // ที่อยู่
-    const addressFields = [
-        'student_address_house_no',
-        'student_address_subdistrict',
-        'student_address_district',
-        'student_address_province',
-        'student_address_zipcode'
-    ];
-    let addressValid = true;
-    addressFields.forEach(id => {
-        if (!$('#' + id).val()) {
-            $('#' + id).addClass('is-invalid');
-            addressValid = false;
-        }
-    });
-    if (!addressValid) {
-        $('#address-invalid-feedback').show();
-        isValid = false;
-    }
-
-    // ข้อมูลผู้ใช้และระบบ
-    const username = $('#student_username').val();
-    const password = $('#student_password').val();
-    const passwordKey = $('#student_password_key').val();
-
-    if (!username) {
-        $('#student_username').addClass('is-invalid');
-        isValid = false;
-    }
-
-    if (!password || password.length < 6) {
-        $('#student_password').addClass('is-invalid');
-        isValid = false;
-    }
-
-    if (password !== passwordKey) {
-        $('#student_password_key').addClass('is-invalid');
-        isValid = false;
-    }
-
-    return isValid;
-}
-
-// 2. ฟังก์ชันสำหรับแสดงไฟล์ที่เลือกไว้และไฟล์เดิม
-function displaySelectedFiles1() {
-    const previewContainer1 = $('#document-preview-container');
-    previewContainer1.empty();
-    
-    // แสดงไฟล์เดิมที่อยู่ในฐานข้อมูล
-    currentStudentFiles.forEach((path, index) => {
-        const filename = path.split('/').pop();
-        const fileItem = $(`<div class="d-flex align-items-center mb-1"><span class="me-2">${filename}</span> <button type="button" class="btn btn-danger btn-sm delete-file" data-type="current" data-index="${index}">&times;</button></div>`);
-        previewContainer1.append(fileItem);
+        // เพิ่ม Event listener สำหรับปุ่ม "เพิ่ม"
+        customerStudentTable.on('click', '.add-from-cus', function() {
+            const ref_id = $(this).data('id');
+            const ref_type = $(this).data('type');
+            selectStudent(ref_id, ref_type);
+        });
     });
 
-    // แสดงไฟล์ใหม่ที่เลือกไว้
-    selectedStudentFiles.forEach((file, index) => {
-        const fileItem = $(`<div class="d-flex align-items-center mb-1"><span class="me-2">${file.name}</span> <button type="button" class="btn btn-danger btn-sm delete-file" data-type="new" data-index="${index}">&times;</button></div>`);
-        previewContainer1.append(fileItem);
-    });
-
-    // เพิ่ม event listener ให้กับปุ่มลบ
-    previewContainer1.off('click', '.delete-file');
-    previewContainer1.on('click', '.delete-file', function() {
-        const type = $(this).data('type');
-        const index = $(this).data('index');
-        if (type === 'current') {
-            currentStudentFiles.splice(index, 1);
-        } else {
-            selectedStudentFiles.splice(index, 1);
-        }
-        displaySelectedFiles1();
+    // ล้าง element Modal ออกจาก DOM เมื่อปิด
+    customerStudentModal.on('hidden.bs.modal', function() {
+        $(this).remove();
     });
 }
 
-// ฟังก์ชันสำหรับตั้งค่า preview ไฟล์
-function setupFilePreview1() {
-    $('#student_image_profile').on('change', function() {
-        showProfilePreview(this.files[0]);
+// ฟังก์ชันใหม่สำหรับการแสดงตัวเลือกการเพิ่มนักเรียน
+function addStudentOptions() {
+    swal({
+        title: 'เลือกประเภทนักเรียนที่ต้องการเพิ่ม',
+        showCancelButton: true,
+        showConfirmButton: false,
+        cancelButtonText: 'ยกเลิก',
+        html: true,
+        customClass: 'bottom-custumer-employee',
+        text: `
+            <div class="d-flex justify-content-around mt-3">
+                <button id="add-employee-student" class="btn btn-info mx-2" style="width:80%;"><i class="fas fa-users" ></i> เพิ่มจาก Employee</button>
+                <button id="add-customer-student" class="btn btn-primary mx-2" style="width:80%;"><i class="fas fa-user-tie" ></i> เพิ่มจาก Customer</button>
+                <button id="add-manual-student" class="btn btn-success mx-2"><i class="fas fa-plus-circle"></i> กรอกข้อมูลเอง</button>
+            </div>
+        `
     });
-    $('#student_card_front').on('change', function() {
-        showCardPreview(this.files[0], '#current-card-front');
-    });
-    $('#student_card_back').on('change', function() {
-        showCardPreview(this.files[0], '#current-card-back');
-    });
-    // เพิ่ม event listener สำหรับช่องอัปโหลดเอกสาร
-    $('#student_attach_document').on('change', function() {
-        handleMultipleFileSelection1(this.files);
-    });
+
+    setTimeout(function() {
+        $('#add-employee-student').on('click', function() {
+            swal.close();
+            showAddEmployeeStudentPopup();
+        });
+
+        $('#add-customer-student').on('click', function() {
+            swal.close();
+            showAddCustomerStudentPopup();
+        });
+
+        $('#add-manual-student').on('click', function() {
+            swal.close();
+            let classroom_id = $("#classroom_id").val();
+            $.redirect(`form?type=student&id=`,{classroom_id: classroom_id},'post','_self');
+        });
+    }, 500); 
 }
 
-// ฟังก์ชันสำหรับจัดการการเลือกไฟล์หลายไฟล์
-function handleMultipleFileSelection1(files) {
-    for (let i = 0; i < files.length; i++) {
-        selectedStudentFiles.push(files[i]);
-    }
-    displaySelectedFiles1();
-    $('#student_attach_document').val('');
-}
-
-// ฟังก์ชันแสดงตัวอย่างรูปโปรไฟล์
-function showProfilePreview(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        $('#profile-img').attr('src', e.target.result).show();
-        $('#upload-icon-overlay').hide();
-    };
-    if (file instanceof File) {
-        reader.readAsDataURL(file);
-    } else if (typeof file === 'string' && file.length > 0) {
-        $('#profile-img').attr('src', file).show();
-        $('#upload-icon-overlay').hide();
-    } else {
-        $('#profile-img').hide().attr('src', '');
-        $('#upload-icon-overlay').show();
-    }
-}
-
-// ฟังก์ชันแสดงตัวอย่างรูปนามบัตร
-function showCardPreview(file, targetId) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        $(targetId).html(`<img src="${e.target.result}" class="img-thumbnail mt-2" style="max-height: 200px;" alt="Image Preview">`);
-    };
-    if (file instanceof File) {
-        reader.readAsDataURL(file);
-    } else if (typeof file === 'string' && file.length > 0) {
-        $(targetId).html(`<img src="${file}" class="img-thumbnail mt-2" style="max-height: 200px;" alt="Current Image">`);
-    } else {
-        $(targetId).html('');
-    }
-}
 // --- ฟังก์ชันลบนักเรียน ---
 function deleteStudent(student_id) {
+    // เปลี่ยน Swal.fire เป็น swal (รุ่นเก่า)
     swal({
         title: 'คุณแน่ใจหรือไม่?',
         text: "คุณต้องการลบข้อมูลนักเรียนท่านนี้ใช่ไหม? การกระทำนี้ไม่สามารถย้อนกลับได้",
-        icon: 'warning',
-        buttons: ["ยกเลิก", "ใช่, ลบเลย!"],
-        dangerMode: true,
-    }).then((willDelete) => {
-        if (willDelete) {
+        type: 'warning', // เปลี่ยน icon เป็น type
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'ใช่, ลบเลย!',
+        cancelButtonText: 'ยกเลิก',
+        closeOnConfirm: false,
+        closeOnCancel: true
+    },
+    // ใช้ callback function แทน .then()
+    function(isConfirm) {
+        if (isConfirm) {
             $.ajax({
                 url: "/classroom/management/actions/student.php",
                 type: "POST",
@@ -598,10 +494,10 @@ function deleteStudent(student_id) {
                 },
                 dataType: 'json',
                 success: function(response) {
-                    if (response.success) {
+                    if (response.status === 'success') { // เปลี่ยน response.success เป็น response.status === 'success' เพื่อให้เหมือนฝั่งครู
                         swal(
                             'ลบเรียบร้อย!',
-                            response.message || 'ลบข้อมูลนักเรียนเรียบร้อยแล้ว',
+                            response.message,
                             'success'
                         );
                         if (window.tb_student) {
@@ -610,7 +506,7 @@ function deleteStudent(student_id) {
                     } else {
                         swal(
                             'เกิดข้อผิดพลาด!',
-                            'ไม่สามารถลบข้อมูลนักเรียนได้: ' + (response.message || 'ไม่ทราบสาเหตุ'),
+                            response.message,
                             'error'
                         );
                     }
@@ -619,7 +515,7 @@ function deleteStudent(student_id) {
                     console.error(xhr.responseText);
                     swal(
                         'เกิดข้อผิดพลาด!',
-                        'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์',
+                        'ไม่สามารถลบข้อมูลนักเรียนได้',
                         'error'
                     );
                 }
