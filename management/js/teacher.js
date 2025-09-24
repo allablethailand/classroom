@@ -8,7 +8,7 @@ function getTeacherTemplate() {
         <table class="table table-border" id="tb_teacher">
             <thead>
                 <tr>
-                    <th><span lang="en">No.</span></th>
+                    <th></th>
                     <th lang="en">Name</th>
                     <th lang="en">Position</th>
                     <th lang="en">Company</th>
@@ -51,60 +51,70 @@ function buildTeacher() {
                 });
             },
             "order": [[0,'asc']],
-             "columns": [
-            {
-                // แก้ไขตรงนี้: ให้ data ชี้ไปที่ 'teacher_id'
-                "data": "teacher_id",
-                "render": function (data, type, row, meta) {
-                    return data; // แสดงค่า teacher_id
+            "columns": [
+                { 
+                    "targets": 0,
+                    "data": "teacher_image_profile",
+                    "render": function (data,type,row,meta) {
+                        let teacher_gender = row['teacher_gender'];
+                        var img_error = {
+                            'M': '/images/default.png',
+                            'F': '/images/female.png',
+                            'O': '/images/icon-01.png'
+                        }[teacher_gender] || '/images/default.png'; 
+                        return `
+                            <div class="avatar" style="border:3px solid #FFFFFF;">
+                                <img src="${data}" onerror="this.src='${img_error}'">
+                            </div>
+                        `;
+                    }
+                },
+                {
+                    "data": "teacher_name",
+                    "render": function (data, type, row, meta) {
+                        return data;
+                    }
+                },
+                {
+                    "data": "teacher_job_position",
+                    "render": function (data, type, row, meta) {
+                        return data;
+                    }
+                },
+                {
+                    "data": "teacher_company",
+                    "render": function (data, type, row, meta) {
+                        return data;
+                    }
+                },
+                {
+                    "data": "teacher_position",
+                    "render": function (data, type, row, meta) {
+                        return data;
+                    }
+                },
+                {
+                    "data": "date_create",
+                    "render": function (data, type, row, meta) {
+                        return data;
+                    }
+                },
+                {
+                    "data": "emp_create",
+                    "render": function (data, type, row, meta) {
+                        return data;
+                    }
+                },
+                {
+                    "data": "teacher_id",
+                    "render": function (data, type, row, meta) {
+                        return `
+                            <button class="btn btn-warning btn-circle" onclick="manageTeacher('${data}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-circle" onclick="deleteTeacher('${data}')"><i class="fas fa-trash-alt"></i></button>
+                        `;
+                    }
                 }
-            },
-            {
-                "data": "teacher_name",
-                "render": function (data, type, row, meta) {
-                    return data;
-                }
-            },
-            {
-                "data": "teacher_job_position",
-                "render": function (data, type, row, meta) {
-                    return data;
-                }
-            },
-            {
-                "data": "teacher_company",
-                "render": function (data, type, row, meta) {
-                    return data;
-                }
-            },
-            {
-                "data": "teacher_position",
-                "render": function (data, type, row, meta) {
-                    return data;
-                }
-            },
-            {
-                "data": "date_create",
-                "render": function (data, type, row, meta) {
-                    return data;
-                }
-            },
-            {
-                "data": "emp_create",
-                "render": function (data, type, row, meta) {
-                    return data;
-                }
-            },
-            {
-                "data": "teacher_id",
-                "render": function (data, type, row, meta) {
-                    return `
-                        <button class="btn btn-warning btn-circle" onclick="manageTeacher('${data}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-circle" onclick="deleteTeacher('${data}')"><i class="fas fa-trash-alt"></i></button>
-                    `;
-                }
-            }
-        ]
+            ]
         });
         $('div#tb_teacher_filter.dataTables_filter label input').remove();
         $('div#tb_teacher_filter.dataTables_filter label span').remove();
@@ -116,7 +126,7 @@ function buildTeacher() {
         $('div#tb_teacher_filter.dataTables_filter label').append(template);
         var searchDataTable = $.fn.dataTable.util.throttle(function (val) {
             if(typeof val != 'undefined') {
-                tb_teacher.search(val).draw();   
+                tb_teacher.search(val).draw(); 
             } 
         },1000);
         $('.search-datatable').on('keyup',function(e) {
@@ -210,7 +220,7 @@ function addTeacherOptions() {
         text: `
             <div class="d-flex justify-content-around mt-3">
                 <button id="add-employee" class="btn btn-info mx-2" style="width:80%;"><i class="fas fa-users" ></i> เพิ่มจาก Employee</button>
-                <button id="add-customer" class="btn btn-primary mx-2" style="width:80%;"><i class="fas fa-user-tie" ></i> เพิ่มจาก Customer</button>
+                <button id="add-customer" class="btn btn-primary mx-2" style="width:80%;"><i class="fas fa-user-tie" ></i> เพิ่มจาก Contact</button>
                 <button id="add-manual" class="btn btn-success mx-2"><i class="fas fa-plus-circle"></i> กรอกข้อมูลเอง</button>
             </div>
         `,
@@ -336,7 +346,7 @@ function showAddCustomerPopup() {
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">เพิ่มครูจาก Customer</h4>
+                        <h4 class="modal-title" id="myModalLabel">เพิ่มครูจาก Contact</h4>
                     </div>
                     <div class="modal-body">
                         <div class="table-responsive">
@@ -390,7 +400,7 @@ function showAddCustomerPopup() {
                 {
                     "data": "cus_id",
                     "render": function(data, type, row) {
-                        return `<button class="btn btn-success btn-circle add-from-cus" data-id="${data}" data-type="customer"><i class="fas fa-check"></i></button>`;
+                        return `<button class="btn btn-success btn-circle add-from-cus" data-id="${data}" data-type="contact"><i class="fas fa-check"></i></button>`;
                     }
                 }
             ],
@@ -458,7 +468,7 @@ function selectPerson(id, type) {
                         setTimeout(() => {
                             if (type === 'employee') {
                                 showAddEmployeePopup();
-                            } else if (type === 'customer') {
+                            } else if (type === 'contact') {
                                 showAddCustomerPopup();
                             }
                         }, 500);
@@ -467,7 +477,7 @@ function selectPerson(id, type) {
                         // Re-open the modal on error
                         if (type === 'employee') {
                             showAddEmployeePopup();
-                        } else if (type === 'customer') {
+                        } else if (type === 'contact') {
                             showAddCustomerPopup();
                         }
                         swal('เกิดข้อผิดพลาด', response.message, 'error');
@@ -477,7 +487,7 @@ function selectPerson(id, type) {
                     // Re-open the modal on server error
                     if (type === 'employee') {
                         showAddEmployeePopup();
-                    } else if (type === 'customer') {
+                    } else if (type === 'contact') {
                         showAddCustomerPopup();
                     }
                     swal('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
