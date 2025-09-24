@@ -124,10 +124,10 @@ function buildStudent() {
                 }
             },{ 
                 "targets": 8,
-                "data": "student_mobile"
+                "data": "student_email"
             },{ 
                 "targets": 9,
-                "data": "student_email"
+                "data": "student_mobile"
             },{ 
                 "targets": 10,
                 "data": "date_create"
