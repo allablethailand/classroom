@@ -92,8 +92,18 @@
             date_format(stu.student_birth_date, '%Y/%m/%d') as student_birth_date,
             CASE  WHEN stu.student_birth_date IS NULL OR stu.student_birth_date = '' THEN ''
             ELSE CONCAT(TIMESTAMPDIFF(YEAR, stu.student_birth_date, CURDATE()), ' Yrs.') END as student_age,
-            stu.student_username,
-            stu.student_password,
+            (
+                CASE
+                    when ifnull(cjoin.approve_status, 0) = 1 then stu.student_username
+                    else ''
+                END
+            ) as student_username,
+            (
+                CASE
+                    when ifnull(cjoin.approve_status, 0) = 1 then stu.student_password
+                    else ''
+                END
+            ) as student_password,
             stu.student_password_key,
             stu.student_company,
             stu.student_position,
