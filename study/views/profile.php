@@ -9,15 +9,15 @@ $student_id = $_SESSION['student_id'];
 // Updated SQL query to select all columns, including group_id
 // เพิ่มการ join ตาราง classroom_student_join และ classroom_group เพื่อดึง group_id และ group_color
 $sql_profile = "
-        SELECT 
-            cs.*, 
-            csj.group_id,
-            cg.group_color
-        FROM `classroom_student` cs
-        LEFT JOIN `classroom_student_join` csj ON cs.student_id = csj.student_id
-        LEFT JOIN `classroom_group` cg ON csj.group_id = cg.group_id
-        WHERE cs.student_id = ?
-    ";
+    SELECT 
+        cs.*, 
+        csj.group_id,
+        cg.group_color
+    FROM `classroom_student` cs
+    LEFT JOIN `classroom_student_join` csj ON cs.student_id = csj.student_id
+    LEFT JOIN `classroom_group` cg ON csj.group_id = cg.group_id
+    WHERE cs.student_id = ?
+";
 
 $stmt = $mysqli->prepare($sql_profile);
 $stmt->bind_param("i", $student_id);
@@ -69,6 +69,25 @@ while ($row_image = $result_images->fetch_assoc()) {
 }
 $stmt_images->close();
 // ----------------------------------------------------
+
+// *** ส่วนที่เพิ่มเข้ามาเพื่อดึงรูปภาพบริษัท ตามที่ร้องขอ ***
+$company_images = []; // สร้าง array เปล่าสำหรับเก็บรูปภาพบริษัท
+$sql_company_files = "
+    SELECT file_id, file_path
+    FROM classroom_student_company_photo
+    WHERE student_id = ? AND is_deleted = 0
+    ORDER BY file_id ASC
+";
+$stmt_company_files = $mysqli->prepare($sql_company_files);
+$stmt_company_files->bind_param("i", $student_id);
+$stmt_company_files->execute();
+$result_company_files = $stmt_company_files->get_result();
+while ($row_company_image = $result_company_files->fetch_assoc()) {
+    $company_images[] = $row_company_image;
+}
+$stmt_company_files->close();
+// ****************************************************
+
 // กำหนดสีขอบรูปภาพ
 $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_all['group_color']) : '#ff8c00';
 ?>
@@ -85,6 +104,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="/dist/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/dist/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/dist/css/sweetalert.css">
     <link rel="stylesheet" href="/dist/css/select2.min.css">
     <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
@@ -105,13 +125,13 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     <script src="/classroom/study/js/profile.js?v=<?php echo time(); ?>" type="text/javascript"></script>
     <style>
         /* 🎨 UI/UX Enhancements to match the image */
-        body {
+        /* body {
             background-color: #f0f2f5;
             font-family: 'Kanit', sans-serif;
             color: #333;
             min-height: auto;
             overflow-y: auto;
-        }
+        } */
 
         .profile-header-container {
             background: url('https://www.trandar.com//public/news_img/photo_2025-09-03_17-51-32.jpg') no-repeat center center;
@@ -629,7 +649,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="carousel-container">
                     <?php foreach ($profile_images as $index => $image_path) : ?>
                         <div class="carousel-item <?= ($index === 0) ? 'active' : ''; ?>" >
-                            <img src="<?= GetUrl($image_path); ?>" alt="Profile Image <?= $index + 1; ?>" style=" border-color: <?= $profile_border_color; ?>;">
+                            <img src="<?= GetUrl($image_path); ?> " onerror="this.src='/images/default.png'" alt="Profile Image <?= $index + 1; ?>" style=" border-color: <?= $profile_border_color; ?>;">
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -838,6 +858,79 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 </div>
             </div>
         </div>
+
+         <div class="info-grid-section">
+            <div class="section-header-icon">
+                <i class="fas fa-building" style="font-size: 25px;"></i>
+                <h3 class="section-title" style="padding-left:10px;">บริษัท</h3>
+            </div>
+            <div class="row">
+                <?php if (!empty($row_all["student_company_url"])): ?>
+                <div class="col-md-6">
+                    <div class="info-item-box" style="display: block;">
+                        <strong>URL บริษัท:</strong>
+                        <span class="info-text">
+                            <a href="<?= htmlspecialchars($row_all["student_company_url"]); ?>" target="_blank"
+                                rel="noopener noreferrer">
+                                <?= htmlspecialchars($row_all["student_company_url"]); ?>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($row_all["student_company_detail"])): ?>
+                <div class="col-md-12">
+                    <div class="info-item-box" style="display: block;">
+                        <strong>รายละเอียดบริษัท:</strong>
+                        <div class="info-text" style="white-space: pre-wrap; margin-top: 5px;">
+                            <?= htmlspecialchars($row_all["student_company_detail"]); ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+
+        
+        <?php if (!empty($row_all["student_company"]) && !empty($row_all["student_company_logo"])): ?>
+        <div class="info-grid-section">
+            <div class="section-header-icon">
+                <i style="font-size: 25px;"></i>
+                <h3 class="section-title" style="padding-left:10px;">โลโก้บริษัท</h3>
+            </div>
+            <div class="row d-flex justify-content-center">
+                <div class="col-6 col-md-4 col-lg-3 text-center">
+                    <img src="<?= GetUrl($row_all["student_company_logo"]); ?>" 
+                        
+                        alt="Company Logo" 
+                        class="img-fluid rounded shadow-sm" 
+                        style="max-height: 150px; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+        </div>        
+        <?php if (!empty($company_images)): ?>
+        <div class="info-grid-section">
+            <div class="section-header-icon">
+                <i class="fas fa-images" style="font-size: 25px;"></i>
+                <h3 class="section-title" style="padding-left:10px;">รูปภาพบริษัท</h3>
+            </div>
+            <div class="row">
+                <?php foreach ($company_images as $image): ?>
+                <div class="col-6 col-md-4 col-lg-3 mb-4" style="padding-bottom: 1em;">
+                    <div class="image-wrapper-display">
+                        <img src="<?= GetUrl($image['file_path']); ?>" 
+                            
+                             alt="Company Photo" 
+                             class="img-fluid rounded shadow-sm company-display-image"
+                             style="width: 100%; height: 150px; object-fit: cover;">
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
     </div>
     <?php require_once("component/footer.php") ?>
 </body>
