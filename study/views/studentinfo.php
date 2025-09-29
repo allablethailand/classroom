@@ -51,7 +51,7 @@ if ($row_all === null) {
 // Check for contact information
 $has_contact = !empty($row_all['student_mobile']) || !empty($row_all['student_email']) || !empty($row_all['student_line']) || !empty($row_all['student_ig']) || !empty($row_all['student_facebook']);
 
-// --- ส่วนที่แก้ไขเพิ่มเข้ามา ---
+// --- ส่วนที่ดึง classroom_name ---
 // 1. ดึง classroom_id จาก classroom_student_join
 $sql_join = "SELECT classroom_id FROM `classroom_student_join` WHERE student_id = ?";
 $stmt_join = $mysqli->prepare($sql_join);
@@ -78,8 +78,8 @@ if ($join_data && $join_data['classroom_id']) {
         $classroom_name = $template_data['classroom_name'];
     }
 }
+// ---------------------------------
 
-// --------------------------------------------------------------------
 // ส่วนที่เพิ่มเข้ามาใหม่สำหรับการดึงรูปภาพโปรไฟล์ (ใช้ student_id จาก URL)
 $profile_images = []; // สร้าง array เปล่าสำหรับเก็บรูปภาพโปรไฟล์
 $sql_images = "SELECT file_path, file_order FROM `classroom_file_student` WHERE student_id = ? AND file_type = 'profile_image' AND is_deleted = 0 ORDER BY file_order ASC LIMIT 4";
@@ -94,9 +94,28 @@ while ($row_image = $result_images->fetch_assoc()) {
 $stmt_images->close();
 // --------------------------------------------------------------------
 
+// *** ส่วนที่เพิ่มเข้ามาเพื่อดึงรูปภาพบริษัท ตามที่ร้องขอ ***
+$company_images = []; // สร้าง array เปล่าสำหรับเก็บรูปภาพบริษัท
+$sql_company_files = "
+    SELECT file_id, file_path
+    FROM classroom_student_company_photo
+    WHERE student_id = ? AND is_deleted = 0
+    ORDER BY file_id ASC
+";
+$stmt_company_files = $mysqli->prepare($sql_company_files);
+$stmt_company_files->bind_param("i", $student_id);
+$stmt_company_files->execute();
+$result_company_files = $stmt_company_files->get_result();
+while ($row_company_image = $result_company_files->fetch_assoc()) {
+    $company_images[] = $row_company_image;
+}
+$stmt_company_files->close();
+// ****************************************************
+
 // กำหนดสีขอบรูปภาพเริ่มต้นเป็นสีส้ม ถ้าไม่มี group_color
 $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row_all['group_color']) : '#ff8c00';
 ?>
+
 <!doctype html>
 <html>
 
@@ -645,16 +664,13 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
 
     <div class="profile-header-container" style="gap: 5px;">
         <div class="settings-button-container">
-            <!-- <a href="setting" class="settings-button" title="ตั้งค่าโปรไฟล์">
-                <i class="fas fa-ellipsis-v"></i>
-            </a> -->
-        </div>
+            </div>
         <div class="profile-image-carousel">
             <?php if (count($profile_images) > 0) : ?>
                 <div class="carousel-container">
                     <?php foreach ($profile_images as $index => $image_path) : ?>
                         <div class="carousel-item <?= ($index === 0) ? 'active' : ''; ?>">
-                            <img src="<?= GetUrl($image_path); ?>" alt="Profile Image <?= $index + 1; ?>" style="border-color: <?= $profile_border_color1; ?>;">
+                            <img src="<?= GetUrl($image_path); ?>"  onerror="this.src='/images/default.png'" alt="Profile Image <?= $index + 1; ?>" style="border-color: <?= $profile_border_color1; ?>;">
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -663,7 +679,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                     <button class="carousel-nav next">&#10095;</button>
                 <?php endif; ?>
             <?php else : ?>
-                  <div class="carousel-container">
+                <div class="carousel-container">
                 <div class="carousel-item" >
                     <img src="../../../images/default.png" alt="Profile Picture" style="border-color: <?= $profile_border_color1; ?>;">
                 </div>
@@ -671,7 +687,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
             <?php endif; ?>
         </div>
         <h2 class="profile-name" style="
-     background-color: rgba(0, 0, 0, 0.1); 
+      background-color: rgba(0, 0, 0, 0.1); 
     
     backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์เบลอ */
     padding: 8px;
@@ -682,7 +698,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
         </h2>
         <?php if (!empty($row_all["student_address"])): ?>
             <p class="profile-location" style="
-     background-color: rgba(0, 0, 0, 0.1); 
+      background-color: rgba(0, 0, 0, 0.1); 
     
     backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์เบลอ */
     padding: 2px;
@@ -694,7 +710,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
             </p>
         <?php endif; ?>
         <p class="profile-bio" style="
-     background-color: rgba(0, 0, 0, 0.1); 
+      background-color: rgba(0, 0, 0, 0.1); 
     
     backdrop-filter: blur(5px); /* เพิ่มเอฟเฟกต์เบลอ */
     padding: 4px;
@@ -865,6 +881,79 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                 </div>
             </div>
         </div>
+
+        <div class="info-grid-section">
+            <div class="section-header-icon">
+                <i class="fas fa-building" style="font-size: 25px;"></i>
+                <h3 class="section-title" style="padding-left:10px;">บริษัท</h3>
+            </div>
+            <div class="row">
+                <?php if (!empty($row_all["student_company_url"])): ?>
+                <div class="col-md-6">
+                    <div class="info-item-box" style="display: block;">
+                        <strong>URL บริษัท:</strong>
+                        <span class="info-text">
+                            <a href="<?= htmlspecialchars($row_all["student_company_url"]); ?>" target="_blank"
+                                rel="noopener noreferrer">
+                                <?= htmlspecialchars($row_all["student_company_url"]); ?>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($row_all["student_company_detail"])): ?>
+                <div class="col-md-12">
+                    <div class="info-item-box" style="display: block;">
+                        <strong>รายละเอียดบริษัท:</strong>
+                        <div class="info-text" style="white-space: pre-wrap; margin-top: 5px;">
+                            <?= htmlspecialchars($row_all["student_company_detail"]); ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+
+        
+        <?php if (!empty($row_all["student_company"]) && !empty($row_all["student_company_logo"])): ?>
+        <div class="info-grid-section">
+            <div class="section-header-icon">
+                <i style="font-size: 25px;"></i>
+                <h3 class="section-title" style="padding-left:10px;">โลโก้บริษัท</h3>
+            </div>
+            <div class="row d-flex justify-content-center">
+                <div class="col-6 col-md-4 col-lg-3 text-center">
+                    <img src="<?= GetUrl($row_all["student_company_logo"]); ?>" 
+                        
+                        alt="Company Logo" 
+                        class="img-fluid rounded shadow-sm" 
+                        style="max-height: 150px; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+        </div>       
+        <?php if (!empty($company_images)): ?>
+        <div class="info-grid-section">
+            <div class="section-header-icon">
+                <i class="fas fa-images" style="font-size: 25px;"></i>
+                <h3 class="section-title" style="padding-left:10px;">รูปภาพบริษัท</h3>
+            </div>
+            <div class="row">
+                <?php foreach ($company_images as $image): ?>
+                <div class="col-6 col-md-4 col-lg-3 mb-4" style="padding-bottom: 1em;">
+                    <div class="image-wrapper-display">
+                        <img src="<?= GetUrl($image['file_path']); ?>" 
+                            
+                              alt="Company Photo" 
+                              class="img-fluid rounded shadow-sm company-display-image"
+                              style="width: 100%; height: 150px; object-fit: cover;">
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
     </div>
     <?php require_once("component/footer.php") ?>
 </body>

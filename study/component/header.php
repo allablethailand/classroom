@@ -172,7 +172,7 @@ $hide_profile = ["Profile", "Edit Profile", "Setting"];
                         </ul>
                     </div>
                     <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>;">
-                        <img style=" border-radius: 100%; object-fit: cover;"height="30" width="30" id="avatar_h" name="avatar_h"  title="test" src="<?php echo $student_image_profile; ?>">
+                        <img style=" border-radius: 100%; object-fit: cover;"height="30" width="30" id="avatar_h" name="avatar_h"  title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'" >
                     </a>
                 </div>
             </div>
@@ -209,7 +209,7 @@ $hide_profile = ["Profile", "Edit Profile", "Setting"];
             <h1 class="header-title<?php echo $marginClass; ?>"><?php echo $currentScreen ?></h1>
             <?php
             if(!in_array($currentScreen, $hide_profile)): ?>
-            <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>;">
+            <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?> ;">
                 <img style=" border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
             </a>
             <?php endif; ?>
