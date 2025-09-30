@@ -450,7 +450,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
 
             }
              .main-content-container {
-            padding: 40px 20px;
+            padding: 50px 20px;
             position: relative;
             top: -10px
         }
@@ -867,7 +867,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             <div class="row">
                 <?php if (!empty($row_all["student_company_url"])): ?>
                 <div class="col-md-6">
-                    <div class="info-item-box" style="display: block;">
+                    <div class="info-item-box" style="display: block; margin-bottom: 2em;">
                         <strong>URL บริษัท:</strong>
                         <span class="info-text">
                             <a href="<?= htmlspecialchars($row_all["student_company_url"]); ?>" target="_blank"
@@ -880,7 +880,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <?php endif; ?>
                 <?php if (!empty($row_all["student_company_detail"])): ?>
                 <div class="col-md-12">
-                    <div class="info-item-box" style="display: block;">
+                    <div class="info-item-box" style="display: block; margin-bottom: 2em;">
                         <strong>รายละเอียดบริษัท:</strong>
                         <div class="info-text" style="white-space: pre-wrap; margin-top: 5px;">
                             <?= htmlspecialchars($row_all["student_company_detail"]); ?>
