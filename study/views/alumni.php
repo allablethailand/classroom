@@ -130,19 +130,18 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                         </div>
                                         <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
                                             <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                                <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["classroom_name"] ?></h4>
+                                                <h4 class="panel-title mb-0 text-truncate d-flex-bs " style="margin-right:40px"> <?= $item["classroom_name"] ?></h4>
                                             </div>
                                             <p class="text-secondary mb-0 small text-truncate-2" >
                                                 สมาชิกปัจจุบัน <?php echo $item['classroom_student']; ?> คน
                                             </p>
                                         </div>
                                         <div class="flex-right-alum" style="align-content: center; text-align:center;">
-                                            <p style="font-size: 9px; text-align:center;">
+                                            <!-- <p style="font-size: 9px; text-align:center;">
                                                 มีทั้งหมด <?php echo $item['group_count']; ?> <br>
-                                                <!-- <br> -->
                                                 กลุ่ม
-                                            </p>
-                                            <div class="">
+                                            </p> -->
+                                            <div class="" style="text-align:center; margin-top: 2rem;">
                                                <i style="font-size: 20px;" class="fas fa-chevron-circle-right"></i>
                                             </div>
                                         </div>
