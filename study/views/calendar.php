@@ -251,7 +251,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px; /* ลด padding จากเดิม */
-    background-color: #70a9e34f; /* ลบพื้นหลังสีเทาออก */
+    background-color: #fff; /* ลบพื้นหลังสีเทาออก */
 }
 .calendar-header h2 {
     font-weight: 600;
