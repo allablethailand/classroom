@@ -70,7 +70,29 @@ session_start();
                                         Wednesday, October 1, 2025
                                     </span>
                                     <span class="progress-text">
-                                        1:00 - 5:00 P.M.
+                                        9:00 - 12:00 A.M.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="container-menu" style="margin-top: 10px;">
+                        <div class="header-menu">
+                            <span class="title-menu">Lunch Break</span>
+                            <span class="subtitle-menu">3 weeks left</span>
+                        </div>
+
+                        <div class="usage-menu">
+                            <div class="progress-section">
+                                <div class="progress-header-flex">
+                                   
+                                    <span class="progress-text">
+                                        Wednesday, October 1, 2025
+                                    </span>
+                                    <span class="progress-text">
+                                        12:00 - 1:00 P.M.
                                     </span>
                                 </div>
                             </div>
@@ -91,7 +113,7 @@ session_start();
                                         Wednesday, October 1, 2025
                                     </span>
                                     <span class="progress-text">
-                                        6:00 P.M.
+                                        1:00 - 5:00 P.M.
                                     </span>
                                 </div>
                             </div>
