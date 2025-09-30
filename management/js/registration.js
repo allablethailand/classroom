@@ -175,7 +175,7 @@ function getRegistrationTemplate() {
         </table>
     `;
 }
-$(document).on("click", ".el-classroom", function(){
+$(document).on("click", ".el-classroom", function() {
     var el = $(this).attr("el");
     $(".el-classroom").removeClass("active");
     $(this).addClass("active");
@@ -611,7 +611,7 @@ function confirmRegistration(join_id, option) {
         cancelButtonColor: '#CCCCCC',
         showLoaderOnConfirm: true,
     },
-    function(isConfirm){
+    function(isConfirm) {
         if (isConfirm) {
             $.ajax({
                 url: "/classroom/management/actions/registration.php",
@@ -623,8 +623,8 @@ function confirmRegistration(join_id, option) {
                 },
                 dataType: "JSON",
                 type: 'POST',
-                success: function(result){
-                    if(result.status === true){	
+                success: function(result) {
+                    if(result.status === true) {	
                         swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});
                         buildRegistration();
                     }else{
@@ -660,7 +660,7 @@ function approveRegistration(join_id, option) {
         cancelButtonColor: '#CCCCCC',
         showLoaderOnConfirm: true,
     },
-    function(isConfirm){
+    function(isConfirm) {
         if (isConfirm) {
             $.ajax({
                 url: "/classroom/management/actions/registration.php",
@@ -672,8 +672,8 @@ function approveRegistration(join_id, option) {
                 },
                 dataType: "JSON",
                 type: 'POST',
-                success: function(result){
-                    if(result.status === true){	
+                success: function(result) {
+                    if(result.status === true) {	
                         swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});
                         buildRegistration();
                     } else {
@@ -709,7 +709,7 @@ function paymentRegistration(join_id, option) {
         cancelButtonColor: '#CCCCCC',
         showLoaderOnConfirm: true,
     },
-    function(isConfirm){
+    function(isConfirm) {
         if (isConfirm) {
             $.ajax({
                 url: "/classroom/management/actions/registration.php",
@@ -721,8 +721,8 @@ function paymentRegistration(join_id, option) {
                 },
                 dataType: "JSON",
                 type: 'POST',
-                success: function(result){
-                    if(result.status === true){	
+                success: function(result) {
+                    if(result.status === true) {	
                         swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});
                         buildRegistration();
                     }else{
@@ -750,7 +750,7 @@ function importStudent() {
 			<div class="row">
 				<div class="col-sm-12 text-center">
 					<h5 lang="en">Download Import Template</h5>
-					<a class="btn btn-white btn-lg text-green" href="/classroom/export/StudentsTemplate.xlsx" target="_blank"><i class="fas fa-download"></i> <span lang="en">Download</span></a>
+					<a class="btn btn-white btn-lg text-green" href="/classroom/export/StudentsTemplate.php?classroom_id=${classroom_id}" target="_blank"><i class="fas fa-download"></i> <span lang="en">Download</span></a>
 				</div>
 				<div class="col-sm-12">
 					<div style="border:2px dotted #00C292; padding:25px; border-radius:15px; margin:25px auto;">
@@ -765,14 +765,14 @@ function importStudent() {
 			<div class="row">
 				<div class="col-sm-12">
 					<h5 class="text-orange"><i class="fas fa-info-circle"></i> <span lang="en">How to import data</span></h5>
-					<p>1. <span lang="en">Download sample files from the link</span> <a href="/classroom/export/StudentsTemplate.xlsx" target="_blank" class="text-orange"><u class="text-green"><b>Download</b></u></a></p>
+					<p>1. <span lang="en">Download sample files from the link</span> <a href="/classroom/export/StudentsTemplate.php?classroom_id=${classroom_id}" target="_blank" class="text-orange"><u class="text-green"><b>Download</b></u></a></p>
 					<p>2. <span lang="en">Choose the file you want to import.</span></p>
 					<p>3. <span lang="en">Press the <b class="text-orange">Import Data</b> button to import the data.</span></p>
 				</div>
 			</div>
 		</form> 
     `);
-    $("#excel_file").change(function(){
+    $("#excel_file").change(function() {
 		const file = this.files[0];
 		if (file) {
 			const fileName = file.name;
@@ -806,15 +806,15 @@ function saveImport() {
 			contentType: false,
 			dataType: "JSON",
 			type: 'POST',
-			success: function(result){
+			success: function(result) {
 				$(".loader").removeClass("active");
-                if(result.status === true){	
+                if(result.status === true) {	
                     $(".systemModal").modal("hide");
-                    swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});
+                    swal({type: 'success',title: "Successfully",text: result.message, showConfirmButton: false,timer: 1500});
                     $(".el-classroomlead").click();
                     buildRegistration();
-                }else{
-                    swal({type: 'error',title: "Sorry...",text: "Something went wrong!",timer: 2000});
+                } else {
+                    swal({type: 'error',title: "Sorry...",text: result.message,timer: 2000});
                 }
             }
         });
@@ -835,7 +835,7 @@ function delRegistration(join_id) {
         cancelButtonColor: '#CCCCCC',
         showLoaderOnConfirm: true,
     },
-    function(isConfirm){
+    function(isConfirm) {
         if (isConfirm) {
             $.ajax({
                 url: "/classroom/management/actions/registration.php",
@@ -846,8 +846,8 @@ function delRegistration(join_id) {
                 },
                 dataType: "JSON",
                 type: 'POST',
-                success: function(result){
-                    if(result.status === true){			
+                success: function(result) {
+                    if(result.status === true) {			
                         swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});							
                         buildGroup();
                     }else{
