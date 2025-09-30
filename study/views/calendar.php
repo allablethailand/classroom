@@ -190,691 +190,412 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
 </head>
 <style>
-    body {
-        background-color: #f0f2f5;
-        font-family: 'Kanit', sans-serif;
-        padding: 0;
-        margin: 0;
-    }
-
-    /* Container และ Card */
-    .schedule-container {
-        width: 100%;
-        max-width: 900px;
-        margin: auto;
-        padding: 20px;
-    }
-
-    /* Calendar Section */
-    .calendar-card {
-        background-color: #fff;
-        border-bottom-right-radius: 20px;
-        border-bottom-left-radius: 20px;
-        padding: 5px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .calendar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px;
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-        color: #ff8c00;
-        background-color: #ebebeb;
-    }
-    .calendar-header h2 {
-        font-weight: 700;
-        margin: 0;
-    }
-    .calendar-nav-btn {
-        background: none;
-        border: none;
-        font-size: 1.5em;
-        color: #ff8c00;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-    .calendar-nav-btn:hover {
-        transform: scale(1.1);
-    }
-    .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 5px;
-        text-align: center;
-        padding-bottom: 5px;
-    }
-    .calendar-weekday {
-    font-weight: bold;
-    font-size: 1.3em;
-    /* สีฟอนต์เริ่มต้นสำหรับวันในสัปดาห์ */
-}
-
-/* สีเฉพาะเจาะจงสำหรับแต่ละวัน */
-.calendar-weekday:nth-child(1) {
-    color: #fd0101; /* สีแดงเข้มสำหรับวันอาทิตย์ */
-}
-
-.calendar-weekday:nth-child(2) {
-    color: #e9c500; /* สีเหลืองสำหรับวันจันทร์ */
-}
-
-.calendar-weekday:nth-child(3) {
-    color: #FF1493; /* สีชมพูเข้มสำหรับวันอังคาร */
-}
-
-.calendar-weekday:nth-child(4) {
-    color: #00d600; /* สีเขียวเข้มสำหรับวันพุธ */
-}
-
-.calendar-weekday:nth-child(5) {
-    color: #FF8C00; /* สีส้มเข้มสำหรับวันพฤหัสบดี */
-}
-
-.calendar-weekday:nth-child(6) {
-    color: #0000ff; /* สีน้ำเงินเข้มสำหรับวันศุกร์ */
-}
-
-.calendar-weekday:nth-child(7) {
-    color: #9503ff; /* สีม่วงเข้มสำหรับวันเสาร์ */
-}
-    .calendar-day {
-        position: relative;
-        background-color: #f7f9fc;
-        padding: 10px 5px;
-        border-radius: 10px;
-        min-height: 80px;
-        cursor: pointer;
-        transition: all 0.2s;
-        border: 2px solid transparent;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .calendar-day:hover {
-        background-color: #e9ecef;
-        transform: translateY(-3px);
-    }
-    .calendar-day.today {
-        background-color: #ff8c00;
-        color: #fff;
-        border-color: #ff8c00;
-    }
-    .calendar-day.today .day-number,
-    .calendar-day.today .event-item {
-        color: #fff !important;
-    }
-    .calendar-day.inactive {
-        background-color: transparent;
-        color: #bbb;
-        cursor: default;
-        box-shadow: none;
-        border: none;
-    }
-    .calendar-day.inactive:hover {
-        transform: none;
-    }
-    .day-number {
-        font-size: 1.5em;
-        font-weight: 700;
-        color: #2c3e50;
-    }
-    .event-item {
-        font-size: 0.8em;
-        padding: 2px 5px;
-        border-radius: 5px;
-        color: #fff;
-        margin-top: 3px;
-        width: 100%;
-        box-sizing: border-box;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    .event-checked-in {
-        background-color: #2ecc71; /* สีเขียว */
-    }
-    .event-not-checked-in {
-        background-color: #f39c12; /* สีส้ม */
-    }
-    
-    /* Responsive styles for mobile devices */
-    @media (max-width: 900px) {
-        .calendar-day {
-            min-height: 60px; /* ลดความสูงของวันในปฏิทิน */
-        }
-        .day-number {
-            font-size: 1.2em; /* ลดขนาดตัวเลขวัน */
-        }
-        .event-item {
-            display: none; /* ซ่อนชื่อวิชา */
-            width: 8px;
-            height: 8px;
-            padding: 0;
-            border-radius: 50%; /* เปลี่ยนเป็นจุดสี */
-        }
-        .calendar-day.today .event-item {
-            border: 1px solid #fff;
-        }
-        .calendar-day {
-            min-height: 60px;
-            padding: 5px;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-        .calendar-day .day-number {
-            margin-bottom: 5px;
-        }
-        .calendar-day .event-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2px;
-        }
-        .calendar-day .event-item {
-            display: block; /* แสดงจุดสี */
-            width: 8px;
-            height: 8px;
-            padding: 0;
-            border-radius: 50%;
-            margin: 2px;
-            text-indent: -9999px; /* ซ่อนข้อความแบบเข้าถึงได้ */
-        }
-        .calendar-day.today .event-item {
-            border: 1px solid #fff; /* เพิ่มขอบสีขาวให้จุดบนวันปัจจุบัน */
-        }
-    }
-    
-    /* Full-screen modal for all monthly schedules */
-    .modal-dialog.modal-fullscreen {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
-    .modal-content.modal-fullscreen {
-        height: 100%;
-        border-radius: 0;
-        padding: 20px;
-        box-shadow: none;
-        border: none;
-    }
-    .modal-header.modal-fullscreen {
-        background: #f0f2f5;
-        border-bottom: none;
-        padding: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 0;
-    }
-    .modal-title-full {
-        font-size: 1.8em;
-        font-weight: 700;
-        color: #333;
-        flex-grow: 1;
-        text-align: center;
-        margin: 0;
-    }
-    .modal-body-full {
-        padding: 20px;
-        overflow-y: auto;
-        flex-grow: 1;
-    }
-    .daily-schedule-list {
-        padding: 0;
-    }
-    .daily-schedule-item {
-        background-color: #fff;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 15px;
-        box-shadow: 8px 8px 10px rgba(0,0,0,0.1);
-        border-left: 5px solid;
-        cursor: pointer;
-    }
-    .daily-schedule-item.checked-in {
-        
-        border-left-color: #2ecc71;
-    }
-    .daily-schedule-item.not-checked-in {
-        border-left-color: #f39c12;
-    }
-    .daily-schedule-item .subject {
-        font-weight: 600;
-        font-size: 1em;
-        color: #555;
-        padding-bottom: .6em;
-    }
-    .daily-schedule-item .date-time {
-        color: #7f8c8d;
-        font-size: 0.9em;
-        padding-bottom: .6em;
-    }
-    .daily-schedule-item .status-text {
-        color: #2ecc71;
-        font-weight: 600;
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    /* Class detail page (separate modal for a specific class) */
-    #classDetailModal .modal-content {
-        border-radius: 15px;
-    }
-    #classDetailModal .checkin-button {
-        width: 100%;
-        margin-top: 20px;
-        background-color: #ff8c00;
-        border: none;
-        color: white;
-        padding: 15px 0;
-        border-radius: 10px;
-        font-size: 1.2em;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    #classDetailModal .checkin-button:hover {
-        background-color: #e57e00;
-    }
-    
-    .class-detail-info h4 {
-        font-size: 1.5em;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 5px;
-    }
-    .class-detail-info p {
-        font-size: 1.1em;
-        color: #7f8c8d;
-        margin: 0;
-    }
-    .friends-list {
-        margin-top: 20px;
-        border-top: 1px solid #ddd;
-        padding-top: 15px;
-    }
-    .friends-list h5 {
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 10px;
-    }
-    .friend-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    .friend-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        overflow: hidden; /* เพื่อให้รูปโปรไฟล์เป็นวงกลม */
-        margin-right: 10px;
-        flex-shrink: 0;
-    }
-    .friend-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border: 2px solid #ff8c00;
-        border-radius: 50%;
-    }
-    .friend-item a {
-        text-decoration: none;
-        color: inherit;
-    }
-
-    /* Custom check-in modal for camera */
-    #cameraModal .modal-content {
-        border-radius: 15px;
-    }
-    #cameraModal .modal-body {
-        text-align: center;
-    }
-    .btn-checkin {
-    background-color: #f39c12; /* เปลี่ยนสีพื้นหลังเป็นสีส้ม */
-    color: #fff; /* เปลี่ยนสีตัวอักษรเป็นสีขาว */
-    border: none; /* ลบขอบของปุ่มออก */
-    border-radius: 10px; /* เพิ่มความโค้งมนให้ปุ่ม */
-    padding: 5px 10px; /* กำหนดระยะห่างภายในปุ่ม */
-    font-size: 1em; /* ปรับขนาดตัวอักษร */
-    font-weight: bold; /* ทำตัวอักษรให้หนา */
-    cursor: pointer; /* แสดงผลเป็นรูปมือเมื่อชี้ */
-    transition: background-color 0.3s; /* เพิ่ม transition ให้ดู smooth ขึ้น */
-    }
-
-    .btn-checkin:hover {
-        background-color: #e67e22; /* เปลี่ยนสีเมื่อเอาเมาส์ไปชี้ */
-    }
-
-    /* Modal for student info */
-    #studentInfoModal .student-info-card {
-        background: #fff;
-        border-radius: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        padding: 30px;
-        text-align: center;
-    }
-    #studentInfoModal .student-avatar-lg {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        overflow: hidden;
-        margin: 0 auto 20px;
-        border: 4px solid #ff8c00;
-    }
-    #studentInfoModal .student-avatar-lg img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    #studentInfoModal .student-name-lg {
-        font-size: 2em;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 5px;
-    }
-    #studentInfoModal .student-detail-item {
-        margin-bottom: 10px;
-    }
-    #studentInfoModal .student-detail-item strong {
-        color: #ff8c00;
-        margin-right: 5px;
-    }
-    #studentInfoModal .student-detail-item span {
-        font-size: 1.1em;
-        color: #555;
-    }
-    #studentInfoModal .close-btn {
-        background: none;
-        border: none;
-        font-size: 40px;
-        position: absolute;
-        top: 5px;
-        right: 30px;
-        opacity: .7;
-    }
-    /* เพิ่มสไตล์สำหรับส่วนข้อมูลติดต่อในป๊อปอัป */
-.student-contact-section-card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    padding: 30px;
-    margin-top: 20px;
-}
-.student-contact-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-}
-.student-contact-item {
-    text-align: center;
-    flex-basis: 80px;
-    flex-grow: 1;
-}
-.student-contact-item a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: #7f8c8d;
-    font-size: 1.1em;
-}
-.student-contact-icon-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 28px;
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-.student-contact-icon-circle.phone { background-color: #2ecc71; }
-.student-contact-icon-circle.mail { background-color: #D44638; }
-.student-contact-icon-circle.line { background-color: #00B900; }
-.student-contact-icon-circle.ig { background-color: #e4405f; }
-.student-contact-icon-circle.fb { background-color: #3b5998; }
-/* เพิ่มสไตล์สำหรับ Modal (popup) เพื่อให้คล้ายกับ studentinfo.php */
-#studentInfoModal .modal-dialog {
-    max-width: 960px;
-    margin: 30px auto;
-}
-#studentInfoModal .modal-content {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-}
-#studentInfoModal .modal-header {
-    border-bottom: none;
-}
-#studentInfoModal .modal-body {
+/* ตั้งค่า Font และพื้นหลังโดยรวมให้ดูสะอาดตา */
+body {
+    background-color: #f5f7fa; /* สีพื้นหลังอ่อน ๆ คล้ายในรูป */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Kanit', sans-serif;
     padding: 0;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
-/* สไตล์จาก studentinfo.php ที่เราจะนำมาใช้ใน popup */
-#studentInfoModal .profile-card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    padding: 40px;
-    text-align: center;
-    position: relative;
-}
-#studentInfoModal .profile-avatar-square {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    border: 5px solid #ff8c00;
-    overflow: hidden;
-    margin: 0 auto 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-#studentInfoModal .profile-avatar-square img {
+
+/* Container หลัก */
+.schedule-container {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-width: 900px;
+    /* margin: auto; */
+    padding-bottom: 20px;
 }
-#studentInfoModal .profile-name {
-    font-size: 2.2em;
-    font-weight: 800;
-    color: #2c3e50;
-    margin-bottom: 8px;
-}
-#studentInfoModal .profile-bio {
-    font-size: 1.1em;
-    color: #7f8c8d;
-    margin-bottom: 25px;
-}
-#studentInfoModal .profile-course-container {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background-color: #f0f7ff;
-    border-radius: 10px;
-    display: inline-block;
-}
-#studentInfoModal .section-header-icon {
+
+/* Header ของปฏิทิน: "Calendar" และปุ่มค้นหา */
+.calendar-header-main {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    padding: 0 20px 20px 20px;
+    max-width: 900px;
+    margin: auto;
 }
-#studentInfoModal .section-header-icon i {
+.calendar-header-main h1 {
     font-size: 2em;
-    color: #ff6600;
-    margin-right: 15px;
-}
-#studentInfoModal .section-title {
     font-weight: 700;
-    color: #333;
+    color: #1a202c;
     margin: 0;
 }
-/* Contact Grid styles */
-#studentInfoModal .contact-section-card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    padding: 30px;
-    margin-bottom: 30px;
-    margin-top: 20px; /* เพิ่ม margin เพื่อแยกส่วน */
+.search-btn {
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    color: #1a202c;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
 }
-#studentInfoModal .contact-grid {
+.search-btn:hover {
+    background-color: #e2e8f0;
+}
+
+/* Calendar Card */
+.calendar-card {
+    background-color: #ebf5ff;
+    border-radius: 20px; /* มุมโค้งมนให้ดูทันสมัย */
+    /* padding: 15px; */
+    box-shadow: 0 10px 30px rgb(193 220 242 / 47%); /* เงาบางเบา */
+}
+
+/* ส่วนแสดงเดือนและปี และปุ่มควบคุม */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px; /* ลด padding จากเดิม */
+    background-color: #70a9e34f; /* ลบพื้นหลังสีเทาออก */
+}
+.calendar-header h2 {
+    font-weight: 600;
+    font-size: 1.5em;
+    color: #1a202c;
+    margin: 0;
+}
+
+/* ปุ่มนำทาง (Prev/Next Month) - ทำให้ใหญ่และดู Minimal */
+.calendar-nav-btn {
+    background: none;
+    border: none;
+    font-size: 2.0em; /* ทำให้ไอคอนใหญ่ขึ้น */
+    color: #4a5568; /* สีเทาเข้ม */
+    cursor: pointer;
+    padding: 10px; /* เพิ่ม padding เพื่อให้กดง่ายขึ้น */
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+.calendar-nav-btn:hover {
+    color: #007aff; /* เปลี่ยนสีเมื่อโฮเวอร์ */
+    background-color: #f0f4f8;
+}
+
+/* Grid สำหรับวันในสัปดาห์ */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0; /* ลบ gap เดิมออก */
+    text-align: center;
+    padding: 10px 0 5px 0;
+}
+
+/* ชื่อวันในสัปดาห์ */
+.calendar-weekday {
+    font-weight: 500;
+    font-size: 1.3em;
+    color: #a0aec0; /* สีเทาอ่อน */
+    padding-bottom: 5px;
+}
+/* สไตล์สีวันในสัปดาห์ (คงไว้ตามเดิมหากต้องการสีเฉพาะ) */
+.calendar-weekday:nth-child(1) { color: #ff4040ff; } /* อาทิตย์: แดงอ่อน */
+.calendar-weekday:nth-child(2) { color: #555; } /* จันทร์: ส้มอ่อน */
+.calendar-weekday:nth-child(3) { color: #555; } /* อังคาร: ส้ม */
+.calendar-weekday:nth-child(4) { color: #555; } /* พุธ: เขียว */
+.calendar-weekday:nth-child(5) { color: #555; } /* พฤหัส: ม่วง */
+.calendar-weekday:nth-child(6) { color: #555; } /* ศุกร์: น้ำเงิน */
+.calendar-weekday:nth-child(7) { color: #805ad5; } /* เสาร์: ชมพู */
+
+/* ช่องวันในปฏิทิน */
+.calendar-day {
+    position: relative;
+    background-color: transparent; /* ลบพื้นหลังออกจากแต่ละช่อง */
+    /* *** แก้ไขที่นี่: เพิ่ม padding ด้านบนและล่าง เพื่อให้ช่องดูสูงขึ้น *** */
+    padding: 10px 5px;
+    border-radius: 12px; /* มุมโค้งมน */
+    /* *** แก้ไขที่นี่: เพิ่มความสูงขั้นต่ำ *** */
+    min-height: 60px; /* เพิ่มจาก 50px */
+    aspect-ratio: 1 / 1; /* ทำให้เป็นสี่เหลี่ยมจัตุรัส */
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    box-sizing: border-box;
+}
+.calendar-day:hover {
+    background-color: #ffffffff; /* สีโฮเวอร์อ่อนๆ */
+    transform: none; /* ลบ animation ยกขึ้น */
+}
+.calendar-day:hover .day-number {
+    color: #d87e75 !important;
+    font-weight: 700;
+}
+
+/* ตัวเลขวัน */
+.day-number {
+    font-size: 1.5em;
+    font-weight: 500;
+    color: #4a5568; /* สีตัวเลขปกติ */
+    padding: 5px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    line-height: 1; /* จัดตำแหน่งตัวเลขให้ตรงกลาง */
+}
+
+/* วันที่ที่ไม่ได้อยู่ในเดือนปัจจุบัน */
+.calendar-day.inactive {
+    color: #cbd5e0; /* สีเทาจางมาก */
+    cursor: default;
+}
+.calendar-day.inactive .day-number {
+    color: #cbd5e0;
+}
+.calendar-day.inactive:hover {
+    background-color: transparent;
+}
+
+/* วันที่ปัจจุบัน (Today) */
+.calendar-day.today {
+    background-color: #ffffffff; /* พื้นหลังอ่อนๆ */
+    /* border: 2px solid #007aff; ขอบสีน้ำเงิน */
+}
+.calendar-day.today .day-number {
+    /* background-color: #007aff; วงกลมสีน้ำเงินเข้ม */
+    color: #ff9900 !important;
+    font-weight: 700;
+}
+
+/* วันที่มีการเลือก (คล้ายกับวันที่ 23 ในรูป) */
+.calendar-day.selected {
+    background-color: #fce4ec; /* สีพื้นหลังอ่อนๆ เช่น สีชมพู */
+    border: 2px solid #f9a8d4; /* ขอบสีหลัก */
+}
+.calendar-day.selected .day-number {
+    color: #ffffffff; /* สีตัวเลขในวงกลม */
+}
+
+/* Event Dots Container */
+.calendar-day .event-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    gap: 3px; /* ระยะห่างระหว่างจุด */
+    margin-top: 5px;
+    width: 100%;
+    min-height: 10px;
 }
-#studentInfoModal .contact-item {
-    text-align: center;
-    flex-basis: 100px;
-    flex-grow: 1;
-}
-#studentInfoModal .contact-item a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: #7f8c8d;
-    font-size: 1.1em;
-}
-#studentInfoModal .contact-icon-circle {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 32px;
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-#studentInfoModal .contact-icon-circle.phone { background-color: #2ecc71; }
-#studentInfoModal .contact-icon-circle.mail { background-color: #D44638; }
-#studentInfoModal .contact-icon-circle.line { background-color: #00B900; }
-#studentInfoModal .contact-icon-circle.ig { background-color: #e4405f; }
-#studentInfoModal .contact-icon-circle.fb { background-color: #3b5998; }
-/* Info Grid styles */
-#studentInfoModal .info-grid-section {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    padding: 30px;
-    margin-bottom: 30px;
-}
-#studentInfoModal .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-}
-#studentInfoModal .info-item-box {
-    width: 80%;
-    background-color: #f7f9fc;
-    padding: 10px;
-    border-radius: 15px;
-    border: 1px solid #eee;
-    display: flex;
-    align-items: center;
-}
-#studentInfoModal .info-item-box i {
-    font-size: 22px;
-    color: #ff8c00;
-    margin-right: 15px;
-}
-#studentInfoModal .info-text strong {
+
+/* Event Dot (จุดบอกอีเวนต์) */
+.calendar-day .event-item {
     display: block;
+    width: 6px; /* ขนาดจุด */
+    height: 6px; /* ขนาดจุด */
+    padding: 0;
+    border-radius: 50%;
+    margin: 0;
+    text-indent: -9999px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* สีของ Event Dots (อ้างอิงจากสีในรูป) */
+.event-checked-in {
+    background-color: #4299e1; /* สีเขียว: เสร็จสิ้น */
+}
+.event-not-checked-in {
+    background-color: #805ad5; /* สีส้ม: ยังไม่เช็คอิน */
+}
+/* ตัวอย่างสีอื่น ๆ (ถ้ามี) */
+/* สีม่วง (Purple) - สำหรับงานอื่น */
+.event-purple {
+    background-color: #805ad5;
+}
+/* สีฟ้า (Blue) - สำหรับงานอื่น */
+.event-blue {
+    background-color: #4299e1;
+}
+
+/* ส่วนแสดงตารางเรียนรายวันด้านล่าง */
+.daily-schedule-display-container {
+    padding: 20px;
+    padding-bottom: 80px;
+}
+.daily-schedule-list {
+    padding: 0;
+}
+
+/* Item ตารางเรียนรายวัน */
+.daily-schedule-item {
+    background-color: #fff;
+    border-radius: 15px; /* มุมโค้งมน */
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-left: 6px solid;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.daily-schedule-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+.daily-schedule-item.checked-in {
+    border-left-color: #48bb78; /* เขียว */
+}
+.daily-schedule-item.not-checked-in {
+    border-left-color: #ae80f061; /* ส้ม */
+}
+.daily-schedule-item .subject {
+    /* font-weight: 700; */ */
     font-size: 1.1em;
-    font-weight: 700;
-    color: #555;
-    margin-bottom: 4px;
+    /* color: #1a202c; */
+    /* margin-bottom: 5px; */
 }
-#studentInfoModal .info-text span {
+.daily-schedule-item .date-time {
+    color: #718096;
     font-size: 1em;
-    color: #888;
+    margin-bottom: 10px;
 }
-/* Responsive styles for mobile devices */
-@media (max-width: 768px) {
-    #studentInfoModal .contact-grid {
-        justify-content: space-around;
-        gap: 10px;
-    }
-    #studentInfoModal .contact-item {
-        flex-basis: 70px;
-    }
-    #studentInfoModal .contact-icon-circle {
-        width: 55px;
-        height: 55px;
-        font-size: 24px;
-    }
+.daily-schedule-item .status-text {
+    color: #48bb78;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
-/* New style for 'no events' message */
+.daily-schedule-item .status-text-not-checked-in {
+    /* ซ่อนสถานะที่ไม่เช็คอิน (ให้เหลือแค่ปุ่ม) */
+    display: none;
+}
 .no-events-message {
     text-align: center;
-    color: #7f8c8d;
-    font-size: 1.3em;
-    font-weight: 600;
+    color: #a0aec0;
+    font-size: 1.1em;
+    font-weight: 500;
     padding: 40px 20px;
     background-color: #fff;
     border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     margin-top: 20px;
-    border: 1px dashed #ccc;
+    border: 1px dashed #e2e8f0;
 }
-/* เพิ่ม Media Query สำหรับหน้าจอขนาดใหญ่ (Desktop) */
-@media (min-width: 901px) {
-    /* กำหนดขนาดสูงสุดและจัดกึ่งกลางสำหรับคอนเทนเนอร์หลัก */
-    .schedule-container,
-    .daily-schedule-display-container {
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-    }
 
-    /* จัดการให้ event-item แสดงผลได้ดีขึ้นบนจอใหญ่ */
+/* ปุ่มเช็คอิน (ทำให้ใหญ่และสวยงาม) */
+.btn-checkin-container {
+    padding-top: 10px;
+}
+.btn-checkin {
+    background-color: #f6ad55; /* สีส้ม */
+    color: #fff;
+    border: none;
+    border-radius: 12px; /* โค้งมนสวยงาม */
+    /* padding: 12px 25px; ทำให้ปุ่มใหญ่ขึ้น */
+    font-size: .9em; /* ตัวอักษรใหญ่ขึ้น */
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    width: 50%; /* เต็มความกว้าง */
+    box-shadow: 0 4px 10px rgba(246, 173, 85, 0.4);
+}
+.btn-checkin:hover {
+    background-color: #ed8936;
+    transform: translateY(-1px);
+}
+.btn-checkin:active {
+    transform: translateY(0);
+}
+
+/* สไตล์ Modal (Popup) - ทำให้ดูสะอาดตาและทันสมัย */
+#cameraModal .modal-content {
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    border: none;
+}
+#cameraModal .modal-header {
+    border-bottom: none;
+    padding: 20px 20px 0 20px;
+}
+#cameraModal .modal-title {
+    font-weight: 700;
+    color: #1a202c;
+}
+#cameraModal .modal-body p {
+    color: #4a5568;
+}
+#cameraModal .modal-footer {
+    border-top: none;
+    padding: 10px 20px 20px 20px;
+    display: flex;
+    justify-content: center; /* จัดปุ่มให้อยู่กึ่งกลาง */
+    gap: 15px;
+}
+
+/* ปุ่มใน Modal (ทำให้ใหญ่และดูดีขึ้น) */
+#cameraModal .btn {
+    padding: 12px 25px; /* ทำให้ปุ่มใหญ่ขึ้น */
+    font-size: 1.1em;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+#cameraModal .btn-default {
+    background-color: #e2e8f0;
+    color: #4a5568;
+    border: none;
+}
+#cameraModal .btn-default:hover {
+    background-color: #cbd5e0;
+}
+#cameraModal .btn-primary {
+    background-color: #4299e1; /* สีน้ำเงิน */
+    color: #fff;
+    border: none;
+}
+#cameraModal .btn-primary:hover {
+    background-color: #3182ce;
+}
+
+/* ปุ่มปิด Modal (X) - ทำให้ใหญ่ขึ้นตามคำขอ */
+#cameraModal .close {
+    font-size: 2.5em; /* ทำให้ใหญ่ขึ้นมาก */
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+#cameraModal .close:hover {
+    opacity: 0.9;
+}
+
+
+/* Media Query สำหรับมือถือ (เน้นจุด) */
+@media (max-width: 768px) {
+    .calendar-card {
+        /* padding: 10px; */
+        border-radius: 15px;
+    }
+    .calendar-day {
+        /* *** แก้ไขที่นี่: ปรับ padding และ min-height บนมือถือให้สูงขึ้น *** */
+        min-height: 50px; /* เพิ่มจาก 40px */
+        padding: 8px 5px; /* เพิ่ม padding */
+    }
+    .day-number {
+        font-size: 1.3em;
+        width: 25px;
+        height: 25px;
+    }
+    .calendar-nav-btn {
+        font-size: 1.5em; /* ลดขนาดปุ่มนำทางเล็กน้อยบนมือถือ */
+        padding: 5px;
+    }
+    
+    /* ซ่อนข้อความในจุดอีเวนต์ (เพื่อให้เหลือแต่จุด) */
     .calendar-day .event-item {
-        /* ใช้คำสั่งนี้เพื่อกำหนดให้ข้อความเกินขอบแล้วแสดงเป็น ... */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        padding: 2px 8px;
-        /* ปรับขนาดฟอนต์ให้เหมาะสม */
-        font-size: 0.85em;
-        width: 90%;
-        margin: 3px auto 0;
-    }
-
-    /* เพิ่มสไตล์สำหรับ card รายวันในส่วนแสดงตารางเรียนรายวัน */
-    .daily-schedule-item {
-        max-width: 600px; /* จำกัดความกว้างของแต่ละรายการ */
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 15px;
-    }
-}
-
-/* เพิ่ม Media Query สำหรับจอใหญ่ */
-@media (min-width: 901px) {
-    /* กำหนดสไตล์ใหม่สำหรับ event-item บนจอใหญ่ */
-    .event-item {
-        /* บังคับให้ข้อความอยู่ในบรรทัดเดียว */
-        white-space: nowrap; 
-        /* ซ่อนส่วนที่ล้นออกมา */
-        overflow: hidden; 
-        /* แสดงเครื่องหมายจุดไข่ปลา (...) เมื่อข้อความล้น */
-        text-overflow: ellipsis; 
-        /* ตั้งค่าความกว้างสูงสุดเพื่อให้ข้อความไม่ยืดยาวเกินไป */
-        max-width: 100px; 
-        /* เพื่อให้การตัดข้อความมีประสิทธิภาพ ควรใช้ flex-shrink: 0; */
-        flex-shrink: 0; 
+        width: 6px;
+        height: 6px;
+        margin: 1px;
     }
 }
 </style>
+
 <body>
     <?php
     require_once ("component/header.php")
@@ -888,13 +609,13 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     <div class="calendar-card">
        
         <div class="calendar-grid">
-            <div class="calendar-weekday">อา</div>
-            <div class="calendar-weekday">จ</div>
-            <div class="calendar-weekday">อ</div>
-            <div class="calendar-weekday">พ</div>
-            <div class="calendar-weekday">พฤ</div>
-            <div class="calendar-weekday">ศ</div>
-            <div class="calendar-weekday">ส</div>
+            <div class="calendar-weekday">Sun</div>
+            <div class="calendar-weekday">Mon</div>
+            <div class="calendar-weekday">Tue</div>
+            <div class="calendar-weekday">Wed</div>
+            <div class="calendar-weekday">Thu</div>
+            <div class="calendar-weekday">Fri</div>
+            <div class="calendar-weekday">Sat</div>
         </div>
         <div class="calendar-grid" id="calendarGrid">
         </div>
@@ -945,8 +666,8 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     let stream;
     let currentClassId = null;
 
-    const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-                        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"];
 
     function renderCalendar() {
         calendarGrid.innerHTML = '';
@@ -1002,7 +723,7 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
    function showDailySchedule(dateStr) {
     const classes = allMonthScheduleData.filter(cls => cls.date === dateStr);
 
-    let htmlContent = `<div id="dailyScheduleHeader" style="color:#555;"class="schedule-header-inline"><h3>ตารางเรียนวันที่ ${formatDateThai(dateStr)}</h3></div>`;
+    let htmlContent = `<div id="dailyScheduleHeader" style="color:#555; "class="schedule-header-inline"><h3 style="font-size: 16px;">ตารางเรียนวันที่ ${formatDateThai(dateStr)}</h3></div>`;
 
     if (classes && classes.length > 0) {
         htmlContent += `<div class="daily-schedule-list">`;
