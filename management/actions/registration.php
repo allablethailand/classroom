@@ -2,10 +2,10 @@
     session_start();
     $base_include = $_SERVER['DOCUMENT_ROOT'];
     $base_path = '';
-    if($_SERVER['HTTP_HOST'] == 'localhost'){
+    if($_SERVER['HTTP_HOST'] == 'localhost') {
         $request_uri = $_SERVER['REQUEST_URI'];
         $exl_path = explode('/',$request_uri);
-        if(!file_exists($base_include."/dashboard.php")){
+        if(!file_exists($base_include."/dashboard.php")) {
             $base_path .= "/".$exl_path[1];
         }
         $base_include .= "/".$exl_path[1];
@@ -168,234 +168,438 @@
 		echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
 		exit();
     }
-    if(isset($_GET) && $_GET['action'] == 'saveImport') {
-        $classroom_id = $_POST['classroom_id'];
-        require_once $base_include."/lib/excel/PHPExcel.php";
-        $excel_name = $_FILES['excel_file']['name'];
-        $excel_tmp = $_FILES['excel_file']['tmp_name'];
-        $excelReader = PHPExcel_IOFactory::createReaderForFile($excel_tmp);
-        $excelObj = $excelReader->load($excel_tmp);
-        $worksheet = $excelObj->getSheet(0);
-        $lastRow = $worksheet->getHighestRow(); 
-        for ($row = 3; $row <= $lastRow; $row++) {
-            if($worksheet->getCell('A'.$row)->getValue()) {
-                $idcard = escape_string($worksheet->getCell('B'.$row)->getValue());
-                $idcard_val = str_replace('-','',$idcard);
-                $passport = escape_string($worksheet->getCell('C'.$row)->getValue());
-                if($idcard_val || $passport) {
-                    $firstname_en = escape_string($worksheet->getCell('D'.$row)->getValue());
-                    $lastname_en = escape_string($worksheet->getCell('E'.$row)->getValue());
-                    $firstname_th = escape_string($worksheet->getCell('F'.$row)->getValue());
-                    $lastname_th = escape_string($worksheet->getCell('G'.$row)->getValue());
-                    $gender = escape_string($worksheet->getCell('H'.$row)->getValue());
-                    $gender_val = '';
-                    switch($gender) {
-                        case 'ชาย':
-                        case 'Male':
-                            $gender_val = 'M';
-                        break;
-                        case 'หญิง':
-                        case 'Female':
-                            $gender_val = 'F';
-                        break;
-                        default:
-                            $gender_val = 'O';
-                    }
-                    $birthday = escape_string($worksheet->getCell('I'.$row)->getValue());
-                    $birthday_val = convertToDate($birthday);
-                    $company = escape_string($worksheet->getCell('J'.$row)->getValue());
-                    $position = escape_string($worksheet->getCell('K'.$row)->getValue());
-                    $mobile = escape_string($worksheet->getCell('L'.$row)->getValue());
-                    $mobile_val = str_replace('-','',$mobile);
-                    $email = escape_string($worksheet->getCell('M'.$row)->getValue());
-                    $username = escape_string($worksheet->getCell('M'.$row)->getValue());
-                    $password = escape_string($worksheet->getCell('N'.$row)->getValue());
-                    $information = [
-                        'idcard' => trim($idcard_val),
-                        'passport' => trim($passport),
-                        'firstname_en' => trim($firstname_en),
-                        'lastname_en' => trim($lastname_en),
-                        'firstname_th' => trim($firstname_th),
-                        'lastname_th' => trim($lastname_th),
-                        'gender' => trim($gender_val),
-                        'birthday' => trim($birthday_val),
-                        'mobile' => trim($mobile_val),
-                        'email' => trim($email),
-                        'company' => trim($company),
-                        'position' => trim($position),
-                        'username' => trim($username),
-                        'password' => trim($password)
-                    ];
-                    $result = createStudent($classroom_id, $information);
+    if (isset($_GET) && $_GET['action'] == 'saveImport') {
+        try {
+            if (!isset($_POST['classroom_id']) || empty($_POST['classroom_id']) || !is_numeric($_POST['classroom_id'])) {
+                throw new Exception('Invalid classroom ID');
+            }
+            if (!isset($_FILES['excel_file']) || $_FILES['excel_file']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('No file uploaded or upload error occurred');
+            }
+            $classroom_id = intval($_POST['classroom_id']);
+            $allowed_types = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+            $file_type = $_FILES['excel_file']['type'];
+            $file_size = $_FILES['excel_file']['size'];
+            $max_size = 10 * 1024 * 1024; 
+            if (!in_array($file_type, $allowed_types)) {
+                throw new Exception('Invalid file type. Only Excel files are allowed.');
+            }
+            if ($file_size > $max_size) {
+                throw new Exception('File size too large. Maximum 10MB allowed.');
+            }
+            require_once $base_include . "/lib/excel/PHPExcel.php";
+            $excel_tmp = $_FILES['excel_file']['tmp_name'];
+            if (!file_exists($excel_tmp)) {
+                throw new Exception('Uploaded file not found');
+            }
+            $excelReader = PHPExcel_IOFactory::createReaderForFile($excel_tmp);
+            $excelReader->setReadDataOnly(true);
+            $excelObj = $excelReader->load($excel_tmp);
+            $worksheet = $excelObj->getSheet(0);
+            $lastRow = $worksheet->getHighestRow();
+            if ($lastRow < 6) {
+                throw new Exception('Excel file must have data starting from row 6');
+            }
+            $registerTemplate = select_data(
+                "register_template", "classroom_template", "WHERE classroom_id = '{$classroom_id}'"
+            );
+            if (empty($registerTemplate)) {
+                throw new Exception('Classroom template not found');
+            }
+            $register_template = $registerTemplate[0]['register_template'] ? explode(',', $registerTemplate[0]['register_template']) : [];
+            if (empty($register_template)) {
+                throw new Exception('No register template fields found');
+            }
+            $columnInsert = [];
+            foreach ($register_template as $row) {
+                $columns = select_data(
+                    "templace_column", 
+                    "classroom_register_template", 
+                    "WHERE template_id = '{$row}'"
+                );
+                if ($columns) {
+                    $columnInsert[] = $columns[0]['templace_column'];
                 }
             }
-            ++$i;
-        }
-        echo json_encode(['status' => true]);
-    }
-    function createStudent($classroom_id, $information) {
-        $conditions = [];
-        if (!empty($information['idcard'])) {
-            $idcard = addslashes($information['idcard']);
-            $conditions[] = "student_idcard = '$idcard'";
-        }
-        if (!empty($information['passport'])) {
-            $passport = addslashes($information['passport']);
-            $conditions[] = "student_idcard = '$passport'";
-        }
-        $exits_condition = '';
-        if (count($conditions) > 0) {
-            $exits_condition = " WHERE " . implode(" OR ", $conditions);
-        }
-        $exits = select_data(
-            "student_id, student_password_key",
-            "classroom_student",
-            $exits_condition
-        );
-        $student_id = '';
-        $student_password_key = '';
-        if (!empty($exits)) {
-            $student_id = $exits[0]['student_id'];
-            $student_password_key = $exits[0]['student_password_key'];
-        }
-        if(!$student_password_key) {
-            $student_password_key = bin2hex(openssl_random_pseudo_bytes(16));
-        }
-        if($information['password']) {
-            $pwd = encryptToken($information['password'], $student_password_key);
-            $password = "'{$pwd}'";
-        } else {
-            $password = "null";
-        }
-        if($student_id) {
-            update_data(
-                "classroom_student",
-                "
-                    student_firstname_en = '{$information['firstname_en']}',
-                    student_lastname_en = '{$information['lastname_en']}',
-                    student_firstname_th = '{$information['firstname_th']}',
-                    student_lastname_th = '{$information['lastname_th']}',
-                    student_gender = '{$information['gender']}',
-                    student_idcard = '{$information['idcard']}',
-                    student_passport = '{$information['passport']}',
-                    student_birth_date = '{$information['birthday']}',
-                    student_mobile = '{$information['mobile']}',
-                    student_email = '{$information['email']}',
-                    student_username = '{$information['username']}',
-                    student_company = '{$information['company']}',
-                    student_position = '{$information['position']}',
-                    student_password = $password,
-                    emp_modify = '{$_SESSION['emp_id']}',
-                    status = 0,
-                    date_modify = NOW()
-                ",
-                "student_id = '{$student_id}'"
-            );
-        } else {
-            $student_id = insert_data(
-                "classroom_student",
-                "(
-                    student_firstname_en,
-                    student_lastname_en,
-                    student_firstname_th,
-                    student_lastname_th,
-                    student_gender,
-                    student_idcard,
-                    student_passport,
-                    student_email,
-                    student_mobile,
-                    student_birth_date,
-                    student_company,
-                    student_position,
-                    student_username,
-                    student_password,
-                    student_password_key,
-                    status,
-                    emp_create,
-                    date_create,
-                    emp_modify,
-                    date_modify
-                )",
-                "(
-                    '{$information['firstname_en']}',
-                    '{$information['lastname_en']}',
-                    '{$information['firstname_th']}',
-                    '{$information['lastname_th']}',
-                    '{$information['gender']}',
-                    '{$information['idcard']}',
-                    '{$information['passport']}',
-                    '{$information['email']}',
-                    '{$information['mobile']}',
-                    '{$information['birthday']}',
-                    '{$information['company']}',
-                    '{$information['position']}',
-                    '{$information['username']}',
-                    $password,
-                    '{$student_password_key}',
-                    0,
-                    '{$_SESSION['emp_id']}',
-                    NOW(),
-                    '{$_SESSION['emp_id']}',
-                    NOW()
-                )"
-            );
-        }
-        if($student_id) {
-            $exitsClass = select_data(
-                "*",
-                "classroom_student_join",
-                "where student_id = '{$student_id}' and classroom_id = '{$classroom_id}'"
-            );
-            if (empty($exitsClass)) {
-                insert_data(
-                    "classroom_student_join",
-                    "(
-                        student_id,
-                        classroom_id,
-                        register_date,
-                        register_by,
-                        register_by_emp,
-                        invite_date,
-                        invite_by,
-                        invite_status,
-                        comp_id,
-                        status,
-                        emp_create,
-                        date_create,
-                        emp_modify,
-                        date_modify
-                    )",
-                    "(
-                        '{$student_id}',
-                        '{$classroom_id}',
-                        NOW(),
-                        1,
-                        '{$_SESSION['emp_id']}',
-                        NOW(),
-                        '{$_SESSION['emp_id']}',
-                        0,
-                        '{$_SESSION['comp_id']}',
-                        0,
-                        '{$_SESSION['emp_id']}',
-                        NOW(),
-                        '{$_SESSION['emp_id']}',
-                        NOW()
-                    )"
+            $form = select_data("form_id", "classroom_forms", "WHERE classroom_id = '{$classroom_id}'");
+            $form_id = !empty($form) ? $form[0]['form_id'] : null;
+            $questions = [];
+            if ($form_id) {
+                $questions = select_data(
+                    "question_id, question_text, question_type, has_options, has_required, has_other_option",
+                    "classroom_form_questions",
+                    "WHERE form_id = '{$form_id}' ORDER BY question_id ASC"
                 );
             }
+            $colChar = range('A', 'Z');
+            $doubleColChar = [];
+            foreach ($colChar as $c1) {
+                foreach ($colChar as $c2) {
+                    $doubleColChar[] = $c1 . $c2;
+                }
+            }
+            $allColumns = array_merge($colChar, $doubleColChar);
+            $map_columns = [];
+            foreach ($columnInsert as $i => $field) {
+                if (isset($allColumns[$i])) {
+                    $map_columns[$field] = $allColumns[$i];
+                }
+            }
+            $offset = count($map_columns);
+            foreach ($questions as $i => $q) {
+                if (isset($allColumns[$offset + $i])) {
+                    $map_columns["form_q_" . $q['question_id']] = $allColumns[$offset + $i];
+                }
+            }
+            $success_count = 0;
+            $error_count = 0;
+            $errors = [];
+            mysqli_autocommit($mysqli, false);
+            for ($row = 6; $row <= $lastRow; $row++) {
+                try {
+                    $has_data = false;
+                    foreach ($map_columns as $field => $col_char) {
+                        $cell_value = $worksheet->getCell($col_char . $row)->getValue();
+                        if (!empty(trim($cell_value))) {
+                            $has_data = true;
+                            break;
+                        }
+                    }
+                    if (!$has_data) {
+                        continue;
+                    }
+                    $studentData = [];
+                    $formData = [];
+                    foreach ($map_columns as $field => $col_char) {
+                        $cell_value = $worksheet->getCell($col_char . $row)->getValue();
+                        if ($cell_value instanceof PHPExcel_RichText) {
+                            $cell_value = $cell_value->getPlainText();
+                        } elseif (PHPExcel_Shared_Date::isDateTime($worksheet->getCell($col_char . $row))) {
+                            $cell_value = PHPExcel_Shared_Date::ExcelToPHP($cell_value);
+                            $cell_value = date('Y-m-d', $cell_value);
+                        }
+                        $cell_value = trim($cell_value);
+                        $cell_value = escape_string($cell_value);
+                        if (strpos($field, 'form_q_') === 0) {
+                            $qid = str_replace('form_q_', '', $field);
+                            $formData[$qid] = $cell_value;
+                        } else {
+                            $studentData[$field] = $cell_value;
+                        }
+                    }
+                    $student_id = createStudent($classroom_id, $studentData);
+                    if ($student_id && !empty($formData)) {
+                        saveFormAnswers($classroom_id, $student_id, $form_id, $formData);
+                    }
+                    if ($student_id) {
+                        $success_count++;
+                    } else {
+                        $error_count++;
+                        $errors[] = "Row {$row}: Failed to create student record";
+                    }
+                } catch (Exception $e) {
+                    $error_count++;
+                    $errors[] = "Row {$row}: " . $e->getMessage();
+                    error_log("Import error at row {$row}: " . $e->getMessage());
+                }
+            }
+            if ($error_count == 0) {
+                mysqli_commit($mysqli);
+                echo json_encode([
+                    'status' => true,
+                    'message' => "Import successful! {$success_count} records imported.",
+                    'success_count' => $success_count,
+                    'error_count' => $error_count
+                ]);
+            } else {
+                mysqli_rollback($mysqli);
+                echo json_encode([
+                    'status' => false,
+                    'message' => "Import completed with errors. {$success_count} successful, {$error_count} failed.",
+                    'success_count' => $success_count,
+                    'error_count' => $error_count,
+                    'errors' => array_slice($errors, 0, 10) 
+                ]);
+            }
+        } catch (Exception $e) {
+            if (isset($mysqli)) {
+                mysqli_rollback($mysqli);
+            }
+            error_log("Import Excel Error: " . $e->getMessage());
+            echo json_encode([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'success_count' => 0,
+                'error_count' => 0
+            ]);
+        } finally {
+            if (isset($mysqli)) {
+                mysqli_autocommit($mysqli, true);
+            }
         }
-        return $student_id;
     }
-    function convertToDate($date) {
-        $date = trim($date);
-        if (!is_string($date)) {
-            $date = (string) $date;
-        }
-        $dateTime = DateTime::createFromFormat('!d/m/Y', $date) ?: DateTime::createFromFormat('!m/d/Y', $date) ?: DateTime::createFromFormat('!Y-m-d', $date);
-        if ($dateTime === false) {
+    function saveFormAnswers($classroom_id, $student_id, $form_id, $formData) {
+        if (!$form_id || !$student_id) return false;
+        try {
+            $exists = select_data(
+                "*",
+                "classroom_form_question_users",
+                "WHERE user_id = '{$student_id}' AND form_id = '{$form_id}'"
+            );
+            if (empty($exists)) {
+                insert_data(
+                    "classroom_form_question_users",
+                    "(user_id, form_id, question_list, date_create)",
+                    "('{$student_id}', '{$form_id}', null, NOW())"
+                );
+            }
+            $q_list = [];
+            foreach ($formData as $question_id => $answer) {
+                if (empty(trim($answer))) continue;
+                $q_list[] = $question_id;
+                $qInfo = select_data(
+                    "question_type, has_other_option",
+                    "classroom_form_questions",
+                    "WHERE question_id = '{$question_id}' AND form_id = '{$form_id}'"
+                );
+                if (!$qInfo) continue;
+                $type = $qInfo[0]['question_type'];
+                $has_other = $qInfo[0]['has_other_option'];
+                delete_data(
+                    "classroom_form_answer_users",
+                    "student_id = '{$student_id}' AND question_id = '{$question_id}'"
+                );
+                switch ($type) {
+                    case 'short_answer':
+                    case 'paragraph':
+                        saveAnswer($classroom_id, $student_id, $question_id, 0, $answer, '');
+                        break;
+                    case 'checkbox':
+                        $answers = array_map('trim', explode(',', $answer));
+                        foreach ($answers as $a) {
+                            if ($a !== '') {
+                                if ($has_other && strpos($a, 'other:') === 0) {
+                                    $other_text = trim(substr($a, 6));
+                                    saveAnswer($classroom_id, $student_id, $question_id, 2, '', $other_text);
+                                } else {
+                                    saveAnswer($classroom_id, $student_id, $question_id, 1, $a, '');
+                                }
+                            }
+                        }
+                        break;
+                    case 'multiple_choice':
+                    case 'radio':
+                        if ($has_other && strpos($answer, 'other:') === 0) {
+                            $other_text = trim(substr($answer, 6));
+                            saveAnswer($classroom_id, $student_id, $question_id, 2, '', $other_text);
+                        } else {
+                            saveAnswer($classroom_id, $student_id, $question_id, 1, $answer, '');
+                        }
+                        break;
+                    case 'dropdown':
+                        saveAnswer($classroom_id, $student_id, $question_id, 1, $answer, '');
+                        break;
+                    default:
+                        saveAnswer($classroom_id, $student_id, $question_id, 0, $answer, '');
+                        break;
+                }
+            }
+            if (!empty($q_list)) {
+                $q_no = implode(',', $q_list);
+                update_data(
+                    "classroom_form_question_users",
+                    "question_list = '{$q_no}'",
+                    "user_id = '{$student_id}' AND form_id = '{$form_id}'"
+                );
+            }
+            return true;
+        } catch (Exception $e) {
+            error_log("saveFormAnswers Error: " . $e->getMessage());
             return false;
         }
-        return $dateTime->format('Y-m-d');
+    }
+    function saveAnswer($classroom_id, $student_id, $question_id, $answer_type, $answer, $other_text) {
+        try {
+            $answer = escape_string($answer);
+            $other_text = escape_string($other_text);
+            $answer_text = ($answer_type == 0 && $answer !== '') ? "'{$answer}'" : "null";
+            $choice_id   = ($answer_type > 0 && $answer !== '') ? "'{$answer}'" : "null";
+            $other       = ($other_text !== '') ? "'{$other_text}'" : "null";
+            $is_other    = ($other_text !== '') ? 1 : 0;
+            $result = insert_data(
+                "classroom_form_answer_users",
+                "(
+                    answer_text,
+                    question_id,
+                    answer_type,
+                    choice_id,
+                    other_text,
+                    is_other,
+                    classroom_id,
+                    student_id,
+                    create_date,
+                    date_update,
+                    status
+                )",
+                "(
+                    $answer_text,
+                    '{$question_id}',
+                    '{$answer_type}',
+                    $choice_id,
+                    $other,
+                    '{$is_other}',
+                    '{$classroom_id}',
+                    '{$student_id}',
+                    NOW(),
+                    NOW(),
+                    0
+                )"
+            );
+            return $result !== false;
+        } catch (Exception $e) {
+            error_log("saveAnswer Error: " . $e->getMessage());
+            return false;
+        }
+    }
+    function createStudent($classroom_id, $information) {
+        try {
+            $student = [
+                'student_idcard' => !empty($information['idcard']) ? str_replace(['-', ' '], '', escape_string($information['idcard'])) : '',
+                'student_passport' => !empty($information['passport']) ? escape_string($information['passport']) : '',
+                'student_perfix' => !empty($information['perfix']) ? escape_string($information['perfix']) : '',
+                'student_firstname_en' => !empty($information['firstname_en']) ? escape_string($information['firstname_en']) : '',
+                'student_lastname_en' => !empty($information['lastname_en']) ? escape_string($information['lastname_en']) : '',
+                'student_firstname_th' => !empty($information['firstname_th']) ? escape_string($information['firstname_th']) : '',
+                'student_lastname_th' => !empty($information['lastname_th']) ? escape_string($information['lastname_th']) : '',
+                'student_nickname_en' => !empty($information['nickname_en']) ? escape_string($information['nickname_en']) : '',
+                'student_nickname_th' => !empty($information['nickname_th']) ? escape_string($information['nickname_th']) : '',
+                'student_gender' => !empty($information['gender']) ? escape_string($information['gender']) : 'O',
+                'student_birth_date' => !empty($information['birthday']) ? convertToDate($information['birthday']) : null,
+                'student_nationality' => !empty($information['nationality']) ? escape_string($information['nationality']) : '',
+                'student_image_profile'=> !empty($information['image_profile']) ? escape_string($information['image_profile']) : '',
+                'student_email' => !empty($information['email']) ? strtolower(escape_string($information['email'])) : '',
+                'student_mobile' => !empty($information['mobile']) ? str_replace(['-', ' ', '(', ')'], '', escape_string($information['mobile'])) : '',
+                'student_company' => !empty($information['company']) ? scape_string($information['company']) : '',
+                'student_position' => !empty($information['position']) ? escape_string($information['position']) : '',
+                'student_username' => !empty($information['username']) ? escape_string($information['username']) : '',
+                'student_password' => !empty($information['password']) ? $information['password'] : null,
+                'copy_of_idcard' => !empty($information['copy_of_idcard']) ? escape_string($information['copy_of_idcard']) : '',
+                'copy_of_passport' => !empty($information['copy_of_passport']) ? escape_string($information['copy_of_passport']) : '',
+                'work_certificate' => !empty($information['work_certificate']) ? escape_string($information['work_certificate']) : '',
+                'company_certificate' => !empty($information['company_certificate']) ? escape_string($information['company_certificate']) : ''
+            ];
+            $student_password_key = bin2hex(openssl_random_pseudo_bytes(16));
+            $student_password = $student['student_password'] ? encryptToken($student['student_password'], $student_password_key) : null;
+            $conditions = [];
+            if ($student['student_idcard']) {
+                $conditions[] = "student_idcard = '{$student['student_idcard']}'";
+            }
+            if ($student['student_passport']) {
+                $conditions[] = "student_passport = '{$student['student_passport']}'";
+            }
+            if ($student['student_email']) {
+                $conditions[] = "student_email = '{$student['student_email']}'";
+            }
+            if (!empty($student['student_mobile'])) {
+                $mobile = preg_replace('/^0/', '', $student['student_mobile']); 
+                $conditions[] = "student_mobile = '{$mobile}'";
+            }
+            $exists_condition = count($conditions) ? " WHERE " . implode(" OR ", $conditions) : '';
+            $exists = select_data("student_id, student_password_key", "classroom_student", $exists_condition);
+            if (!empty($exists)) {
+                $student_id = $exists[0]['student_id'];
+                $student_password_key = $exists[0]['student_password_key'] ?: $student_password_key;
+                $update_sql = [];
+                foreach ($student as $key => $val) {
+                    if ($key == 'student_password') {
+                        if ($val) {
+                            $encrypted_pwd = encryptToken($val, $student_password_key);
+                            $update_sql[] = "$key='$encrypted_pwd'";
+                        }
+                    } else {
+                        $update_sql[] = "$key='{$val}'";
+                    }
+                }
+                if (!empty($_SESSION['emp_id'])) {
+                    $update_sql[] = "emp_modify='{$_SESSION['emp_id']}'";
+                }
+                $update_sql[] = "date_modify=NOW()";
+                update_data("classroom_student", implode(',', $update_sql), "student_id='{$student_id}'");
+            } else {
+                $fields = array_keys($student);
+                $values = [];
+                foreach ($student as $key => $val) {
+                    if ($key == 'student_password') {
+                        $values[] = $val ? "'$student_password'" : "NULL";
+                    } else {
+                        $values[] = "'$val'";
+                    }
+                }
+                $fields[] = 'student_password_key';
+                $fields[] = 'status';
+                $fields[] = 'emp_create';
+                $fields[] = 'date_create';
+                $fields[] = 'emp_modify';
+                $fields[] = 'date_modify';
+                $values[] = "'$student_password_key'";
+                $values[] = 0;
+                $values[] = !empty($_SESSION['emp_id']) ? "'{$_SESSION['emp_id']}'" : "NULL";
+                $values[] = "NOW()";
+                $values[] = !empty($_SESSION['emp_id']) ? "'{$_SESSION['emp_id']}'" : "NULL";
+                $values[] = "NOW()";
+                $student_id = insert_data(
+                    "classroom_student",
+                    "(" . implode(',', $fields) . ")",
+                    "(" . implode(',', $values) . ")"
+                );
+            }
+            if ($student_id) {
+                $existsClass = select_data(
+                    "*", 
+                    "classroom_student_join", 
+                    "WHERE student_id='{$student_id}' AND classroom_id='{$classroom_id}'"
+                );
+                if (empty($existsClass)) {
+                    insert_data(
+                        "classroom_student_join",
+                        "(student_id,classroom_id,register_date,register_by,register_by_emp,invite_date,invite_by,invite_status,comp_id,status,emp_create,date_create,emp_modify,date_modify)",
+                        "('{$student_id}','{$classroom_id}',NOW(),1,'" . $_SESSION['emp_id'] . "',NOW(),'" . $_SESSION['emp_id'] . "',0,'" . $_SESSION['comp_id'] . "',0,'" . $_SESSION['emp_id'] . "',NOW(),'" . $_SESSION['emp_id'] . "',NOW())"
+                    );
+                }
+            }
+            return $student_id;
+        } catch (Exception $e) {
+            error_log("createStudent Error: " . $e->getMessage());
+            return false;
+        }
+    }
+    function convertToDate($date_string) {
+        if (empty($date_string)) return null;
+        try {
+            if (is_numeric($date_string)) {
+                $unix_date = ($date_string - 25569) * 86400;
+                return date('Y-m-d', $unix_date);
+            }
+            $formats = [
+                'Y-m-d', 'Y/m/d', 'd/m/Y', 'd-m-Y',
+                'Y-m-d H:i:s', 'Y/m/d H:i:s',
+                'd/m/Y H:i:s', 'd-m-Y H:i:s'
+            ];
+            foreach ($formats as $format) {
+                $date = DateTime::createFromFormat($format, $date_string);
+                if ($date !== false) {
+                    return $date->format('Y-m-d');
+                }
+            }
+            $timestamp = strtotime($date_string);
+            if ($timestamp !== false) {
+                return date('Y-m-d', $timestamp);
+            }
+            return null;
+        } catch (Exception $e) {
+            error_log("Date conversion error: " . $e->getMessage());
+            return null;
+        }
     }
     if(isset($_POST) && $_POST['action'] == 'confirmRegistration') {
         $join_id = $_POST['join_id'];
