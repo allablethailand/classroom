@@ -106,7 +106,7 @@ function buildClassroom() {
 					defaultLang: 'en'
 				});
 			},
-			"order": [[8,'desc']],
+			"order": [[9,'desc']],
 			"columns": [{ 
                 "targets": 0,
                 "data": "classroom_poster",
@@ -154,13 +154,25 @@ function buildClassroom() {
                 "className": "dt-click"
             },{ 
                 "targets": 8,
+                "data": "classroom_promote",
+                "className": "dt-click",
+                "render": function (data,type,row,meta) {	
+                    let classroom_id = row['classroom_id'];
+					return `
+                        <a class="text-${(data == 0) ? 'green' : 'grey'}" onclick="switchClassroom(${classroom_id}, ${data});"><i class="fas fa-toggle-${(data == 0) ? 'on' : 'off'} fa-2x"></i></a>
+                    `;
+                }
+            },{ 
+                "targets": 9,
                 "data": "classroom_id",
                 "className": "text-center",
                 "render": function (data,type,row,meta) {	
                     let classroom_key = row['classroom_key'];
+                    let classroom_link = row['classroom_link'];
 					return `
                         <div class="nowarp">
-                            <button type="button" class="btn btn-info btn-circle" onclick="viewLink(${data})"><i class="fas fa-link"></i></button> 
+                            <button type="button" class="btn btn-info btn-circle" onclick="showQRCode('${classroom_link}')" title="Show QR Code"><i class="fas fa-qrcode"></i></button> 
+                            <button type="button" class="btn btn-primary btn-circle" onclick="viewLink('${data}')" title="Show QR Code"><i class="fa fa-link"></i></button> 
                             <button type="button" class="btn btn-orange btn-circle" onclick="manageClassroom(${data})"><i class="fas fa-pencil-alt"></i></button> 
                             <button type="button" class="btn btn-red btn-circle" onclick="delClassroom(${data})"><i class="fas fa-trash-alt"></i></button>
                         </div>
@@ -197,6 +209,87 @@ function buildClassroom() {
             }
         });
     }
+}
+function switchClassroom(classroom_id,option) {
+    if(option == 0){
+        var message = 'Hide';
+		var topic = 'Hidden on login page';
+        var type_color = 'error';
+		var button_color = '#FF6666';
+	} else {
+		var message = 'Show';
+		var topic = 'Show on login page';
+		var type_color = 'info';
+		var button_color = '#5bc0de';
+	}
+	event.stopPropagation();
+	swal({ 
+		html:true,
+		title: window.lang.translate(`${topic}?`),
+		text: ``,
+		type: type_color,
+		showCancelButton: true,
+		closeOnConfirm: false,
+		confirmButtonText: window.lang.translate(message),
+		cancelButtonText: window.lang.translate("Cancel"),	
+		confirmButtonColor: button_color,
+		cancelButtonColor: '#CCCCCC',
+		showLoaderOnConfirm: true,
+	},
+	function(isConfirm){
+		if (isConfirm) {
+			$.ajax({
+                url: "/classroom/management/actions/management.php",
+                type: "POST",
+                data: {
+                    action:'switchClassroom',
+                    classroom_id: classroom_id,
+                    classroom_promote: option
+                },
+                dataType: "JSON",
+                type: 'POST',
+                success: function(result){
+                    swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});							
+                    buildClassroom();
+                }
+            });
+		}else{
+			swal.close();
+		}
+	});
+}
+function showQRCode(event_id) {
+    $(".systemModal").modal();
+    $(".systemModal .modal-header").html(`
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h5 class="modal-title" lang="en">Classroom QR Code</h5>
+    `);
+    $(".systemModal .modal-body").html(`
+        <div id="qrcode"></div>
+    `);
+    $(".systemModal .modal-footer").html(`
+        <a id="download" class="btn btn-orange" href="#" download="qrcode.png" style="display:none; font-size:12px;">Download QR Code</a>
+        <a style="font-size:10px;" class="btn btn-white share-link copy-4 copy-qr2" onclick="copyLink(4)"><i class="fas fa-link"></i> <span lang="en">Copy</span><span class="notofication-share"><i class="fas fa-check"></i> <label lang="en">Copy Link</label></span></a>
+        <button type="button" class="btn btn-white" data-dismiss="modal" style="font-size:12px;">Close</button>
+    `);
+    var text = event_id;
+    $('#qrcode').empty(); 
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: text,
+        width: 1024,
+        height: 1024,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+    setTimeout(function(){
+        var canvas = $('#qrcode canvas')[0];
+        var dataUrl = canvas.toDataURL('image/png');
+        $('#download').attr('href', dataUrl);
+        $('#download').show();
+    }, 500); 
+    $(".copy-qr2").attr("data-clipboard-text",event_id);
+	new ClipboardJS('.copy-qr2');
 }
 function manageClassroom(classroom_id) {
     $.redirect("detail",{classroom_id: classroom_id},'post','_blank');

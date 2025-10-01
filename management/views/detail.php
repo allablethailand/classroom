@@ -97,6 +97,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/jquery-clockpicker.min.js" integrity="sha512-x0qixPCOQbS3xAQw8BL9qjhAh185N7JSw39hzE/ff71BXg7P1fkynTqcLYMlNmwRDtgdoYgURIvos+NJ6g0rNg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.css" integrity="sha512-BB0bszal4NXOgRP9MYCyVA0NNK2k1Rhr+8klY17rj4OhwTmqdPUQibKUDeHesYtXl7Ma2+tqC6c7FzYuHhw94g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
 <?php require_once "../../include_header.php"; ?>
@@ -276,33 +277,6 @@
     </div>
 </div>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzxc7D9o3CcmSyLWVo6h4rCxS0yL_wB2k&libraries=places"></script>
-<div class="locationModal modal" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="btn-close close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><i class="fas fa-map-marker-alt"></i> <span lang="en">Location</span></h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-xs-6">
-                        <input type="text" class="form-control" id="location-lat" readonly placeholder="Latitude">
-                    </div>
-                    <div class="col-xs-6">
-                        <input type="text" class="form-control" id="location-lng" readonly placeholder="Longitude">
-                    </div>
-                </div>
-                <div class="map-box" style="height: calc(60vh - 100px)">
-                    <div class="map-container" style="height: 100%;"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-orange btn-save-location">Save Location</button>
-                <button type="button" class="btn btn-white btn-close" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="modal fade modal-template" role="dialog" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog fullscreen">
         <div class="modal-content">

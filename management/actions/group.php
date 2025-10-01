@@ -148,8 +148,8 @@
             $group_logo = null;
             $group_logo_thumb = null;
             if ($group_logo_name && $group_logo_tmp) {
-                $strname = md5($classroom_id.'||'.$group_id);
-                $group_logo_dir = 'uploads/classroom/' . $_SESSION['comp_id'] . '/group/';
+                $strname = md5($group_id);
+                $group_logo_dir = "uploads/{$_SESSION['comp_id']}/classroom/group/";
                 $path_info = pathinfo($group_logo_name);
                 $group_logo_ext = strtolower($path_info['extension']);
                 $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif');

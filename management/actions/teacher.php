@@ -109,8 +109,8 @@ if(isset($_POST) && $_POST['action'] == 'buildTeacher') {
             echo json_encode(array('status' => 'error', 'message' => 'Required data (comp_id or classroom_id) not found.'));
             exit();
         }
-        $upload_dir = 'uploads/teachers/';
-        $file_fields = array('teacher_image_profile', 'teacher_card_front', 'teacher_card_back');
+        $upload_dir = "uploads/{$comp_id}/classroom/teacher/";
+        $file_fields = array("teacher_image_profile", "teacher_card_front", "teacher_card_back");
         $file_paths = array();
         foreach ($file_fields as $field) {
             if (isset($_FILES[$field]) && $_FILES[$field]['error'] == UPLOAD_ERR_OK) {
