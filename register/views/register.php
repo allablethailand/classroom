@@ -169,21 +169,25 @@
                                 <label class="register-form" for="copy_of_idcard" data-lang="copy_of_idcard"></label>
                                 <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
                                 <input type="file" class="form-control input-file" id="copy_of_idcard" name="copy_of_idcard" accept="image/*,.pdf">
+                                <input type="hidden" id="existing_copy_of_idcard" name="existing_copy_of_idcard">
                             </div>
                             <div class="form-group form-input input-22 hidden">
                                 <label class="register-form" for="copy_of_passport" data-lang="copy_of_passport"></label>
                                 <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
                                 <input type="file" class="form-control input-file" id="copy_of_passport" name="copy_of_passport" accept="image/*,.pdf">
+                                <input type="hidden" id="existing_copy_of_passport" name="existing_copy_of_passport">
                             </div>
                             <div class="form-group form-input input-20 hidden">
                                 <label class="register-form" for="work_certificate" data-lang="work_certificate"></label>
                                 <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
                                 <input type="file" class="form-control input-file" id="work_certificate" name="work_certificate" accept="image/*,.pdf">
+                                <input type="hidden" id="existing_work_certificate" name="existing_work_certificate">
                             </div>
                             <div class="form-group form-input input-21 hidden">
                                 <label class="register-form" for="company_certificate" data-lang="company_certificate"></label>
                                 <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
                                 <input type="file" class="form-control input-file" id="company_certificate" name="company_certificate" accept="image/*,.pdf">
+                                <input type="hidden" id="existing_company_certificate" name="existing_company_certificate">
                             </div>
                             <div class="form-group form-input input-12 hidden">
                                 <label class="register-form" for="student_username" data-lang="username"></label>
@@ -216,11 +220,24 @@
                             <span><span data-lang="i_accept"></span> <a class="open-term" style="color: #667eea; cursor:pointer;" data-lang="policy"></a></span>
                         </div>
                     </div>
-                    <div class="form-group" style="margin-top: 30px;">
-                        <button type="submit" class="btn btn-register"><span data-lang="register"></span></button>
-                        <p class="text-center" style="margin: 15px auto;"><span data-lang="already"></span> <b><a class="login" style="color:#FF9900; cursor:pointer;" data-lang="login"></a></b></p>
+                    <div class="before-login hidden">
+                        <div class="form-group" style="margin-top: 30px;">
+                            <button type="submit" class="btn btn-register"><span data-lang="register"></span></button>
+                            <p class="text-center" style="margin: 15px auto;"><span data-lang="already"></span> <b><a class="login" style="color:#FF9900; cursor:pointer;" data-lang="login"></a></b></p>
+                        </div>
+                    </div>
+                    <div class="after-login hidden">
+                        <div class="form-group" style="margin-top: 30px;">
+                            <button type="submit" class="btn btn-register"><span data-lang="save"></span></button>
+                            <p class="text-center" style="margin: 15px auto;"><a class="logout" style="color:#FF9900; cursor:pointer;" data-lang="logout"></a></b></p>
+                        </div>
                     </div>
                 </form>
+            </div>
+            <div class="form-progress">
+                <div class="progress">
+                    <div id="progress_bar" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+                </div>
             </div>
         </div>
     </div>

@@ -3,6 +3,7 @@ let tenant_key = '';
 let currentLang = "th";
 let consent_status = 'N';
 let channel_id = '';
+let is_logged_in = false;
 const translations = {
     en: {
         eng: "English", thai: "Thai", register: "Register", infomation: "Details",
@@ -20,11 +21,10 @@ const translations = {
         password_info: "Password must be 4–20 characters, using only English letters or numbers.",
         username_info: "Username must be 8–20 characters, consisting of English letters or numbers only. (By default, your registered mobile number will be used)",
         close: "Close", accept: "Accept", already: "Already have an account?", login: "Log in",
-        registered: "Successfully registered.", registered_success: "Your registration has been submitted successfully.",
-        however: "However, your account is currently pending approval from our administrator.",
-        once: "Once your registration is reviewed and approved, you will receive a notification via email.",
-        registered_login: "You can now log in to the system using your registered username and password.",
-        please_login: "Please proceed by clicking the \"Login\" button below.",
+        registered: "Successfully registered.", registered_success: "You have successfully completed your registration.",
+        registered_success2: "Please check the email address you provided to view the details and status of your registration. If you do not receive an email within a few minutes, please check your spam folder or contact our support team for further assistance.",
+        registered_success3: "If you do not receive an email within a few minutes,",
+        registered_success4: "please check your spam folder or contact our support team for further assistance.",
         accept_register: "Accept and register",
         copy_of_idcard: "Copy of ID card",
         copy_of_passport: "Passport",
@@ -32,6 +32,8 @@ const translations = {
         company_certificate: "Company Certificate (for business owners)",
         support_upload: "Supports only image files or PDF.",
         nationality: "Nationality",
+        save: "Save",
+        logout: "Logout",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
@@ -49,11 +51,10 @@ const translations = {
         password_info: "รหัสผ่านต้องมีความยาว 4–20 ตัวอักษร และใช้ได้เฉพาะตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น",
         username_info: "ชื่อผู้ใช้ต้องมีความยาว 8–20 ตัวอักษร และประกอบด้วยตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น (ค่าเริ่มต้นคือหมายเลขโทรศัพท์มือถือที่ท่านกรอกไว้)",
         close: "ปิด", accept: "ยอมรับ", already: "มีบัญชีผู้ใช้อยู่แล้ว?", login: "เข้าสู่ระบบ",
-        registered: "ลงทะเบียนสำเร็จ", registered_success: "การลงทะเบียนของคุณเรียบร้อยแล้ว",
-        however: "อย่างไรก็ตาม บัญชีของคุณกำลังรอการอนุมัติจากผู้ดูแลระบบของเรา",
-        once: "เมื่อการลงทะเบียนของคุณได้รับการตรวจสอบและอนุมัติแล้ว คุณจะได้รับการแจ้งเตือนทางอีเมล",
-        registered_login: "คุณสามารถเข้าสู่ระบบโดยใช้ชื่อผู้ใช้และรหัสผ่านที่คุณลงทะเบียนไว้ได้แล้ว",
-        please_login: "กรุณาดำเนินการต่อโดยคลิกปุ่ม \"เข้าสู่ระบบ\" ด้านล่าง",
+        registered: "ลงทะเบียนสำเร็จ", registered_success: "คุณได้ทำการลงทะเบียนเรียบร้อยแล้ว",
+        registered_success2: "กรุณาตรวจสอบอีเมลที่ท่านได้กรอกไว้ เพื่อดูรายละเอียดและผลการลงทะเบียนของท่าน",
+        registered_success3: "หากท่านไม่ได้รับอีเมลภายในไม่กี่นาที กรุณาตรวจสอบโฟลเดอร์สแปม",
+        registered_success4: "หรือแจ้งเจ้าหน้าที่เพื่อตรวจสอบเพิ่มเติม",
         accept_register: "ยอมรับและลงทะเบียน",
         copy_of_idcard: "สำเนาบัตรประชาชน",
         copy_of_passport: "หนังสือเดินทาง",
@@ -61,9 +62,12 @@ const translations = {
         company_certificate: "หนังสือรับรองของบริษัท (สำหรับเจ้าของกิจการ)",
         support_upload: "รองรับไฟล์รูปภาพหรือ pdf เท่านั้น",
         nationality: "สัญชาติ",
+        save: "บันทึกข้อมูล",
+        logout: "ออกจากระบบ",
     }
 };
 $(document).ready(function () {
+    $('#registrationForm').on('input change', 'input, textarea, select', updateProgressBar);
     function toggleScrollBtn() {
         if ($(window).width() > 767) return $('#scrollToFormBtn').hide();
         const formOffset = $('#registration-form').offset().top;
@@ -209,8 +213,123 @@ $(document).ready(function () {
                 text: nationality.nationality_name 
             }));
         }
-        $(".login").attr("href", "/" + tenant_key);
+        is_logged_in = response.is_logged_in;
+        if (response.is_logged_in && response.student_data) {
+            $(".after-login").removeClass("hidden");
+            const data = response.student_data;
+            if (data.student_id) {
+                $("input[name='student_id']").val(data.student_id);
+                if ($("input[name='student_id']").length === 0) {
+                    $("form").append('<input type="hidden" name="student_id" value="' + data.student_id + '">');
+                }
+            }
+            if (data.student_firstname_en) $("#student_firstname_en").val(data.student_firstname_en);
+            if (data.student_lastname_en) $("#student_lastname_en").val(data.student_lastname_en);
+            if (data.student_nickname_en) $("#student_nickname_en").val(data.student_nickname_en);
+            if (data.student_firstname_th) $("#student_firstname_th").val(data.student_firstname_th);
+            if (data.student_lastname_th) $("#student_lastname_th").val(data.student_lastname_th);
+            if (data.student_nickname_th) $("#student_nickname_th").val(data.student_nickname_th);
+            if (data.student_email) $("#student_email").val(data.student_email);
+            if (data.student_mobile) $("#student_mobile").val(data.student_mobile);
+            if (data.student_company) $("#student_company").val(data.student_company);
+            if (data.student_position) $("#student_position").val(data.student_position);
+            if (data.student_username) $("#student_username").val(data.student_username);
+            if (data.student_birth_date) $("#student_birth_date").val(data.student_birth_date);
+            if (data.student_idcard) $("#student_idcard").val(data.student_idcard);
+            if (data.student_passport) $("#student_passport").val(data.student_passport);
+            if (data.student_password) $("#student_password").val(data.student_password);
+            if (data.dial_code) {
+                $("#dialCode").val(data.dial_code);
+                $("select[name='dialCode']").val(data.dial_code);
+            }
+            if (data.student_gender) {
+                $("input[name='student_gender'][value='" + data.student_gender + "']").prop('checked', true);
+            }
+            if (data.student_perfix) {
+                $("#student_perfix").val(data.student_perfix);
+                $("select[name='student_perfix']").val(data.student_perfix).trigger('change');
+            }
+            if (data.student_perfix_other) {
+                $("#student_perfix_other").val(data.student_perfix_other);
+                $(".input-perfix-other").removeClass("hidden");
+            }
+            if (data.student_nationality) {
+                $("#student_nationality").val(data.student_nationality);
+                $("select[name='student_nationality']").val(data.student_nationality);
+            }
+            if (data.student_image_profile) {
+                const $imgPreview = $("#preview_student_image_profile");
+                if ($imgPreview.length) {
+                    $imgPreview.attr('src', data.student_image_profile).removeClass('hidden').show();
+                } else {
+                    $("input[name='student_image_profile']").after(
+                        '<img id="preview_student_image_profile" src="' + data.student_image_profile + '" class="img-thumbnail mt-2" style="max-width: 200px;">'
+                    );
+                }
+            }
+            if (data.copy_of_idcard) {
+                showDocumentPreview('copy_of_idcard', data.copy_of_idcard, 'ID Card');
+                $("#existing_copy_of_idcard").val(data.copy_of_idcard);
+            }
+            if (data.copy_of_passport) {
+                showDocumentPreview('copy_of_passport', data.copy_of_passport, 'Passport');
+                $("#existing_copy_of_passport").val(data.copy_of_passport);
+            }
+            if (data.work_certificate) {
+                showDocumentPreview('work_certificate', data.work_certificate, 'Work Certificate');
+                $("#existing_work_certificate").val(data.work_certificate);
+            }
+            if (data.company_certificate) {
+                showDocumentPreview('company_certificate', data.company_certificate, 'Company Certificate');
+                $("#existing_company_certificate").val(data.company_certificate);
+            }
+            $(".page-title, h1").append(' <span class="badge badge-info" data-lang="update_mode">Update Mode</span>');
+            $(".input-password").addClass("hidden");
+            $("input[name='student_password']").removeClass("require");
+            $(".logout").attr("href", "/actions/logout.php");
+        } else {
+            $(".before-login").removeClass("hidden");
+            $(".login").attr("href", "/" + tenant_key);
+        }
+        updateProgressBar();
     }, 'json').fail(() => window.location.href = '/');
+    function showDocumentPreview(fieldName, fileUrl, label) {
+        const $input = $("input[name='" + fieldName + "']");
+        const $existingInput = $("input[name='existing_" + fieldName + "']");
+        let $container = $input.siblings('.document-preview-list-' + fieldName);
+        if ($container.length === 0) {
+            $container = $('<ul class="list-group document-preview-list-' + fieldName + ' mt-2"></ul>');
+            $input.after($container);
+        }
+        const fileExt = fileUrl.split('.').pop().toLowerCase();
+        let $item = $('<li class="list-group-item d-flex justify-content-between align-items-center"></li>');
+        let previewContent = '';
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) {
+            previewContent = `
+                <div class="text-center">
+                    <img src="${fileUrl}" class="img-thumbnail" style="max-width: 80px; margin-right:10px;">
+                </div>
+            `;
+        } else {
+            previewContent = `
+                <div class="text-center">
+                    <i class="fa fa-file-pdf-o fa-5x text-danger"></i>
+                </div>
+            `;
+        }
+        $item.append(previewContent);
+        const $btnGroup = $('<div class="text-center" style="margin-top: 15px;"></div>');
+        const $viewBtn = $('<a href="' + fileUrl + '" target="_blank" class="btn btn-primary">View</a> ');
+        const $deleteBtn = $('<button type="button" class="btn btn-warning">Delete</button>');
+        $deleteBtn.on('click', function() {
+            $item.remove();
+            $existingInput.val('');
+        });
+        $btnGroup.append($viewBtn).append($deleteBtn);
+        $item.append($btnGroup);
+        $container.append($item);
+        toggleLanguage(currentLang);
+    }
     $(".language-menu div").click(function () {
         const lang = $(this).attr("store-translate");
         if (lang) toggleLanguage(lang.toLowerCase());
@@ -223,13 +342,16 @@ $(document).ready(function () {
             <button type="button" class="btn btn-warning accept-term" data-lang="accept"></button>
             <button type="button" class="btn" data-lang="close" data-dismiss="modal"></button>
         `);
-        $.post('/classroom/register/actions/register.php', { action: "loadTerm", classroom_id }, (res) => {
+        $.post('/classroom/register/actions/register.php', { 
+            action: "loadTerm", 
+            classroom_id 
+        }, (res) => {
             $(".systemModal .modal-body").html(res.classroom_consent || '-');
         }, 'json');
     });
-    $(document).on("click", ".accept-term", () => {
-        $("#agree").prop("checked", true);
-        $(".systemModal").modal("hide");
+    $(document).on('click', '.accept-term', function() {
+        $("#agree").prop('checked', true);
+        $(".systemModal").modal('hide');
     });
     $(document).on('shown.bs.modal', '.modal', () => toggleLanguage(currentLang));
     $(".btn-register").click(function(e) {
@@ -523,51 +645,69 @@ function handleRegisterResponse(result) {
         });
         return;
     }
-    $(".systemModal .modal-header").html(`<h5 class="modal-title" data-lang="registered"></h5>`);
-    $(".systemModal .modal-body").html(`
-        <div class="text-center">
-            <img src="/images/origami-academy.png" onerror="this.src='/images/origami-academy.png'" style="height: 100px;">
-            <h5 class="text-success" data-lang="registered_success"></h5>
-            <p data-lang="however"></p>
-            <p data-lang="once"></p>
-        </div>
-    `);
-    $(".systemModal .modal-footer").html(`
-        <div class="text-center">
-            <button type="button" class="btn btn-default close-register" data-lang="close"></button>
-        </div>
-    `);
-    $(".systemModal").modal();
-    toggleLanguage(currentLang);
-    $(".close-register").off("click").on("click", function() {
-        location.reload();
-    });
+    if(is_logged_in) {
+        swal({
+            title: 'Saved successfully',
+            text: '',
+            type: 'success',
+            confirmButtonColor: '#41a85f'
+        }, function() {
+            location.reload();
+        });
+        $(".btn-register").prop('disabled', false);
+    } else {
+        $(".systemModal .modal-header").html(`<h5 class="modal-title" data-lang="registered"></h5>`);
+        $(".systemModal .modal-body").html(`
+            <div class="text-center">
+                <img src="/images/ogm_logo.png" onerror="this.src='/images/ogm_logo.png'" style="height: 100px; margin-bottom: 20px;">
+                <h5 data-lang="registered_success"></h5>
+                <p data-lang="registered_success2"></p>
+                <p data-lang="registered_success3"></p>
+                <p data-lang="registered_success4"></p>
+            </div>
+        `);
+        $(".systemModal .modal-footer").html(`
+            <div class="text-center">
+                <button type="button" class="btn btn-default close-register" data-lang="close"></button>
+            </div>
+        `);
+        toggleLanguage(currentLang);
+        $(".close-register").off("click").on("click", function() {
+            location.reload();
+        });
+    }
 }
 function initForm(form_data) {
     if(!form_data) return;
     let html = '';
     form_data.forEach(q => {
+        const answerChoice = q.answer_choice_id;
+        const answerText = q.answer_text;
+        const answerOther = q.answer_other_text;
         html += `<div class="form-group">
             <input type="hidden" name="question_id[]" value="${q.question_id}">
             <input type="hidden" name="question_type[]" value="${q.question_type}">
+            <hr>
         `;
-        html += `<label class="${q.has_required == 1 ? 'required-field' : ''} question_text">${q.question_text}</label>`;
+        html += `<label class="${q.has_required == 1 ? 'required-field' : ''} question_text"><i class="fas fa-question-circle"></i> ${q.question_text}</label>`;
         let requiredAttr = q.has_required == 1 ? 'data-required="1"' : '';
         if(q.has_options == 1) {
             if(q.question_type === "radio" || q.question_type === "multiple_choice") {
                 q.option_item.forEach(opt => {
+                    const checked = (answerChoice == opt.choice_id) ? 'checked' : '';
                     html += `
                         <div>
-                            <input type="radio" id="q_${q.question_id}_opt_${opt.choice_id}" name="q_${q.question_id}" value="${opt.choice_id}" class="option-input" data-qid="${q.question_id}" ${requiredAttr}>
+                            <input type="radio" id="q_${q.question_id}_opt_${opt.choice_id}" name="q_${q.question_id}" value="${opt.choice_id}" class="option-input" data-qid="${q.question_id}" ${requiredAttr} ${checked}>
                             <label for="q_${q.question_id}_opt_${opt.choice_id}" class="radio-label">${opt.choice_text}</label>
                         </div>
                     `;
                 });
             } else if(q.question_type === "checkbox") {
                 q.option_item.forEach(opt => {
+                    const checked = (Array.isArray(answerChoice) && answerChoice.includes(opt.choice_id)) ? 'checked' : '';
                     html += `
                         <div>
-                            <input type="checkbox" id="q_${q.question_id}_opt_${opt.choice_id}" name="q_${q.question_id}[]" value="${opt.choice_id}" class="option-input" data-qid="${q.question_id}" ${requiredAttr}>
+                            <input type="checkbox" id="q_${q.question_id}_opt_${opt.choice_id}" name="q_${q.question_id}[]" value="${opt.choice_id}" class="option-input" data-qid="${q.question_id}" ${requiredAttr} ${checked}>
                             <label for="q_${q.question_id}_opt_${opt.choice_id}" class="checkbox-label">${opt.choice_text}</label>
                         </div>
                     `;
@@ -575,20 +715,22 @@ function initForm(form_data) {
             }
             if(q.has_other_option == 1) {
                 const inputType = (q.question_type === 'checkbox' ? 'checkbox' : 'radio');
-                const inputName = `q_${q.question_id}${inputType === 'checkbox' ? '[]' : ''}`;
+                const inputName = `q_${q.question_id}_other`;
+                const otherChecked = (answerOther && answerOther !== '') ? 'checked' : '';
+                const otherDisplay = otherChecked ? 'block' : 'none';
                 html += `
                     <div>
-                        <input type="${inputType}" id="q_${q.question_id}_other" name="${inputName}" value="other" class="option-input other-input" data-qid="${q.question_id}" ${requiredAttr}>
+                        <input type="${inputType}" id="q_${q.question_id}_other" name="${inputName}" value="other" class="option-input other-input" data-qid="${q.question_id}" ${requiredAttr} ${otherChecked}>
                         <label for="q_${q.question_id}_other" class="${inputType==='checkbox' ? 'checkbox-label':'radio-label'}"><span data-lang="other">อื่นๆ</span></label>
                     </div>
-                    <div id="other_box_${q.question_id}" style="display:none; margin-top:5px;">
-                        <input type="text" class="form-control" name="q_${q.question_id}_other">
+                    <div id="other_box_${q.question_id}" style="display:${otherDisplay}; margin-top:5px;">
+                        <input type="text" class="form-control" name="q_${q.question_id}_other" value="${answerOther || ''}">
                     </div>
                 `;
             }
         } else {
             if(q.question_type === "short_answer") {
-                html += `<textarea name="q_${q.question_id}" class="form-control" ${requiredAttr}></textarea>`;
+                html += `<textarea name="q_${q.question_id}" class="form-control" ${requiredAttr} onclick="autoResize(this);" onkeyup="autoResize(this);">${answerText || ''}</textarea>`;
             }
         }
         html += `</div>`;
@@ -663,4 +805,50 @@ function toggleLanguage(lang) {
     });
     $(".language-menu div").removeClass("lang-active");
     $(".language-menu div[store-translate='" + lang.toUpperCase() + "']").addClass("lang-active");
+}
+function calculateFormCompletion() {
+    const fieldStatus = {};
+    $('#registrationForm').find('input:visible, textarea:visible, select:visible').each(function() {
+        const $el = $(this);
+        const name = $el.attr('name');
+        if(!name) return;
+        if(fieldStatus[name]) return;
+        let filled = false;
+        const type = $el.attr('type');
+        if($el.is('textarea') || type === 'text' || type === 'tel' || type === 'email' || type === 'password') {
+            filled = isInputValid($el);
+        } else if(type === 'file') {
+            filled = $el.val() || ($(`#existing_${$el.attr('id')}`).length && $(`#existing_${$el.attr('id')}`).val());
+        } else if(type === 'checkbox' || type === 'radio') {
+            if($(`input[name="${name}"]:checked`).length) filled = true;
+            const otherEl = $(`input[name="${name}_other"]`);
+            const otherChecked = $(`input[name="${name}"][value="other"]`).is(':checked');
+            if(otherEl.length && otherChecked && otherEl.val().trim() !== '') filled = true;
+        } else if($el.is('select')) {
+            filled = $el.val() && $el.val() !== '';
+        }
+        fieldStatus[name] = filled;
+    });
+    const totalFields = Object.keys(fieldStatus).length;
+    const filledFields = Object.values(fieldStatus).filter(v => v).length;
+    return totalFields ? Math.round((filledFields / totalFields) * 100) : 0;
+}
+function isInputValid($el) {
+    const val = ($el.val() || '').trim();
+    if(!val) return false;
+    const id = $el.attr('id') || '';
+    if(id.endsWith('_en')) {
+        return /^[A-Za-z\s]+$/.test(val);
+    } else if(id.endsWith('_th')) {
+        return /^[ก-๙\s]+$/.test(val);
+    } else if(id === 'student_username') {
+        return /^[A-Za-z0-9]+$/.test(val);
+    } else if(id === 'student_password') {
+        return /^[A-Za-z0-9!@#$%^&*()_\+\-=\[\]{};:'",.<>\/?]+$/.test(val);
+    }
+    return true;
+}
+function updateProgressBar() {
+    const percent = calculateFormCompletion();
+    $('#progress_bar').css('width', percent + '%').text(percent + '%');
 }

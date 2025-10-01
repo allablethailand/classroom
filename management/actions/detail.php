@@ -53,7 +53,7 @@
                 (
                     case
                         when template.classroom_type = 'online' then pf.platforms_name
-                        else template.classroom_plateform
+                        else template.classroom_source
                     end
                 ) as platforms_name,
                 template.classroom_source,

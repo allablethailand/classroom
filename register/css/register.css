@@ -185,6 +185,12 @@ body {
     .scroll-to-form-btn {
         display: block;
     }
+    .right-section .form-progress .progress {
+        height: 20px !important;
+    }
+    .right-section .form-progress {
+        position: fixed !important;
+    }
 }
 @media (min-width: 768px) {
     .scroll-to-form-btn {
@@ -424,4 +430,34 @@ input[type="radio"]:checked + .radio-label::after {
     font-size: 20px;
     color: #FF9900;
     top: -5px;
+}
+img {
+    max-width: 100%;
+    height: auto;
+}
+textarea, input[type="text"], input[type="email"], input[type="password"], select {
+    font-size: 13px !important;
+}
+.right-section .form-progress {
+    position: sticky;
+    bottom: -25px;
+    left: 0;
+    width: 100%;
+    background: #f5f5f5;
+}
+.right-section .form-progress .progress {
+    height: 15px;
+    background-color: #e9ecef;
+    border-radius: 0;
+}
+.right-section .progress-bar {
+    width: 0%;
+    height: 15px;
+    background-color: #28a745;
+    color: #fff;
+    text-align: center;
+    line-height: 15px;
+    border-radius: 0;
+    transition: width 0.3s ease;
+    font-size: 10px;
 }
