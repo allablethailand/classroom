@@ -413,12 +413,12 @@ function populateFormData(data) {
                 value: data.platforms_id, 
                 text: data.platforms_name 
             }));
-        } else if (data.platforms_name) {
-            $(".getLatLong").val(data.platforms_name);
-            const [lat, lng] = data.platforms_name.split(",");
+        } else if (data.platforms_id) {
+            $(".getLatLong").val(data.platforms_id);
+            const [lat, lng] = data.platforms_id.split(",");
             $(".getLatLong").attr({ lat, lng });
         }
-        $("#classroom_source").val(data.classroom_source || '');
+        $(".classroom_source").val(data.platforms_name || '');
         setDatePickerValue("#classroom_open_register_date", data.classroom_open_register_date);
         setDatePickerValue("#classroom_close_register_date", data.classroom_close_register_date);
         $("#classroom_open_register_time").val(data.classroom_open_register_time || '');
@@ -1075,7 +1075,7 @@ function getManagementTemplate() {
                             </div>
                             <div class="col-sm-9">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="classroom_source" id="classroom_source" autocomplete="off">
+                                    <input type="text" class="form-control classroom_source" name="classroom_source" id="classroom_source" autocomplete="off">
                                     <span class="input-group-addon"><i class="fas fa-link"></i></span>
                                 </div>
                             </div>
@@ -1098,7 +1098,7 @@ function getManagementTemplate() {
                                 <label lang="en" class="control-label">Location Name</label>
                             </div>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" name="classroom_source" id="classroom_source" autocomplete="off">
+                                <input type="text" class="form-control classroom_source" name="classroom_source" id="classroom_source" autocomplete="off">
                             </div>
                         </div>
                     </div>
