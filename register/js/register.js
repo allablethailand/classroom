@@ -30,7 +30,7 @@ const translations = {
         copy_of_passport: "Passport",
         work_certificate: "Work certificate",
         company_certificate: "Company Certificate (for business owners)",
-        support_upload: "Supports only image files or PDF.",
+        support_upload: "Supports image or PDF files with a size not exceeding 20 MB only.",
         nationality: "Nationality",
         save: "Save",
         logout: "Logout",
@@ -60,7 +60,7 @@ const translations = {
         copy_of_passport: "หนังสือเดินทาง",
         work_certificate: "หนังสือรับรองการทำงาน",
         company_certificate: "หนังสือรับรองของบริษัท (สำหรับเจ้าของกิจการ)",
-        support_upload: "รองรับไฟล์รูปภาพหรือ pdf เท่านั้น",
+        support_upload: "รองรับไฟล์รูปภาพหรือ pdf ที่มีขนาดไม่เกิน 20 MB เท่านั้น",
         nationality: "สัญชาติ",
         save: "บันทึกข้อมูล",
         logout: "ออกจากระบบ",
@@ -511,6 +511,7 @@ $(document).ready(function () {
         var file = this.files[0];
         if (file) {
             var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
+            var maxSize = 20 * 1024 * 1024; 
             if (allowedTypes.indexOf(file.type) === -1) {
                 swal({
                     type: 'warning',
@@ -519,6 +520,17 @@ $(document).ready(function () {
                     confirmButtonColor: '#FF9900'
                 });
                 $(this).val('');
+                return;
+            }
+            if (file.size > maxSize) {
+                swal({
+                    type: 'warning',
+                    title: "Warning",
+                    text: "File size must not exceed 20 MB.",
+                    confirmButtonColor: '#FF9900'
+                });
+                $(this).val('');
+                return;
             }
         }
     });
