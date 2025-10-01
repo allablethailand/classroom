@@ -45,7 +45,10 @@
             count(student.join_id) as classroom_register,
             date_format(template.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
             CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
-            template.classroom_poster
+            template.classroom_poster,
+            template.classroom_key,
+            '' as classroom_link,
+            template.classroom_promote
         FROM 
             classroom_template template
         LEFT JOIN 
@@ -61,6 +64,7 @@
             array('db' => 'classroom_id', 'dt' => 'classroom_id'),
             array('db' => 'classroom_name', 'dt' => 'classroom_name'),
             array('db' => 'classroom_date', 'dt' => 'classroom_date'),
+            array('db' => 'classroom_promote', 'dt' => 'classroom_promote'),
             array('db' => 'classroom_student', 'dt' => 'classroom_student','formatter' => function ($d, $row) {
                 return number_format($d);
             }),
@@ -70,6 +74,7 @@
             }),
             array('db' => 'date_create', 'dt' => 'date_create'),
             array('db' => 'emp_create', 'dt' => 'emp_create'),
+            array('db' => 'classroom_key', 'dt' => 'classroom_key'),
             array(
                 'db' => 'classroom_poster',
                 'dt' => 'classroom_poster',
@@ -79,6 +84,20 @@
                         return GetUrl($info['dirname'] . '/' . $info['filename'] . '_thumbnail.' . $info['extension']);
                     }
                     return GetUrl('/images/training.jpg');
+                }
+            ),
+            array(
+                'db' => 'classroom_link',
+                'dt' => 'classroom_link',
+                'formatter' => function ($d, $row) {
+                    global $domain_name;
+                    $classroom_key = $row['classroom_key'];
+                    $register_url = $domain_name . 'classroom/register/' .$classroom_key;
+                    if ($register_url) {
+                        return $register_url;
+                    } else {
+                        return '';
+                    }
                 }
             ),
         );
@@ -127,5 +146,20 @@
             'login_url' => $login_url,
             'register_url' => $register_url
         ]);
+    }
+    if(isset($_POST) && $_POST['action'] == 'switchClassroom') {
+        $classroom_id = $_POST['classroom_id'];
+        $classroom_promote = $_POST['classroom_promote'];
+        $new_promote = ((int) $classroom_promote == 0) ? 1 : 0;
+        update_data(
+            "classroom_template",
+            "classroom_promote = {$new_promote}, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
+            "classroom_id = '{$classroom_id}'"
+        );
+        echo json_encode([
+            'status' => true,
+            'new_promote' => $new_promote
+        ]);
+
     }
 ?>

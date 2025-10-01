@@ -260,3 +260,11 @@ form p {
 .bottom-custumer-employee{
     width: 550PX;
 }
+#qrcode {
+    padding: 10px;
+    background-color: #FFFFFF;
+}
+#qrcode img {
+    max-width: 80%;
+    margin: 0 auto;
+}

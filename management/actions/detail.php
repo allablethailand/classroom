@@ -70,7 +70,9 @@
                 template.auto_password_length,
                 template.auto_password_custom,
                 template.password_sensitivity_case,
-                template.contact_us
+                template.contact_us,
+                template.shortcut_status,
+                template.shortcut_field
             ",
             "classroom_template template",
             "
@@ -124,6 +126,7 @@
                 'auto_password_custom' => $classroom['auto_password_custom'],
                 'password_sensitivity_case' => $classroom['password_sensitivity_case'],
                 'contact_us' => $classroom['contact_us'],
+                'shortcut_status' => $classroom['shortcut_status'],
                 'staff_groups' => $staff_groups,
             ]
         ]);
@@ -417,6 +420,7 @@
         $contact_us = initVal($_POST['contact_us']);
         $line_oa = $_POST['line_oa'];
         $line_oa_link = initVal($_POST['line_oa_link']);
+        $shortcut_status = initVal($_POST['shortcut_status']);
         $auto_approve = $_POST['auto_approve'];
         $auto_username = $_POST['auto_username'];
         $auto_username_type = ($_POST['auto_username_type']) ? "'" . implode(',', $_POST['auto_username_type']) . "'" : "null";
@@ -430,6 +434,7 @@
         $classroom_information = initVal($_POST['classroom_information']);
         $register_template = implode(',', $_POST['register_template']);
         $register_require = implode(',', $_POST['register_require']);
+        $shortcut_field = implode(',', $_POST['shortcut_field']);
         if($classroom_id) {
             update_data(
                 "classroom_template",
@@ -462,7 +467,9 @@
                     emp_modify = '{$_SESSION['emp_id']}',
                     date_modify = NOW(),
                     register_template = '{$register_template}',
-                    register_require = '{$register_require}'
+                    register_require = '{$register_require}',
+                    shortcut_status = $shortcut_status,
+                    shortcut_field = '{$shortcut_field}'
                 ",
                 "classroom_id = '{$classroom_id}'"
             );
@@ -504,7 +511,9 @@
                     emp_modify,
                     date_modify,
                     register_template,
-                    register_require
+                    register_require,
+                    shortcut_status,
+                    shortcut_field
                 )",
                 "(
                     '{$classroom_key}',
@@ -540,7 +549,9 @@
                     '{$_SESSION['emp_id']}',
                     NOW(),
                     '{$register_template}',
-                    '{$register_require}'
+                    '{$register_require}',
+                    $shortcut_status,
+                    '{$shortcut_field}'
                 )"
             );
         }
@@ -607,7 +618,7 @@
         $classroom_poster_thumb = null;
         if ($classroom_poster_name && $classroom_poster_tmp) {
             $strname = md5($classroom_id);
-            $classroom_poster_dir = 'uploads/classroom/' . $_SESSION['comp_id'] . '/';
+            $classroom_poster_dir = "uploads/{$_SESSION['comp_id']}/classroom/";
             $path_info = pathinfo($classroom_poster_name);
             $classroom_poster_ext = strtolower($path_info['extension']);
             $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif');
@@ -718,19 +729,25 @@
         $classroom_id = $_POST['classroom_id'];
         $display = [];
         $require = [];
+        $short_display = [];
         if($classroom_id) {
             $classroom = select_data(
-                "register_template, register_template",
+                "register_template, register_require, shortcut_status, shortcut_field",
                 "classroom_template",
                 "where classroom_id = '{$classroom_id}'"
             );
             $register_template = $classroom[0]['register_template'];
             $register_require = $classroom[0]['register_require'];
+            $shortcut_status = $classroom[0]['shortcut_status'];
+            $shortcut_field = $classroom[0]['shortcut_field'];
             if($register_template) {
                 $display = explode(',', $register_template);
             }
             if($register_require) {
                 $require = explode(',', $register_require);
+            }
+            if($shortcut_status == 0) {
+                $short_display = explode(',', $shortcut_field);
             }
         }
         $templates = select_data(
@@ -747,11 +764,13 @@
                 'is_default' => (int) $t['is_default'],
                 'template_display' => ((int) $t['is_default'] == 0) ? 0 : ((in_array($t['template_id'], $display)) ? 0 : 1),
                 'template_require' => ((int) $t['is_default'] == 0) ? 0 : ((in_array($t['template_id'], $require)) ? 0 : 1),
+                'short_display' => ((int) $t['is_default'] == 0) ? 0 : ((in_array($t['template_id'], $short_display)) ? 0 : 1),
             ];
         }
         echo json_encode([
             'status' => true,
-            'template_data' => $template_data
+            'template_data' => $template_data,
+            'shortcut_status' => (isset($shortcut_status)) ? (int) $shortcut_status : 1
         ]);
     }
 ?>

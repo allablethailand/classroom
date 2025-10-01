@@ -108,18 +108,24 @@
     function previewTemplate($classroom_id, $template, $member_id, $student_id) {
         global $domain_name;
         $template = str_replace('http://origami.local/', $domain_name, $template);
-        $origami_academy_logo = $domain_name . 'images/origami-academy.png';
+        $origami_academy_logo = $domain_name . 'images/ogm_logo.png';
         $origami_academy_logo_img = '<img src="' . $origami_academy_logo . '" style="height:125px;">';
         $classroom = classroomData($classroom_id);
+        $tenant = select_data("tenant_key", "ogm_tenant", "where status = '{$_SESSION['comp_id']}' and status = 0");
+        $tenant_url = $domain_name;
+        if (!empty($tenant)) {
+            $tenant_url .= $tenant[0]['tenant_key'];
+        }
         $replacements = [
             '{{origamiAcademyLogo}}' => $origami_academy_logo_img,
-            '{{academyLogo}}' => ($classroom['academy_logo']) ? '<img src="' . $classroom['academy_logo'] . '" style="max-width:100%;">' : '',
+            '{{academyLogo}}' => ($classroom['academy_logo']) ? '<img src="' . $classroom['academy_logo'] . '" style="max-width:100%; max-height:300px;">' : '',
             '{{academyName}}' => $classroom['classroom_name'],
             '{{academyStart}}' => $classroom['classroom_start'],
             '{{academyEnd}}' => $classroom['classroom_end'],
             '{{academyLocationName}}' => $classroom['classroom_location'],
             '{{academyInfomation}}' => $classroom['classroom_information'],
             '{{academyContactUs}}' => $classroom['contact_us'],
+            '{{tenantLink}}' => $tenant_url,
         ];
         $student_keys = [
             '{{studentName}}', '{{studentAvatar}}', '{{studentEmail}}',

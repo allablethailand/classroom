@@ -148,8 +148,8 @@
             $channel_logo = null;
             $channel_logo_thumb = null;
             if ($channel_logo_name && $channel_logo_tmp) {
-                $strname = md5($classroom_id.'||'.$group_id);
-                $channel_logo_dir = 'uploads/classroom/' . $_SESSION['comp_id'] . '/channel/';
+                $strname = md5($channel_id);
+                $channel_logo_dir = "uploads/{$_SESSION['comp_id']}/classroom/channel/";
                 $path_info = pathinfo($channel_logo_name);
                 $channel_logo_ext = strtolower($path_info['extension']);
                 $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif');
