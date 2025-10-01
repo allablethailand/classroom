@@ -70,7 +70,29 @@ session_start();
                                         Wednesday, October 1, 2025
                                     </span>
                                     <span class="progress-text">
-                                        1:00 - 5:00 P.M.
+                                        9:00 - 12:00 A.M.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="container-menu" style="margin-top: 10px;">
+                        <div class="header-menu">
+                            <span class="title-menu">Lunch Break</span>
+                            <span class="subtitle-menu">3 weeks left</span>
+                        </div>
+
+                        <div class="usage-menu">
+                            <div class="progress-section">
+                                <div class="progress-header-flex">
+                                   
+                                    <span class="progress-text">
+                                        Wednesday, October 1, 2025
+                                    </span>
+                                    <span class="progress-text">
+                                        12:00 - 1:00 P.M.
                                     </span>
                                 </div>
                             </div>
@@ -91,7 +113,7 @@ session_start();
                                         Wednesday, October 1, 2025
                                     </span>
                                     <span class="progress-text">
-                                        6:00 P.M.
+                                        1:00 - 5:00 P.M.
                                     </span>
                                 </div>
                             </div>
@@ -170,6 +192,24 @@ session_start();
                         </svg>
                         <h4 style="margin-top: 10px;">HISTORY</h4>
                     </a>
+
+                      <a class="action-card" href="myphoto">
+                        <svg width="80" height="80" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="48" height="48" rx="9.99999" fill="url(#paint0_linear_myphoto)"/>
+                            <path d="M12 12V36H36V12H12ZM10 10H38C39.1 10 40 10.9 40 12V36C40 37.1 39.1 38 38 38H10C8.9 38 8 37.1 8 36V12C8 10.9 8.9 10 10 10Z" fill="white"/>
+                            <circle cx="20" cy="18" r="3" fill="white"/>
+                            <path d="M12 32L18 26L24 32L34 22L36 24V36H12V32Z" fill="white"/>
+                            <defs>
+                                <linearGradient id="paint0_linear_myphoto" x1="4" y1="3" x2="45" y2="46" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#FF5733"/>
+                                    <stop offset="1" stop-color="#C70039"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <h4 style="margin-top: 10px;">MY PHOTO</h4>
+                    </a>
+
+                    <li><a href="add_group_photo">เพิ่มรูปภาพกลุ่ม</a></li>
                 </div>
             </div>
         </div>

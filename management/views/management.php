@@ -28,6 +28,7 @@
 <script src="/dist/js/jquery.redirect.js"></script>
 <script src="/js/clipboard.min.js"></script>
 <script src="/node_modules/clipboard/dist/clipboard.min.js"></script>
+<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 <script src="/classroom/management/js/management.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 <body>
@@ -69,6 +70,7 @@
                     <th lang="en">Register</th>
                     <th lang="en">Create Date</th>
                     <th lang="en">Create By</th>
+                    <th lang="en">Show on login page</th>
                     <th></th>
                 </tr>
             </thead>

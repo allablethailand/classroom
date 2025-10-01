@@ -190,16 +190,17 @@ function manageTemplate(template_id) {
         { key: 5, label: "Location Name", text: "{{academyLocationName}}", },
         { key: 6, label: "Academy Information", text: "{{academyInfomation}}", },
         { key: 7, label: "Contact Us", text: "{{academyContactUs}}", },
+        { key: 8, label: "Login Link", text: "tenantLink", },
     ];
     const studentData = [
-        { key: 8, label: "Name", text: "{{studentName}}" },
-        { key: 9, label: "Profile", text: "{{studentAvatar}}" },
-        { key: 10, label: "Email", text: "{{studentEmail}}" },
-        { key: 11, label: "Mobile", text: "{{studentTel}}" },
-        { key: 12, label: "Company", text: "{{studentCompany}}" },
-        { key: 13, label: "Position", text: "{{studentPosition}}" },
-        { key: 14, label: "Username", text: "{{studentUsername}}" },
-        { key: 15, label: "Password", text: "{{studentPassword}}" },
+        { key: 9, label: "Name", text: "{{studentName}}" },
+        { key: 10, label: "Profile", text: "{{studentAvatar}}" },
+        { key: 11, label: "Email", text: "{{studentEmail}}" },
+        { key: 12, label: "Mobile", text: "{{studentTel}}" },
+        { key: 13, label: "Company", text: "{{studentCompany}}" },
+        { key: 14, label: "Position", text: "{{studentPosition}}" },
+        { key: 15, label: "Username", text: "{{studentUsername}}" },
+        { key: 16, label: "Password", text: "{{studentPassword}}" },
     ];
     function generateListClassroom(data) {
         return data.map(item => `

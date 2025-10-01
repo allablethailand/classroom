@@ -98,23 +98,44 @@ $(document).ready(function() {
     $('.getLatLong').click(function(e) {
 		var lng = $(this).attr("lng");
 		var lat = $(this).attr("lat");
-        $('.locationModal').modal();
+        $('.systemModal').modal();
+        $(".systemModal .modal-header").html(`
+            <button type="button" class="btn-close close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"><i class="fas fa-map-marker-alt"></i> <span lang="en">Location</span></h4>  
+        `);
+        $(".systemModal .modal-footer").html(`
+            <button type="button" class="btn btn-orange" onclick="saveLocation();">Save Location</button>
+            <button type="button" class="btn btn-white btn-close" data-dismiss="modal">Close</button>
+        `);
+        $(".systemModal .modal-body").html(`
+            <div class="row">
+                <div class="col-xs-6">
+                    <input type="text" class="form-control" id="location-lat" readonly placeholder="Latitude">
+                </div>
+                <div class="col-xs-6">
+                    <input type="text" class="form-control" id="location-lng" readonly placeholder="Longitude">
+                </div>
+            </div>
+            <div class="map-box" style="height: calc(60vh - 100px)">
+                <div class="map-container" style="height: 100%;"></div>
+            </div>
+        `);
         $("#location-lat").val(lat);
         $("#location-lng").val(lng);
 		mapInit(lat,lng);
     });
-    $(".btn-save-location").click(function(){
-        var lat = $("#location-lat").val();
-        var lng = $("#location-lng").val();
-		if(lat && lng) {
-			var val = lat+','+lng;
-			$(".getLatLong").val(val);
-			$('.locationModal').modal("hide");
-		} else {
-			swal({type: 'warning',title: "Warning...",text: 'Please select a location.',showConfirmButton: false,timer: 3000});
-		}
-    });
 });
+function saveLocation() {
+    var lat = $("#location-lat").val();
+    var lng = $("#location-lng").val();
+    if(lat && lng) {
+        var val = lat+','+lng;
+        $(".getLatLong").val(val);
+        $('.systemModal').modal("hide");
+    } else {
+        swal({type: 'warning',title: "Warning...",text: 'Please select a location.',showConfirmButton: false,timer: 3000});
+    }
+}
 function initializeClassroomManagement() {
     classroom_id = $("#classroom_id").val();
     if(classroom_id) {
@@ -286,6 +307,10 @@ function bindFormEventHandlers() {
         const isEnabled = $(this).val() === '0';
         $('.for-lineconnect').toggleClass('hidden', !isEnabled);
     });
+    $('input[name="shortcut_status"]').on('change', function() {
+        const isEnabled = $(this).val() === '0';
+        $('.pre-registration').toggleClass('hidden', !isEnabled);
+    });
     $('input[name="classroom_allow_register"]').on('change', function() {
         const isEnabled = $(this).val() === '0';
         $('.for-open-register').toggleClass('hidden', !isEnabled);
@@ -307,7 +332,7 @@ function buildRegisterTemplate() {
         dataType: "JSON",
         success: function(result) {
             if (result && result.template_data) {
-                populateFormRegister(result.template_data);
+                populateFormRegister(result.template_data, result.shortcut_status);
             }
         },
         error: function(xhr, status, error) {
@@ -315,14 +340,16 @@ function buildRegisterTemplate() {
         }
     });
 }
-function populateFormRegister(template_data) {
+function populateFormRegister(template_data, shortcut_status = 1) {
     let tbody = $("#tb_register_template tbody");
     tbody.empty();
     template_data.forEach(function(t) {
         let chkDisplay = `<input type="checkbox" class="chk-display" data-id="${t.template_id}" name="register_template[]" ${t.template_display == 0 ? 'checked' : ''} ${t.is_default == 0 ? 'disabled' : ''} value="${t.template_id}">`;
         let chkRequire = `<input type="checkbox" class="chk-require" data-id="${t.template_id}" name="register_require[]" ${t.template_require == 0 ? 'checked' : ''} ${t.is_default == 0 ? 'disabled' : ''} value="${t.template_id}">`;
+        let chkShort = `<input type="checkbox" class="chk-short" data-id="${t.template_id}" name="shortcut_field[]" ${t.short_display == 0 ? 'checked' : ''} ${t.is_default == 0 ? 'disabled' : ''} value="${t.template_id}">`;
         let row = `
             <tr>
+                <td class="text-center pre-registration ${shortcut_status == 1 ? 'hidden' : ''}">${chkShort}</td>
                 <td class="text-center">${chkDisplay}</td>
                 <td class="text-center">${chkRequire}</td>
                 <td>${t.template_name_en}</td>
@@ -371,8 +398,11 @@ function populateFormData(data) {
         setRadioValue("auto_approve", data.auto_approve);
         setRadioValue("auto_username", data.auto_username);
         setRadioValue("auto_password", data.auto_password);
+        setRadioValue("shortcut_status", data.shortcut_status || 1);
         const isEnabled = data.classroom_allow_register === '0';
         $('.for-open-register').toggleClass('hidden', !isEnabled);
+        const isEnabledShort = data.shortcut_status === '0';
+        $('.pre-registration').toggleClass('hidden', !isEnabledShort);
         const isEnabledLineOA = data.line_oa === '0';
         $('.for-lineconnect').toggleClass('hidden', !isEnabledLineOA);
         const isOnline = data.classroom_type === 'online';
@@ -1397,9 +1427,20 @@ function getManagementTemplate() {
                     <div class="form-group row">
                         <div class="col-sm-2">&nbsp;</div>
                         <div class="col-sm-10">
+                            <p style="font-weight: 700;" lang="en">Do you want to have a Pre-registration (Short Form)?</p>
+                            <div class="checkbox checkbox-success">
+                                <input class="styled" id="shortcut_status_0" name="shortcut_status" type="radio" value="0">
+                                <label for="shortcut_status_0" lang="en">Yes</label>
+                            </div>
+                            <div class="checkbox checkbox-danger">
+                                <input class="styled" id="shortcut_status_1" name="shortcut_status" type="radio" value="1" checked>
+                                <label for="shortcut_status_1" lang="en">No</label>
+                            </div>
+                            <p lang="en">A short version of the registration form that allows participants to sign up quickly with only essential information, before completing the full registration later.</p>
                             <table class="table table-border" id="tb_register_template">
                                 <thead>
                                     <tr>
+                                        <th lang="en" class="text-center pre-registration hidden">Pre-registration (Short Form)</th>
                                         <th lang="en" class="text-center">Display Filed</th>
                                         <th lang="en" class="text-center">Require Filed</th>
                                         <th lang="en">Field name (EN)</th>

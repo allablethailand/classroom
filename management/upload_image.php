@@ -1,12 +1,27 @@
 <?php
     session_start();
-    define('ROOT', str_replace("\\", '/', dirname(__FILE__)));
-    define('PATH', ROOT == $_SERVER['DOCUMENT_ROOT'] ? '' : substr(ROOT, strlen($_SERVER['DOCUMENT_ROOT'])));
-    $uploadDir  = '/uploads/';
-    $uploadPath = ROOT . $uploadDir;
-    if (!file_exists($uploadPath)) {
-        mkdir($uploadPath, 0777, true);
+    $base_include = $_SERVER['DOCUMENT_ROOT'];
+    $base_path = '';
+    if($_SERVER['HTTP_HOST'] == 'localhost'){
+        $request_uri = $_SERVER['REQUEST_URI'];
+        $exl_path = explode('/',$request_uri);
+        if(!file_exists($base_include."/dashboard.php")){
+            $base_path .= "/".$exl_path[1];
+        }
+        $base_include .= "/".$exl_path[1];
     }
+    define('BASE_PATH', $base_path);
+    define('BASE_INCLUDE', $base_include);
+    require_once $base_include.'/lib/connect_sqli.php';
+    $fsData = getBucketMaster();
+    $filesystem_user = $fsData['fs_access_user'];
+    $filesystem_pass = $fsData['fs_access_pass'];
+    $filesystem_host = $fsData['fs_host'];
+    $filesystem_path = $fsData['fs_access_path'];
+    $filesystem_type = $fsData['fs_type'];
+    $fs_id = $fsData['fs_id'];
+	setBucket($fsData);
+    $uploadDir  = "uploads/{$_SESSION['comp_id']}/classroom/information/";
     if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
         $fileTmp  = $_FILES['file']['tmp_name'];
         $fileSize = $_FILES['file']['size'];
@@ -16,17 +31,11 @@
         if (!in_array($ext, $allowed)) {
             echo json_encode(array('error' => 'Invalid file type'));
             exit;
-        }
-        $newName = date("YmdHis") . '.' . $ext;
-        $target  = $uploadPath . $newName;
-        if (move_uploaded_file($fileTmp, $target)) {
-            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-            $dirUrl   = dirname($_SERVER['REQUEST_URI']);
-            if (substr($dirUrl, -1) != '/') {
-                $dirUrl .= '/';
-            }
+        };
+        $target  = $uploadDir . $fileName;
+        if(SaveFile($fileTmp, $target)) {
             $response = new StdClass;
-            $response->link = $protocol . "://" . $_SERVER['HTTP_HOST'] . $dirUrl . "uploads/" . $newName;
+            $response->link = GetPublicUrl($target);
             echo json_encode($response);
         } else {
             echo json_encode(array('error' => 'Upload failed'));

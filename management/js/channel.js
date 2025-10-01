@@ -47,7 +47,7 @@ function buildChannel() {
 					defaultLang: 'en'
 				});
 			},
-			"order": [[0,'asc']],
+			"order": [[2,'asc']],
 			"columns": [{ 
                 "targets": 0,
                 "data": "channel_logo",
@@ -83,11 +83,7 @@ function buildChannel() {
                     let classroom_link = row['classroom_link'];
 					return `
                         <div class="nowarp">
-                            <a type="button" class="btn btn-circle btn-info share-link copy-${data}" onclick="copyLink(${data})" data-clipboard-text="${classroom_link}">
-                                <i class="fa fa-link"></i>
-                                <span class="notofication-share"><i class="fa fa-check"></i> 
-                                <label lang="en">Copy Link</label></span>
-                            </a> 
+                            <button type="button" class="btn btn-info btn-circle" onclick="showQRCode('${classroom_link}')" title="Show QR Code"><i class="fa fa-link"></i></button>
                             <button type="button" class="btn btn-orange btn-circle" onclick="manageChannel(${data})"><i class="fas fa-pencil-alt"></i></button> 
                             <button type="button" class="btn btn-red btn-circle" onclick="delChannel(${data})"><i class="fas fa-trash-alt"></i></button>
                         </div>
@@ -120,6 +116,46 @@ function buildChannel() {
             }
         });
     }
+}
+function showQRCode(event_id) {
+    $(".systemModal").modal();
+    $(".systemModal .modal-header").html(`
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h5 class="modal-title" lang="en">Channel QR Code</h5>
+    `);
+    $(".systemModal .modal-body").html(`
+        <div id="qrcode"></div>
+    `);
+    $(".systemModal .modal-footer").html(`
+        <a id="download" class="btn btn-orange" href="#" download="qrcode.png" style="display:none; font-size:12px;">Download QR Code</a>
+        <a style="font-size:10px;" class="btn btn-white share-link copy-4 copy-qr2" onclick="copyLink(4)"><i class="fas fa-link"></i> <span lang="en">Copy</span><span class="notofication-share"><i class="fas fa-check"></i> <label lang="en">Copy Link</label></span></a>
+        <button type="button" class="btn btn-white" data-dismiss="modal" style="font-size:12px;">Close</button>
+    `);
+    var text = event_id;
+    $('#qrcode').empty(); 
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: text,
+        width: 1024,
+        height: 1024,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+    setTimeout(function(){
+        var canvas = $('#qrcode canvas')[0];
+        var dataUrl = canvas.toDataURL('image/png');
+        $('#download').attr('href', dataUrl);
+        $('#download').show();
+    }, 500); 
+    $(".copy-qr2").attr("data-clipboard-text",event_id);
+	new ClipboardJS('.copy-qr2');
+}
+function copyLink(rows) {
+    new ClipboardJS('.copy-'+rows);
+    $(".copy-"+rows+" .notofication-share").addClass("active");
+    setTimeout(function() { 
+        $(".copy-"+rows+" .notofication-share").removeClass("active");
+    }, 2000);
 }
 function manageChannel(channel_id) {
     $(".systemModal").modal();

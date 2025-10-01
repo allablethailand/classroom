@@ -118,7 +118,7 @@
             echo json_encode(array('status' => 'error', 'message' => 'Required data (comp_id or classroom_id) not found.'));
             exit();
         }
-        $upload_dir = 'uploads/students/';
+        $upload_dir = "uploads/{$comp_id}/classroom/student/";
         $file_fields = array('student_image_profile', 'student_card_front', 'student_card_back');
         $file_paths = array();
         foreach ($file_fields as $field) {
