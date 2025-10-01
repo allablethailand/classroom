@@ -697,8 +697,8 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
         </p>
     </div>
-
-    <div class="page-container main-content-container">
+    <div class="main-content">
+            <div class="page-container main-content-container">
 
         <div class="profile-card" style="padding: 10px;">
             <div class="profile-course-container">
@@ -932,6 +932,9 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         <?php endif; ?>
 
     </div>
+    </div>
+
+    
     <?php require_once("component/footer.php") ?>
 </body>
 

@@ -98,6 +98,7 @@ $count_student = $count_total[0]['total_student'];
     <script src="/classroom/study/js/group.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 
 </head>
+
 <body>
 
     <?php require_once 'component/header.php'; ?>
@@ -105,27 +106,31 @@ $count_student = $count_total[0]['total_student'];
     <!-- work ON mobile screen ONLY -->
     <div class="main-content">
         <div class="container-fluid px-4 py-2">
-            <div class="text-center mb-4">
-                <h1 class="display-4 fw-bold text-dark mb-bs-5 text-center">
-                    <!-- Elemental Group -->
-                    <!-- Element Group -->
-                </h1>
-            </div>
-            <div class="justify-content-center mb-bs-3" style="display: flex; direction: rtl;">
-                <div class="" style="margin-left: 10px;">
-                    <button class="btn btn-default" id="toggleStudent">
-                       <i class="fas fa-address-book"></i>
-                    </button>
+            <div class="justify-content-center mb-bs-2-5" style="display: flex; justify-content: space-between; ">
+                <div class="">
+                    <h1 class="heading-1">สมาชิกกลุ่ม</h1>
+                    <div class="divider-1"> 
+                        <span></span>
+                    </div>
                 </div>
-                <div class="dropdown">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter"></i><span class="caret"></span></button>
+
+                <div style="display: flex; align-items: center;">
+                    <div class="dropdown">
+                        <button type="button" style="border: none;" class="btn btn-default blur-shadow dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter"></i><span class="caret"></span></button>
                         <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li role="separator" class="divider"></li>
-                        <li><a href="#">4</a></li>
+                            <li><a href="#">1</a></li>
+                            <li><a href="#">2</a></li>
+                            <li><a href="#">3</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">4</a></li>
                         </ul>
+                    </div>
+
+                    <div class="" style="margin-left: 0.8rem;">
+                        <button class="btn btn-default blur-shadow" id="toggleStudent" style="border: none;">
+                            <i class="fas fa-address-book"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -136,23 +141,26 @@ $count_student = $count_total[0]['total_student'];
                             ไม่พบข้อมูลกลุ่มที่คุณอยู่
                 </span>';
             }
+
+            // Add animation on clikc transform color to group color.
+            
             foreach ($classroom_group as $item): {
             ?>
                     <div id="rowData" class="g-4 justify-content-center mb-bs-3 ">
                         <div class="col-12 col-md-6 col-lg-3">
-                            <a href="student?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
-                                <div class="card group-card h-100 bg-element-earth rounded-small" style="padding: 10px;">
+                            <a href="student?<?php echo $item['group_id']; ?>" style="color: black; font-family: 'Kanit', sans-serif !important;">
+                                <div class="card group-card h-100 bg-white rounded-small" style="padding: 10px;">
                                     <div class="panel-heading border-0" style="padding:0;">
                                         <div class="d-flex-bs align-items-center gap-3">
                                             <div class="group-icon-large" style="color: #FFF;">
                                                 <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                                <img src="<?php echo $item['group_logo']; ?>"  class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                                                <img src="<?php echo $item['group_logo']; ?>" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
                                             </div>
                                             <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
                                                 <div class="d-flex-bs align-items-center gap-2 mb-1">
                                                     <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["group_name"] ?></h4>
                                                 </div>
-                                                <p class="text-secondary mb-0 small text-truncate-2"> 
+                                                <p class="text-secondary mb-0 small text-truncate-2">
                                                     <?php echo "สมาชิกปัจจุบัน " . $count_student . " คน" ?>
                                                 </p>
                                             </div>
@@ -169,20 +177,22 @@ $count_student = $count_total[0]['total_student'];
             <div id="menu"></div>
 
             <h1 class="heading-1" style="margin-top: 3rem;">คณะกรรมการ</h1>
-            <div class="divider-1"> 
+            <div class="divider-1">
                 <span></span>
             </div>
             <div class="g-4 justify-content-center mb-bs-3 ">
                 <div class="col-12 col-md-6 col-lg-3">
-                    <a href="teacher?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
-                        <div class="card group-card h-100 bg-element-water rounded-small" style="padding: 10px;">
+                    <a href="teacher?<?php echo $item['group_id']; ?>" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
+                        <div class="card group-card h-100 bg-teacher rounded-small " style="padding: 10px;">
                             <div class="panel-heading border-0" style="padding:0;">
                                 <div class="d-flex-bs align-items-center gap-3">
                                     <div class="group-icon-large" style="color: #FFF;">
+                                        <!-- <i class="fas fa-power-off" style=""></i> -->
                                         <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                        <img src="" onerror="this.src='/images/online-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                                         <i class="fas fa-chalkboard-teacher" style="color:black;"></i>
+                                        <!-- <img src="" onerror="this.src='/images/online-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;"> -->
                                     </div>
-                                    <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
+                                    <div class="col-md-9 flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
                                         <div class="d-flex-bs align-items-center gap-2 mb-1">
                                             <h4 class="panel-title mb-0 text-truncate d-flex-bs ">อาจารย์ผู้สอน</h4>
                                         </div>
@@ -198,17 +208,19 @@ $count_student = $count_total[0]['total_student'];
             </div>
             <div class="g-4 justify-content-center mb-bs-3 ">
                 <div class="col-12 col-md-6 col-lg-3">
-                    <a href="staff?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
-                        <div class="card group-card h-100 bg-element-fire rounded-small" style="padding: 10px;">
+                    <a href="staff?<?php echo $item['group_id']; ?>" class="blur-shadow" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
+                        <div class="card group-card h-100 bg-teacher rounded-small " style="padding: 10px;">
                             <div class="panel-heading border-0" style="padding:0;">
                                 <div class="d-flex-bs align-items-center gap-3">
                                     <div class="group-icon-large" style="color: #FFF;">
-                                        <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                        <img src="" onerror="this.src='/images/offline-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                                        <div class="col-md-3"><span class="circle"><span><i class="fas fa-user-tie" style="color:#EED8DA;"></i></span></span> </div>
+                                        <!-- <i class="fas fa-user-tie" style="width: 50px; color:#F39865;"></i> -->
+                                         
+                                        <!-- <img src="" onerror="this.src='/images/offline-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;"> -->
                                     </div>
-                                    <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
+                                    <div class="col-md-9 flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
                                         <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                            <h4 class="panel-title mb-0 text-truncate d-flex-bs ">Staff</h4>
+                                            <h4 class="panel-title mb-0 text-truncate d-flex-bs ">Staff Member</h4>
                                         </div>
                                         <p class="text-secondary mb-0 small text-truncate-2">
                                             สมาชิกปัจจุบัน 3 คน
@@ -222,7 +234,7 @@ $count_student = $count_total[0]['total_student'];
             </div>
 
 
-                    <!-- <div class="g-4 justify-content-center bg-element-fire-two mx-3 mb-bs-3 rounded-small">
+            <!-- <div class="g-4 justify-content-center bg-element-fire-two mx-3 mb-bs-3 rounded-small">
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="card group-card h-100 ">
                         <div class="panel-heading border-0">
@@ -303,9 +315,9 @@ $count_student = $count_total[0]['total_student'];
 
                 </div>
             </div> -->
-                </div>
-            </div>
-            <?php require_once 'component/footer.php'; ?>
+        </div>
+    </div>
+    <?php require_once 'component/footer.php'; ?>
 
 
 </body>

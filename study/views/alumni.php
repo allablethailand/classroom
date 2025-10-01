@@ -103,12 +103,16 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
     <!-- work ON mobile screen ONLY -->
     <div class="main-transparent-content" >
         <div class="container-fluid px-4 py-2">
-            <div class="text-center mb-4">
-                <h1 class="display-4 fw-bold text-dark mb-bs-5 text-center">
-                    <!-- Elemental Group -->
-                    <!-- Element Group -->
-                </h1>
+            <h1 class="heading-1" >รุ่นหลักสูตร</h1>
+            <div class="divider-1">
+                <span></span>
             </div>
+            <!-- <div class="text-center mb-4">
+                <h1 class="display-4 fw-bold text-dark mb-bs-5 text-center">
+                </h1>
+            </div> -->
+
+            
 
             <?php
             if ($classroom_group === [] || count($classroom_group) === 0) {

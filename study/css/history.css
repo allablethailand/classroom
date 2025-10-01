@@ -128,7 +128,7 @@
   /* height: 117px; */
   display: flex;
   align-items: flex-end;
-  padding: 0 20px 10px;
+  padding: 0 10px 10px;
   gap: 15px;
 }
 
@@ -139,8 +139,8 @@
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(224, 232, 242, 0.6);
+  background: rgba(247, 0, 0, 0.8);
+  /* border: 1px solid rgba(224, 232, 242, 0.6); */
 }
 
 .account-bg-layer {
@@ -185,19 +185,20 @@
   transform: rotate(90deg);
 }
 
-.nav-button {
+.navbox-button {
   width: 45px;
   height: 45px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: white;
-  border: 1px solid rgba(224, 232, 242, 0.6);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-.nav-button svg {
+.navbox-button svg {
   width: 60px;
   height: 60px;
 }

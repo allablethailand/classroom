@@ -13,10 +13,10 @@ html,body {
 
 
 body {
-  /* width: 100vw; */
-  /* height: 120vh; */
-  /* background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%); */
-  /* background-color: var(--ori-gray); */
+  width: 100%;
+  height: 120vh;
+  background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%);
+  background-color: var(--ori-gray);
 }
 
 :root {
@@ -50,7 +50,7 @@ body {
   height: auto !important;
   margin-top: 10px;
   background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%);
-  padding-bottom: 10dvh !important; 
+  padding-bottom: 15dvh !important; 
 }
 
 /* Container for main content that grows */
