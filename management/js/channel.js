@@ -8,6 +8,7 @@ function getChannelTemplate() {
             <thead>
                 <tr>
                     <th lang="en">Logo</th>
+                    <th></th>
                     <th lang="en">Chennel</th>
                     <th lang="en">Create Date</th>
                     <th lang="en">Create By</th>
@@ -47,7 +48,7 @@ function buildChannel() {
 					defaultLang: 'en'
 				});
 			},
-			"order": [[2,'asc']],
+			"order": [[3,'asc']],
 			"columns": [{ 
                 "targets": 0,
                 "data": "channel_logo",
@@ -58,6 +59,13 @@ function buildChannel() {
                 }
             },{ 
                 "targets": 1,
+                "data": "channel_type",
+                "render": function (data,type,row,meta) {	
+                    let type_label = (data == 1) ? `<span class="badge badge-success" lang="en" style="background-color:#00C292;">LINE OA</span>` : `<span class="badge badge-info" lang="en">Normal</span>`;
+					return type_label;
+                }
+            },{ 
+                "targets": 2,
                 "data": "channel_name",
                 "render": function (data,type,row,meta) {	
 					return `
@@ -66,26 +74,29 @@ function buildChannel() {
                     `;
                 }
             },{ 
-                "targets": 2,
+                "targets": 3,
                 "data": "date_create",
             },{ 
-                "targets": 3,
+                "targets": 4,
                 "data": "emp_create",
             },{ 
-                "targets": 4,
+                "targets": 5,
                 "data": "channel_student",
                 "className": "text-right",
             },{ 
-                "targets": 5,
+                "targets": 6,
                 "data": "channel_id",
-                "className": "text-center",
+                "className": "text-right",
                 "render": function (data,type,row,meta) {	
                     let classroom_link = row['classroom_link'];
                     let channel_name = row['channel_name'];
+                    let channel_type = row['channel_type'];
 					return `
                         <div class="nowarp">
                             <button type="button" class="btn btn-info btn-circle" onclick="showQRCode('${classroom_link}', '${channel_name}')" title="Show QR Code"><i class="fa fa-link"></i></button>
-                            <button type="button" class="btn btn-orange btn-circle" onclick="manageChannel(${data})"><i class="fas fa-pencil-alt"></i></button> 
+                            ${(channel_type == 0) ? `
+                                <button type="button" class="btn btn-orange btn-circle" onclick="manageChannel(${data})"><i class="fas fa-pencil-alt"></i></button> 
+                            ` : ``}
                             <button type="button" class="btn btn-red btn-circle" onclick="delChannel(${data})"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     `;
@@ -96,7 +107,8 @@ function buildChannel() {
         $('div#tb_channel_filter.dataTables_filter label span').remove();
         var template = `
             <input type="search" class="form-control input-sm search-datatable" placeholder="" autocomplete="off" style="margin-bottom:0px !important;"> 
-            <button type="button" class="btn btn-green" style="font-size:12px;" onclick="manageChannel('')"><i class="fas fa-plus"></i> <span lang="en">Channel</span></button>
+            <button type="button" class="btn btn-green" style="font-size:12px;" onclick="manageChannel('')"><i class="fas fa-plus"></i> <span lang="en">Channel</span></button> 
+            <button type="button" class="btn btn-white text-green" style="font-size:12px;" onclick="addLineOA();"><i class="fab fa-line"></i> Line OA</button> 
         `;
         $('div#tb_channel_filter.dataTables_filter input').hide();
         $('div#tb_channel_filter.dataTables_filter label').append(template);
@@ -117,6 +129,85 @@ function buildChannel() {
             }
         });
     }
+}
+function addLineOA() {
+    $(".systemModal").modal();
+    $(".systemModal .modal-header").html(`
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h5 class="modal-title" lang="en"><i class="fab fa-line"></i> Line OA</h5>
+    `);
+    $(".systemModal .modal-body").html(`
+        <div class="line-oa-list"></div>
+    `);
+    $(".systemModal .modal-footer").html(`
+        <button type="button" class="btn btn-white" data-dismiss="modal" style="font-size:12px;">Close</button>
+    `);
+    $.ajax({
+        url: '/classroom/management/actions/channel.php',
+        type: "POST",
+        data: {
+            action: 'lineOAList',
+            classroom_id: classroom_id
+        },
+        dataType: "JSON",
+        success: function (result) {
+            if (result.status) {
+                const data = result.line_oa;
+                let html = '';  
+                if(data.length) {
+                    data.forEach(item => {
+                        html += `
+                            <div class="col-sm-6 col-md-4" style="margin-bottom:15px;">
+                                <div class="panel panel-default line-oa-item">
+                                    <div class="panel-heading text-center">
+                                        <img src="/images/line-oa.png" class="img-responsive" style="max-height:80px;margin:0 auto;" onerror="this.src='/images/noimage.jpg'">
+                                    </div>
+                                    <div class="panel-body text-center">
+                                        <p><b>${item.line_token_name}</b></p>
+                                        <button type="button" class="btn btn-success btn-sm" onclick="addLineOAChannel('${item.line_token_id}');">
+                                            <i class="fas fa-plus"></i> <span lang="en">Add Channel</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html = `<div class="row">${html}</div>`;
+                } else {
+                    html = `<p class="text-center text-grey" lang="en">No Line OA found.</p>`;
+                }
+                $(".line-oa-list").html(html);
+            } else {
+                let html = `
+                    <p class="text-center text-grey"><i class="fab fa-line fa-5x"></i></p>
+                    <p class="text-center text-grey" lang="en">No Line OA found.</p>
+                `;
+                $(".line-oa-list").html(html);
+            }
+        }
+    })
+}
+function addLineOAChannel(line_token_id) {
+    event.stopPropagation();
+    $.ajax({    
+        url: '/classroom/management/actions/channel.php',
+        type: "POST",
+        data: {
+            action: 'addLineOAChannel',
+            classroom_id: classroom_id,
+            line_token_id: line_token_id   
+        },
+        dataType: "JSON",
+        success: function (result) {
+            if (result.status) {
+                swal({type: 'success', title: "Successfully", text: "", showConfirmButton: false, timer: 2500});
+                addLineOA();
+                buildChannel();
+            } else {
+                swal({type: 'error',title: "Sorry...",text: result.msg, timer: 2500});
+            }
+        }
+    });
 }
 function showQRCode(classroom_link, channel_name) {
     $(".systemModal").modal();
