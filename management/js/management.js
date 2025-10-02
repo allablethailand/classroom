@@ -167,11 +167,11 @@ function buildClassroom() {
                 "data": "classroom_id",
                 "className": "text-center",
                 "render": function (data,type,row,meta) {	
-                    let classroom_key = row['classroom_key'];
+                    let classroom_name = row['classroom_name'];
                     let classroom_link = row['classroom_link'];
 					return `
                         <div class="nowarp">
-                            <button type="button" class="btn btn-info btn-circle" onclick="showQRCode('${classroom_link}')" title="Show QR Code"><i class="fas fa-qrcode"></i></button> 
+                            <button type="button" class="btn btn-info btn-circle" onclick="showQRCode('${classroom_link}', '${classroom_name}')" title="Show QR Code"><i class="fas fa-qrcode"></i></button> 
                             <button type="button" class="btn btn-primary btn-circle" onclick="viewLink('${data}')" title="Show QR Code"><i class="fa fa-link"></i></button> 
                             <button type="button" class="btn btn-orange btn-circle" onclick="manageClassroom(${data})"><i class="fas fa-pencil-alt"></i></button> 
                             <button type="button" class="btn btn-red btn-circle" onclick="delClassroom(${data})"><i class="fas fa-trash-alt"></i></button>
@@ -258,21 +258,30 @@ function switchClassroom(classroom_id,option) {
 		}
 	});
 }
-function showQRCode(event_id) {
+function showQRCode(classroom_link, classroom_name) {
     $(".systemModal").modal();
     $(".systemModal .modal-header").html(`
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h5 class="modal-title" lang="en">Classroom QR Code</h5>
     `);
     $(".systemModal .modal-body").html(`
-        <div id="qrcode"></div>
+        <h4 class="text-center">${classroom_name}</h4>
+        <br>
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2 text-center">
+                <div id="qrcode"></div>
+            </div>
+        </div>
     `);
     $(".systemModal .modal-footer").html(`
-        <a id="download" class="btn btn-orange" href="#" download="qrcode.png" style="display:none; font-size:12px;">Download QR Code</a>
-        <a style="font-size:10px;" class="btn btn-white share-link copy-4 copy-qr2" onclick="copyLink(4)"><i class="fas fa-link"></i> <span lang="en">Copy</span><span class="notofication-share"><i class="fas fa-check"></i> <label lang="en">Copy Link</label></span></a>
+        <a id="download" class="btn btn-orange" href="#" download="qrcode.png" style="font-size:12px;">Download QR Code</a>
+        <a style="font-size:10px;" class="btn btn-white share-link copy-4 copy-qr2" onclick="copyLink(4)">
+            <i class="fas fa-link"></i> <span lang="en">Copy</span>
+            <span class="notofication-share"><i class="fas fa-check"></i> <label lang="en">Copy Link</label></span>
+        </a>
         <button type="button" class="btn btn-white" data-dismiss="modal" style="font-size:12px;">Close</button>
     `);
-    var text = event_id;
+    var text = classroom_link;
     $('#qrcode').empty(); 
     var qrcode = new QRCode(document.getElementById("qrcode"), {
         text: text,
@@ -282,14 +291,18 @@ function showQRCode(event_id) {
         colorLight : "#ffffff",
         correctLevel : QRCode.CorrectLevel.H
     });
-    setTimeout(function(){
-        var canvas = $('#qrcode canvas')[0];
-        var dataUrl = canvas.toDataURL('image/png');
-        $('#download').attr('href', dataUrl);
-        $('#download').show();
-    }, 500); 
-    $(".copy-qr2").attr("data-clipboard-text",event_id);
-	new ClipboardJS('.copy-qr2');
+    $('#download').off('click').on('click', function(e){
+        e.preventDefault();
+        html2canvas($(".systemModal .modal-body")[0]).then(function(canvas) {
+            var dataUrl = canvas.toDataURL('image/png');
+            var link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = classroom_name.replace(/\s+/g, '_') + '.png';
+            link.click();
+        });
+    });
+    $(".copy-qr2").attr("data-clipboard-text", classroom_link);
+    new ClipboardJS('.copy-qr2');
 }
 function manageClassroom(classroom_id) {
     $.redirect("detail",{classroom_id: classroom_id},'post','_blank');
