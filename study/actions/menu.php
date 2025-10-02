@@ -13,30 +13,27 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/classroom/study/actions/student_func.php';
 
 date_default_timezone_set('Asia/Bangkok');
-$timeserver = date("Y-m-d H:i:s");
 $dateSchedule = date('Y-m-d');
 
-$student_id = $_SESSION['student_id'];
-
-
+$student_id = getStudentId();
 if (!isset($student_id)) {
     echo json_encode(['error' => 'Unauthorized']);
     exit();
 }
 
-$student_classroom_id = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
-
-if (!$student_classroom_id) {
+$class_id = getStudentClassroomId($student_id);
+if (!$class_id) {
     echo json_encode(['error' => 'Classroom not found']);
     exit();
 }
 
-$classroom_id = $student_classroom_id[0]['classroom_id'];
+$classroom_id = $class_id[0]['classroom_id'];
 
 $scheduleItems = select_data(
-    "course.trn_subject AS  schedule_name,
+    "course.trn_subject AS schedule_name,
     course.trn_detail AS topic_name,
     course.trn_date AS date_start,
     course.trn_from_time AS time_start,
@@ -81,7 +78,6 @@ $response = [
     'other_classes' => $otherClasses,
     'overdue_class' => $overdueClasses,
 ];
-
 
 header('Content-Type: application/json');
 echo json_encode($response);
