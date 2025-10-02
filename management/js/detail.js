@@ -3,6 +3,7 @@ let management_template;
 let join_template;
 let tb_staff;
 let table_join_user;
+let classroom_name
 function mapInit(lat,lng) {
 	lat = (lat) ? lat : '13.736717';
 	lng = (lng) ? lng : '100.523186';
@@ -386,6 +387,7 @@ function populateFormData(data) {
             $("#ex_classroom_poster").val(data.classroom_poster);
         }
         initializeDropify();
+        classroom_name = data.classroom_name || '';
         $("#classroom_name").val(data.classroom_name || '');
         $("#classroom_student").val(data.classroom_student || '0');
         setDatePickerValue("#classroom_start_date", data.classroom_start_date);
