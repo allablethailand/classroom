@@ -304,10 +304,6 @@ function bindFormEventHandlers() {
         const isEnabled = $(this).val() === '0';
         $('#auto_uname_settings').toggle(isEnabled);
     });
-    $('input[name="line_oa"]').on('change', function() {
-        const isEnabled = $(this).val() === '0';
-        $('.for-lineconnect').toggleClass('hidden', !isEnabled);
-    });
     $('input[name="shortcut_status"]').on('change', function() {
         const isEnabled = $(this).val() === '0';
         $('.pre-registration').toggleClass('hidden', !isEnabled);
@@ -396,7 +392,6 @@ function populateFormData(data) {
         $("#classroom_end_time").val(data.classroom_end_time || '');
         setRadioValue("classroom_type", data.classroom_type);
         setRadioValue("classroom_allow_register", data.classroom_allow_register);
-        setRadioValue("line_oa", data.line_oa);
         setRadioValue("auto_approve", data.auto_approve);
         setRadioValue("auto_username", data.auto_username);
         setRadioValue("auto_password", data.auto_password);
@@ -405,8 +400,6 @@ function populateFormData(data) {
         $('.for-open-register').toggleClass('hidden', !isEnabled);
         const isEnabledShort = data.shortcut_status === '0';
         $('.pre-registration').toggleClass('hidden', !isEnabledShort);
-        const isEnabledLineOA = data.line_oa === '0';
-        $('.for-lineconnect').toggleClass('hidden', !isEnabledLineOA);
         const isOnline = data.classroom_type === 'online';
         $('.for-online').toggleClass('hidden', !isOnline);
         $('.for-onsite').toggleClass('hidden', isOnline);
@@ -426,12 +419,6 @@ function populateFormData(data) {
         $("#classroom_open_register_time").val(data.classroom_open_register_time || '');
         $("#classroom_close_register_time").val(data.classroom_close_register_time || '');
         $("#close_register_message").val(data.close_register_message || '');
-        if (data.line_oa_name) {
-            $('#line_oa_link').append($('<option>', { 
-                value: data.line_oa_id, 
-                text: data.line_oa_name 
-            }));
-        }
         if (data.classroom_information) {
             $('#classroom_information').editable("setHTML", data.classroom_information, true);
         }
@@ -645,50 +632,6 @@ function buildDepartment() {
                         term: params.term,
                         page: params.page || 1,
                         action: 'buildDepartment'
-                    };
-                },
-                processResults: function(data, params) {
-                    const page = params.page || 1;
-                    return {
-                        results: $.map(data, function(item) {
-                            return {
-                                id: item.id,
-                                text: item.col,
-                                code: item.code,
-                                desc: item.desc,
-                            };
-                        }),
-                        pagination: {
-                            more: (page * 10) <= (data[0] ? data[0].total_count : 0)
-                        }
-                    };
-                },
-            },
-            templateSelection: function(data) {
-                return data.text;
-            },
-        });
-    } catch (error) {
-        console.error('Error building department dropdown:', error);
-    }
-}
-function buildLineOA() {
-    try {
-        $("#line_oa_link").select2({
-            theme: "bootstrap",
-            placeholder: "Choose Line OA",
-            minimumInputLength: -1,
-            allowClear: true,
-            ajax: {
-                url: "/classroom/management/actions/detail.php",
-                dataType: 'json',
-                delay: 250,
-                cache: false,
-                data: function(params) {
-                    return {
-                        term: params.term,
-                        page: params.page || 1,
-                        action: 'buildLineOA'
                     };
                 },
                 processResults: function(data, params) {
@@ -1182,29 +1125,6 @@ function getManagementTemplate() {
                             <div class="col-sm-9">
                                 <textarea name="close_register_message" id="close_register_message" class="form-control" style="height:100px;"></textarea>
                             </div>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-3">
-                            <label lang="en" class="control-label required-field">Line Connect</label>
-                        </div>
-                        <div class="col-sm-9">
-                            <div class="checkbox checkbox-success">
-                                <input class="styled" id="line_oa_0" name="line_oa" type="radio" value="0">
-                                <label for="line_oa_0" lang="en">Yes</label>
-                            </div>
-                            <div class="checkbox checkbox-danger">
-                                <input class="styled" id="line_oa_1" name="line_oa" type="radio" value="1" checked>
-                                <label for="line_oa_1" lang="en">No</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row for-lineconnect hidden">
-                        <div class="col-sm-3">
-                            <label lang="en" class="control-label required-field">Line OA</label>
-                        </div>
-                        <div class="col-sm-9">
-                            <select class="form-control require_obj" name="line_oa_link" id="line_oa_link"></select>
                         </div>
                     </div>
                     <div class="form-group row">
