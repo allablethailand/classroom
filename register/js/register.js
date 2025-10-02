@@ -34,6 +34,10 @@ const translations = {
         nationality: "Nationality",
         save: "Save",
         logout: "Logout",
+        passport_expire: "Passport Expiry Date",
+        view: "View",
+        delete: "Delete",
+        file_preview: "File Preview",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
@@ -64,6 +68,10 @@ const translations = {
         nationality: "สัญชาติ",
         save: "บันทึกข้อมูล",
         logout: "ออกจากระบบ",
+        passport_expire: "วันหมดอายุของพาสปอร์ต",
+        view: "ดู",
+        delete: "ลบ",
+        file_preview: "ตัวอย่างไฟล์",
     }
 };
 $(document).ready(function () {
@@ -88,12 +96,21 @@ $(document).ready(function () {
         if (this.files && this.files[0]) {
             const file = this.files[0];
             if (!file.type.startsWith("image/")) {
-                swal({
-                    type: 'warning',
-                    title: 'Warning',
-                    text: 'Please select a valid image file.',
-                    confirmButtonColor: '#FF9900'
-                });
+                if(currentLang == 'en') {
+                    swal({
+                        type: 'warning',
+                        title: 'Warning',
+                        text: 'Please select a valid image file.',
+                        confirmButtonColor: '#FF9900'
+                    });
+                } else {
+                    swal({
+                        type: 'warning',
+                        title: 'คำเตือน',
+                        text: 'กรุณาเลือกไฟล์รูปภาพที่ถูกต้อง.',
+                        confirmButtonColor: '#FF9900'
+                    });
+                }
                 $(this).val("");
                 return;
             }
@@ -120,7 +137,15 @@ $(document).ready(function () {
         changeMonth: true,
         changeYear: true,
         yearRange: "-100:+0",
-        autoclose: true
+        autoclose: true,
+        maxDate: 0 
+    });
+    $('.datepicker-past').datepicker({
+        dateFormat: 'yy/mm/dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "-20:+20",
+        autoclose: true,
     });
     $("#student_idcard, #student_mobile").on("keypress", function (e) {
         if (e.which < 48 || e.which > 57) e.preventDefault();
@@ -153,15 +178,23 @@ $(document).ready(function () {
         if (!validators[type]) return;
         if (val && !validators[type].test(val)) {
             $(this).addClass('has-error');
-            const msg = type === 'student_email'
-                ? 'Invalid email format'
-                : 'The phone number format is incorrect.';
-            swal({ 
-                type: 'warning', 
-                title: "Warning...", 
-                text: msg, 
-                confirmButtonColor: '#FF9900'
-            });
+            if(currentLang == 'en') {
+                const msg = type === 'student_email' ? 'Invalid email format' : 'The phone number format is incorrect.';
+                swal({ 
+                    type: 'warning', 
+                    title: "Warning...", 
+                    text: msg, 
+                    confirmButtonColor: '#FF9900'
+                });
+            } else {    
+                const msg = type === 'student_email' ? 'รูปแบบอีเมลไม่ถูกต้อง' : 'รูปแบบหมายเลขโทรศัพท์ไม่ถูกต้อง';
+                swal({ 
+                    type: 'warning', 
+                    title: "คำเตือน...", 
+                    text: msg, 
+                    confirmButtonColor: '#FF9900'
+                }); 
+            }
         } else {
             $(this).removeClass('has-error');
             if (type === 'student_mobile') {
@@ -237,6 +270,7 @@ $(document).ready(function () {
             if (data.student_birth_date) $("#student_birth_date").val(data.student_birth_date);
             if (data.student_idcard) $("#student_idcard").val(data.student_idcard);
             if (data.student_passport) $("#student_passport").val(data.student_passport);
+            if (data.student_passport_expire) $("#student_passport_expire").val(data.student_passport_expire);
             if (data.student_password) $("#student_password").val(data.student_password);
             if (data.dial_code) {
                 $("#dialCode").val(data.dial_code);
@@ -319,11 +353,29 @@ $(document).ready(function () {
         }
         $item.append(previewContent);
         const $btnGroup = $('<div class="text-center" style="margin-top: 15px;"></div>');
-        const $viewBtn = $('<a href="' + fileUrl + '" target="_blank" class="btn btn-primary">View</a> ');
-        const $deleteBtn = $('<button type="button" class="btn btn-warning">Delete</button>');
+        const $viewBtn = $(`<button type="button" class="btn btn-primary" onclick="viewFile('${fileUrl}')" data-lang="view"></button>`);
+        const $deleteBtn = $('<button type="button" class="btn btn-warning" data-lang="delete" style="margin-left: 15px;"></button>');
         $deleteBtn.on('click', function() {
-            $item.remove();
-            $existingInput.val('');
+            const msg = currentLang === 'en' ? "Are you sure?" : "คุณแน่ใจหรือไม่?";
+            const text = currentLang === 'en' ? "This file will be removed from the list." : "ไฟล์นี้จะถูกลบออกจากรายการ";
+            const confmsg = currentLang === 'en' ? "Yes, delete it!" : "ใช่, ลบเลย!";
+            const canfmsg = currentLang === 'en' ? "Cancel" : "ยกเลิก";
+            swal({
+                title: msg,
+                text: text,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: confmsg,
+                cancelButtonText: canfmsg,
+                closeOnConfirm: true,
+                closeOnCancel: true
+            }, function(isConfirm){
+                if (isConfirm) {
+                    $item.remove();
+                    $existingInput.val('');
+                }
+            });
         });
         $btnGroup.append($viewBtn).append($deleteBtn);
         $item.append($btnGroup);
@@ -484,12 +536,21 @@ $(document).ready(function () {
                 $('html, body').animate({ scrollTop: firstInvalidField.offset().top - 100 }, 300);
                 firstInvalidField.focus();
             }
-            swal({
-                type: 'warning',
-                title: 'Warning',
-                text: 'Please fill in all required fields. ' + errorMessage,
-                confirmButtonColor: '#FF9900'
-            });
+            if(currentLang == 'en') {
+                swal({
+                    type: 'warning',
+                    title: 'Warning',
+                    text: 'Please fill in all required fields. ' + errorMessage,
+                    confirmButtonColor: '#FF9900'
+                });
+            } else {
+                swal({
+                    type: 'warning',
+                    title: 'คำเตือน',
+                    text: 'กรุณากรอกข้อมูลในฟิลด์ที่จำเป็นทั้งหมด ' + errorMessage,
+                    confirmButtonColor: '#FF9900'
+                });
+            }
             return false;
         }
         if (!$('#agree').is(':checked') && consent_status == "Y") {
@@ -512,21 +573,24 @@ $(document).ready(function () {
         if (file) {
             var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
             var maxSize = 20 * 1024 * 1024; 
+            const titlemsg = currentLang === 'en' ? "Warning" : "คำเตือน";
             if (allowedTypes.indexOf(file.type) === -1) {
+                const msg = currentLang === 'en' ? "Please select only an image or PDF file." : "กรุณาเลือกไฟล์ภาพหรือ PDF เท่านั้น.";
                 swal({
                     type: 'warning',
-                    title: "Warning",
-                    text: "Please select only an image or PDF file.",
+                    title: titlemsg,
+                    text: msg,
                     confirmButtonColor: '#FF9900'
                 });
                 $(this).val('');
                 return;
             }
             if (file.size > maxSize) {
+                const msg = currentLang === 'en' ? "File size must not exceed 20 MB." : "ขนาดไฟล์ต้องไม่เกิน 20 MB.";
                 swal({
                     type: 'warning',
-                    title: "Warning",
-                    text: "File size must not exceed 20 MB.",
+                    title: titlemsg,
+                    text: msg,
                     confirmButtonColor: '#FF9900'
                 });
                 $(this).val('');
@@ -540,10 +604,12 @@ $(document).ready(function () {
         if (id.length === 0) return;
         if (!isValidThaiID(id)) {
             $this.addClass("has-error");
+            const titlemsg = currentLang === 'en' ? "Warning" : "คำเตือน";
+            const msg = currentLang === 'en' ? "Invalid ID card number" : "หมายเลขบัตรประชาชนไม่ถูกต้อง";
             swal({
                 type: 'warning',
-                title: 'Warning',
-                text: 'Invalid ID card number',
+                title: titlemsg,
+                text: msg,
                 confirmButtonColor: '#FF9900'
             });
             setTimeout(function() {
@@ -562,6 +628,30 @@ $(document).ready(function () {
     });
     buildNationality();
 });
+function viewFile(fileUrl) {
+    $(".systemModal").modal();
+    $(".systemModal .modal-header").html(`<h5 class="modal-title" data-lang="file_preview"></h5>`);
+    const ext = fileUrl.split('.').pop().toLowerCase();
+    let content = '';
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+        content = `<img src="${fileUrl}" alt="Preview" class="img-fluid" style="max-width:100%; height:auto;">`;
+    } else if (ext === 'pdf') {
+        const gviewUrl = "https://docs.google.com/gview?embedded=true&url=" + encodeURIComponent(fileUrl);
+        content = `
+            <iframe src="${gviewUrl}" 
+                width="100%" 
+                height="500px" 
+                style="border:none;">
+            </iframe>
+        `;
+    }
+    $(".systemModal .modal-body").html(content);
+    $(".systemModal .modal-footer").html(`
+        <div class="text-center">
+            <button type="button" class="btn btn-default" data-lang="close" data-dismiss="modal">Close</button>
+        </div>
+    `);
+}
 function buildNationality() {
     try {
         $("#student_nationality").select2({
@@ -635,10 +725,12 @@ function saveRegister() {
         error: () => {
             $(".systemModal").modal("hide");
             $btn.prop('disabled', false);
+            const titlemsg = currentLang === 'en' ? "Warning" : "คำเตือน";
+            const msg = currentLang === 'en' ? "Save failed, please try again." : "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง";
             swal({
                 type: 'warning',
-                title: "Warning",
-                text: "Save faild, please try again.",
+                title: titlemsg,
+                text: msg,
                 confirmButtonColor: '#FF9900'
             });
         }
@@ -649,17 +741,20 @@ function handleRegisterResponse(result) {
     $(".systemModal").modal("hide");
     if (!result.status) {
         $(".btn-register").prop('disabled', false);
-        swal({ 
-            type: 'warning', 
-            title: "Duplicate Data", 
-            text: result.message, 
+        const titlemsg = currentLang === 'en' ? "Warning" : "คำเตือน";
+        const msg = currentLang === 'en' ? "Duplicate Data" : "ข้อมูลซ้ำ";
+        swal({
+            type: 'warning',
+            title: titlemsg,
+            text: msg,
             confirmButtonColor: '#FF9900'
         });
         return;
     }
     if(is_logged_in) {
+        const msg = currentLang === 'en' ? "Saved successfully" : "บันทึกข้อมูลเรียบร้อย";
         swal({
-            title: 'Saved successfully',
+            title: msg,
             text: '',
             type: 'success',
             confirmButtonColor: '#41a85f'

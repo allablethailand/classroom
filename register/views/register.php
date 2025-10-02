@@ -90,11 +90,24 @@
                             </div>
                             <div class="form-group form-input input-17 hidden">
                                 <label class="register-form" for="student_idcard" data-lang="idcard"></label>
-                                <input type="text" class="form-control " id="student_idcard" name="student_idcard" autocomplete="off" maxlength="13">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " id="student_idcard" name="student_idcard" autocomplete="off" maxlength="13">
+                                    <span class="input-group-addon"><i class="fas fa-address-card"></i></span>
+                                </div>
                             </div>
                             <div class="form-group form-input input-18 hidden">
                                 <label class="register-form" for="student_passport" data-lang="passport"></label>
-                                <input type="text" class="form-control" id="student_passport" name="student_passport" autocomplete="off">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="student_passport" name="student_passport" autocomplete="off">
+                                    <span class="input-group-addon"><i class="fas fa-passport"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group form-input input-24 hidden">
+                                <label class="register-form" for="student_passport_expire" data-lang="passport_expire"></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control datepicker-past" id="student_passport_expire" name="student_passport_expire" autocomplete="off">
+                                    <span class="input-group-addon"><i class="far fa-calendar-alt"></i></span>
+                                </div>
                             </div>
                             <div class="form-group form-input input-16 hidden">
                                 <label class="register-form" for="studentstudent_perfix_gender" data-lang="prefix"></label>
@@ -142,7 +155,10 @@
                             </div>
                             <div class="form-group form-input input-14 hidden">
                                 <label class="register-form" for="student_birth_date" data-lang="birthday"></label>
-                                <input type="text" class="form-control datepicker" id="student_birth_date" name="student_birth_date" autocomplete="off">
+                                <div class="input-group">
+                                    <input type="text" class="form-control datepicker" id="student_birth_date" name="student_birth_date" autocomplete="off">
+                                    <span class="input-group-addon"><i class="far fa-calendar-alt"></i></span>
+                                </div>
                             </div>
                             <div class="form-group form-input input-23 hidden">
                                 <label class="register-form" for="student_nationality" data-lang="nationality"></label>
@@ -150,7 +166,10 @@
                             </div>
                             <div class="form-group form-input input-8 hidden">
                                 <label class="register-form" for="student_email" data-lang="email"></label>
-                                <input type="text" class="form-control" id="student_email" name="student_email" autocomplete="off">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="student_email" name="student_email" autocomplete="off">
+                                    <span class="input-group-addon"><i class="fas fa-envelope-open-text"></i></span>
+                                </div>
                                 <div style="font-size: 11px; color: #888888; margin-top: 10px;">example@origami.life</div>
                             </div>
                             <div class="form-group form-input input-9 hidden">
@@ -159,11 +178,17 @@
                             </div>
                             <div class="form-group form-input input-10 hidden">
                                 <label class="register-form" for="student_company" data-lang="company"></label>
-                                <input type="text" class="form-control" id="student_company" name="student_company" autocomplete="off">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="student_company" name="student_company" autocomplete="off">
+                                    <span class="input-group-addon"><i class="fas fa-building"></i></span>
+                                </div>
                             </div>
                             <div class="form-group form-input input-11 hidden">
                                 <label class="register-form" for="student_position" data-lang="position"></label>
-                                <input type="text" class="form-control" id="student_position" name="student_position" autocomplete="off">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="student_position" name="student_position" autocomplete="off">
+                                    <span class="input-group-addon"><i class="fas fa-briefcase"></i></span>
+                                </div>
                             </div>
                             <div class="form-group form-input input-19 hidden">
                                 <label class="register-form" for="copy_of_idcard" data-lang="copy_of_idcard"></label>
@@ -191,7 +216,10 @@
                             </div>
                             <div class="form-group form-input input-12 hidden">
                                 <label class="register-form" for="student_username" data-lang="username"></label>
-                                <input type="text" class="form-control" id="student_username" name="student_username" autocomplete="off" maxlength="20">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="student_username" name="student_username" autocomplete="off" maxlength="20">
+                                    <span class="input-group-addon"><i class="fas fa-user-lock"></i></span>
+                                </div>
                                 <div data-lang="username_info" style="font-size: 11px; color: #888888; margin-top: 10px;"></div>
                             </div>
                             <div class="form-group form-input input-13 hidden">
