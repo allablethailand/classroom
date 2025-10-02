@@ -31,53 +31,62 @@ if (!$class_id) {
 }
 
 $classroom_id = $class_id[0]['classroom_id'];
+$startingSoonClasses = [];
+$otherClass = [];
+$overdueClass = [];
+$ongoingClass = [];
 
-$scheduleItems = select_data(
-    "course.trn_subject AS schedule_name,
-    course.trn_detail AS topic_name,
-    course.trn_date AS date_start,
-    course.trn_from_time AS time_start,
-    course.trn_to_time AS time_end",
-    "ot_training_list course 
+if (isset($_POST) && $_POST['action'] == 'getUpcomingClass') {
+
+    $scheduleItems = select_data(
+        "cc.course_ref_id AS id,
+        course.trn_subject AS schedule_name,
+        course.trn_detail AS topic_name,
+        course.trn_date AS date_start,
+        course.trn_from_time AS time_start,
+        course.trn_to_time AS time_end",
+        "ot_training_list course 
         LEFT JOIN classroom_course cc ON course.trn_id = cc.course_ref_id
         JOIN ot_training_categories categories ON course.categories_id = categories.categories_id",
-    "WHERE cc.classroom_id = {$classroom_id}
-    AND cc.status = 0 
-            AND course.status = 0 
-            AND course.trn_date = '{$dateSchedule}' 
-    ORDER BY time_start ASC LIMIT 5"
-);
+        "WHERE cc.classroom_id = {$classroom_id}
+        AND cc.status = 0 
+                AND course.status = 0 
+                AND course.trn_date = '{$dateSchedule}' "
+    );
 
-$now = new DateTime();
+    $now = new DateTime();
 
-$soonClass = null;
-$otherClasses = [];
-$overdueClasses = [];
+    foreach ($scheduleItems as $item) {
+        $classStart = new DateTime($item['date_start'] . ' ' . $item['time_start']);
+        $classEnd = new DateTime($item['date_start'] . ' ' . $item['time_end']);
+        $minutesDiff = ($classStart->getTimestamp() - $now->getTimestamp()) / 60;
 
-foreach ($scheduleItems as $item) {
-    $classDateTime = new DateTime($item['date_start'] . ' ' . $item['time_start']);
-    $minutesDiff = ($classDateTime->getTimestamp() - $now->getTimestamp()) / 60;
-
-    if ($minutesDiff < 0) {
-        // Class start time already passed - overdue class
-        $item['overdue'] = true;
-        $overdueClasses[] = $item;
-    } else if ($minutesDiff <= 180 && $soonClass === null) {
-        $item['starting_soon'] = true;
-        $item['minutes_to_start'] = round($minutesDiff);
-        $item['stamp_in_status'] = 'No Stamp'; // real logic
-        $soonClass = $item;
-    } else {
-        $item['starting_soon'] = false;
-        $otherClasses[] = $item;
+        if ($now >= $classStart && $now <= $classEnd) {
+            // Current time is within the class duration - ongoing class
+            $item['ongoing'] = true;
+            $ongoingClass[] = $item;
+        } elseif ($minutesDiff < 0) {
+            // Overdue class (class already started and ended)
+            $item['overdue'] = true;
+            $overdueClass[] = $item;
+        } elseif ($minutesDiff > 0 && $minutesDiff <= 360) {
+            // Starting soon within 6 hour
+            $item['starting_soon'] = true;
+            $item['minutes_to_start'] = round($minutesDiff); // your logic here
+            $startingSoonClasses[] = $item;
+        } else {
+            // Other upcoming classes beyond 1 hour
+            $item['starting_soon'] = false;
+            $otherClass[] = $item;
+        }
     }
+
+    $response = [
+        'ongoing_class' => $ongoingClass,
+        'overdue_class' => $overdueClass,
+        'starting_soon_class' => $startingSoonClasses,
+        'other_upcoming_class' => $otherClass,
+    ];
+
+    echo json_encode($response);
 }
-
-$response = [
-    'soon_class' => $soonClass,
-    'other_classes' => $otherClasses,
-    'overdue_class' => $overdueClasses,
-];
-
-header('Content-Type: application/json');
-echo json_encode($response);
