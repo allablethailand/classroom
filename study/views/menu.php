@@ -41,87 +41,13 @@ session_start();
   
     <div class="main-content">
         <div class="container-fluid" style="margin: 0 1rem;">
-            <!-- <div class="" id="upcomingclass"></div> -->
-            <div class="row">
-                <div class="head-flex-menu">
-                    <p class="menu-title">Upcoming Class</p>
-                    <a href="schedule" class="menu-title-button">
-                        <svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set-Filled" sketch:type="MSLayerGroup" transform="translate(-310.000000, -1089.000000)" fill="currentColor"> <path d="M332.535,1105.88 L326.879,1111.54 C326.488,1111.93 325.855,1111.93 325.465,1111.54 C325.074,1111.15 325.074,1110.51 325.465,1110.12 L329.586,1106 L319,1106 C318.447,1106 318,1105.55 318,1105 C318,1104.45 318.447,1104 319,1104 L329.586,1104 L325.465,1099.88 C325.074,1099.49 325.074,1098.86 325.465,1098.46 C325.855,1098.07 326.488,1098.07 326.879,1098.46 L332.535,1104.12 C332.775,1104.36 332.85,1104.69 332.795,1105 C332.85,1105.31 332.775,1105.64 332.535,1105.88 L332.535,1105.88 Z M326,1089 C317.163,1089 310,1096.16 310,1105 C310,1113.84 317.163,1121 326,1121 C334.837,1121 342,1113.84 342,1105 C342,1096.16 334.837,1089 326,1089 L326,1089 Z" id="arrow-right-circle" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>
-                    </a>
-                </div>
-            </div>
+            
+            <div id="ongoing-class-container"></div>
+            <div id="starting-soon-class-container"></div>
+            <div id="other-upcoming-class-container"></div>
+            <!-- <div id="overdue-class-container"></div> -->
 
-            <div class="row" id="upcomingClass"></div>
-
-            <!-- <div class="row" id="otherUpClass"></div> -->
-    
-                <div class="row" >
-                    <div class="container-menu" style="margin-top: 10px;">
-                        <div class="header-menu">
-                            <span class="title-menu">Opening Ceremony</span>
-                            <span class="subtitle-menu">3 weeks left</span>
-                        </div>
-
-                        <div class="usage-menu">
-                            <div class="progress-section">
-                                <div class="progress-header-flex">
-                                   
-                                    <span class="progress-text">
-                                        Wednesday, October 1, 2025
-                                    </span>
-                                    <span class="progress-text">
-                                        9:00 - 12:00 A.M.
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" >
-                    <div class="container-menu" style="margin-top: 10px;">
-                        <div class="header-menu">
-                            <span class="title-menu">Lunch Break</span>
-                            <span class="subtitle-menu">3 weeks left</span>
-                        </div>
-
-                        <div class="usage-menu">
-                            <div class="progress-section">
-                                <div class="progress-header-flex">
-                                   
-                                    <span class="progress-text">
-                                        Wednesday, October 1, 2025
-                                    </span>
-                                    <span class="progress-text">
-                                        12:00 - 1:00 P.M.
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" style="margin-bottom: 10px;">
-                    <div class="container-menu" style="margin-top: 10px;">
-                        <div class="header-menu">
-                            <span class="title-menu">Dinner</span>
-                            <span class="subtitle-menu">3 weeks left</span>
-                        </div>
-                        <div class="usage-menu">
-                            <div class="progress-section">
-                                <div class="progress-header-flex">
-                                
-                                    <span class="progress-text">
-                                        Wednesday, October 1, 2025
-                                    </span>
-                                    <span class="progress-text">
-                                        1:00 - 5:00 P.M.
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            <div class="row">
+            <div class="row" style="margin-top: 1rem;">
                 <p class="menu-title">Academy Menu</p>
             </div>
             <div class="row" style="margin-top: 1rem; ">
@@ -245,47 +171,5 @@ session_start();
     </div>
     <?php require_once 'component/footer.php'; ?>
 </body>
-<script>
-
-// function calculateTimeDiffInBangkok(targetDate) {
-//   // Get current time in Bangkok timezone (UTC+7)
-//   const now = new Date();
-//   const bangkokNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
-
-// //   console.log(now)
-
-//   // Parse the targetDate as a Date object if it's not already
-//   const target = new Date(targetDate);
-
-//   // Calculate time difference in milliseconds
-//   const diffMs = Math.abs(target - bangkokNow);
-
-//   // Convert milliseconds to total minutes
-//   const totalMinutes = Math.floor(diffMs / (1000 * 60));
-
-//   // Calculate hour and minute difference
-//   let hourdiff = 0;
-//   let minutediff = 0;
-
-//   if (totalMinutes < 24 * 60) {
-//     hourdiff = Math.floor(totalMinutes / 60);
-//     minutediff = totalMinutes % 60;
-//   }
-
-//   return { hourdiff, minutediff };
-// }
-
-// // Example usage:
-// const targetDate = "2025-09-13T09:30:00+07:00"; // ISO string in Bangkok timezone
-// const { hourdiff, minutediff } = calculateTimeDiffInBangkok(targetDate);
-
-// const nextclassSpan = document.getElementById("countdown");
-// if (hourdiff > 0 || minutediff > 0) {
-//   nextclassSpan.innerHTML = `Class will begin in <span style="color: #ff8c5a;">&nbsp; ${hourdiff} &nbsp;</span> hour${hourdiff !== 1 ? "s" : ""} <span style="color: #ff8c5a;">&nbsp; ${minutediff} &nbsp;</span> min${minutediff !== 1 ? "s" : ""}.`;
-// } else {
-//   nextclassSpan.innerHTML = "Class has started or time not valid.";
-// }
-</script>
-
 
 </html>
