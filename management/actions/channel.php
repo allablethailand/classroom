@@ -33,6 +33,9 @@
             c.channel_logo,
             t.classroom_key,
             count(stu.student_id) as channel_student,
+            c.channel_type,
+            l.line_token_name,
+            l.line_client_id,
             '' as classroom_link
         FROM 
             classroom_channel c
@@ -42,8 +45,10 @@
             classroom_template t on t.classroom_id = c.classroom_id
         LEFT JOIN 
             classroom_student_join stu on stu.channel_id = c.channel_id and stu.status = 0
+        LEFT JOIN 
+            line_token l on l.line_token_id = c.line_oa
         WHERE 
-            c.classroom_id = '{$classroom_id}' 
+            c.classroom_id = '{$classroom_id}' and c.status = 0
         GROUP BY 
             c.channel_id";
         $primaryKey = 'channel_id';
@@ -54,14 +59,28 @@
             array('db' => 'channel_name', 'dt' => 'channel_name'),
             array('db' => 'channel_description', 'dt' => 'channel_description'),
             array('db' => 'classroom_key', 'dt' => 'classroom_key'),
+            array('db' => 'channel_type', 'dt' => 'channel_type'),
+            array('db' => 'line_token_name', 'dt' => 'line_token_name'),
+            array('db' => 'line_client_id', 'dt' => 'line_client_id'),
             array('db' => 'channel_logo', 'dt' => 'channel_logo','formatter' => function ($d, $row) {
-				return ($d) ? GetUrl($d) : '';
+                $channel_type = $row['channel_type'];
+                if($channel_type == 1) {
+                    return '/images/line-oa.png';
+                } else {
+                    return ($d) ? GetUrl($d) : '';
+                }
 			}),
             array('db' => 'classroom_link', 'dt' => 'classroom_link','formatter' => function ($d, $row) {
                 global $domain_name;
                 $channel_id = $row['channel_id'];
                 $classroom_key = $row['classroom_key'];
-				return $domain_name.'classroom/register/'.$classroom_key.'/'.md5($channel_id);
+                $channel_type = $row['channel_type'];
+                $line_client_id = $row['line_client_id'];
+                if($channel_type == 1 && $line_client_id) {
+                    return $domain_name.'classroom/register/'.$classroom_key.'/'.md5($channel_id).'/'.$line_client_id;
+                } else {
+                    return $domain_name.'classroom/register/'.$classroom_key.'/'.md5($channel_id);
+                }
 			}),
             array('db' => 'channel_student', 'dt' => 'channel_student','formatter' => function ($d, $row) {
 				return number_format($d);
@@ -197,6 +216,87 @@
             return "'" . mysqli_real_escape_string($mysqli, $val) . "'";
         } else {
             return "null";
+        }
+    }
+    if(isset($_POST) && $_POST['action'] == 'lineOAList') {
+        $classroom_id = initVal($_POST['classroom_id']);
+        $lines = select_data(
+            "line_token_id, line_token_name",
+            "line_token",
+            "where status = 0 and comp_id = '{$_SESSION['comp_id']}' and line_token_id NOT IN (SELECT line_oa FROM classroom_channel WHERE classroom_id = $classroom_id AND channel_type = 1 AND status = 0) ORDER BY line_token_name ASC"
+        );
+        if(count($lines) > 0) {
+            echo json_encode([
+                'status' => true,
+                'line_oa' => $lines
+            ]);
+        } else {
+            echo json_encode([
+                'status' => false,
+                'message' => 'No Line OA found. Please add Line OA first.'
+            ]);
+        }
+    }
+    if(isset($_POST) && $_POST['action'] == 'addLineOAChannel') {
+        $classroom_id = initVal($_POST['classroom_id']);
+        $line_token_id = initVal($_POST['line_token_id']);
+        $existing = select_data(
+            "channel_id",
+            "classroom_channel",
+            "where classroom_id = $classroom_id and line_oa = $line_token_id and channel_type = 1"
+        );
+        if(count($existing) > 0) {
+            update_data(
+                "classroom_channel",
+                "status = 0, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
+                "channel_id = '{$existing[0]['channel_id']}'"
+            );
+            echo json_encode([
+                'status' => true
+            ]);
+            exit();
+        } else {
+            $channel_id = insert_data(
+                "classroom_channel",
+                "(
+                    classroom_id,
+                    channel_name,
+                    channel_description,
+                    channel_type,
+                    line_oa,
+                    comp_id,
+                    status,
+                    emp_create,
+                    date_create,
+                    emp_modify,
+                    date_modify
+                )",
+                "(
+                    $classroom_id,
+                    (SELECT line_token_name FROM line_token WHERE line_token_id = $line_token_id),
+                    null,
+                    1,
+                    $line_token_id,
+                    '{$_SESSION['comp_id']}',
+                    0,
+                    '{$_SESSION['emp_id']}',
+                    NOW(),
+                    '{$_SESSION['emp_id']}',
+                    NOW()
+                )"
+            );
+            if($channel_id) {
+                echo json_encode([
+                    'status' => true
+                ]);
+                exit();
+            } else {
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'Error: Could not add Line OA channel.'
+                ]);
+                exit();
+            }
         }
     }
 ?>

@@ -57,9 +57,6 @@
                     end
                 ) as platforms_name,
                 template.classroom_source,
-                template.line_oa,
-                line.line_token_id as line_oa_id,
-                line.line_token_name as line_oa_name,
                 template.auto_approve,
                 template.auto_username,
                 template.auto_username_type,
@@ -77,7 +74,6 @@
             "classroom_template template",
             "
                 left join data_meeting_platforms pf on pf.platforms_id = template.classroom_plateform
-                left join line_token line on line.line_token_id = template.line_oa_link
                 where template.classroom_id = '{$classroom_id}'
             "
         );
@@ -113,9 +109,6 @@
                 'platforms_id' => $classroom['platforms_id'],
                 'platforms_name' => $classroom['platforms_name'],
                 'classroom_source' => $classroom['classroom_source'],
-                'line_oa' => $classroom['line_oa'],
-                'line_oa_id' => $classroom['line_oa_id'],
-                'line_oa_name' => $classroom['line_oa_name'],
                 'auto_approve' => $classroom['auto_approve'],
                 'auto_username' => $classroom['auto_username'],
                 'auto_username_type' => $classroom['auto_username_type'],
@@ -213,35 +206,6 @@
                 m_department 
             where 
                 comp_id = '{$_SESSION['comp_id']}' and dept_del is null and status = 0 $search
-        ) data_table";
-        $whereData = (($_GET['page']) ? "LIMIT ".$end.",".$start : "")."";
-        $Data = select_data($columnData,$tableData,$whereData);
-		$count_data = count($Data);
-		$i = 0;
-		while($i < $count_data) {
-			$data[] = ['id' => $Data[$i]['data_code'],'col' => $Data[$i]['data_desc'],'total_count' => $count_data,'code' => $Data[$i]['data_code'],'desc' => $Data[$i]['data_desc'],];
-			++$i;
-		}
-		if (empty($data)) {
-			$data[] = ['id' => '','col' => '', 'total_count' => ''];
-		}
-        echo json_encode($data);
-	}
-    if(isset($_GET['action']) && $_GET['action'] == 'buildLineOA') {
-		$keyword = trim($_GET['term']);
-		$search = ($keyword) ? " and line_token_name like '%{$keyword}%' " : "";
-		$resultCount = 10;
-		$end = ($_GET['page'] - 1) * $resultCount;
-		$start = $end + $resultCount;
-        $columnData = "*";
-        $tableData = "(
-            select 
-                line_token_id as data_code,
-                line_token_name as data_desc 
-            from 
-                line_token 
-            where 
-                comp_id = '{$_SESSION['comp_id']}' and status = 0 $search
         ) data_table";
         $whereData = (($_GET['page']) ? "LIMIT ".$end.",".$start : "")."";
         $Data = select_data($columnData,$tableData,$whereData);
@@ -418,8 +382,6 @@
         $classroom_close_register = initVal($sql_classroom_close_register);
         $close_register_message = initVal($_POST['close_register_message']);
         $contact_us = initVal($_POST['contact_us']);
-        $line_oa = $_POST['line_oa'];
-        $line_oa_link = initVal($_POST['line_oa_link']);
         $shortcut_status = initVal($_POST['shortcut_status']);
         $auto_approve = $_POST['auto_approve'];
         $auto_username = $_POST['auto_username'];
@@ -451,8 +413,6 @@
                     classroom_type = $classroom_type,
                     classroom_plateform = $classroom_plateform,
                     classroom_source = $classroom_source,
-                    line_oa = $line_oa,
-                    line_oa_link = $line_oa_link,
                     auto_approve = $auto_approve,
                     auto_username = $auto_username,
                     auto_username_type = $auto_username_type,
@@ -491,8 +451,6 @@
                     classroom_type,
                     classroom_plateform,
                     classroom_source,
-                    line_oa,
-                    line_oa_link,
                     auto_approve,
                     auto_username,
                     auto_username_type,
@@ -529,8 +487,6 @@
                     $classroom_type,
                     $classroom_plateform,
                     $classroom_source,
-                    $line_oa,
-                    $line_oa_link,
                     $auto_approve,
                     $auto_username,
                     $auto_username_type,

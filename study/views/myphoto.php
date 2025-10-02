@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ฟังก์ชันสำหรับเรียก PHP process
     function fetchMyPhotos() {
         // ใช้ fetch เพื่อเรียก myphoto_process.php (ควรใช้ POST แต่ตัวอย่างนี้ใช้ GET เพื่อความง่าย)
-        fetch(`myphoto_process.php?student_id=${studentId}`)
+        fetch(`myphoto_process?student_id=${studentId}`)
             .then(response => response.json())
             .then(data => {
                 gallery.innerHTML = ''; // ล้างข้อความ 'กำลังค้นหา'

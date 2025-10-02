@@ -230,9 +230,13 @@ body {
 .language-menu > div:not(:first-child)::before {
     content: '|';
     margin: 0 6px;
+    font-weight: 400;
+    color: #555555;
 }
 .language-menu > div.lang-active {
     text-decoration: underline;
+    font-weight: 700;
+    color: #FF9900;
 }
 .modal-body{
 	width:100%;
