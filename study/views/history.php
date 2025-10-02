@@ -324,6 +324,10 @@ session_start();
     <div class="main-content">
         <!-- Tabs Section -->
             <div class="tabs-section">
+                <h1 class="heading-1" >ประวัติการเข้าเรียน</h1>
+                <div class="divider-1">
+                    <span></span>
+                </div>
                 <div class="" style="display: flex; gap: 10px;">
                     <div class="account-picker">
                         <!-- <div class="account-bg-layer"></div> -->
