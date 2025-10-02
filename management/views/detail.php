@@ -57,6 +57,7 @@
 <script src="/dist/editor/js/plugins/urls.min.js"></script>
 <script src="/js/clipboard.min.js"></script>
 <script src="/node_modules/clipboard/dist/clipboard.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="/classroom/management/js/detail.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/course.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/group.js?v=<?php echo time(); ?>" type="text/javascript"></script>
