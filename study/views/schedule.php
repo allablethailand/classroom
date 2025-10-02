@@ -56,7 +56,11 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
     <?php require_once("component/header.php"); ?>
 
     <div class="main-transparent-content">
-        <div class="container-fluid" style="margin-top: 1rem;">
+        <div class="container-fluid">
+             <h1 class="heading-1" >กำหนดการประจำวัน</h1>
+            <div class="divider-1">
+                <span></span>
+            </div>
             <div class="schedule-section">
                 <!-- <div class="schedule-header">
                     <h3 class="schedule-title-card">Class Schedule</h3>

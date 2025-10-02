@@ -118,11 +118,10 @@ $count_student = $count_total[0]['total_student'];
                     <div class="dropdown">
                         <button type="button" style="border: none;" class="btn btn-default blur-shadow dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter"></i><span class="caret"></span></button>
                         <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="#">4</a></li>
+                            <li><a href="#" class="group-filter" data-group-id="all">ทั้งหมด</a></li>
+                            <?php foreach ($classroom_group as $group): ?>
+                                <li><a href="#" class="group-filter" data-group-id="<?= $group['group_id'] ?>"><?= htmlspecialchars($group['group_name']) ?></a></li>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
 
@@ -149,7 +148,7 @@ $count_student = $count_total[0]['total_student'];
                     <div id="rowData" class="g-4 justify-content-center mb-bs-3 ">
                         <div class="col-12 col-md-6 col-lg-3">
                             <a href="student?<?php echo $item['group_id']; ?>" style="color: black; font-family: 'Kanit', sans-serif !important;">
-                                <div class="card group-card h-100 bg-white rounded-small" style="padding: 10px;">
+                                <div class="card group-card h-100 bg-white rounded-small" style="padding: 10px; border-left: 15px solid <?php echo $item['group_color']; ?> !important;">
                                     <div class="panel-heading border-0" style="padding:0;">
                                         <div class="d-flex-bs align-items-center gap-3">
                                             <div class="group-icon-large" style="color: #FFF;">
@@ -183,14 +182,14 @@ $count_student = $count_total[0]['total_student'];
             <div class="g-4 justify-content-center mb-bs-3 ">
                 <div class="col-12 col-md-6 col-lg-3">
                     <a href="teacher?<?php echo $item['group_id']; ?>" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
-                        <div class="card group-card h-100 bg-teacher rounded-small " style="padding: 10px;">
+                        <div class="card group-card h-100 bg-teacher rounded-small " style="padding: 10px;  ">
                             <div class="panel-heading border-0" style="padding:0;">
                                 <div class="d-flex-bs align-items-center gap-3">
                                     <div class="group-icon-large" style="color: #FFF;">
-                                        <!-- <i class="fas fa-power-off" style=""></i> -->
-                                        <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                         <i class="fas fa-chalkboard-teacher" style="color:black;"></i>
-                                        <!-- <img src="" onerror="this.src='/images/online-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;"> -->
+                                        <div class="col-md-3"><span class="circle"><span> <i class="fas fa-chalkboard-teacher" style="color:#EED8DA; font-size: 2.5rem;"></i></span></span> </div>
+                                        <!-- <i class="fas fa-user-tie" style="width: 50px; color:#F39865;"></i> -->
+                                         
+                                        <!-- <img src="" onerror="this.src='/images/offline-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;"> -->
                                     </div>
                                     <div class="col-md-9 flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
                                         <div class="d-flex-bs align-items-center gap-2 mb-1">

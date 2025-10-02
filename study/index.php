@@ -88,6 +88,10 @@
         case '/classroom/study/history':
             require __DIR__.'/views/history.php';
         break;
+        case '/classroom/study/game/':
+        case '/classroom/study/game':
+            require __DIR__.'/views/game.php';
+        break;
         default: 
            header('Location: /classroom/study/');
     }

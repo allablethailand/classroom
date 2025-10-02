@@ -209,6 +209,7 @@
                     student_perfix_other,
                     student_idcard,
                     student_passport,
+                    student_passport_expire,
                     copy_of_idcard,
                     copy_of_passport,
                     work_certificate,
@@ -246,6 +247,7 @@
                     'student_perfix_other' => $student['student_perfix_other'],
                     'student_idcard' => $student['student_idcard'],
                     'student_passport' => $student['student_passport'],
+                    'student_passport_expire' => $student['student_passport_expire'] ? date('d/m/Y', strtotime($student['student_passport_expire'])) : '',
                     'copy_of_idcard' => $student['copy_of_idcard'] ? GetPublicUrl($student['copy_of_idcard']) : '',
                     'copy_of_passport' => $student['copy_of_passport'] ? GetPublicUrl($student['copy_of_passport']) : '',
                     'work_certificate' => $student['work_certificate'] ? GetPublicUrl($student['work_certificate']) : '',
@@ -374,6 +376,9 @@
         if(isset($_POST['student_birth_date']) && trim($_POST['student_birth_date']) !== '') {
             $student_birth_date = initVal(str_replace('/', '-', trim($_POST['student_birth_date'])));
         }
+        if(isset($_POST['student_passport_expire']) && trim($_POST['student_passport_expire']) !== '') {
+            $student_passport_expire = initVal(str_replace('/', '-', trim($_POST['student_passport_expire'])));
+        }
         $student_perfix = isset($_POST['student_perfix']) ? initVal(trim($_POST['student_perfix'])) : "null";
         $student_perfix_other = isset($_POST['student_perfix_other']) ? initVal(trim($_POST['student_perfix_other'])) : "null";
         $student_idcard = isset($_POST['student_idcard']) ? initVal(trim($_POST['student_idcard'])) : "null";
@@ -462,6 +467,7 @@
                         student_perfix_other = $student_perfix_other,
                         student_idcard = $student_idcard,
                         student_passport = $student_passport,
+                        student_passport_expire = $student_passport_expire,
                         student_nationality = $student_nationality,
                         date_modify = NOW()
                     ",
@@ -485,7 +491,7 @@
                         student_company, student_position, student_username,
                         student_password, student_password_key, student_birth_date,
                         student_image_profile, student_perfix, student_perfix_other,
-                        student_idcard, student_passport, copy_of_idcard,
+                        student_idcard, student_passport, student_passport_expire, copy_of_idcard,
                         copy_of_passport, work_certificate, company_certificate,
                         student_nationality, status, date_create, date_modify
                     )",
@@ -496,7 +502,7 @@
                         $student_company, $student_position, $student_username,
                         $student_password, $student_password_key, $student_birth_date,
                         $student_image_profile, $student_perfix, $student_perfix_other,
-                        $student_idcard, $student_passport, $copy_of_idcard,
+                        $student_idcard, $student_passport, $student_passport_expire, $copy_of_idcard,
                         $copy_of_passport, $work_certificate, $company_certificate,
                         $student_nationality, 0, NOW(), NOW()
                     )"
@@ -549,13 +555,9 @@
                 );
             }
             if(isset($_POST['question_id']) && is_array($_POST['question_id'])) {
-                update_data(
+                delete_data(
                     "classroom_form_answer_users",
-                    "
-                        date_update = NOW(),
-                        status      = 1
-                    ",
-                    "student_id = $student_id and classroom_id = " . intval($classroom_id) . " and status = 0"
+                    "student_id = " . intval($student_id) . " and classroom_id = " . intval($classroom_id)
                 );
                 $forms = select_data(
                     "form_id",
