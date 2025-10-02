@@ -724,7 +724,7 @@ function find_birth($birthday, $today)
 <body>
     <?php require_once("component/header.php") ?>
 
-    <div class="main-container" style="margin-bottom: 4rem;">
+    <div class="main-content" style="padding-inline: 20px;" >
         <div class="tab-content">
             <div class="edit-profile-card">
                 <div class="section-header-icon">

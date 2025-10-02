@@ -92,6 +92,10 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             <?php foreach ($classroom_group as $item):  ?>
 
             <div class="g-4 justify-content-center mb-bs-3 " style="margin-top: 2rem;">
+                <h1 class="heading-1">หลักสูตรชั้นเรียน</h1>
+                    <div class="divider-1"> 
+                        <span></span>
+                    </div>
                 <div class="col-12">
                     <a href="classinfo?classroom_id=<?php echo $item['classroom_id']; ?>" style="font-family: 'Kanit', sans-serif !important;">
                         <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 1.8rem">

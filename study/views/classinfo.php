@@ -51,9 +51,15 @@ $class_id = $_GET['classroom_id'];
 
 <body>
     <?php require_once 'component/header.php'; ?>
-    <div class="min-vh-100 bg-ori-gray">
+    
+    <div class="main-content">
+            
 
         <div class="container-fluid" style="margin-bottom: 7rem;">
+            <h1 class="heading-1">ห้องเรียน</h1>
+            <div class="divider-1"> 
+                <span></span>
+            </div>
             <div class="text-center mb-4 course-class-info" style="margin-top: 2rem; margin: 1rem">
             </div>
         </div>

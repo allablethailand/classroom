@@ -35,10 +35,6 @@ $currentScreen = preg_replace('/([a-z])info/i', '$1 info', $currentScreen);
 // Convert to first letter to uppercase
 $currentScreen = ucwords($currentScreen);
 
-// if ($currentScreen == 'group') {
-//     $currentScreen = 'academy';
-// }
-
 if (!isset($_SESSION['student_id'])) {
     header("Location: /classroom/study/login");
     exit();
