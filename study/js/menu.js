@@ -25,7 +25,7 @@ function renderClasses(classes, containerId, label = '') {
     return;
   }
 
-  if (label) {
+  if (label && classes.length > 0 ) {
     container.innerHTML += `
       <div class="row">
         <div class="head-flex-menu">
