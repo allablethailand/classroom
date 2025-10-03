@@ -3,24 +3,19 @@
 
 ?>
 
-
-
 <!doctype html>
 <html>
 
 <head>
-    <script>
-    // var classroomId = <?php echo json_encode($class_id); ?>;
-</script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
-    <title>Game • ORIGAMI SYSTEM</title>
+    <title>Mini Game • ORIGAMI SYSTEM</title>
     <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/classroom/study/css/classinfo.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/classroom/study/css/game.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="/classroom/study/css/menu.css?v=<?php echo time(); ?>">
+    <!-- <link rel="stylesheet" href="/classroom/study/css/menu.css?v=<?php echo time(); ?>"> -->
     <link rel="stylesheet" href="/dist/css/sweetalert.css">
     <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
     <script src="/bootstrap/3.3.6/js/jquery-2.2.3.min.js" type="text/javascript"></script>
@@ -32,87 +27,78 @@
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
-    <script src="/classroom/study/js/classinfo.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <script src="/classroom/study/js/game.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 
 <body>
     <?php require_once 'component/header.php'; ?>
-    
+
     <div class="main-content">
         <div class="container-fluid" style="margin-bottom: 7rem;">
-            <h1 class="heading-1">Mini Game</h1>
-            <div class="divider-1"> 
+            <h1 class="heading-1" id="mini-game-title">Mini Game</h1>
+            <div class="divider-1">
                 <span></span>
             </div>
-            <div class="text-center mb-4 course-class-info" style="margin-top: 2rem; margin: 1rem">
-                <div class="card group-card h-100 bg-white rounded-small" style=" border-left: 15px solid <?php echo $item['group_color']; ?> !important;">
-                    <div class="panel-heading border-0" style="padding:0;">
-                        <div class="d-flex-bs align-items-center gap-3">
-                            <div class="group-icon-large" style="color: #FFF;">
-                                <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                <img src="<?php echo $item['group_logo']; ?>" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
-                            </div>
-                            <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
-                                <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                    <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["group_name"] ?></h4>
-                                </div>
-                                <p class="text-secondary mb-0 small text-truncate-2">
-                                    <?php echo "เกมแรก" ?>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="card group-card h-100 bg-white rounded-small" style=" margin-top: 2rem; margin: 1rem border-left: 15px solid <?php echo $item['group_color']; ?> !important;">
-                    <div class="panel-heading border-0" style="padding:0;">
-                        <div class="d-flex-bs align-items-center gap-3">
-                            <div class="group-icon-large" style="color: #FFF;">
-                                <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                <img src="<?php echo $item['group_logo']; ?>" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
-                            </div>
-                            <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
-                                <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                    <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["group_name"] ?></h4>
-                                </div>
-                                <p class="text-secondary mb-0 small text-truncate-2">
-                                    <?php echo "เกมสอง" ?>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="row" id="game-menu">
+                <div class="actions-grid">
+                    <button class="action-card" id="btn-quiz-game">
+                        <i class="fas fa-trophy"></i>
+                        <h4 style="margin-top: 10px;">Quiz</h4>
 
-                <div class="card group-card h-100 bg-white rounded-small" style=" margin-top: 2rem; margin: 1rem border-left: 15px solid <?php echo $item['group_color']; ?> !important;">
-                    <div class="panel-heading border-0" style="padding:0;">
-                        <div class="d-flex-bs align-items-center gap-3">
-                            <div class="group-icon-large" style="color: #FFF;">
-                                <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                <img src="<?php echo $item['group_logo']; ?>" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
-                            </div>
-                            <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
-                                <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                    <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["group_name"] ?></h4>
-                                </div>
-                                <p class="text-secondary mb-0 small text-truncate-2">
-                                    <?php echo "เกมสาม" ?>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    </button>
+                    <button class="action-card" id="btn-memory-game">
+                        <i class="fas fa-question-circle"></i>
+                        <h4 style="margin-top: 10px;">Guess Who</h4>
+                    </button>
+                    <button class="action-card" id="btn-card-flip-game">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <h4 style="margin-top: 10px;">Card Flip</h4>
 
-                
+                    </button>
+                    <button class="action-card" id="btn-wordle-game">
+                        <i class="fas fa-spell-check"></i>
+                        <h4 style="margin-top: 10px;">Wordle</h4>
+                    </button>
+                </div>
+            </div>
+
+            <div id="quiz-game" class="game-template" style="display:none;">
+                <!-- <h2>Quiz Game</h2> -->
+                <div id="questionNumber"></div>
+                <div id="questionText"></div>
+                <form id="quizForm">
+                    <div id="choicesContainer"></div>
+                </form>
+                <button id="prevBtn">Previous</button>
+                <button id="nextBtn">Next</button>
+            </div>
+
+            <div id="guess-who-game" class="game-template" style="display:none;">
+                <!-- <h2>Guess Who</h2> -->
+                <div id="characterImage"></div>
+                <div id="questionPrompt">Ask a question to guess the character's name!</div>
+                <input type="text" id="guessInput" placeholder="Enter your guess">
+                <button id="submitGuess">Guess</button>
+                <div id="feedback"></div>
+            </div>
+
+            <div id="card-flip-game" class="game-template" style="display:none;">
+                <!-- <h2>Card Flip</h2> -->
+                <div id="cardContainer"></div>
+                <div id="gameStatus"></div>
+            </div>
+
+            <div id="wordle-game" class="game-template" style="display:none;">
+                <!-- <h2>Wordle</h2> -->
+                <div id="wordle-grid"></div>
+                <input type="text" id="wordleInput" maxlength="5" placeholder="Enter 5-letter word">
+                <button id="submitWordleGuess">Submit</button>
+                <div id="wordleFeedback"></div>
             </div>
         </div>
     </div>
-    
+
     <?php require_once 'component/footer.php'; ?>
-
-
 </body>
-<script>
-
-</script>
-
 </html>

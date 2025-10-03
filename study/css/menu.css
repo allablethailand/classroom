@@ -374,6 +374,10 @@
   height: 3rem; /* h-12 */
 }
 
+.header-menu .subtitle-menu {
+  color: #555555;
+}
+
 .progress-label-menu {
   position: absolute;
   inset: 0; /* top: 0; right: 0; bottom: 0; left: 0 */

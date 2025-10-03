@@ -162,14 +162,13 @@ session_start();
                         </defs>
                         </svg>
                         <h4 style="margin-top: 10px;">COIN</h4>
-                    </a> -->
+                    </a>
 
-                    <li><a href="add_group_photo">เพิ่มรูปภาพกลุ่ม</a></li> 
+                    <li><a href="add_group_photo">เพิ่มรูปภาพกลุ่ม</a></li> -->
                 </div>
             </div>
         </div>
     </div>
     <?php require_once 'component/footer.php'; ?>
 </body>
-
 </html>
