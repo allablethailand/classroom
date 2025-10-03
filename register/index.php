@@ -4,6 +4,7 @@
     $parts = explode('/', trim($url, '/'));
     $classroomCode = isset($parts[2]) ? $parts[2] : null;
     $channel = isset($parts[3]) ? $parts[3] : '';
+    $line_client_id = isset($parts[4]) ? $parts[4] : '';
     if(empty($classroomCode)) {
         header('Location: /');
         exit;

@@ -221,7 +221,6 @@
                 "classroom_student",
                 "where student_id = " . intval($student_id) . " and status = 0"
             );
-            
             if(!empty($students)) {
                 $student = $students[0];
                 $student_data = array(
@@ -324,8 +323,10 @@
     }
     if(isset($_GET['action']) && $_GET['action'] == 'saveRegister') {
         $classroom_id = isset($_POST['classroom_id']) ? intval($_POST['classroom_id']) : 0;
+        $line_client_id = isset($_POST['line_client_id']) ? intval($_POST['line_client_id']) : '';
+        $currentLang = isset($_POST['currentLang']) ? $_POST['currentLang'] : 'th';
         if(!$classroom_id) {
-            echo json_encode(array('status' => false, 'message' => 'Invalid classroom ID'));
+            echo json_encode(array('status' => false, 'message' => ($currentLang == 'en') ? 'Invalid classroom ID' : 'รหัสห้องเรียนไม่ถูกต้อง'));
             exit;
         }
         $student_id = isset($_SESSION['student_id']) ? intval($_SESSION['student_id']) : 0;
@@ -335,7 +336,7 @@
             "where classroom_id = " . intval($classroom_id)
         );
         if(empty($classroom)) {
-            echo json_encode(array('status' => false, 'message' => 'Classroom not found'));
+            echo json_encode(array('status' => false, 'message' => ($currentLang == 'en') ? 'Classroom not found' : 'ไม่พบห้องเรียน'));
             exit;
         }
         $comp_id = intval($classroom[0]['comp_id']);
@@ -352,7 +353,7 @@
         if(isset($_POST['student_email']) && trim($_POST['student_email']) !== '') {
             $email_raw = trim($_POST['student_email']);
             if(!filter_var($email_raw, FILTER_VALIDATE_EMAIL)) {
-                echo json_encode(array('status' => false, 'message' => 'Invalid email format'));
+                echo json_encode(array('status' => false, 'message' => ($currentLang == 'en') ? 'Invalid email format' : 'รูปแบบอีเมลไม่ถูกต้อง'));
                 exit;
             }
             $student_email = initVal($email_raw);
@@ -361,7 +362,7 @@
         if(isset($_POST['student_mobile']) && trim($_POST['student_mobile']) !== '') {
             $mobile = preg_replace('/[^0-9]/', '', trim($_POST['student_mobile']));
             if(strlen($mobile) < 9 || strlen($mobile) > 10) {
-                echo json_encode(array('status' => false, 'message' => 'Invalid mobile number'));
+                echo json_encode(array('status' => false, 'message' => ($currentLang == 'en') ? 'Invalid mobile number' : 'หมายเลขโทรศัพท์มือถือไม่ถูกต้อง'));
                 exit;
             }
             if(substr($mobile, 0, 1) === '0') {
@@ -376,6 +377,7 @@
         if(isset($_POST['student_birth_date']) && trim($_POST['student_birth_date']) !== '') {
             $student_birth_date = initVal(str_replace('/', '-', trim($_POST['student_birth_date'])));
         }
+        $student_passport_expire = "null";
         if(isset($_POST['student_passport_expire']) && trim($_POST['student_passport_expire']) !== '') {
             $student_passport_expire = initVal(str_replace('/', '-', trim($_POST['student_passport_expire'])));
         }
@@ -399,7 +401,7 @@
                 if(!empty($exits_email)) {
                     echo json_encode(array(
                         'status' => false,
-                        'message' => 'This email is already registered. Please use another email.'
+                        'message' => ($currentLang == 'en') ? 'This email is already registered. Please use another email.' : 'อีเมลนี้ถูกลงทะเบียนแล้ว กรุณาใช้เมลอื่น'
                     ));
                     exit;
                 }
@@ -413,7 +415,7 @@
                 if(!empty($exits_mobile)) {
                     echo json_encode(array(
                         'status' => false,
-                        'message' => 'This mobile number is already registered. Please use another number.'
+                        'message' => ($currentLang == 'en') ? 'This mobile number is already registered. Please use another number.' : 'หมายเลขโทรศัพท์มือถือถูกลงทะเบียนแล้ว กรุณาใช้หมายเลขอื่น'
                     ));
                     exit;
                 }
@@ -625,7 +627,7 @@
                 }
             }
             mysqli_commit($mysqli);
-            echo json_encode(array('status' => true, 'student_id' => $student_id));
+            echo json_encode(array('status' => true, 'student_id' => $student_id, 'line_client_id' => $line_client_id));
             
         } catch(Exception $e) {
             mysqli_rollback($mysqli);
@@ -655,9 +657,6 @@
         }
         $strname = md5($classroom_id . microtime(true) . rand(1000,9999) . $file_key);
         $upload_dir = 'uploads/' . intval($comp_id) . '/classroom/' . $subfolder . '/';
-        if(!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0755, true);
-        }
         $upload_path = $upload_dir . $strname . '.' . $file_ext;
         if(!SaveFile($file_tmp, $upload_path)) {
             throw new Exception("Failed to save file: " . $file_key);
@@ -723,5 +722,34 @@
 			$data[] = ['id' => '','col' => '', 'total_count' => ''];
 		}
         echo json_encode($data);
+    }
+    if(isset($_POST) && $_POST['action'] == 'verifyDuplicateData') {
+        $currentLang = isset($_POST['currentLang']) ? trim($_POST['currentLang']) : 'th';
+        $verify_val = isset($_POST['verify_val']) ? trim($_POST['verify_val']) : '';
+        $verify_type = isset($_POST['verify_type']) ? trim($_POST['verify_type']) : '';
+        $condition = ($student_id) ? "and student_id <> " . intval($student_id) : "";
+        switch($verify_type) {
+            case 'idcard':
+                $exits = select_data("student_id", "classroom_student", "where student_idcard = '" . mysqli_real_escape_string($mysqli, $verify_val) . "' and status = 0 $condition");
+                $duplicate_message = ($currentLang == 'th') ? 'หมายเลขบัตรประชาชนนี้ถูกลงทะเบียนแล้ว กรุณาใช้หมายเลขอื่น' : 'This ID card number is already registered. Please use another number.';
+                break;
+            case 'email':   
+                $exits = select_data("student_id", "classroom_student", "where LOWER(student_email) = LOWER('" . mysqli_real_escape_string($mysqli, $verify_val) . "') and status = 0 $condition");
+                $duplicate_message = ($currentLang == 'th') ? 'อีเมลนี้ถูกลงทะเบียนแล้ว กรุณาใช้เมลอื่น' : 'This email is already registered. Please use another email.';
+                break;
+            case 'mobile':  
+                $mobile = preg_replace('/[^0-9]/', '', $verify_val);
+                if(substr($mobile, 0, 1) === '0') {
+                    $mobile = substr($mobile, 1);
+                } 
+                $exits = select_data("student_id", "classroom_student", "where student_mobile = '" . mysqli_real_escape_string($mysqli, $mobile) . "' and status = 0 $condition");
+                $duplicate_message = ($currentLang == 'th') ? 'หมายเลขโทรศัพท์มือถือถูกลงทะเบียนแล้ว กรุณาใช้หมายเลขอื่น' : 'This mobile number is already registered. Please use another number.';
+                break;
+        }
+        if(!empty($exits)) {
+            echo json_encode(array('status' => false, 'message' => $duplicate_message));
+        } else {
+            echo json_encode(array('status' => true, 'message' => ''));
+        }
     }
 ?>

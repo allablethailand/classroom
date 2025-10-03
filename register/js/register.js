@@ -4,6 +4,7 @@ let currentLang = "th";
 let consent_status = 'N';
 let channel_id = '';
 let is_logged_in = false;
+let line_client_id;
 const translations = {
     en: {
         eng: "English", thai: "Thai", register: "Register", infomation: "Details",
@@ -38,6 +39,9 @@ const translations = {
         view: "View",
         delete: "Delete",
         file_preview: "File Preview",
+        consent_notice: "Consent Notice",
+        consent_paragraph: "This form has been created by the form owner. Any information you submit will be sent directly to the form owner. Allable is not responsible for the privacy practices or actions of third-party form owners. Please avoid submitting personal, sensitive, or confidential information, and never share your password.",
+        consent_footer: "Please do not provide personal or sensitive information. Thank you for your understanding!",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
@@ -72,9 +76,13 @@ const translations = {
         view: "ดู",
         delete: "ลบ",
         file_preview: "ตัวอย่างไฟล์",
+        consent_notice: "หนังสือแจ้งเพื่อขอความยินยอม",
+        consent_paragraph: "แบบฟอร์มนี้ถูกสร้างขึ้นโดยเจ้าของฟอร์ม ข้อมูลใด ๆ ที่คุณส่ง จะถูกส่งไปยังเจ้าของฟอร์มโดยตรง Allable จะไม่รับผิดชอบต่อการปฏิบัติด้านความเป็นส่วนตัวหรือการดำเนินการใด ๆ ของเจ้าของฟอร์มภายนอก โปรดหลีกเลี่ยงการส่งข้อมูลส่วนบุคคล ข้อมูลที่อ่อนไหว หรือข้อมูลลับ และอย่าเปิดเผยรหัสผ่านของคุณโดยเด็ดขาด",
+        consent_footer: "กรุณางดให้ข้อมูลส่วนบุคคลหรือข้อมูลที่อ่อนไหว ขอบคุณในความเข้าใจของท่าน",
     }
 };
 $(document).ready(function () {
+    line_client_id = $("#line_client_id").val();
     $('#registrationForm').on('input change', 'input, textarea, select', updateProgressBar);
     function toggleScrollBtn() {
         if ($(window).width() > 767) return $('#scrollToFormBtn').hide();
@@ -147,8 +155,8 @@ $(document).ready(function () {
         yearRange: "-20:+20",
         autoclose: true,
     });
-    $("#student_idcard, #student_mobile").on("keypress", function (e) {
-        if (e.which < 48 || e.which > 57) e.preventDefault();
+    $(document).on("input", "#student_idcard, #student_mobile", function () {
+        this.value = this.value.replace(/[^0-9]/g, "");
     });
     $(document).on("input", "[id$='_en']", function () {
         this.value = this.value.replace(/[^A-Za-z\s]/g, "");
@@ -197,15 +205,11 @@ $(document).ready(function () {
             }
         } else {
             $(this).removeClass('has-error');
-            if (type === 'student_mobile') {
-                let usernameMobile = val;
-                if (val.startsWith("0")) {
-                    val = val.replace(/^0/, "");
-                    $(this).val(val);
-                } else if (val.length > 0) {
-                    usernameMobile = "0" + val;
-                }
-                $("#student_username").val(val ? usernameMobile : "");
+            if(type === 'student_email') {
+                verifyDuplicateData(val, 'email', 'student_email');
+            }
+            if(type === 'student_mobile') {
+                verifyDuplicateData(val, 'mobile', 'student_mobile');
             }
         }
     });
@@ -617,6 +621,7 @@ $(document).ready(function () {
             }, 0);
         } else {
             $this.removeClass("has-error");
+            verifyDuplicateData(id, 'idcard', 'student_idcard');
         }
     });
     $("#student_perfix").on("change", function() {
@@ -628,6 +633,44 @@ $(document).ready(function () {
     });
     buildNationality();
 });
+function verifyDuplicateData(value, type, fieldId) {
+    $.ajax({
+        url: "/classroom/register/actions/register.php",
+        type: "POST",
+        data: {
+            action:'verifyDuplicateData',
+            verify_val: value,
+            verify_type: type,
+            currentLang: currentLang
+        },
+        dataType: "JSON",
+        type: 'POST',
+        success: function(result){
+            if (!result.status) {
+                $("#" + fieldId).addClass("has-error");
+                const titlemsg = currentLang === 'en' ? "Warning" : "คำเตือน";
+                swal({
+                    type: 'warning',
+                    title: titlemsg,
+                    text: result.message,
+                    confirmButtonColor: '#FF9900'
+                });
+            } else {
+                $("#" + fieldId).removeClass("has-error");
+                if(type == 'mobile') {
+                    let usernameMobile = value;
+                    if (value.startsWith("0")) {
+                        value = value.replace(/^0/, "");
+                        $(this).val(value);
+                    } else if (value.length > 0) {
+                        usernameMobile = "0" + value;
+                    }
+                    $("#student_username").val(value ? usernameMobile : "");
+                }
+            }
+        }
+    });
+}
 function viewFile(fileUrl) {
     $(".systemModal").modal();
     $(".systemModal .modal-header").html(`<h5 class="modal-title" data-lang="file_preview"></h5>`);
@@ -714,6 +757,8 @@ function saveRegister() {
     const dialCode = $(".iti__selected-dial-code").html();
     fd.append('dialCode', dialCode);
     fd.append('channel_id', channel_id);
+    fd.append('line_client_id', line_client_id);
+    fd.append('currentLang', currentLang);
     $.ajax({
         url: '/classroom/register/actions/register.php?action=saveRegister',
         type: "POST",
@@ -742,11 +787,10 @@ function handleRegisterResponse(result) {
     if (!result.status) {
         $(".btn-register").prop('disabled', false);
         const titlemsg = currentLang === 'en' ? "Warning" : "คำเตือน";
-        const msg = currentLang === 'en' ? "Duplicate Data" : "ข้อมูลซ้ำ";
         swal({
             type: 'warning',
             title: titlemsg,
-            text: msg,
+            text: result.message,
             confirmButtonColor: '#FF9900'
         });
         return;
@@ -782,6 +826,13 @@ function handleRegisterResponse(result) {
         $(".close-register").off("click").on("click", function() {
             location.reload();
         });
+        // let line_client_id = result.line_client_id || '';
+        // if(line_client_id && line_client_id !== '') {
+        //     let classroom_key = $("#classroomCode").val();
+        //     let student_id = result.student_id || '';
+        //     const state = btoa(encodeURIComponent(`cid=${classroom_key}&stu=${student_id}&lid=${line_client_id}`));
+        //     window.location.href = "/classroom/lib/line/login.php?" + state;
+        // }
     }
 }
 function initForm(form_data) {
@@ -874,6 +925,7 @@ function autoResize(textarea) {
     textarea.style.height = textarea.scrollHeight + 'px'; 
 }
 function initTemplate(data) {
+    $(document).attr("title", `${data.classroom_name} • ORIGAMI PLATFORM`);
     let bg = (data.classroom_bg != '') ? data.classroom_bg : "/images/ogm_bg.png";
     $(".poster-bg").css("background-image",`url(${bg})`);
     $(".poster-img img").attr("src", data.classroom_poster || "/images/training.jpg");
@@ -942,16 +994,16 @@ function calculateFormCompletion() {
 }
 function isInputValid($el) {
     const val = ($el.val() || '').trim();
-    if(!val) return false;
+    if (!val) return false;
     const id = $el.attr('id') || '';
-    if(id.endsWith('_en')) {
-        return /^[A-Za-z\s]+$/.test(val);
-    } else if(id.endsWith('_th')) {
-        return /^[ก-๙\s]+$/.test(val);
-    } else if(id === 'student_username') {
+    if (id.endsWith('_en')) {
+        return /^[A-Za-z\s'-]+$/.test(val);
+    } else if (id.endsWith('_th')) {
+        return /^[ก-๙ะ-๏\s]+$/.test(val);
+    } else if (id === 'student_username') {
         return /^[A-Za-z0-9]+$/.test(val);
-    } else if(id === 'student_password') {
-        return /^[A-Za-z0-9!@#$%^&*()_\+\-=\[\]{};:'",.<>\/?]+$/.test(val);
+    } else if (id === 'student_password') {
+        return /^[A-Za-z0-9!@#$%^&*()_\+\-=\[\]{};:'",.<>\/?\\|`~]+$/.test(val);
     }
     return true;
 }
