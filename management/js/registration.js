@@ -849,7 +849,7 @@ function delRegistration(join_id) {
                 success: function(result) {
                     if(result.status === true) {			
                         swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});							
-                        buildGroup();
+                        buildRegistration();
                     }else{
                         swal({type: 'error',title: "Sorry...",text: "Something went wrong!",timer: 2000});
                     }
