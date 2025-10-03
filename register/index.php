@@ -5,6 +5,7 @@
     $classroomCode = isset($parts[2]) ? $parts[2] : null;
     $channel = isset($parts[3]) ? $parts[3] : '';
     $line_client_id = isset($parts[4]) ? $parts[4] : '';
+    $is_result = isset($_SESSION['is_result']) ? $_SESSION['is_result'] : '';
     if(empty($classroomCode)) {
         header('Location: /');
         exit;
@@ -18,4 +19,5 @@
             header('Location: /classroom/register/');
             exit;
     }
+    session_destroy();
 ?> 

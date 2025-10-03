@@ -30,6 +30,7 @@
 <input type="hidden" id="classroomCode" value="<?php echo $classroomCode; ?>">
 <input type="hidden" id="channel" value="<?php echo $channel; ?>">
 <input type="hidden" id="line_client_id" value="<?php echo $line_client_id; ?>">
+<input type="hidden" id="is_result" value="<?php echo $is_result; ?>">
 <div class="container-fluid registration-container">
     <div class="row" style="height: 100vh;">
         <div class="col-sm-9 left-section">

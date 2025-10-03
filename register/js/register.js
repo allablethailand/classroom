@@ -5,6 +5,7 @@ let consent_status = 'N';
 let channel_id = '';
 let is_logged_in = false;
 let line_client_id;
+let is_result = false;
 const translations = {
     en: {
         eng: "English", thai: "Thai", register: "Register", infomation: "Details",
@@ -23,9 +24,6 @@ const translations = {
         username_info: "Username must be 8–20 characters, consisting of English letters or numbers only. (By default, your registered mobile number will be used)",
         close: "Close", accept: "Accept", already: "Already have an account?", login: "Log in",
         registered: "Successfully registered.", registered_success: "You have successfully completed your registration.",
-        registered_success2: "Please check the email address you provided to view the details and status of your registration. If you do not receive an email within a few minutes, please check your spam folder or contact our support team for further assistance.",
-        registered_success3: "If you do not receive an email within a few minutes,",
-        registered_success4: "please check your spam folder or contact our support team for further assistance.",
         accept_register: "Accept and register",
         copy_of_idcard: "Copy of ID card",
         copy_of_passport: "Passport",
@@ -60,9 +58,6 @@ const translations = {
         username_info: "ชื่อผู้ใช้ต้องมีความยาว 8–20 ตัวอักษร และประกอบด้วยตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น (ค่าเริ่มต้นคือหมายเลขโทรศัพท์มือถือที่ท่านกรอกไว้)",
         close: "ปิด", accept: "ยอมรับ", already: "มีบัญชีผู้ใช้อยู่แล้ว?", login: "เข้าสู่ระบบ",
         registered: "ลงทะเบียนสำเร็จ", registered_success: "คุณได้ทำการลงทะเบียนเรียบร้อยแล้ว",
-        registered_success2: "กรุณาตรวจสอบอีเมลที่ท่านได้กรอกไว้ เพื่อดูรายละเอียดและผลการลงทะเบียนของท่าน",
-        registered_success3: "หากท่านไม่ได้รับอีเมลภายในไม่กี่นาที กรุณาตรวจสอบโฟลเดอร์สแปม",
-        registered_success4: "หรือแจ้งเจ้าหน้าที่เพื่อตรวจสอบเพิ่มเติม",
         accept_register: "ยอมรับและลงทะเบียน",
         copy_of_idcard: "สำเนาบัตรประชาชน",
         copy_of_passport: "หนังสือเดินทาง",
@@ -83,6 +78,10 @@ const translations = {
 };
 $(document).ready(function () {
     line_client_id = $("#line_client_id").val();
+    is_result = $("#is_result").val();
+    if(is_result) {
+        showSuccessModal(currentLang);
+    }
     $('#registrationForm').on('input change', 'input, textarea, select', updateProgressBar);
     function toggleScrollBtn() {
         if ($(window).width() > 767) return $('#scrollToFormBtn').hide();
@@ -859,8 +858,11 @@ function handleRegisterResponse(result) {
         }
         $(".btn-register").prop('disabled', false);
     } else {
-        showSuccessModal(lang);
-        // handleLineLogin(result);
+        if(line_client_id) {
+            handleLineLogin(result);
+        } else {
+            showSuccessModal(lang);
+        }
     }
 }
 function showSuccessModal(lang) {
@@ -876,15 +878,15 @@ function showSuccessModal(lang) {
     `);
     $modal.find(".modal-body").html(`
         <div class="text-center">
-            <img src="/images/ogm_logo.png" 
-                 onerror="this.style.display='none'" 
-                 alt="ORIGAMI Logo"
-                 style="height: 100px; margin-bottom: 20px;">
-            <h5 data-lang="registered_success"></h5>
-            <p data-lang="registered_success2"></p>
-            <p data-lang="registered_success3"></p>
-            <p data-lang="registered_success4"></p>
+            <img src="/images/ogm_logo.png" onerror="this.style.display='none'" alt="ORIGAMI Logo" style="height: 100px; margin-bottom: 20px;">
         </div>
+        <div class="text-center">
+            <h4 class="text-success" data-lang="registered_success"></h4>
+        </div>
+        <br>
+        <p>กรุณาตรวจสอบอีเมลที่ท่านได้กรอกไว้ เพื่อดูรายละเอียดในการลงทะเบียน หากท่านไม่ได้รับอีเมล กรุณาตรวจสอบโฟลเดอร์สแปมหรือเมลขยะ หรือติดต่อเจ้าหน้าที่เพื่อตรวจสอบเพิ่มเติม</p>
+        <br>
+        <p>You have successfully completed your registration. Please check the email address you provided for the registration details. If you do not receive the email, kindly check your spam or junk mail folder, or contact our staff for further assistance.</p>
     `);
     $modal.find(".modal-footer").html(`
         <div class="text-center w-100">
@@ -903,11 +905,9 @@ function showSuccessModal(lang) {
 }
 function handleLineLogin(result) {
     const lineClientId = result.line_client_id || '';
-    
     if (lineClientId && lineClientId !== '') {
         const classroomKey = $("#classroomCode").val() || '';
         const studentId = result.student_id || '';
-        
         if (classroomKey && studentId) {
             try {
                 const stateData = `cid=${classroomKey}&stu=${studentId}&lid=${lineClientId}`;
