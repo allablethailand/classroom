@@ -13,6 +13,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/lib/connect_sqli.php';
 
 global $mysqli;
 // Get current directory or page identifier, example by parsing URL path

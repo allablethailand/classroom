@@ -216,8 +216,6 @@
 }
 
 
-
-
 .menu-title {
   color: #7d7c7c;
   font-size: 1.4rem;
@@ -336,7 +334,7 @@
 .container-menu {
   background-color: white;
   border-radius: 1rem; /* rounded-2xl */
-  padding: 0.7rem 1rem; /* p-4 */
+  padding: 1rem; /* p-4 */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
   border: 1px solid #f3f4f6; /* border-gray-100 */
 }
@@ -348,9 +346,15 @@
   margin-bottom: 0.3rem; /* mb-3 */
 }
 
-.header-menu .title {
+.header-menu .title-menu {
   color: #4b5563; /* text-gray-700 */
   font-size: 0.875rem; /* text-sm */
+ overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  max-width: 200px;;
 }
 
 .header-menu .subtitle {
@@ -368,6 +372,10 @@
   position: relative;
   width: 3rem; /* w-12 */
   height: 3rem; /* h-12 */
+}
+
+.header-menu .subtitle-menu {
+  color: #555555;
 }
 
 .progress-label-menu {
@@ -528,3 +536,23 @@
   background: none !important;
   color: inherit !important; 
 } */
+
+.button-menu {
+  margin-top: 0.5rem;
+}
+
+.progress-header-reverse {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; 
+}
+
+
+.btn-origami {
+  border-radius: 30px;
+  color: white;
+  background-color: #ff8c5a;
+  border: none;
+  padding-inline: 0.7rem;
+}

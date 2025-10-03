@@ -29,6 +29,7 @@
 <body>
 <input type="hidden" id="classroomCode" value="<?php echo $classroomCode; ?>">
 <input type="hidden" id="channel" value="<?php echo $channel; ?>">
+<input type="hidden" id="line_client_id" value="<?php echo $line_client_id; ?>">
 <div class="container-fluid registration-container">
     <div class="row" style="height: 100vh;">
         <div class="col-sm-9 left-section">
@@ -54,13 +55,10 @@
                         <h5 style="margin-bottom: 25px;">Powered by Origami</h5>
                         <div>Copyright © 2020, Allable Co.,Ltd. All Rights Reserved.</div>
                     </div>
-                    <div class="origami-events-notice"><label>Consent Notice</label>
-                        This form has been created by the form owner. Any information you submit will be sent directly to the form owner. 
-                        Allable is not responsible for the privacy practices or actions of third-party form owners. Please avoid submitting personal, sensitive, 
-                        or confidential information, and never share your password.
-                        <br><br> <label>Origami Form</label>
-                        Please do not provide personal or sensitive information.
-                        Thank you for your understanding!
+                    <div class="origami-events-notice"><label data-lang="consent_notice"></label>
+                        <p data-lang="consent_paragraph"></p>
+                        <label>Origami Form</label>
+                        <p data-lang="consent_footer"></p>
                     </div>
                 </div>
             </div>

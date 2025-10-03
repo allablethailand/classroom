@@ -6,6 +6,9 @@ body {
     color: #555555;
     font-size: 13px;
 }
+.sweet-alert {
+    font-family: 'Kanit', sans-serif;
+}
 .registration-container {
     height: 100vh;
     overflow: hidden;
@@ -448,6 +451,7 @@ textarea, input[type="text"], input[type="email"], input[type="password"], selec
     left: 0;
     width: 100%;
     background: #f5f5f5;
+    z-index: 9999999;
 }
 .right-section .form-progress .progress {
     height: 15px;
