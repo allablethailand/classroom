@@ -340,6 +340,11 @@
             exit;
         }
         $comp_id = intval($classroom[0]['comp_id']);
+        $tenant = select_data("tenant_key", "ogm_tenant", "where comp_id = '{$comp_id}' and status = 0");
+        $tenant_url = $domain_name;
+        if (!empty($tenant)) {
+            $tenant_url .= $tenant[0]['tenant_key'];
+        }
         $channel_id = isset($_POST['channel_id']) && trim($_POST['channel_id']) ? initVal(trim($_POST['channel_id'])) : "null";
         $dial_code = isset($_POST['dialCode']) && trim($_POST['dialCode']) ? initVal(trim($_POST['dialCode'])) : "'+66'";
         $student_firstname_en = isset($_POST['student_firstname_en']) ? initVal(trim($_POST['student_firstname_en'])) : "null";
@@ -627,7 +632,7 @@
                 }
             }
             mysqli_commit($mysqli);
-            echo json_encode(array('status' => true, 'student_id' => $student_id, 'line_client_id' => $line_client_id));
+            echo json_encode(array('status' => true, 'student_id' => $student_id, 'line_client_id' => $line_client_id, 'tenant_url' => $tenant_url));
             
         } catch(Exception $e) {
             mysqli_rollback($mysqli);

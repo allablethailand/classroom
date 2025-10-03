@@ -77,6 +77,7 @@ const translations = {
     }
 };
 $(document).ready(function () {
+    $("input").attr("autocomplete", "off");
     line_client_id = $("#line_client_id").val();
     is_result = $("#is_result").val();
     if(is_result) {
@@ -850,22 +851,18 @@ function handleRegisterResponse(result) {
                 text: '',
                 type: 'success',
                 confirmButtonColor: '#41a85f'
-            }, function() {
-                location.reload();
             });
-        } else {
-            location.reload();
         }
         $(".btn-register").prop('disabled', false);
     } else {
         if(line_client_id) {
             handleLineLogin(result);
         } else {
-            showSuccessModal(lang);
+            showSuccessModal(lang, result.tenant_url);
         }
     }
 }
-function showSuccessModal(lang) {
+function showSuccessModal(lang, tenant_url) {
     const $modal = $(".systemModal");
     if ($modal.length === 0) {
         console.error('System modal not found');
@@ -890,15 +887,12 @@ function showSuccessModal(lang) {
     `);
     $modal.find(".modal-footer").html(`
         <div class="text-center w-100">
-            <button type="button" class="btn btn-primary close-register" data-lang="close"></button>
+            <a href="${tenant_url}" class="btn btn-primary" data-lang="close"></a>
         </div>
     `);
     if (typeof toggleLanguage === 'function') {
         toggleLanguage(lang);
     }
-    $(".close-register").off("click").on("click", function() {
-        location.reload();
-    });
     $modal.off('hidden.bs.modal').on('hidden.bs.modal', function() {
         location.reload();
     });
