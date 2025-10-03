@@ -884,9 +884,9 @@ function showSuccessModal(lang) {
             <h4 class="text-success" data-lang="registered_success"></h4>
         </div>
         <br>
-        <h5>กรุณาตรวจสอบอีเมลที่ท่านได้กรอกไว้ เพื่อดูรายละเอียดในการลงทะเบียน หากท่านไม่ได้รับอีเมล กรุณาตรวจสอบโฟลเดอร์สแปมหรือเมลขยะ หรือติดต่อเจ้าหน้าที่เพื่อตรวจสอบเพิ่มเติม</h5>
+        <p>กรุณาตรวจสอบอีเมลที่ท่านได้กรอกไว้ เพื่อดูรายละเอียดในการลงทะเบียน หากท่านไม่ได้รับอีเมล กรุณาตรวจสอบโฟลเดอร์สแปมหรือเมลขยะ หรือติดต่อเจ้าหน้าที่เพื่อตรวจสอบเพิ่มเติม</p>
         <br>
-        <h5>You have successfully completed your registration. Please check the email address you provided for the registration details. If you do not receive the email, kindly check your spam or junk mail folder, or contact our staff for further assistance.</h5>
+        <p>You have successfully completed your registration. Please check the email address you provided for the registration details. If you do not receive the email, kindly check your spam or junk mail folder, or contact our staff for further assistance.</p>
     `);
     $modal.find(".modal-footer").html(`
         <div class="text-center w-100">
