@@ -1,5 +1,5 @@
 <?php
-// myphoto_process.php (เปลี่ยนเป็นการดึงจากตาราง detech แทนการรัน Python)
+// myphoto_process.php (เปลี่ยนเป็นการดึงจากตาราง detech แทนการรัน Python และดึง Description)
 
 header('Content-Type: application/json');
 
@@ -30,7 +30,7 @@ require_once(BASE_INCLUDE . "/lib/connect_sqli.php");
 
 global $mysqli;
 
-$student_id = $_SESSION['student_id'] ? $_SESSION['student_id'] : ($_GET['student_id'] ? : null); 
+$student_id = $_SESSION['student_id'] ? $_SESSION['student_id'] : ($_GET['student_id'] ? $_GET['student_id'] : null); 
 
 if (!$student_id) {
     echo json_encode(['status' => 'error', 'message' => 'Student ID ไม่ถูกต้อง']);
@@ -38,14 +38,14 @@ if (!$student_id) {
 }
 
 // ----------------------------------------------------
-// ✅ NEW: ดึงรูปภาพกลุ่มจากตาราง photo_face_detection ที่ตรวจจับไว้ล่วงหน้า
+// ✅ NEW: ดึง group_photo_path และ description (ชื่อ Event)
 // ----------------------------------------------------
-$result_db_paths = [];
-$sql = "SELECT t2.`group_photo_path` 
-        FROM `photo_face_detection` t1
-        JOIN `photo_album_group` t2 ON t1.group_photo_id = t2.group_photo_id
+$result_data = [];
+$sql = "SELECT t2.`group_photo_path`, t2.`description`, t2.`date_create` 
+        FROM `classroom_photo_face_detection` t1
+        JOIN `classroom_photo_album_group` t2 ON t1.group_photo_id = t2.group_photo_id
         WHERE t1.`student_id` = ? 
-        ORDER BY t2.date_create DESC"; // เรียงตามวันที่อัปโหลดล่าสุด
+        ORDER BY t2.date_create DESC, t2.group_photo_id DESC"; // เรียงตาม Event ล่าสุด และ ID ล่าสุด
         
 $stmt = $mysqli->prepare($sql);
 
@@ -55,18 +55,22 @@ if ($stmt) {
     $result = $stmt->get_result();
     
     while ($row = $result->fetch_assoc()) {
-        $result_db_paths[] = $row['group_photo_path'];
+        $result_data[] = [
+            'path' => $row['group_photo_path'],
+            'description' => $row['description'], // ชื่อ Event
+            'date' => $row['date_create'] // ใช้สำหรับจัดเรียงภายใน Event
+        ];
     }
     $stmt->close();
 }
 
 
-if (!empty($result_db_paths)) {
-    echo json_encode(['status' => 'success', 'images' => $result_db_paths, 'message' => 'ดึงรูปภาพที่ตรวจจับไว้ล่วงหน้าสำเร็จ']); 
+if (!empty($result_data)) {
+    // ส่งข้อมูลที่มีทั้ง Path และ Description (ชื่อ Event) กลับไปให้ JS จัดกลุ่ม
+    echo json_encode(['status' => 'success', 'data' => $result_data, 'message' => 'ดึงรูปภาพที่ตรวจจับไว้ล่วงหน้าสำเร็จ']); 
 } else {
-    echo json_encode(['status' => 'success', 'images' => [], 'message' => 'ไม่พบรูปภาพที่คุณถูกตรวจจับ']);
+    echo json_encode(['status' => 'success', 'data' => [], 'message' => 'ไม่พบรูปภาพที่คุณถูกตรวจจับ']);
 }
 
 // โค้ดส่วนที่เรียก Python ก่อนหน้านี้ถูกลบออกไปทั้งหมด
-// myphoto_process.php นี้จะทำหน้าที่เป็น API ดึงผลลัพธ์ที่ Pre-processed ไว้เท่านั้น
 ?>
