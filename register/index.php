@@ -19,5 +19,5 @@
             header('Location: /classroom/register/');
             exit;
     }
-    session_destroy();
+    unset($_SESSION['is_result']);
 ?> 
