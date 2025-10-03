@@ -750,15 +750,32 @@ function isValidThaiID(id) {
 }
 function saveRegister() {
     const $form = $('#registrationForm');
+    if ($form.length === 0) {
+        console.error('Registration form not found');
+        return;
+    }
     const $btn = $form.find('button[type="submit"]');
     $btn.prop('disabled', true);
+    if ($(".loader").length > 0) {
+        $(".loader").addClass("active");
+    }
     const fd = new FormData($form[0]);
-    fd.append('classroom_id', classroom_id);
-    const dialCode = $(".iti__selected-dial-code").html();
-    fd.append('dialCode', dialCode);
-    fd.append('channel_id', channel_id);
-    fd.append('line_client_id', line_client_id);
-    fd.append('currentLang', currentLang);
+    if (typeof classroom_id !== 'undefined' && classroom_id) {
+        fd.append('classroom_id', classroom_id);
+    }
+    const $dialCode = $(".iti__selected-dial-code");
+    if ($dialCode.length > 0) {
+        const dialCode = $dialCode.text().trim();
+        fd.append('dialCode', dialCode);
+    }
+    if (typeof channel_id !== 'undefined' && channel_id) {
+        fd.append('channel_id', channel_id);
+    }
+    if (typeof line_client_id !== 'undefined' && line_client_id) {
+        fd.append('line_client_id', line_client_id);
+    }
+    const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'th';
+    fd.append('currentLang', lang);
     $.ajax({
         url: '/classroom/register/actions/register.php?action=saveRegister',
         type: "POST",
@@ -766,73 +783,140 @@ function saveRegister() {
         processData: false,
         contentType: false,
         dataType: "JSON",
-        success: handleRegisterResponse,
-        error: () => {
+        success: function(result) {
+            handleRegisterResponse(result);
+        },
+        error: function(xhr, status, error) {
+            console.error('Register error:', status, error);
+            $(".loader").removeClass("active");
             $(".systemModal").modal("hide");
             $btn.prop('disabled', false);
-            const titlemsg = currentLang === 'en' ? "Warning" : "คำเตือน";
-            const msg = currentLang === 'en' ? "Save failed, please try again." : "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง";
-            swal({
-                type: 'warning',
-                title: titlemsg,
-                text: msg,
-                confirmButtonColor: '#FF9900'
-            });
+            const titlemsg = (lang === 'en') ? "Warning" : "คำเตือน";
+            const msg = (lang === 'en') ? "Save failed, please try again." : "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง";
+            if (typeof swal === 'function') {
+                swal({
+                    type: 'warning',
+                    title: titlemsg,
+                    text: msg,
+                    confirmButtonColor: '#FF9900'
+                });
+            } else {
+                alert(msg);
+            }
         }
     });
 }
 function handleRegisterResponse(result) {
     $(".loader").removeClass("active");
     $(".systemModal").modal("hide");
-    if (!result.status) {
-        $(".btn-register").prop('disabled', false);
-        const titlemsg = currentLang === 'en' ? "Warning" : "คำเตือน";
-        swal({
-            type: 'warning',
-            title: titlemsg,
-            text: result.message,
-            confirmButtonColor: '#FF9900'
-        });
+    if (!result || typeof result !== 'object') {
+        console.error('Invalid response:', result);
+        const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'th';
+        const msg = (lang === 'en') ? "Invalid response from server" : "ข้อมูลจากเซิร์ฟเวอร์ไม่ถูกต้อง";
+        if (typeof swal === 'function') {
+            swal({
+                type: 'error',
+                title: 'Error',
+                text: msg,
+                confirmButtonColor: '#FF0000'
+            });
+        } else {
+            alert(msg);
+        }
         return;
     }
-    if(is_logged_in) {
-        const msg = currentLang === 'en' ? "Saved successfully" : "บันทึกข้อมูลเรียบร้อย";
-        swal({
-            title: msg,
-            text: '',
-            type: 'success',
-            confirmButtonColor: '#41a85f'
-        }, function() {
+    const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'th';
+    if (!result.status) {
+        $(".btn-register").prop('disabled', false);
+        const titlemsg = (lang === 'en') ? "Warning" : "คำเตือน";
+        const message = result.message || ((lang === 'en') ? "Registration failed" : "การลงทะเบียนล้มเหลว");
+        if (typeof swal === 'function') {
+            swal({
+                type: 'warning',
+                title: titlemsg,
+                text: message,
+                confirmButtonColor: '#FF9900'
+            });
+        } else {
+            alert(message);
+        }
+        return;
+    }
+    const isLoggedIn = (typeof is_logged_in !== 'undefined') ? is_logged_in : false;
+    if (isLoggedIn) {
+        const msg = (lang === 'en') ? "Saved successfully" : "บันทึกข้อมูลเรียบร้อย";
+        if (typeof swal === 'function') {
+            swal({
+                title: msg,
+                text: '',
+                type: 'success',
+                confirmButtonColor: '#41a85f'
+            }, function() {
+                location.reload();
+            });
+        } else {
             location.reload();
-        });
+        }
         $(".btn-register").prop('disabled', false);
     } else {
-        $(".systemModal .modal-header").html(`<h5 class="modal-title" data-lang="registered"></h5>`);
-        $(".systemModal .modal-body").html(`
-            <div class="text-center">
-                <img src="/images/ogm_logo.png" onerror="this.src='/images/ogm_logo.png'" style="height: 100px; margin-bottom: 20px;">
-                <h5 data-lang="registered_success"></h5>
-                <p data-lang="registered_success2"></p>
-                <p data-lang="registered_success3"></p>
-                <p data-lang="registered_success4"></p>
-            </div>
-        `);
-        $(".systemModal .modal-footer").html(`
-            <div class="text-center">
-                <button type="button" class="btn btn-default close-register" data-lang="close"></button>
-            </div>
-        `);
-        toggleLanguage(currentLang);
-        $(".close-register").off("click").on("click", function() {
-            location.reload();
-        });
-        // let line_client_id = result.line_client_id || '';
-        // if(line_client_id && line_client_id !== '') {
-        //     let classroom_key = $("#classroomCode").val();
-        //     let student_id = result.student_id || '';
-        //     const state = btoa(encodeURIComponent(`cid=${classroom_key}&stu=${student_id}&lid=${line_client_id}`));
-        //     window.location.href = "/classroom/lib/line/login.php?" + state;
-        // }
+        showSuccessModal(lang);
+        // handleLineLogin(result);
+    }
+}
+function showSuccessModal(lang) {
+    const $modal = $(".systemModal");
+    if ($modal.length === 0) {
+        console.error('System modal not found');
+        location.reload();
+        return;
+    }
+    $modal.modal('show');
+    $modal.find(".modal-header").html(`
+        <h5 class="modal-title" data-lang="registered"></h5>
+    `);
+    $modal.find(".modal-body").html(`
+        <div class="text-center">
+            <img src="/images/ogm_logo.png" 
+                 onerror="this.style.display='none'" 
+                 alt="ORIGAMI Logo"
+                 style="height: 100px; margin-bottom: 20px;">
+            <h5 data-lang="registered_success"></h5>
+            <p data-lang="registered_success2"></p>
+            <p data-lang="registered_success3"></p>
+            <p data-lang="registered_success4"></p>
+        </div>
+    `);
+    $modal.find(".modal-footer").html(`
+        <div class="text-center w-100">
+            <button type="button" class="btn btn-primary close-register" data-lang="close"></button>
+        </div>
+    `);
+    if (typeof toggleLanguage === 'function') {
+        toggleLanguage(lang);
+    }
+    $(".close-register").off("click").on("click", function() {
+        location.reload();
+    });
+    $modal.off('hidden.bs.modal').on('hidden.bs.modal', function() {
+        location.reload();
+    });
+}
+function handleLineLogin(result) {
+    const lineClientId = result.line_client_id || '';
+    
+    if (lineClientId && lineClientId !== '') {
+        const classroomKey = $("#classroomCode").val() || '';
+        const studentId = result.student_id || '';
+        
+        if (classroomKey && studentId) {
+            try {
+                const stateData = `cid=${classroomKey}&stu=${studentId}&lid=${lineClientId}`;
+                const state = btoa(encodeURIComponent(stateData));
+                window.location.href = `/classroom/lib/line/login.php?${state}`;
+            } catch (error) {
+                console.error('Error encoding LINE state:', error);
+            }
+        }
     }
 }
 function initForm(form_data) {
