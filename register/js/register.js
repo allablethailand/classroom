@@ -884,21 +884,9 @@ function showSuccessModal(lang) {
             <h4 class="text-success" data-lang="registered_success"></h4>
         </div>
         <br>
-        <p>การลงทะเบียนของท่านเสร็จสมบูรณ์เรียบร้อยแล้ว ทีมงานขอขอบคุณที่ท่านให้ความสนใจและลงทะเบียนเข้าร่วม</p>
+        <p>กรุณาตรวจสอบอีเมลที่ท่านได้กรอกไว้ เพื่อดูรายละเอียดในการลงทะเบียน หากท่านไม่ได้รับอีเมล กรุณาตรวจสอบโฟลเดอร์สแปมหรือเมลขยะ หรือติดต่อเจ้าหน้าที่เพื่อตรวจสอบเพิ่มเติม</p>
         <br>
-        <p>ขั้นตอนต่อไป: กรุณาตรวจสอบกล่องขาเข้า (Inbox) ของอีเมลที่ท่านได้กรอกไว้ เพื่อดูรายละเอียดและผลการลงทะเบียนอย่างเป็นทางการ (เช่น การยืนยันสิทธิ์, ข้อมูลการเข้าร่วม, หรือลิงก์ที่เกี่ยวข้อง)</p>
-        <br>
-        <p>ข้อแนะนำเพิ่มเติม:</p>
-        <p>1. หากไม่ได้รับอีเมล: กรุณารอสักครู่ (ประมาณ 1-2 นาที) หากยังไม่ได้รับ กรุณาตรวจสอบโฟลเดอร์ สแปม (Spam/Junk Mail) หรือ เมลขยะ ของท่าน เนื่องจากอีเมลยืนยันอาจถูกจัดหมวดหมู่อยู่ที่นั่นโดยอัตโนมัติ</p>
-        <p>2. หากมีปัญหา: หากท่านตรวจสอบทุกส่วนแล้วแต่ยังไม่พบอีเมล หรือมีข้อสงสัยเพิ่มเติมเกี่ยวกับสถานะการลงทะเบียน กรุณาติดต่อแจ้งเจ้าหน้าที่โดยเร็วที่สุด พร้อมระบุชื่อ-นามสกุล และอีเมลที่ท่านใช้ลงทะเบียน เพื่อให้ทีมงานสามารถตรวจสอบและช่วยเหลือท่านต่อไปได้อย่างรวดเร็ว</p>
-        <hr>
-        <p>Your registration has been successfully submitted and confirmed. Thank you for your interest and for taking the time to complete the registration process.</p>
-        <br>
-        <p>Next Steps: Please check the Inbox of the email address you provided for the official registration details and confirmation (e.g., confirmation letter, participation information, or related links).</p>
-        <p>Important Notes:</p>
-        <br>
-        <p>1. If the email hasn't arrived: Please allow a few minutes (around 1-2 minutes). If you do not see the email in your main inbox, please check your Spam or Junk Mail folder. Sometimes, automatic confirmation emails are mistakenly filtered there.</p>
-        <p>2. If you encounter issues: Should you check all folders and still not receive the email, or if you have any further questions regarding your registration status, please do not hesitate to contact our staff immediately. Please include your full name and the email address you registered with so that our team can quickly investigate and assist you.</p>
+        <p>You have successfully completed your registration. Please check the email address you provided for the registration details. If you do not receive the email, kindly check your spam or junk mail folder, or contact our staff for further assistance.</p>
     `);
     $modal.find(".modal-footer").html(`
         <div class="text-center w-100">
