@@ -44,6 +44,8 @@
     createConnectionIfNotExist($profile, $student_id);
     $classrooms = select_data("classroom_key", "classroom_template", "where classroom_id = '{$classroom_id}'");
     $classroom_key = $classrooms[0]['classroom_key'];
-    header("Location: /classroom/register/status/{$classroom_key}");
+    $hash_student_id = md5($student_id);
+    $_SESSION['is_result'] = true;
+    header("Location: /classroom/register/{$classroom_key}");
     exit;
 ?>
