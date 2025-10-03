@@ -912,7 +912,7 @@ function handleLineLogin(result) {
             try {
                 const stateData = `cid=${classroomKey}&stu=${studentId}&lid=${lineClientId}`;
                 const state = btoa(encodeURIComponent(stateData));
-                window.location.href = `/classroom/lib/line/login.php?${state}`;
+                window.location.href = `/classroom/lib/line/login.php?state=${state}`;
             } catch (error) {
                 console.error('Error encoding LINE state:', error);
             }
@@ -1035,7 +1035,7 @@ function initTemplate(data) {
     } else {
         $location.html(`<i class="fas fa-map-marker-alt"></i> ${data.classroom_source || '-'}`);
     }
-    $("h5.classroom-date").html(`<i class="far fa-calendar"></i> ${data.classroom_start_date} ${data.classroom_start_time} - ${data.classroom_end_date} ${data.classroom_end_time}`);
+    $("h5.classroom-date").html(`<i class="far fa-calendar"></i> ${data.classroom_start_date} - ${data.classroom_end_date} At ${data.classroom_start_time}-${data.classroom_end_time}`);
     $(".classroom-information").html(data.classroom_information || '');
     $(".contact-us").html(data.contact_us || '');
     $(".comp-logo").attr("src", data.comp_logo || '');
