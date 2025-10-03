@@ -28,6 +28,7 @@
     $classroom_key = isset($params['cid']) ? $params['cid'] : '';
     $student_id = isset($params['stu']) ? $params['stu'] : '';
     $client_id = isset($params['lid']) ? $params['lid'] : '';
+    $channel_id = isset($params['ch']) ? $params['ch'] : '';
     $classroom_key_safe = mysqli_real_escape_string($mysqli, $classroom_key);
     $classroom = select_data(
         "classroom_id", "classroom_template", "where classroom_key = '{$classroom_key_safe}' AND status = 0"
@@ -37,7 +38,7 @@
     }
     $classroom = $classroom[0];
     $classroom_id = (int) $classroom['classroom_id'];
-    $login_url = LINEHelper::buildLoginUrl($classroom_id, $student_id, $client_id);
+    $login_url = LINEHelper::buildLoginUrl($classroom_id, $student_id, $client_id, $channel_id);
     if (!$login_url) {
         redirect($control_page);
     }
