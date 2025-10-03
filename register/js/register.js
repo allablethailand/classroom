@@ -890,9 +890,7 @@ function showSuccessModal(lang, tenant_url) {
             <a href="${tenant_url}" class="btn btn-primary" data-lang="close"></a>
         </div>
     `);
-    if (typeof toggleLanguage === 'function') {
-        toggleLanguage(lang);
-    }
+    toggleLanguage(lang);
     $modal.off('hidden.bs.modal').on('hidden.bs.modal', function() {
         location.reload();
     });
