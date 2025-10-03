@@ -1,8 +1,9 @@
 <?php   
     function notiMail($classroom_id, $student_id, $mail_type) {
-        global $base_include;
+        global $base_include, $mysqli;
         $student_id = (int) $student_id;
-        if ($student_id <= 0) return;
+        $classroom_id = (int) $classroom_id;
+        if ($student_id <= 0 || $classroom_id <= 0) return;
         $email_data = select_data("student_email", "classroom_student", "where student_id = '{$student_id}'");
         $email = !empty($email_data[0]['student_email']) ? $email_data[0]['student_email'] : '';
         if (empty($email)) return;
@@ -25,6 +26,7 @@
                 $email_key = "and mail_subject = 'Receive Certificate'";
                 break;
             default:
+                $mail_type = mysqli_real_escape_string($mysqli, $mail_type);
                 $email_key = "and mail_template_id = '{$mail_type}'";
         }
         $template = select_data("mail_subject,mail_description", "classroom_mail_template", "where classroom_id = '{$classroom_id}' and status = 0 {$email_key}");
@@ -47,7 +49,8 @@
     }
     function classroomData($classroom_id) {
         $classroom_id = (int) $classroom_id;
-        $classroom = select_data(
+        if ($classroom_id <= 0) return [];
+        $result = select_data(
             "
                 template.classroom_poster as academy_logo,
                 template.classroom_name,
@@ -65,19 +68,22 @@
             "classroom_template template",
             "left join data_meeting_platforms pf on pf.platforms_id = template.classroom_plateform 
             where template.classroom_id = '{$classroom_id}'"
-        )[0];
+        );
+        if (empty($result)) return [];
+        $classroom = $result[0];
         return [
             'academy_logo' => ($classroom['academy_logo']) ? GetPublicUrl($classroom['academy_logo']) : '',
             'classroom_name' => ($classroom['classroom_name']) ? $classroom['classroom_name'] : '',
             'classroom_start' => ($classroom['classroom_start']) ? $classroom['classroom_start'] : '',
             'classroom_end' => ($classroom['classroom_end']) ? $classroom['classroom_end'] : '',
             'classroom_location' => ($classroom['classroom_location']) ? $classroom['classroom_location'] : '',
-            'classroom_information' => ($classroom['contact_us']) ? htmlspecialchars_decode($classroom['classroom_information']) : '',
+            'classroom_information' => ($classroom['classroom_information']) ? htmlspecialchars_decode($classroom['classroom_information']) : '',
             'contact_us' => ($classroom['contact_us']) ? htmlspecialchars_decode($classroom['contact_us']) : '',
         ];
     }
     function getStudentData($classroom_id, $student_id) {
         $student_id = (int) $student_id;
+        if ($student_id <= 0) return [];
         $columns = "CONCAT(student_firstname_en, ' ', student_lastname_en) AS student_name,
             student_image_profile,
             student_email,
@@ -91,7 +97,7 @@
         $Student = select_data($columns, "classroom_student", $joins);
         if (empty($Student)) return [];
         $s = $Student[0];
-        $avatar = $s['student_image_profile'] ?: ($s['student_image_profile'] ? GetPublicUrl($s['student_image_profile']) : '');
+        $avatar = $s['student_image_profile'] ? GetPublicUrl($s['student_image_profile']) : '';
         $password = ($s['student_password']) ? decryptToken($s['student_password'], $s['student_password_key']) : '';
         return [
             $s['student_name'] ?: '',
@@ -101,17 +107,16 @@
             $s['student_company'] ?: '',
             $s['student_position'] ?: '',
             $s['student_username'] ?: '',
-            $s['guest_username'] ?: '',
             $password ?: '',
         ];
     }
-    function previewTemplate($classroom_id, $template, $member_id, $student_id) {
+    function previewTemplate($classroom_id, $template, $student_id) {
         global $domain_name;
         $template = str_replace('http://origami.local/', $domain_name, $template);
         $origami_academy_logo = $domain_name . 'images/ogm_logo.png';
         $origami_academy_logo_img = '<img src="' . $origami_academy_logo . '" style="height:125px;">';
         $classroom = classroomData($classroom_id);
-        $tenant = select_data("tenant_key", "ogm_tenant", "where status = '{$_SESSION['comp_id']}' and status = 0");
+        $tenant = select_data("tenant_key", "ogm_tenant", "where comp_id = '{$_SESSION['comp_id']}' and status = 0");
         $tenant_url = $domain_name;
         if (!empty($tenant)) {
             $tenant_url .= $tenant[0]['tenant_key'];
@@ -125,7 +130,7 @@
             '{{academyLocationName}}' => $classroom['classroom_location'],
             '{{academyInfomation}}' => $classroom['classroom_information'],
             '{{academyContactUs}}' => $classroom['contact_us'],
-            '{{tenantLink}}' => $tenant_url,
+            'tenantLink' => $tenant_url,
         ];
         $student_keys = [
             '{{studentName}}', '{{studentAvatar}}', '{{studentEmail}}',
@@ -134,26 +139,33 @@
         ];
         $student_data = getStudentData($classroom_id, $student_id);
         foreach ($student_keys as $index => $key) {
-            $replacements[$key] = !empty($student_data[$index]) ? $studentt_data[$index] : '';
+            $replacements[$key] = !empty($student_data[$index]) ? $student_data[$index] : '';
         }
         $data = str_replace(array_keys($replacements), array_values($replacements), $template);
         $html = htmlspecialchars_decode($data);
         return $html;
     }
     function autoApprove($base_include, $classroom_id, $student_id) {
+        $classroom_id = (int) $classroom_id;
+        $student_id = (int) $student_id;
+        if ($classroom_id <= 0 || $student_id <= 0) return;
         $AutoApprove = select_data("auto_approve", "classroom_template", "where classroom_id = '{$classroom_id}'");
-        if ((int) $AutoApprove[0]['auto_approve'] !== 0) return;
+        if (empty($AutoApprove) || (int) $AutoApprove[0]['auto_approve'] !== 0) return;
         $ApStatus = select_data("approve_status", "classroom_student_join", "where student_id = '{$student_id}' and classroom_id = '{$classroom_id}'");
-        if ((int) $ApStatus[0]['approve_status'] != 0) return;
+        if (empty($ApStatus) || (int) $ApStatus[0]['approve_status'] != 0) return;
         update_data(
             "classroom_student_join", 
             "approve_status = 1, approve_date = NOW()", 
             "student_id = '{$student_id}' and classroom_id = '{$classroom_id}'"
         );
         generateUser($classroom_id, $student_id);
-        notiMail($student_id, 'Approve');
+        notiMail($classroom_id, $student_id, 'Approve');
     }
     function generateUser($classroom_id, $student_id) {
+        global $mysqli;
+        $classroom_id = (int) $classroom_id;
+        $student_id = (int) $student_id;
+        if ($classroom_id <= 0 || $student_id <= 0) return;
         $template = select_data(
             "
                 auto_username,
@@ -169,39 +181,46 @@
             "classroom_template",
             "where classroom_id = '{$classroom_id}'"
         );
+        if (empty($template)) return;
         $auto_username = (int) $template[0]['auto_username'];
         $auto_username_type = $template[0]['auto_username_type'];
-        $auto_username_length = $template[0]['auto_username_length'];
+        $auto_username_length = (int) $template[0]['auto_username_length'];
         $auto_password = (int) $template[0]['auto_password'];
         $password_type = $template[0]['password_type'];
         $auto_password_type = $template[0]['auto_password_type'];
-        $auto_password_length = $template[0]['auto_password_length'];
+        $auto_password_length = (int) $template[0]['auto_password_length'];
         $auto_password_custom = $template[0]['auto_password_custom'];
-        $comp_id = $template[0]['comp_id'];
+        $comp_id = (int) $template[0]['comp_id'];
         if($auto_username == 1 && $auto_password == 1) {
             return;
         }
-        $studentData = select_data(
+        $studentDataResult = select_data(
             "student_mobile, student_username, student_password, student_email",
             "classroom_student",
             "where student_id = '{$student_id}'"
-        )[0];
+        );
+        if (empty($studentDataResult)) return;
+        $studentData = $studentDataResult[0];
         $student_mobile = preg_replace('/[^0-9]/', '', $studentData['student_mobile']);
         $student_email = trim(strtolower($studentData['student_email']));
         $student_username = $studentData['student_username'];
         $student_password = $studentData['student_password'];
         $needUpdate = false;
+        $username = $student_username;
+        $password = $student_password;
         if ($auto_username == 0) {
             $include_array = array_map('intval', explode(',', $auto_username_type));
             $username = '';
             if (!empty($student_mobile)) {
                 $username = (substr($student_mobile, 0, 1) == '0') ? $student_mobile : '0' . $student_mobile;
                 $checkExist = select_data("count(*) as total", "classroom_student", 
-                    "where student_username = '{$username}' and comp_id = '{$comp_id}'")[0]['total'];
+                    "where student_username = '{$username}' and comp_id = '{$comp_id}'");
+                $checkExist = !empty($checkExist) ? (int)$checkExist[0]['total'] : 0;
                 if ($checkExist > 0 && !empty($student_email)) {
                     $username = $student_email;
                     $checkExist = select_data("count(*) as total", "classroom_student", 
-                        "where student_username = '{$username}' and comp_id = '{$comp_id}'")[0]['total'];
+                        "where student_username = '{$username}' and comp_id = '{$comp_id}'");
+                    $checkExist = !empty($checkExist) ? (int)$checkExist[0]['total'] : 0;
                 }
                 if ($checkExist > 0) {
                     $username = substr(str_shuffle('0123456789'), 0, 10);
@@ -209,7 +228,8 @@
             } elseif (!empty($student_email)) {
                 $username = $student_email;
                 $checkExist = select_data("count(*) as total", "classroom_student", 
-                    "where student_username = '{$username}' and comp_id = '{$comp_id}'")[0]['total'];
+                    "where student_username = '{$username}' and comp_id = '{$comp_id}'");
+                $checkExist = !empty($checkExist) ? (int)$checkExist[0]['total'] : 0;
                 if ($checkExist > 0) {
                     $username = generateSecurity($include_array,$auto_username_length);
                 }
@@ -221,23 +241,26 @@
         }
         if ($auto_password == 0) {
             if($password_type == 'custom') {
-                $student_password = $auto_password_custom;
+                $password = $auto_password_custom;
             } else {
                 $include_array = array_map('intval', explode(',', $auto_password_type));
-                $student_password = generateSecurity($include_array,$auto_password_length);
+                $password = generateSecurity($include_array,$auto_password_length);
             }
-            $password = escape_string($student_password);
             $needUpdate = true;
         }
-        $student_password_key = bin2hex(openssl_random_pseudo_bytes(16));
-        $pwd = encryptToken($password, $student_password_key);
         if ($needUpdate) {
+            $username = mysqli_real_escape_string($mysqli, $username);
+            $password = mysqli_real_escape_string($mysqli, $password);
+            $student_password_key = bin2hex(openssl_random_pseudo_bytes(16));
+            $pwd = encryptToken($password, $student_password_key);
             $valueUpd = "student_username = '{$username}', student_password = '{$pwd}', student_password_key = '{$student_password_key}'";
             $whereUpd = "student_id = '{$student_id}'";
             update_data("classroom_student", $valueUpd, $whereUpd);
         }
     }
     function generateSecurity($include_char, $length) {
+        $length = (int) $length;
+        if ($length <= 0) return '';
         $char_sets = array(
             1 => '0123456789',
             2 => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',

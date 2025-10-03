@@ -198,7 +198,6 @@ function buildManagementPage() {
     buildRegisterTemplate();
     buildStaff();
     bindFormEventHandlers();
-    buildLineOA();
     buildPlatform();
     if(!classroom_id) {
         initializeDropify();
