@@ -71,4 +71,24 @@ $(document).ready(function() {
     //     });
     // });
 
+    // function fetchStudentHistory() {
+    //     $.ajax({
+    //         url: '/classroom/study/actions/group.php?action=fetch_student_history',
+    //         type: "GET",
+    //         success: function(data) {
+    //             var students = JSON.parse(data);
+    //             var html = '<div class="student-list">';
+
+     $('#toggleStudent').click(function (e) {
+        e.stopPropagation();
+        var $btn = $(this);
+        $.ajax({
+                url: '/classroom/study/actions/history.php',
+                type: "GET",
+                success: function(data) {
+
+            }
+        });
+    });
+
 });
