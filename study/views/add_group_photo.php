@@ -35,20 +35,20 @@ define('BASE_INCLUDE', $base_include);
 
 require_once BASE_INCLUDE . '/lib/connect_sqli.php';
 
-// *** ดึงฟังก์ชัน uploadFile จากโค้ดส่วนแรก (ไม่มีการแก้ไข) ***
-function uploadFile($file, $name, $target_sub_dir = 'classroom') {
+// *** ดึงฟังก์ชัน uploadFile จากโค้ดส่วนแรก (มีการปรับปรุงเล็กน้อยเพื่อรองรับการเรียกใช้ภายใน Loop) ***
+function uploadFile($file_data, $target_sub_dir = 'classroom') {
     global $base_path; 
     
     // Server Path: /var/www/html/origami.local/ + /uploads/ + classroom/
     $target_dir = rtrim($_SERVER['DOCUMENT_ROOT'] . $base_path, '/') . "/uploads/" . $target_sub_dir . "/";
     
-    if (!isset($file[$name]['tmp_name']) || empty($file[$name]['tmp_name'])) {
+    if (!isset($file_data['tmp_name']) || empty($file_data['tmp_name'])) {
         return null;
     }
 
-    $tmp_name = $file[$name]['tmp_name'];
-    $file_name = $file[$name]['name'];
-    $file_error = $file[$name]['error'];
+    $tmp_name = $file_data['tmp_name'];
+    $file_name = $file_data['name'];
+    $file_error = $file_data['error'];
 
     if ($tmp_name && $file_error == UPLOAD_ERR_OK) {
         if (!is_dir($target_dir)) {
@@ -70,8 +70,9 @@ function uploadFile($file, $name, $target_sub_dir = 'classroom') {
     return null; // อัปโหลดมีปัญหา
 }
 
+
 // ------------------------------------------------------------------------------------------------------
-// *** NEW: ฟังก์ชันสำหรับรัน Python เพื่อตรวจจับใบหน้าในรูปกลุ่มที่เพิ่งอัปโหลด
+// *** NEW: ฟังก์ชันสำหรับรัน Python เพื่อตรวจจับใบหน้าในรูปกลุ่มที่เพิ่งอัปโหลด (ไม่มีการแก้ไขจากเดิม)
 // ------------------------------------------------------------------------------------------------------
 function runFaceDetectionBatch($mysqli, $group_photo_id, $group_db_path) {
     global $base_path;
@@ -148,7 +149,7 @@ function runFaceDetectionBatch($mysqli, $group_photo_id, $group_db_path) {
             }
             
             // ใช้ REPLACE INTO เพื่อป้องกัน Duplicate Key หากมีการรันซ้ำ
-            $sql_insert_batch = "REPLACE INTO `photo_face_detection` 
+            $sql_insert_batch = "REPLACE INTO `classroom_photo_face_detection` 
                                  (`group_photo_id`, `student_id`, `detection_date`) 
                                  VALUES " . implode(", ", $value_parts);
 
@@ -179,41 +180,81 @@ if (!$student_id) {
 $message = '';
 $redirect_to = $_SERVER['PHP_SELF']; // URL ของไฟล์ปัจจุบัน
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo'])) {
+// **✅ NEW: เพิ่ม Logic สำหรับ Multiple File Upload**
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && isset($_POST['event_name'])) {
     
-    $file = $_FILES['group_photo'];
-    $description = $_POST['description'] ? $_POST['description'] : 'No Description';
+    $files = $_FILES['group_photo'];
+    // ใช้ event_name เป็น Description และทำความสะอาดข้อมูล
+    $event_name = trim($_POST['event_name']); 
+    $description = $event_name ? $event_name : 'No Event Description';
     
-    $db_file_path = uploadFile(['group_photo' => $file], 'group_photo', 'classroom');
+    $total_uploaded = 0;
+    $total_detected = 0;
+    $errors = [];
 
-    if ($db_file_path) {
-        // 1. บันทึก Path ลงในตาราง photo_album_group
-        $sql = "INSERT INTO `photo_album_group` 
-                (`group_photo_path`, `description`, `emp_create`, `date_create`) 
-                VALUES (?, ?, ?, NOW())";
-        
-        $stmt = $mysqli->prepare($sql);
-        if ($stmt) {
-            $stmt->bind_param("ssi", $db_file_path, $description, $student_id); 
-            if ($stmt->execute()) {
-                $new_group_photo_id = $mysqli->insert_id; // ได้ ID ของรูปกลุ่มที่เพิ่มใหม่
-                $stmt->close();
+    // วนลูปเพื่อจัดการไฟล์ที่อัปโหลดมาหลายไฟล์
+    for ($i = 0; $i < count($files['name']); $i++) {
+        // จัดรูปแบบ $files ให้อยู่ในรูปที่ฟังก์ชัน uploadFile ต้องการ
+        $file_data = [
+            'name'     => $files['name'][$i],
+            'type'     => $files['type'][$i],
+            'tmp_name' => $files['tmp_name'][$i],
+            'error'    => $files['error'][$i],
+            'size'     => $files['size'][$i],
+        ];
 
-                // 2. NEW: รัน Face Recognition Batch Process ทันที
-                $detection_result_msg = runFaceDetectionBatch($mysqli, $new_group_photo_id, $db_file_path);
-                
-                // ✅ ใช้ PRG Pattern: Redirect หลัง INSERT และ Process สำเร็จ
-                $success_msg = urlencode("✅ อัปโหลดรูปภาพกลุ่มสำเร็จ และ: {$detection_result_msg}");
-                header("Location: {$redirect_to}?msg={$success_msg}&status=success");
-                exit; // ออกจากการทำงาน
-            } else {
-                $message = "<div class='alert alert-danger'>❌ Error: บันทึก DB ไม่สำเร็จ: " . $stmt->error . "</div>";
-                @unlink($_SERVER['DOCUMENT_ROOT'] . BASE_PATH . '/' . $db_file_path);
-            }
-            // $stmt->close() ถูกย้ายไปด้านใน
+        if ($file_data['error'] !== UPLOAD_ERR_OK) {
+            $errors[] = "ไฟล์ '{$file_data['name']}' มีข้อผิดพลาดในการอัปโหลด ({$file_data['error']})";
+            continue;
         }
+
+        $db_file_path = uploadFile($file_data, 'classroom');
+
+        if ($db_file_path) {
+            // 1. บันทึก Path ลงในตาราง classroom_photo_album_group
+            $sql = "INSERT INTO `classroom_photo_album_group` 
+                    (`group_photo_path`, `description`, `emp_create`, `date_create`) 
+                    VALUES (?, ?, ?, NOW())";
+            
+            $stmt = $mysqli->prepare($sql);
+            if ($stmt) {
+                // ใช้ $description เป็นชื่อ Event
+                $stmt->bind_param("ssi", $db_file_path, $description, $student_id); 
+                if ($stmt->execute()) {
+                    $new_group_photo_id = $mysqli->insert_id; 
+                    $stmt->close();
+                    $total_uploaded++;
+
+                    // 2. รัน Face Recognition Batch Process ทันที
+                    $detection_result_msg = runFaceDetectionBatch($mysqli, $new_group_photo_id, $db_file_path);
+                    if (strpos($detection_result_msg, 'พบนักเรียน') !== false) {
+                        $total_detected++;
+                    }
+
+                } else {
+                    $errors[] = "Error: บันทึก DB ไม่สำเร็จสำหรับไฟล์ '{$file_data['name']}': " . $stmt->error;
+                    @unlink($_SERVER['DOCUMENT_ROOT'] . BASE_PATH . '/' . $db_file_path);
+                }
+            }
+        } else {
+            $errors[] = "Error: อัปโหลดไฟล์ '{$file_data['name']}' ไม่สำเร็จ";
+        }
+    }
+    
+    // สรุปผลลัพธ์และ Redirect
+    if ($total_uploaded > 0) {
+        $msg_summary = "✅ อัปโหลดรูปภาพกลุ่มสำเร็จ: **{$total_uploaded}** รูป, ตรวจจับพบนักเรียนในรูป: **{$total_detected}** รูป";
+        if (!empty($errors)) {
+             $msg_summary .= " (มีข้อผิดพลาด {$msg_count} รูป)";
+        }
+        $success_msg = urlencode($msg_summary);
+        header("Location: {$redirect_to}?msg={$success_msg}&status=success");
+        exit;
     } else {
-        $message = "<div class='alert alert-danger'>❌ Error: อัปโหลดไฟล์ไม่สำเร็จ (อาจเป็นข้อจำกัดด้านขนาด/สิทธิ์การเขียนไฟล์)</div>";
+        $message = "<div class='alert alert-danger'>❌ Error: ไม่สามารถอัปโหลดไฟล์ใดๆ ได้ (ตรวจสอบสิทธิ์ไฟล์หรือขนาดไฟล์)</div>";
+        if (!empty($errors)) {
+            $message .= "<div class='alert alert-warning'>รายละเอียด: " . implode('<br>', $errors) . "</div>";
+        }
     }
 }
 
@@ -263,12 +304,12 @@ if (isset($_GET['status']) && $_GET['status'] == 'success' && isset($_GET['msg']
         <?php echo $message; ?>
         <form action="" method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="group_photo">เลือกรูปภาพกลุ่ม:</label>
-                <input type="file" class="form-control" name="group_photo" id="group_photo" accept="image/jpeg, image/png" required>
+                <label for="event_name">ชื่อ Event / คำอธิบาย (จะใช้จัดกลุ่มภาพ):</label>
+                <input type="text" class="form-control" name="event_name" id="event_name" maxlength="255" required>
             </div>
             <div class="form-group">
-                <label for="description">คำอธิบาย:</label>
-                <input type="text" class="form-control" name="description" id="description" maxlength="255">
+                <label for="group_photo">เลือกรูปภาพกลุ่ม (สามารถเลือกได้หลายไฟล์):</label>
+                <input type="file" class="form-control" name="group_photo[]" id="group_photo" accept="image/jpeg, image/png" multiple required>
             </div>
             <button type="submit" class="btn btn-primary">อัปโหลดและบันทึก</button>
         </form>
