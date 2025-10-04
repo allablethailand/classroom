@@ -4,8 +4,6 @@ let currentLang = "th";
 let consent_status = 'N';
 let channel_id = '';
 let is_logged_in = false;
-let line_client_id;
-let is_result = false;
 const translations = {
     en: {
         eng: "English", thai: "Thai", register: "Register", infomation: "Details",
@@ -80,11 +78,6 @@ const translations = {
 };
 $(document).ready(function () {
     $("input").attr("autocomplete", "off");
-    line_client_id = $("#line_client_id").val();
-    is_result = $("#is_result").val();
-    if(is_result) {
-        showSuccessModal(currentLang);
-    }
     $('#registrationForm').on('input change', 'input, textarea, select', updateProgressBar);
     function toggleScrollBtn() {
         if ($(window).width() > 767) return $('#scrollToFormBtn').hide();
@@ -766,9 +759,6 @@ function autoSaveRegister() {
     if (typeof channel_id !== 'undefined' && channel_id) {
         fd.append('channel_id', channel_id);
     }
-    if (typeof line_client_id !== 'undefined' && line_client_id) {
-        fd.append('line_client_id', line_client_id);
-    }
     const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'th';
     fd.append('currentLang', lang);
     $.ajax({
@@ -822,9 +812,6 @@ function saveRegister() {
     }
     if (typeof channel_id !== 'undefined' && channel_id) {
         fd.append('channel_id', channel_id);
-    }
-    if (typeof line_client_id !== 'undefined' && line_client_id) {
-        fd.append('line_client_id', line_client_id);
     }
     const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'th';
     fd.append('currentLang', lang);
@@ -909,11 +896,7 @@ function handleRegisterResponse(result) {
         }
         $(".btn-register").prop('disabled', false);
     } else {
-        if(line_client_id) {
-            handleLineLogin(result);
-        } else {
-            showSuccessModal(lang, result.tenant_url, result.message_success);
-        }
+        showSuccessModal(lang, result.tenant_url, result.message_success);
     }
 }
 function showSuccessModal(lang, tenant_url, message_success) {
@@ -937,22 +920,6 @@ function showSuccessModal(lang, tenant_url, message_success) {
     $modal.off('hidden.bs.modal').on('hidden.bs.modal', function() {
         location.reload();
     });
-}
-function handleLineLogin(result) {
-    const lineClientId = result.line_client_id || '';
-    if (lineClientId && lineClientId !== '') {
-        const classroomKey = $("#classroomCode").val() || '';
-        const studentId = result.student_id || '';
-        if (classroomKey && studentId) {
-            try {
-                const stateData = `cid=${classroomKey}&stu=${studentId}&lid=${lineClientId}`;
-                const state = btoa(encodeURIComponent(stateData));
-                window.location.href = `/classroom/lib/line/login.php?state=${state}`;
-            } catch (error) {
-                console.error('Error encoding LINE state:', error);
-            }
-        }
-    }
 }
 function initForm(form_data) {
     if(!form_data) return;

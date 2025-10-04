@@ -323,7 +323,6 @@
     }
     if(isset($_GET['action']) && $_GET['action'] == 'saveRegister') {
         $classroom_id = isset($_POST['classroom_id']) ? intval($_POST['classroom_id']) : 0;
-        $line_client_id = isset($_POST['line_client_id']) ? intval($_POST['line_client_id']) : '';
         $currentLang = isset($_POST['currentLang']) ? $_POST['currentLang'] : 'th';
         if(!$classroom_id) {
             echo json_encode(array('status' => false, 'message' => ($currentLang == 'en') ? 'Invalid classroom ID' : 'รหัสห้องเรียนไม่ถูกต้อง'));
@@ -637,8 +636,20 @@
                 "template_body", "classroom_message_template", "where classroom_id = '{$classroom_id}' and status = 0 and template_subject = 'Register'"
             );
             $message_success = previewTemplate($classroom_id, $messages[0]['template_body'], '');
+            if(isset($_SESSION['userId'])) {
+                $userId = initVal($_SESSION['userId']);
+                $exits = select_data(
+                    "connect_id", "classroom_line_connect", "where userId = $userId"
+                );
+                if(!empty($exits)) {
+                    $connect_id = $exits[0]['connect_id'];
+                    update_data(
+                        "classroom_line_connect", "student_id = '{$student_id}', update_date = NOW()", "connect_id = '{$connect_id}'"
+                    );
+                }
+            }
             mysqli_commit($mysqli);
-            echo json_encode(array('status' => true, 'student_id' => $student_id, 'line_client_id' => $line_client_id, 'tenant_url' => $tenant_url, 'message_success' => $message_success));
+            echo json_encode(array('status' => true, 'student_id' => $student_id, 'tenant_url' => $tenant_url, 'message_success' => $message_success));
             
         } catch(Exception $e) {
             mysqli_rollback($mysqli);

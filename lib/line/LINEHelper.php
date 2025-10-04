@@ -24,15 +24,12 @@
             );
             return isset($token[0]) ? $token[0] : null;
         }
-        public static function buildLoginUrl($classroom_id, $student_id, $client_id, $channel_id) {
+        public static function buildLoginUrl($classroom_id, $client_id, $channel_id) {
             if (!$client_id || !$classroom_id) {
                 return null;
             }
             $state = "cid_" . intval($classroom_id);
             $state .= "_lid_" . intval($client_id);
-            if ($student_id !== '') {
-                $state .= "_stu_" . urlencode($student_id);
-            }
             if ($channel_id !== '') {
                 $state .= "_ch_" . urlencode($channel_id);
             }
