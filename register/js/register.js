@@ -397,7 +397,7 @@ $(document).ready(function () {
         `);
         $.post('/classroom/register/actions/register.php', { 
             action: "loadTerm", 
-            classroom_id 
+            classroom_id, currentLang
         }, (res) => {
             $(".systemModal .modal-body").html(res.classroom_consent || '-');
         }, 'json');

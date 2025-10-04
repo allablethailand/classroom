@@ -8,7 +8,8 @@ function getConsentTemplate() {
             <thead>
                 <tr>
                     <th lang="en">Publish</th>
-                    <th lang="en">Consent</th>
+                    <th lang="en">Consent (ภาษาไทย)</th>
+                    <th lang="en">Consent (English)</th>
                     <th lang="en">Create Date</th>
                     <th lang="en">Create By</th>
                     <th></th>
@@ -68,12 +69,20 @@ function buildConsent() {
                 }
             },{ 
                 "targets": 2,
-                "data": "date_create",
+                "data": "consent_body_en",
+                "render": function (data,type,row,meta) {	
+					return `
+                        <div class="consent-example">${data}</div>
+                    `;
+                }
             },{ 
                 "targets": 3,
-                "data": "emp_create",
+                "data": "date_create",
             },{ 
                 "targets": 4,
+                "data": "emp_create",
+            },{ 
+                "targets": 5,
                 "data": "consent_id",
                 "className": "text-center",
                 "render": function (data,type,row,meta) {	
@@ -210,7 +219,10 @@ function manageConsent(consent_id = '') {
      $(".systemModal .modal-body").html(`
         <form id="consent_form">
             <input type="hidden" name="consent_id" value="${consent_id}">
+            <p style="margin: 10px auto;"><b>ภาษาไทย</b></p>
             <textarea name="classroom_consent" id="classroom_consent" class="form-control"></textarea>
+            <p style="margin: 10px auto;"><b>English</b></p>
+            <textarea name="classroom_consent_en" id="classroom_consent_en" class="form-control"></textarea>
         </div>
     `);
     $(".systemModal .modal-footer").html(`
@@ -230,6 +242,7 @@ function manageConsent(consent_id = '') {
             success: function(result) {
                 if (result && result.consent_body) {
                     $('#classroom_consent').editable("setHTML", result.consent_body, true);
+                    $('#classroom_consent_en').editable("setHTML", result.consent_body_en, true);
                 }
             },
             error: function(xhr, status, error) {
@@ -240,7 +253,7 @@ function manageConsent(consent_id = '') {
 }
 function initializeConsentEditor() {
     try {
-        const editorElement = $('#classroom_consent');
+        const editorElement = $('#classroom_consent, #classroom_consent_en');
         if (editorElement.length && typeof editorElement.editable === 'function') {
             editorElement.editable({
                 theme: 'gray',
@@ -263,14 +276,15 @@ function initializeConsentEditor() {
 function saveConsent() {
     var err = 0;
     const consentText = $("#classroom_consent").val().trim();
-    if (!consentText) {
+    const consentTextEn = $("#classroom_consent_en").val().trim();
+    if (!consentText && !consentTextEn) {
         ++err;
     }
 	if(err > 0) {
 		swal({
 			type: 'warning',
 			title: "Warning",
-			text: "Please input all item completely.",
+			text: "Please input one item completely.",
 			timer: 2500,
 			showConfirmButton: false,
 			allowOutsideClick: true
