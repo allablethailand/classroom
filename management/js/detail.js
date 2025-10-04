@@ -346,11 +346,27 @@ function populateFormRegister(template_data, shortcut_status = 1) {
         let chkDisplay = `<input type="checkbox" class="chk-display" data-id="${t.template_id}" name="register_template[]" ${t.template_display == 0 ? 'checked' : ''} ${t.is_default == 0 ? 'disabled' : ''} value="${t.template_id}">`;
         let chkRequire = `<input type="checkbox" class="chk-require" data-id="${t.template_id}" name="register_require[]" ${t.template_require == 0 ? 'checked' : ''} ${t.is_default == 0 ? 'disabled' : ''} value="${t.template_id}">`;
         let chkShort = `<input type="checkbox" class="chk-short" data-id="${t.template_id}" name="shortcut_field[]" ${t.short_display == 0 ? 'checked' : ''} ${t.is_default == 0 ? 'disabled' : ''} value="${t.template_id}">`;
+        let templace_icon = '';
+        switch(t.templace_type) {
+            case 'text':
+                templace_icon = '<i class="fas fa-spell-check"></i>';
+                break;
+            case 'date':
+                templace_icon = '<i class="far fa-calendar-alt"></i>';
+                break;
+            case 'dropdown':
+                templace_icon = '<i class="fas fa-caret-square-down"></i>';
+                break;
+            case 'file':
+                templace_icon = '<i class="fas fa-paperclip"></i>';
+                break;
+        }
         let row = `
             <tr>
                 <td class="text-center pre-registration ${shortcut_status == 1 ? 'hidden' : ''}">${chkShort}</td>
                 <td class="text-center">${chkDisplay}</td>
                 <td class="text-center">${chkRequire}</td>
+                <td>${templace_icon}</td>
                 <td>${t.template_name_en}</td>
                 <td>${t.template_name_th}</td>
             </tr>
@@ -1358,6 +1374,7 @@ function getManagementTemplate() {
                                         <th lang="en" class="text-center pre-registration hidden">Pre-registration (Short Form)</th>
                                         <th lang="en" class="text-center">Display Filed</th>
                                         <th lang="en" class="text-center">Require Filed</th>
+                                        <th lang="en">Filed Type</th>
                                         <th lang="en">Field name (EN)</th>
                                         <th lang="en">Field name (TH)</th>
                                     </tr>

@@ -671,7 +671,7 @@
             }
         }
         $templates = select_data(
-            "template_id, template_name_en, template_name_th, is_default, template_order",
+            "template_id, template_name_en, template_name_th, is_default, template_order, templace_type",
             "classroom_register_template",
             "where status = 0 order by is_default asc, template_order asc"
         );
@@ -681,6 +681,7 @@
                 'template_id' => $t['template_id'],
                 'template_name_en' => $t['template_name_en'],
                 'template_name_th' => $t['template_name_th'],
+                'templace_type' => $t['templace_type'],
                 'is_default' => (int) $t['is_default'],
                 'template_display' => ((int) $t['is_default'] == 0) ? 0 : ((in_array($t['template_id'], $display)) ? 0 : 1),
                 'template_require' => ((int) $t['is_default'] == 0) ? 0 : ((in_array($t['template_id'], $require)) ? 0 : 1),
