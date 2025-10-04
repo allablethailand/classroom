@@ -52,7 +52,6 @@
                 template.classroom_name, 
                 template.classroom_information, 
                 template.classroom_poster, 
-                template.classroom_bg, 
                 date_format(template.classroom_start, '%d %b %Y') as classroom_start_date, 
                 date_format(template.classroom_start, '%H:%i') as classroom_start_time, 
                 date_format(template.classroom_end, '%d %b %Y') as classroom_end_date, 
@@ -101,7 +100,6 @@
             'classroom_name' => $classroom['classroom_name'], 
             'classroom_information' => $classroom['classroom_information'], 
             'classroom_poster' => ($classroom['classroom_poster']) ? GetPublicUrl($classroom['classroom_poster']) : '', 
-            'classroom_bg' => ($classroom['classroom_bg']) ? GetPublicUrl($classroom['classroom_bg']) : '', 
             'classroom_start_date' => $classroom['classroom_start_date'], 
             'classroom_start_time' => $classroom['classroom_start_time'], 
             'classroom_end_date' => $classroom['classroom_end_date'], 
@@ -203,20 +201,21 @@
                     student_company,
                     student_position,
                     student_username,
-                    date_format(student_birth_date, '%d/%m/%Y') as student_birth_date,
+                    date_format(student_birth_date, '%Y/%m/%d') as student_birth_date,
                     student_image_profile,
                     student_perfix,
                     student_perfix_other,
                     student_idcard,
                     student_passport,
-                    student_passport_expire,
+                    date_format(student_passport_expire, '%Y/%m/%d') as student_passport_expire,
                     copy_of_idcard,
                     copy_of_passport,
                     work_certificate,
                     company_certificate,
                     student_nationality,
                     student_password,
-                    student_password_key
+                    student_password_key,
+                    student_reference
                 ",
                 "classroom_student",
                 "where student_id = " . intval($student_id) . " and status = 0"
@@ -241,12 +240,13 @@
                     'student_position' => $student['student_position'],
                     'student_username' => $student['student_username'],
                     'student_birth_date' => $student['student_birth_date'],
+                    'student_passport_expire' => $student['student_passport_expire'],
                     'student_image_profile' => $student['student_image_profile'] ? GetPublicUrl($student['student_image_profile']) : '',
                     'student_perfix' => $student['student_perfix'],
                     'student_perfix_other' => $student['student_perfix_other'],
                     'student_idcard' => $student['student_idcard'],
                     'student_passport' => $student['student_passport'],
-                    'student_passport_expire' => $student['student_passport_expire'] ? date('d/m/Y', strtotime($student['student_passport_expire'])) : '',
+                    'student_reference' => $student['student_reference'],
                     'copy_of_idcard' => $student['copy_of_idcard'] ? GetPublicUrl($student['copy_of_idcard']) : '',
                     'copy_of_passport' => $student['copy_of_passport'] ? GetPublicUrl($student['copy_of_passport']) : '',
                     'work_certificate' => $student['work_certificate'] ? GetPublicUrl($student['work_certificate']) : '',
@@ -378,6 +378,7 @@
         $student_company = isset($_POST['student_company']) ? initVal(trim($_POST['student_company'])) : "null";
         $student_position = isset($_POST['student_position']) ? initVal(trim($_POST['student_position'])) : "null";
         $student_username = isset($_POST['student_username']) ? initVal(trim($_POST['student_username'])) : "null";
+        $student_reference = isset($_POST['student_reference']) ? initVal(trim($_POST['student_reference'])) : "null";
         $student_birth_date = "null";
         if(isset($_POST['student_birth_date']) && trim($_POST['student_birth_date']) !== '') {
             $student_birth_date = initVal(str_replace('/', '-', trim($_POST['student_birth_date'])));
@@ -476,7 +477,8 @@
                         student_passport = $student_passport,
                         student_passport_expire = $student_passport_expire,
                         student_nationality = $student_nationality,
-                        date_modify = NOW()
+                        date_modify = NOW(),
+                        student_reference = $student_reference
                     ",
                     "student_id = " . intval($student_id)
                 );
@@ -500,7 +502,7 @@
                         student_image_profile, student_perfix, student_perfix_other,
                         student_idcard, student_passport, student_passport_expire, copy_of_idcard,
                         copy_of_passport, work_certificate, company_certificate,
-                        student_nationality, status, date_create, date_modify
+                        student_nationality, status, date_create, date_modify, student_reference
                     )",
                     "(
                         $student_firstname_en, $student_lastname_en, $student_nickname_en,
@@ -511,7 +513,7 @@
                         $student_image_profile, $student_perfix, $student_perfix_other,
                         $student_idcard, $student_passport, $student_passport_expire, $copy_of_idcard,
                         $copy_of_passport, $work_certificate, $company_certificate,
-                        $student_nationality, 0, NOW(), NOW()
+                        $student_nationality, 0, NOW(), NOW(), $student_reference
                     )"
                 );
                 insert_data(
@@ -631,8 +633,12 @@
                     );
                 }
             }
+            $messages = select_data(
+                "template_body", "classroom_message_template", "where classroom_id = '{$classroom_id}' and status = 0 and template_subject = 'Register'"
+            );
+            $message_success = previewTemplate($classroom_id, $messages[0]['template_body'], '');
             mysqli_commit($mysqli);
-            echo json_encode(array('status' => true, 'student_id' => $student_id, 'line_client_id' => $line_client_id, 'tenant_url' => $tenant_url));
+            echo json_encode(array('status' => true, 'student_id' => $student_id, 'line_client_id' => $line_client_id, 'tenant_url' => $tenant_url, 'message_success' => $message_success));
             
         } catch(Exception $e) {
             mysqli_rollback($mysqli);
