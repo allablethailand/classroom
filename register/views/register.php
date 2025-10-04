@@ -28,8 +28,6 @@
 <body>
 <input type="hidden" id="classroomCode" value="<?php echo $classroomCode; ?>">
 <input type="hidden" id="channel" value="<?php echo $channel; ?>">
-<input type="hidden" id="line_client_id" value="<?php echo $line_client_id; ?>">
-<input type="hidden" id="is_result" value="<?php echo $is_result; ?>">
 <div class="container-fluid registration-container">
     <div class="row" style="height: 100vh;">
         <div class="col-sm-9 left-section">
@@ -196,25 +194,25 @@
                                 </div>
                             </div>
                             <div class="form-group form-input input-19 hidden">
-                                <label class="register-form" for="copy_of_idcard" data-lang="copy_of_idcard"></label>
+                                <label class="register-form" for="copy_of_idcard"><i class="fas fa-paperclip"></i> <span data-lang="copy_of_idcard"></span></label>
                                 <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
                                 <input type="file" class="form-control input-file" id="copy_of_idcard" name="copy_of_idcard" accept="image/*,.pdf">
                                 <input type="hidden" id="existing_copy_of_idcard" name="existing_copy_of_idcard">
                             </div>
                             <div class="form-group form-input input-22 hidden">
-                                <label class="register-form" for="copy_of_passport" data-lang="copy_of_passport"></label>
+                                <label class="register-form" for="copy_of_passport"><i class="fas fa-paperclip"></i> <span data-lang="copy_of_passport"></span></label>
                                 <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
                                 <input type="file" class="form-control input-file" id="copy_of_passport" name="copy_of_passport" accept="image/*,.pdf">
                                 <input type="hidden" id="existing_copy_of_passport" name="existing_copy_of_passport">
                             </div>
                             <div class="form-group form-input input-20 hidden">
-                                <label class="register-form" for="work_certificate" data-lang="work_certificate"></label>
+                                <label class="register-form" for="work_certificate"><i class="fas fa-paperclip"></i> <span data-lang="work_certificate"></span></label>
                                 <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
                                 <input type="file" class="form-control input-file" id="work_certificate" name="work_certificate" accept="image/*,.pdf">
                                 <input type="hidden" id="existing_work_certificate" name="existing_work_certificate">
                             </div>
                             <div class="form-group form-input input-21 hidden">
-                                <label class="register-form" for="company_certificate" data-lang="company_certificate"></label>
+                                <label class="register-form" for="company_certificate"><i class="fas fa-paperclip"></i> data-lang="company_certificate"</label>
                                 <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
                                 <input type="file" class="form-control input-file" id="company_certificate" name="company_certificate" accept="image/*,.pdf">
                                 <input type="hidden" id="existing_company_certificate" name="existing_company_certificate">
