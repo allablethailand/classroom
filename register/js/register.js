@@ -23,7 +23,7 @@ const translations = {
         password_info: "Password must be 4–20 characters, using only English letters or numbers.",
         username_info: "Username must be 8–20 characters, consisting of English letters or numbers only. (By default, your registered mobile number will be used)",
         close: "Close", accept: "Accept", already: "Already have an account?", login: "Log in",
-        registered: "Successfully registered.", registered_success: "You have successfully completed your registration.",
+        registered: "Successfully registered.", 
         accept_register: "Accept and register",
         copy_of_idcard: "Copy of ID card",
         copy_of_passport: "Passport",
@@ -40,6 +40,7 @@ const translations = {
         consent_notice: "Consent Notice",
         consent_paragraph: "This form has been created by the form owner. Any information you submit will be sent directly to the form owner. Allable is not responsible for the privacy practices or actions of third-party form owners. Please avoid submitting personal, sensitive, or confidential information, and never share your password.",
         consent_footer: "Please do not provide personal or sensitive information. Thank you for your understanding!",
+        reference: "Person Who Referred You",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
@@ -57,7 +58,7 @@ const translations = {
         password_info: "รหัสผ่านต้องมีความยาว 4–20 ตัวอักษร และใช้ได้เฉพาะตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น",
         username_info: "ชื่อผู้ใช้ต้องมีความยาว 8–20 ตัวอักษร และประกอบด้วยตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น (ค่าเริ่มต้นคือหมายเลขโทรศัพท์มือถือที่ท่านกรอกไว้)",
         close: "ปิด", accept: "ยอมรับ", already: "มีบัญชีผู้ใช้อยู่แล้ว?", login: "เข้าสู่ระบบ",
-        registered: "ลงทะเบียนสำเร็จ", registered_success: "คุณได้ทำการลงทะเบียนเรียบร้อยแล้ว",
+        registered: "ลงทะเบียนสำเร็จ",
         accept_register: "ยอมรับและลงทะเบียน",
         copy_of_idcard: "สำเนาบัตรประชาชน",
         copy_of_passport: "หนังสือเดินทาง",
@@ -74,6 +75,7 @@ const translations = {
         consent_notice: "หนังสือแจ้งเพื่อขอความยินยอม",
         consent_paragraph: "แบบฟอร์มนี้ถูกสร้างขึ้นโดยเจ้าของฟอร์ม ข้อมูลใด ๆ ที่คุณส่ง จะถูกส่งไปยังเจ้าของฟอร์มโดยตรง Allable จะไม่รับผิดชอบต่อการปฏิบัติด้านความเป็นส่วนตัวหรือการดำเนินการใด ๆ ของเจ้าของฟอร์มภายนอก โปรดหลีกเลี่ยงการส่งข้อมูลส่วนบุคคล ข้อมูลที่อ่อนไหว หรือข้อมูลลับ และอย่าเปิดเผยรหัสผ่านของคุณโดยเด็ดขาด",
         consent_footer: "กรุณางดให้ข้อมูลส่วนบุคคลหรือข้อมูลที่อ่อนไหว ขอบคุณในความเข้าใจของท่าน",
+        reference: "ผู้แนะนำให้มาสมัคร",
     }
 };
 $(document).ready(function () {
@@ -276,12 +278,14 @@ $(document).ready(function () {
             if (data.student_passport) $("#student_passport").val(data.student_passport);
             if (data.student_passport_expire) $("#student_passport_expire").val(data.student_passport_expire);
             if (data.student_password) $("#student_password").val(data.student_password);
+            if (data.student_reference) $("#student_reference").val(data.student_reference);
             if (data.dial_code) {
                 $("#dialCode").val(data.dial_code);
                 $("select[name='dialCode']").val(data.dial_code);
             }
             if (data.student_gender) {
-                $("input[name='student_gender'][value='" + data.student_gender + "']").prop('checked', true);
+                $("#student_gender").val(data.student_gender);
+                $("select[name='student_gender']").val(data.student_gender).trigger('change');
             }
             if (data.student_perfix) {
                 $("#student_perfix").val(data.student_perfix);
@@ -748,6 +752,54 @@ function isValidThaiID(id) {
     let checkDigit = (11 - (sum % 11)) % 10;
     return checkDigit === parseInt(id.charAt(12));
 }
+function autoSaveRegister() {
+    const $form = $('#registrationForm');
+    const fd = new FormData($form[0]);
+    if (typeof classroom_id !== 'undefined' && classroom_id) {
+        fd.append('classroom_id', classroom_id);
+    }
+    const $dialCode = $(".iti__selected-dial-code");
+    if ($dialCode.length > 0) {
+        const dialCode = $dialCode.text().trim();
+        fd.append('dialCode', dialCode);
+    }
+    if (typeof channel_id !== 'undefined' && channel_id) {
+        fd.append('channel_id', channel_id);
+    }
+    if (typeof line_client_id !== 'undefined' && line_client_id) {
+        fd.append('line_client_id', line_client_id);
+    }
+    const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'th';
+    fd.append('currentLang', lang);
+    $.ajax({
+        url: '/classroom/register/actions/register.php?action=saveRegister',
+        type: "POST",
+        data: fd,
+        processData: false,
+        contentType: false,
+        dataType: "JSON",
+        success: function(result) {
+        },
+        error: function(xhr, status, error) {
+            console.error('Register error:', status, error);
+            $(".loader").removeClass("active");
+            $(".systemModal").modal("hide");
+            $btn.prop('disabled', false);
+            const titlemsg = (lang === 'en') ? "Warning" : "คำเตือน";
+            const msg = (lang === 'en') ? "Save failed, please try again." : "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง";
+            if (typeof swal === 'function') {
+                swal({
+                    type: 'warning',
+                    title: titlemsg,
+                    text: msg,
+                    confirmButtonColor: '#FF9900'
+                });
+            } else {
+                alert(msg);
+            }
+        }
+    });
+}
 function saveRegister() {
     const $form = $('#registrationForm');
     if ($form.length === 0) {
@@ -851,6 +903,8 @@ function handleRegisterResponse(result) {
                 text: '',
                 type: 'success',
                 confirmButtonColor: '#41a85f'
+            },function() {
+                location.reload();
             });
         }
         $(".btn-register").prop('disabled', false);
@@ -858,11 +912,11 @@ function handleRegisterResponse(result) {
         if(line_client_id) {
             handleLineLogin(result);
         } else {
-            showSuccessModal(lang, result.tenant_url);
+            showSuccessModal(lang, result.tenant_url, result.message_success);
         }
     }
 }
-function showSuccessModal(lang, tenant_url) {
+function showSuccessModal(lang, tenant_url, message_success) {
     const $modal = $(".systemModal");
     if ($modal.length === 0) {
         console.error('System modal not found');
@@ -873,18 +927,7 @@ function showSuccessModal(lang, tenant_url) {
     $modal.find(".modal-header").html(`
         <h5 class="modal-title" data-lang="registered"></h5>
     `);
-    $modal.find(".modal-body").html(`
-        <div class="text-center">
-            <img src="/images/ogm_logo.png" onerror="this.style.display='none'" alt="ORIGAMI Logo" style="height: 100px; margin-bottom: 20px;">
-        </div>
-        <div class="text-center">
-            <h4 class="text-success" data-lang="registered_success"></h4>
-        </div>
-        <br>
-        <p>กรุณาตรวจสอบอีเมลที่ท่านได้กรอกไว้ เพื่อดูรายละเอียดในการลงทะเบียน หากท่านไม่ได้รับอีเมล กรุณาตรวจสอบโฟลเดอร์สแปมหรือเมลขยะ หรือติดต่อเจ้าหน้าที่เพื่อตรวจสอบเพิ่มเติม</p>
-        <br>
-        <p>You have successfully completed your registration. Please check the email address you provided for the registration details. If you do not receive the email, kindly check your spam or junk mail folder, or contact our staff for further assistance.</p>
-    `);
+    $modal.find(".modal-body").html(message_success);
     $modal.find(".modal-footer").html(`
         <div class="text-center w-100">
             <a href="${tenant_url}" class="btn btn-primary" data-lang="close"></a>
@@ -1002,10 +1045,9 @@ function autoResize(textarea) {
 }
 function initTemplate(data) {
     $(document).attr("title", `${data.classroom_name} • ORIGAMI PLATFORM`);
-    let bg = (data.classroom_bg != '') ? data.classroom_bg : "/images/ogm_bg.png";
-    $(".poster-bg").css("background-image",`url(${bg})`);
+    $(".poster-bg").css("background-image",`url(/images/ogm_bg.png)`);
     $(".poster-img img").attr("src", data.classroom_poster || "/images/training.jpg");
-    $(".container-header-bg").css("background-image",`url(${bg})`);
+    $(".container-header-bg").css("background-image",`url(/images/ogm_bg.png)`);
     $(".container-header-logo img").attr("src", data.comp_logo);
     const sheet = document.styleSheets[0];
     const rule = `
@@ -1086,4 +1128,7 @@ function isInputValid($el) {
 function updateProgressBar() {
     const percent = calculateFormCompletion();
     $('#progress_bar').css('width', percent + '%').text(percent + '%');
+    if(is_logged_in) {
+        autoSaveRegister();
+    }
 }

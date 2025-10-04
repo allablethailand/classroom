@@ -186,6 +186,9 @@ function buildPage(page) {
         case 'pricing':
             buildPricingPage();
             break;
+        case 'message':
+            buildMessagePage();
+            break;
         default:
             console.warn('Unknown page type:', page);
     }
@@ -417,7 +420,6 @@ function populateFormData(data) {
         setDatePickerValue("#classroom_close_register_date", data.classroom_close_register_date);
         $("#classroom_open_register_time").val(data.classroom_open_register_time || '');
         $("#classroom_close_register_time").val(data.classroom_close_register_time || '');
-        $("#close_register_message").val(data.close_register_message || '');
         if (data.classroom_information) {
             $('#classroom_information').editable("setHTML", data.classroom_information, true);
         }
@@ -1115,14 +1117,6 @@ function getManagementTemplate() {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-3">
-                                <label lang="en" class="control-label">Close Registration Message</label>
-                            </div>
-                            <div class="col-sm-9">
-                                <textarea name="close_register_message" id="close_register_message" class="form-control" style="height:100px;"></textarea>
                             </div>
                         </div>
                     </div>

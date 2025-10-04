@@ -42,7 +42,6 @@
                 date_format(template.classroom_open_register, '%H:%i') as classroom_open_register_time,
                 date_format(template.classroom_close_register, '%Y/%m/%d') as classroom_close_register_date,
                 date_format(template.classroom_close_register, '%H:%i') as classroom_close_register_time,
-                template.close_register_message,
                 template.classroom_type,
                 (
                     case
@@ -104,7 +103,6 @@
                 'classroom_open_register_time' => $classroom['classroom_open_register_time'],
                 'classroom_close_register_date' => $classroom['classroom_close_register_date'],
                 'classroom_close_register_time' => $classroom['classroom_close_register_time'],
-                'close_register_message' => $classroom['close_register_message'],
                 'classroom_type' => $classroom['classroom_type'],
                 'platforms_id' => $classroom['platforms_id'],
                 'platforms_name' => $classroom['platforms_name'],
@@ -380,7 +378,6 @@
         $sql_classroom_close_register = convertDateTime($classroom_close_register_date, $classroom_close_register_time);
         $classroom_open_register = initVal($sql_classroom_open_register);
         $classroom_close_register = initVal($sql_classroom_close_register);
-        $close_register_message = initVal($_POST['close_register_message']);
         $contact_us = initVal($_POST['contact_us']);
         $shortcut_status = initVal($_POST['shortcut_status']);
         $auto_approve = $_POST['auto_approve'];
@@ -409,7 +406,6 @@
                     classroom_allow_register = $classroom_allow_register,
                     classroom_open_register = $classroom_open_register,
                     classroom_close_register = $classroom_close_register,
-                    close_register_message = $close_register_message,
                     classroom_type = $classroom_type,
                     classroom_plateform = $classroom_plateform,
                     classroom_source = $classroom_source,
@@ -447,7 +443,6 @@
                     classroom_allow_register,
                     classroom_open_register,
                     classroom_close_register,
-                    close_register_message,
                     classroom_type,
                     classroom_plateform,
                     classroom_source,
@@ -483,7 +478,6 @@
                     $classroom_allow_register,
                     $classroom_open_register,
                     $classroom_close_register,
-                    $close_register_message,
                     $classroom_type,
                     $classroom_plateform,
                     $classroom_source,
@@ -540,26 +534,8 @@
                 } else {
                     insert_data(
                         "classroom_staff",
-                        "(
-                            classroom_id,
-                            emp_id,
-                            comp_id,
-                            status,
-                            emp_create,
-                            date_create,
-                            emp_modify,
-                            date_modify
-                        )",
-                        "(
-                            '{$classroom_id}',
-                            '{$emp_id}',
-                            '{$_SESSION['comp_id']}',
-                            0,
-                            '{$_SESSION['emp_id']}',
-                            NOW(),
-                            '{$_SESSION['emp_id']}',
-                            NOW()
-                        )"
+                        "(classroom_id, emp_id, comp_id, status, emp_create, date_create, emp_modify, date_modify)",
+                        "('{$classroom_id}', '{$emp_id}', '{$_SESSION['comp_id']}', 0, '{$_SESSION['emp_id']}', NOW(), '{$_SESSION['emp_id']}', NOW())"
                     );
                 }
             }
@@ -610,55 +586,43 @@
                 exit;
             }
         }
-        $columnMaster = "mail_master_id,mail_master_name,mail_master_description,mail_master_html";
-        $tableMaster = "classroom_mail_master";
-        $whereMaster = "where status = 0 and mail_master_public = 0";
-        $Master = select_data($columnMaster,$tableMaster,$whereMaster);
-        $count_master = count($Master);
-        $i_master = 0;
-        while($i_master < $count_master) {
-            $mail_master_id = $Master[$i_master]['mail_master_id'];
-            $mail_master_name = escape_string($Master[$i_master]['mail_master_name']);
-            $mail_master_description = escape_string($Master[$i_master]['mail_master_description']);
-            $mail_master_html = escape_string($Master[$i_master]['mail_master_html']);
-            $columnData = "*";
-            $tableData = "classroom_mail_template";
-            $whereData = "where ifnull(mail_reference,0) = '{$mail_master_id}' and classroom_id = '{$classroom_id}'";
-            $Data = select_data($columnData,$tableData,$whereData);
-            $count_data = count($Data);
-            if($count_data == 0) {
-                $tableInsData = "classroom_mail_template";
-                $columnInsData = "(
-                    classroom_id,
-                    comp_id,
-                    mail_name,
-                    mail_subject,
-                    mail_reason,
-                    mail_description,
-                    mail_reference,
-                    status,
-                    emp_create,
-                    date_create,
-                    emp_modify,
-                    date_modify
-                )";
-                $valueInsData = "(
-                    '{$classroom_id}',
-                    '{$_SESSION['comp_id']}',
-                    '{$mail_master_name}',
-                    '{$mail_master_name}',
-                    '{$mail_master_description}',
-                    '{$mail_master_html}',
-                    '{$mail_master_id}',
-                    0,
-                    '{$_SESSION['emp_id']}',
-                    NOW(),
-                    '{$_SESSION['emp_id']}',
-                    NOW()
-                )";
-                insert_data($tableInsData,$columnInsData,$valueInsData);
+        $mails = select_data(
+            "mail_master_id, mail_master_name, mail_master_description, mail_master_html", "classroom_mail_master", "where status = 0 and mail_master_public = 0"
+        );
+        foreach($mails as $e) {
+            $mail_master_id = initVal($e['mail_master_id']);
+            $mail_master_name = initVal($e['mail_master_name']);
+            $mail_master_description = initVal($e['mail_master_description']);
+            $mail_master_html = initVal($e['mail_master_html']);
+            $exists = select_data(
+                "mail_template_id", "classroom_mail_template", "where ifnull(mail_reference,0) = $mail_master_id and classroom_id = '{$classroom_id}'"
+            );
+            if(empty($exists)) {
+                insert_data(
+                    "classroom_mail_template",
+                    "(classroom_id, comp_id, mail_name, mail_subject, mail_reason, mail_description, mail_reference, status, emp_create, date_create, emp_modify, date_modify)",
+                    "('{$classroom_id}', '{$_SESSION['comp_id']}', $mail_master_name, $mail_master_name, $mail_master_description, $mail_master_html, $mail_master_id, 0, '{$_SESSION['emp_id']}', NOW(), '{$_SESSION['emp_id']}', NOW())"
+                );
             }
-            ++$i_master;
+        }
+        $messages = select_data(
+            "master_id, master_subject, master_description, master_body", "classroom_message_master" ,"where status = 0"
+        );
+        foreach($messages as $m) {
+            $master_id = initVal($m['master_id']);
+            $master_subject = initVal($m['master_subject']);
+            $master_description = initVal($m['master_description']);
+            $master_body = initVal($m['master_body']);
+            $exists = select_data(
+                "template_id", "classroom_message_template", "where classroom_id = '{$classroom_id}' and master_id = $master_id"
+            );
+            if(empty($exists)) {
+                insert_data(
+                    "classroom_message_template",
+                    "(template_subject, template_description, template_body, master_id, classroom_id, comp_id, status, emp_create, date_create, emp_modify, date_modify)",
+                    "($master_subject, $master_description, $master_body, $master_id, '{$classroom_id}', '{$_SESSION['comp_id']}', 0, '{$_SESSION['emp_id']}', NOW(), '{$_SESSION['emp_id']}', NOW())"
+                );
+            }
         }
         echo json_encode([
             'status' => true,
