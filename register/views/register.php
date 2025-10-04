@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Register • ORIGAMI PLATFORM</title>
 <link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
-<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="/dist/css/sweetalert.css">
 <link rel="stylesheet" href="/dist/css/jquery-ui.css">
@@ -187,6 +186,13 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="student_position" name="student_position" autocomplete="off">
                                     <span class="input-group-addon"><i class="fas fa-briefcase"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group form-input input-25 hidden">
+                                <label class="register-form" for="student_reference" data-lang="reference"></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="student_reference" name="student_reference" autocomplete="off">
+                                    <span class="input-group-addon"><i class="fas fa-user-friends"></i></span>
                                 </div>
                             </div>
                             <div class="form-group form-input input-19 hidden">
