@@ -313,12 +313,13 @@
     }
     if($action == 'loadTerm') {
         $classroom_id = (!empty($_POST['classroom_id'])) ? escape_string($_POST['classroom_id']) : ''; 
+        $currentLang = isset($_POST['currentLang']) ? $_POST['currentLang'] : 'th';
         $Term = select_data(
-            "consent_body as classroom_consent", "classroom_consent", "where classroom_id = '{$classroom_id}' and status = 0 and consent_use = 0"
+            "ifnull(consent_body,consent_body_en) as classroom_consent, ifnull(consent_body_en,consent_body) as classroom_consent_en", "classroom_consent", "where classroom_id = '{$classroom_id}' and status = 0 and consent_use = 0"
         );
         echo json_encode([
             'status' => true,
-            'classroom_consent' => $Term[0]['classroom_consent'],
+            'classroom_consent' => ($currentLang == 'th') ? $Term[0]['classroom_consent'] : $Term[0]['classroom_consent_en'],
         ]);
     }
     if(isset($_GET['action']) && $_GET['action'] == 'saveRegister') {

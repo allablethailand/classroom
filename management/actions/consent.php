@@ -29,7 +29,8 @@
             date_format(c.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
             CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
             c.consent_use,
-            c.consent_body
+            c.consent_body,
+            c.consent_body_en
         FROM 
             classroom_consent c
         LEFT JOIN 
@@ -43,6 +44,7 @@
             array('db' => 'emp_create', 'dt' => 'emp_create'),
             array('db' => 'consent_use', 'dt' => 'consent_use'),
             array('db' => 'consent_body', 'dt' => 'consent_body'),
+            array('db' => 'consent_body_en', 'dt' => 'consent_body_en'),
 		);
 		$sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db'   => $db_name,'host' => $db_host);
 		require($base_include.'/lib/ssp-subquery.class.php');
@@ -52,13 +54,14 @@
     if(isset($_POST) && $_POST['action'] == 'buildConsentData') {
         $consent_id = $_POST['consent_id'];
         $consents = select_data(
-            "consent_body",
+            "consent_body, consent_body_en",
             "classroom_consent",
             "where consent_id = '{$consent_id}'"
         );
         echo json_encode([
             'status' => true,
-            'consent_body' => $consents[0]['consent_body']
+            'consent_body' => $consents[0]['consent_body'],
+            'consent_body_en' => $consents[0]['consent_body_en']
         ]);
     }
     if(isset($_POST) && $_POST['action'] == 'delConsent') {
@@ -76,10 +79,11 @@
         $classroom_id = $_POST['classroom_id'];
         $consent_id = $_POST['consent_id'];
         $classroom_consent = initVal($_POST['classroom_consent']);
+        $classroom_consent_en = initVal($_POST['classroom_consent_en']);
         if($consent_id) {
             update_data(
                 "classroom_consent",
-                "consent_body = $classroom_consent, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
+                "consent_body = $classroom_consent, consent_body_en = $classroom_consent_en, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
                 "consent_id = '{$consent_id}'"
             );
         } else { 
@@ -89,6 +93,7 @@
                     classroom_id,
                     comp_id,
                     consent_body,
+                    consent_body_en,
                     status,
                     emp_create,
                     date_create,
@@ -99,6 +104,7 @@
                     '{$classroom_id}',
                     '{$_SESSION['comp_id']}',
                     $classroom_consent,
+                    $classroom_consent_en,
                     0,
                     '{$_SESSION['emp_id']}',
                     NOW(),
