@@ -94,9 +94,7 @@ function buildChannel() {
 					return `
                         <div class="nowarp">
                             <button type="button" class="btn btn-info btn-circle" onclick="showQRCode('${classroom_link}', '${channel_name}')" title="Show QR Code"><i class="fa fa-link"></i></button>
-                            ${(channel_type == 0) ? `
-                                <button type="button" class="btn btn-orange btn-circle" onclick="manageChannel(${data})"><i class="fas fa-pencil-alt"></i></button> 
-                            ` : ``}
+                            <button type="button" class="btn btn-orange btn-circle" onclick="manageChannel(${data})"><i class="fas fa-pencil-alt"></i></button> 
                             <button type="button" class="btn btn-red btn-circle" onclick="delChannel(${data})"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     `;
