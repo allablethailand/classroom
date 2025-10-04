@@ -5,7 +5,14 @@
     $classroomCode = isset($parts[2]) ? $parts[2] : null;
     $channel = isset($parts[3]) ? $parts[3] : '';
     $line_client_id = isset($parts[4]) ? $parts[4] : '';
-    $is_result = isset($_SESSION['is_result']) ? $_SESSION['is_result'] : '';
+    if($line_client_id) {
+        $state = "cid={$classroomCode}&lid={$line_client_id}";
+        if($channel) {
+            $state .= "&ch={$channel}";
+        }
+        header('Location: /classroom/lib/line/login.php?state=' . base64_encode($state));
+        exit;
+    }
     if(empty($classroomCode)) {
         header('Location: /');
         exit;
@@ -16,8 +23,7 @@
             require __DIR__.'/views/register.php';
             break;
         default:
-            header('Location: /classroom/register/');
+            header('Location: /');
             exit;
     }
-    unset($_SESSION['is_result']);
 ?> 

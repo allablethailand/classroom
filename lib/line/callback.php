@@ -22,7 +22,7 @@
     if (!$code || !$state) {
         redirect($control_page);
     }
-    list($classroom_id, $line_client_id, $student_id, $channel_id) = parseState($state);
+    list($classroom_id, $line_client_id, $channel_id) = parseState($state);
     $register_url = LINEHelper::getRegisterUrl($classroom_id, $channel_id);
     $token_data = LINEHelper::getLineToken($line_client_id);
     if (!$token_data) {
@@ -41,11 +41,17 @@
     $displayName = isset($profile['displayName']) ? escape_string($profile['displayName']) : '';
     $pictureUrl = isset($profile['pictureUrl']) ? escape_string($profile['pictureUrl']) : '';
     $statusMessage = isset($profile['statusMessage']) ? escape_string($profile['statusMessage']) : '';
-    createConnectionIfNotExist($profile, $student_id);
+    createConnectionIfNotExist($profile);
     $classrooms = select_data("classroom_key", "classroom_template", "where classroom_id = '{$classroom_id}'");
     $classroom_key = $classrooms[0]['classroom_key'];
-    $hash_student_id = md5($student_id);
-    $_SESSION['is_result'] = true;
+    $students = select_data(
+        "student_id", "classroom_line_connect", "where userId = '{$userId}'"
+    );
+    if(!empty($students)) {
+        $student_id = $students[0]['student_id'];
+        $_SESSION['student_id'] = $student_id;
+        $_SESSION['userId'] = $userId;
+    }
     header("Location: /classroom/register/{$classroom_key}");
     exit;
 ?>
