@@ -38,7 +38,7 @@ const translations = {
         consent_notice: "Consent Notice",
         consent_paragraph: "This form has been created by the form owner. Any information you submit will be sent directly to the form owner. Allable is not responsible for the privacy practices or actions of third-party form owners. Please avoid submitting personal, sensitive, or confidential information, and never share your password.",
         consent_footer: "Please do not provide personal or sensitive information. Thank you for your understanding!",
-        reference: "Person Who Referred You (if any, please specify)",
+        reference: "Reference Person (if any, please specify)",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
