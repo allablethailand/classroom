@@ -63,7 +63,8 @@
                     END
                 ) as classroom_location,
                 template.classroom_information,
-                template.contact_us
+                template.contact_us,
+                template.comp_id
             ",
             "classroom_template template",
             "left join data_meeting_platforms pf on pf.platforms_id = template.classroom_plateform 
@@ -76,6 +77,7 @@
             'classroom_name' => ($classroom['classroom_name']) ? $classroom['classroom_name'] : '',
             'classroom_start' => ($classroom['classroom_start']) ? $classroom['classroom_start'] : '',
             'classroom_end' => ($classroom['classroom_end']) ? $classroom['classroom_end'] : '',
+            'comp_id' => ($classroom['comp_id']) ? $classroom['comp_id'] : '',
             'classroom_location' => ($classroom['classroom_location']) ? $classroom['classroom_location'] : '',
             'classroom_information' => ($classroom['classroom_information']) ? htmlspecialchars_decode($classroom['classroom_information']) : '',
             'contact_us' => ($classroom['contact_us']) ? htmlspecialchars_decode($classroom['contact_us']) : '',
@@ -116,7 +118,8 @@
         $origami_academy_logo = $domain_name . 'images/ogm_logo.png';
         $origami_academy_logo_img = '<img src="' . $origami_academy_logo . '" style="height:125px;">';
         $classroom = classroomData($classroom_id);
-        $tenant = select_data("tenant_key", "ogm_tenant", "where comp_id = '{$_SESSION['comp_id']}' and status = 0");
+        $comp_id = $classroom['comp_id'];
+        $tenant = select_data("tenant_key", "ogm_tenant", "where comp_id = '{$comp_id}' and status = 0");
         $tenant_url = $domain_name;
         if (!empty($tenant)) {
             $tenant_url .= $tenant[0]['tenant_key'];
