@@ -38,7 +38,7 @@ const translations = {
         consent_notice: "Consent Notice",
         consent_paragraph: "This form has been created by the form owner. Any information you submit will be sent directly to the form owner. Allable is not responsible for the privacy practices or actions of third-party form owners. Please avoid submitting personal, sensitive, or confidential information, and never share your password.",
         consent_footer: "Please do not provide personal or sensitive information. Thank you for your understanding!",
-        reference: "Person Who Referred You",
+        reference: "Person Who Referred You (if any, please specify)",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
@@ -73,7 +73,7 @@ const translations = {
         consent_notice: "หนังสือแจ้งเพื่อขอความยินยอม",
         consent_paragraph: "แบบฟอร์มนี้ถูกสร้างขึ้นโดยเจ้าของฟอร์ม ข้อมูลใด ๆ ที่คุณส่ง จะถูกส่งไปยังเจ้าของฟอร์มโดยตรง Allable จะไม่รับผิดชอบต่อการปฏิบัติด้านความเป็นส่วนตัวหรือการดำเนินการใด ๆ ของเจ้าของฟอร์มภายนอก โปรดหลีกเลี่ยงการส่งข้อมูลส่วนบุคคล ข้อมูลที่อ่อนไหว หรือข้อมูลลับ และอย่าเปิดเผยรหัสผ่านของคุณโดยเด็ดขาด",
         consent_footer: "กรุณางดให้ข้อมูลส่วนบุคคลหรือข้อมูลที่อ่อนไหว ขอบคุณในความเข้าใจของท่าน",
-        reference: "ผู้แนะนำให้มาสมัคร",
+        reference: "ผู้แนะนำให้มาสมัคร (ถ้ามีโปรดระบุ)",
     }
 };
 $(document).ready(function () {
