@@ -113,12 +113,13 @@
             'classroom_allow_register' => $classroom['classroom_allow_register']
         );
         $register_forms = select_data(
-            "register_template, register_require, shortcut_status, shortcut_field",
+            "register_template, register_require, shortcut_status, shortcut_field, shortcut_require",
             "classroom_template",
             "where classroom_id = '" . escape_string($classroom['classroom_id']) . "'"
         );
         $shortcut_status = $register_forms[0]['shortcut_status'];
         $shortcut_field = explode(',', $register_forms[0]['shortcut_field']);
+        $shortcut_require = explode(',', $register_forms[0]['shortcut_require']);
         $register_template = explode(',', $register_forms[0]['register_template']);
         $register_require = explode(',', $register_forms[0]['register_require']);
         $forms = select_data(
@@ -262,7 +263,7 @@
         } else {
             if($shortcut_status == 0) {
                 $register_template = $shortcut_field;
-                $register_require = $shortcut_field;
+                $register_require = $shortcut_require;
                 $form_data = array();
             } else {
                 $register_template = $register_template;
