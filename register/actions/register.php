@@ -376,6 +376,7 @@
             }
             $student_mobile = "'" . mysqli_real_escape_string($mysqli, $mobile) . "'";
         }
+        $ex_student_image_profile = isset($_POST['ex_student_image_profile']) ? $_POST['ex_student_image_profile'] : '';
         $student_company = isset($_POST['student_company']) ? initVal(trim($_POST['student_company'])) : "null";
         $student_position = isset($_POST['student_position']) ? initVal(trim($_POST['student_position'])) : "null";
         $student_username = isset($_POST['student_username']) ? initVal(trim($_POST['student_username'])) : "null";
@@ -649,6 +650,13 @@
                         "classroom_line_connect", "student_id = '{$student_id}', update_date = NOW()", "connect_id = '{$connect_id}'"
                     );
                 }
+            }
+            if($ex_student_image_profile == '') {
+                update_data(
+                    "classroom_student",
+                    "student_image_profile = null",
+                    "student_id = '{$student_id}'"
+                );
             }
             mysqli_commit($mysqli);
             echo json_encode(array('status' => true, 'student_id' => $student_id, 'tenant_url' => $tenant_url, 'message_success' => $message_success));
