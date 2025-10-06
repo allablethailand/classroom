@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/dist/css/jquery-ui.css">
 <link rel="stylesheet" href="/dist/css/select2.min.css">
 <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
 <link rel="stylesheet" href="/classroom/register/css/register.css?v=<?php echo time(); ?>">
 <script src="/dist/fontawesome-5.11.2/js/all.min.js"></script>
 <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js"></script>
@@ -24,6 +25,7 @@
 <script src="/classroom/register/js/register.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
 </head>
 <body>
 <input type="hidden" id="classroomCode" value="<?php echo $classroomCode; ?>">
@@ -79,9 +81,10 @@
                                 <div class="profile-upload" style="position:relative; display:inline-block;">
                                     <img id="profilePreview" src="/images/profile-default.jpg" onerror="this.src='/images/profile-default.jpg'" class="img-circle" style="width:120px;height:120px;object-fit:cover;border:2px solid #ddd; cursor:pointer;">
                                     <span for="student_image_profile" class="camera-icon" style="position:absolute; bottom:5px; right:5px; background:#fff; border-radius:50%; padding:6px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);"><i class="fa fa-camera"></i></span>
-                                    <button type="button" id="removeProfile" style="display:none; position:absolute; top:5px; right:5px; background:#f44336; color:#fff; border:none; border-radius:50%; width:25px; height:25px; line-height:0px; font-size:20px; cursor:pointer;">&times;</button>
+                                    <button type="button" id="removeProfile" style="display:none; position:absolute; top:5px; right:5px; background:#f44336; color:#fff; border:none; border-radius:50%; width:25px; height:25px; line-height:10px;  cursor:pointer;">&times;</button>
                                 </div>
                                 <input type="file" id="student_image_profile" name="student_image_profile" accept="image/*" style="display:none;">
+                                <input type="hidden" id="ex_student_image_profile" name="ex_student_image_profile">
                                 <p><label class="register-form" style="margin-top:10px;color:#888;" data-lang="upload_image"></label></p>
                             </div>
                             <div class="form-group form-input input-17 hidden">
@@ -212,7 +215,7 @@
                                 <input type="hidden" id="existing_work_certificate" name="existing_work_certificate">
                             </div>
                             <div class="form-group form-input input-21 hidden">
-                                <label class="register-form" for="company_certificate"><i class="fas fa-paperclip"></i> data-lang="company_certificate"</label>
+                                <label class="register-form" for="company_certificate"><i class="fas fa-paperclip"></i> <span data-lang="company_certificate"></span></label>
                                 <p class="text-orange" data-lang="support_upload" style="margin: 10px auto;"></p>
                                 <input type="file" class="form-control input-file" id="company_certificate" name="company_certificate" accept="image/*,.pdf">
                                 <input type="hidden" id="existing_company_certificate" name="existing_company_certificate">
