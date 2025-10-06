@@ -24,7 +24,7 @@ const translations = {
         registered: "Successfully registered.", 
         accept_register: "Accept and register",
         copy_of_idcard: "Copy of ID card",
-        copy_of_passport: "Passport",
+        copy_of_passport: "Copy of Passport",
         work_certificate: "Work certificate",
         company_certificate: "Company Certificate (for business owners)",
         support_upload: "Supports image or PDF files with a size not exceeding 20 MB only.",
@@ -121,16 +121,18 @@ $(document).ready(function () {
             reader.onload = function (e) {
                 $("#profilePreview").attr("src", e.target.result);
                 $("#removeProfile").show();
+                $("#ex_student_image_profile").val(e.target.result);
             }
             reader.readAsDataURL(file);
         }
     });
     $("#removeProfile").on("click", function() {
-        $("#student_image_profile").val("");
+        $("#ex_student_image_profile").val("");
         $("#profilePreview").attr("src", "/images/profile-default.jpg");
         $(this).hide();
     });
     $("#removeProfile").on("click", function () {
+        $("#student_image_profile").val("");
         $("#student_image_profile").val("");
         $("#profilePreview").attr("src", defaultProfile);
         $(this).hide();
@@ -293,14 +295,10 @@ $(document).ready(function () {
                 $("select[name='student_nationality']").val(data.student_nationality);
             }
             if (data.student_image_profile) {
-                const $imgPreview = $("#preview_student_image_profile");
-                if ($imgPreview.length) {
-                    $imgPreview.attr('src', data.student_image_profile).removeClass('hidden').show();
-                } else {
-                    $("input[name='student_image_profile']").after(
-                        '<img id="preview_student_image_profile" src="' + data.student_image_profile + '" class="img-thumbnail mt-2" style="max-width: 200px;">'
-                    );
-                }
+                const $imgPreview = $("#profilePreview");
+                $imgPreview.attr('src', data.student_image_profile);
+                $("#removeProfile").show();
+                $("#ex_student_image_profile").val(data.student_image_profile);
             }
             if (data.copy_of_idcard) {
                 showDocumentPreview('copy_of_idcard', data.copy_of_idcard, 'ID Card');
@@ -1040,6 +1038,17 @@ function initTemplate(data) {
     $(".classroom-information").html(data.classroom_information || '');
     $(".contact-us").html(data.contact_us || '');
     $(".comp-logo").attr("src", data.comp_logo || '');
+    $(".classroom-information img").css("cursor", "pointer");
+    $(".classroom-information img").each(function() {
+    var src = $(this).attr("src");
+    if (!$(this).parent().is("a[data-fancybox]")) {
+        $(this).wrap('<a data-fancybox="gallery" href="' + src + '"></a>');
+    }
+    });
+    Fancybox.bind("[data-fancybox='gallery']", {
+        Thumbs: { autoStart: true },
+        Toolbar: { display: ["zoom", "close"] }
+    });
 }
 function toggleLanguage(lang) {
     currentLang = lang;
