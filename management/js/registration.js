@@ -151,6 +151,8 @@ function getRegistrationTemplate() {
                     </th>
                     <th lang="en">Register Date</th>
                     <th lang="en">Student</th>
+                    <th lang="en">Attach Files</th>
+                    <th lang="en">Reference Person</th>
                     <th lang="en">Channel</th>
                     <th lang="en">Lead</th>
                     <th lang="en">Approve</th>
@@ -245,10 +247,7 @@ function buildRegistration() {
                 "data": "student_firstname_en",
                 "render": function (data,type,row,meta) {	
 					var {
-						student_firstname_en, student_lastname_en, student_firstname_th, student_lastname_th,
-						student_nickname_en, student_nickname_th, student_gender = 'O', student_idcard,
-						student_passport, student_image_profile, student_email, student_mobile,
-						student_birth_date, student_age, student_username, student_password, student_company, student_position
+                        student_perfix, student_perfix_th, student_firstname_en, student_lastname_en, student_firstname_th, student_lastname_th, student_nickname_en, student_nickname_th, student_gender = 'O', student_idcard, student_passport, student_passport_expire, student_image_profile, student_email, student_mobile, student_company, student_position, student_username, student_password, student_birth_date, student_age, nationality_name
 					} = row;
                     var student_gender = {
 						'M': '<div class="text-info"><i class="fas fa-male"></i> <span lang="en">Male</span></div>',
@@ -266,75 +265,123 @@ function buildRegistration() {
 								<img src="${student_image_profile}" onerror="this.src='${img_error}'" alt="Profile Image">
 							</div>
 							${(student_firstname_en || student_lastname_en) ? `
-							<div class="text-orange text-center" style="margin-bottom:10px;">
-								<b>${student_firstname_en || ''} ${student_lastname_en || ''}</b>
-							</div>` : ''}
+                                <div class="text-orange text-center" style="margin-bottom:10px;">
+                                    <b>${student_perfix || ''} ${student_firstname_en || ''} ${student_lastname_en || ''}</b>
+                                </div>` : ''}
 							${(student_firstname_th || student_lastname_th) ? `
-							<div class="text-orange text-center" style="margin-bottom:10px;">
-								<b>${(student_firstname_th || '')} ${(student_lastname_th || '')}</b>
-							</div>` : ''}
+                                <div class="text-orange text-center" style="margin-bottom:10px;">
+                                    <b>${student_perfix_th || ''} ${(student_firstname_th || '')} ${(student_lastname_th || '')}</b>
+                                </div>` : ''}
 							<div class="text-center" style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; font-weight: 600;">
 								${student_nickname_en ? `<span><i class="fas fa-user-tag"></i> ${student_nickname_en}</span>` : ''}
 								${student_nickname_th ? `<span><i class="fas fa-user-tag"></i> ${student_nickname_th}</span>` : ''}
 								${student_gender || ''}
 							</div>
-						<div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
-							<i class="fas fa-building"></i>
-							<span>${student_company || '-'}</span>
-						</div>
-						<div style="font-size:11px; display:flex; gap:6px; word-break: break-all;">
-							<i class="fas fa-briefcase"></i>
-							<span>${student_position || '-'}</span>
-						</div>
-						<div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
-							<i class="fas fa-phone-volume"></i>
-							<span>${student_mobile || '-'}</span>
-						</div>
-						<div style="font-size:11px; display:flex; gap:6px; word-break: break-all;">
-							<i class="fas fa-envelope-open-text"></i>
-							<span>${student_email || '-'}</span>
-						</div>
-						${( (student_birth_date && student_birth_date !== '0000/00/00') || student_age ) ? `
-							<div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
-								<i class="fas fa-birthday-cake"></i>
-								<span>${student_birth_date || '-'}</span>
-								<span lang="en" style="margin-left:6px;">Age</span> <span>${student_age || ''}</span>
-							</div>` : ''}
-						${(student_username || student_password) ? `
-							<div style="font-size:11px; margin-top:10px;">
-							${student_username ? `
-								<div style="display:flex; gap:6px; word-break: break-all;">
-									<i class="fas fa-user-circle"></i>
-									<span class="copy-text" data-copy="${student_username}">
-									${student_username}
-									<a href="javascript:void(0);" onclick="copyToClipboard('${student_username}')">
-										<i class="far fa-copy"></i>
-									</a>
-									</span>
-								</div>` : ''}
-							${student_password ? `
-								<div style="display:flex; gap:6px; word-break: break-all;">
-									<i class="fas fa-unlock-alt"></i>
-									<span class="copy-text" data-copy="${student_password}">
-									${student_password}
-									<a href="javascript:void(0);" onclick="copyToClipboard('${student_password}')">
-										<i class="far fa-copy"></i>
-									</a>
-									</span>
-								</div>` : ''}
-							</div>` : ''}
+                            ${ (student_idcard) ? `
+                                <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                    <i class="fas fa-address-card"></i>
+                                    <span>${student_idcard || '-'}</span>
+                                </div>` : ''}
+                            ${ (student_passport) ? `
+                                <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                    <i class="fas fa-passport"></i>
+                                    <span>${student_passport || '-'}</span>
+                                </div>` : ''}
+                            ${ (student_passport_expire && student_passport_expire !== '0000/00/00') ? `
+                                <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>${student_passport_expire || '-'}</span>
+                                </div>` : ''}
+                            ${ (nationality_name) ? `
+                                <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                    <i class="fas fa-globe"></i>
+                                    <span>${nationality_name || '-'}</span>
+                                </div>` : ''}
+                            <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                <i class="fas fa-building"></i>
+                                <span>${student_company || '-'}</span>
+                            </div>
+                            <div style="font-size:11px; display:flex; gap:6px; word-break: break-all;">
+                                <i class="fas fa-briefcase"></i>
+                                <span>${student_position || '-'}</span>
+                            </div>
+                            <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                <i class="fas fa-phone-volume"></i>
+                                <span>${student_mobile || '-'}</span>
+                            </div>
+                            <div style="font-size:11px; display:flex; gap:6px; word-break: break-all;">
+                                <i class="fas fa-envelope-open-text"></i>
+                                <span>${student_email || '-'}</span>
+                            </div>
+                            ${( (student_birth_date && student_birth_date !== '0000/00/00') || student_age ) ? `
+                                <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                    <i class="fas fa-birthday-cake"></i>
+                                    <span>${student_birth_date || '-'}</span>
+                                    <span lang="en" style="margin-left:6px;">Age</span> <span>${student_age || ''}</span>
+                                </div>` : ''}
+						    ${(student_username || student_password) ? `
+							    <div style="font-size:11px; margin-top:10px;">
+                                    ${student_username ? `
+                                        <div style="display:flex; gap:6px; word-break: break-all;">
+                                            <i class="fas fa-user-circle"></i>
+                                            <span class="copy-text" data-copy="${student_username}">
+                                            ${student_username}
+                                            <a href="javascript:void(0);" onclick="copyToClipboard('${student_username}')">
+                                                <i class="far fa-copy"></i>
+                                            </a>
+                                            </span>
+                                        </div>` : ''}
+                                    ${student_password ? `
+                                        <div style="display:flex; gap:6px; word-break: break-all;">
+                                            <i class="fas fa-unlock-alt"></i>
+                                            <span class="copy-text" data-copy="${student_password}">
+                                            ${student_password}
+                                            <a href="javascript:void(0);" onclick="copyToClipboard('${student_password}')">
+                                                <i class="far fa-copy"></i>
+                                            </a>
+                                            </span>
+                                        </div>` : ''}
+							    </div>` : ''}
 						</div>
 					`;
                 }
             },{ 
                 "targets": 4,
+                "render": function (data,type,row,meta) {	
+                    var {
+                        copy_of_idcard, copy_of_passport, work_certificate, company_certificate
+					} = row;
+                    return `
+                        ${(copy_of_idcard) ? `
+                            <div><a onclick="viewFile('${copy_of_idcard}', 'Copy of ID card')"><i class="fas fa-link"></i> <span lang="en">Copy of ID card</span></a></div>
+                            ` : ``} 
+                        ${(copy_of_passport) ? `
+                            <div><a onclick="viewFile('${copy_of_idcard}', 'Copy of Passport')"><i class="fas fa-link"></i> <span lang="en">Copy of Passport</span></a></div>
+                            ` : ``} 
+                        ${(work_certificate) ? `
+                            <div><a onclick="viewFile('${copy_of_idcard}', 'Work certificate')"><i class="fas fa-link"></i> <span lang="en">Work certificate</span></a></div>
+                            ` : ``} 
+                        ${(company_certificate) ? `
+                            <div><a onclick="viewFile('${copy_of_idcard}', 'Company Certificate (for business owners)')"><i class="fas fa-link"></i> <span lang="en">Company Certificate (for business owners)</span></a></div>
+                            ` : ``} 
+                    `;
+                }
+            },{ 
+                "targets": 5,
+                "data": "student_reference",
+                "render": function (data,type,row,meta) {	
+                    let student_reference = row['student_reference'] || "";
+                    return student_reference;
+                }
+            },{ 
+                "targets": 6,
                 "data": "channel_name",
                 "render": function (data,type,row,meta) {	
                     let channel_name = row['channel_name'] || "";
                     return channel_name;
                 }
             },{ 
-                "targets": 5,
+                "targets": 7,
                 "data": "invite_status",
                 "render": function (data,type,row,meta) {	
                     let invite_status = row['invite_status'] || "-";
@@ -385,7 +432,7 @@ function buildRegistration() {
 					return mockup;
                 }
             },{ 
-                "targets": 6,
+                "targets": 8,
                 "data": "approve_status",
                 "render": function (data,type,row,meta) {	
 					let approve_status = row['approve_status'] || "-";
@@ -439,7 +486,7 @@ function buildRegistration() {
 					return mockup;
                 }
             },{ 
-                "targets": 7,
+                "targets": 9,
                 "data": "payment_status",
                 "render": function (data,type,row,meta) {	
 					let payment_status = row['payment_status'] || "-";
@@ -493,12 +540,12 @@ function buildRegistration() {
 					return mockup;
                 }
             },{ 
-                "targets": 8,
+                "targets": 10,
                 "render": function (data,type,row,meta) {	
 					return ``;
                 }
             },{ 
-                "targets": 9,
+                "targets": 11,
                 "data": "join_id",
                 "className": "text-center",
                 "render": function (data,type,row,meta) {	
@@ -510,51 +557,51 @@ function buildRegistration() {
                     `;
                 }
             },{ 
-                "targets": 10,
+                "targets": 12,
                 "data": "student_firstname_en",
                 "visible": false,
             },{ 
-                "targets": 11,
+                "targets": 13,
                 "data": "student_lastname_en",
                 "visible": false,
             },{ 
-                "targets": 12,
+                "targets": 14,
                 "data": "student_firstname_th",
                 "visible": false,
             },{ 
-                "targets": 13,
+                "targets": 15,
                 "data": "student_lastname_th",
                 "visible": false,
             },{ 
-                "targets": 14,
+                "targets": 16,
                 "data": "student_nickname_en",
                 "visible": false,
             },{ 
-                "targets": 15,
+                "targets": 17,
                 "data": "student_nickname_th",
                 "visible": false,
             },{ 
-                "targets": 16,
+                "targets": 18,
                 "data": "student_mobile",
                 "visible": false,
             },{ 
-                "targets": 17,
+                "targets": 19,
                 "data": "student_email",
                 "visible": false,
             },{ 
-                "targets": 18,
+                "targets": 20,
                 "data": "student_idcard",
                 "visible": false,
             },{ 
-                "targets": 19,
+                "targets": 21,
                 "data": "student_passport",
                 "visible": false,
             },{ 
-                "targets": 20,
+                "targets": 22,
                 "data": "student_company",
                 "visible": false,
             },{ 
-                "targets": 21,
+                "targets": 23,
                 "data": "student_position",
                 "visible": false,
             }]
@@ -563,7 +610,7 @@ function buildRegistration() {
         $('div#tb_registration_filter.dataTables_filter label span').remove();
         var template = `
             <input type="search" class="form-control input-sm search-datatable" placeholder="" autocomplete="off" style="margin-bottom:0px !important;">
-            <button type="button" class="btn btn-white text-green" style="font-size:12px;" onclick="importStudent('')"><i class="fas fa-file-excel"></i> <span lang="en">Import</span></button> 
+            <button type="button" class="btn btn-white text-green hidden" style="font-size:12px;" onclick="importStudent('')"><i class="fas fa-file-excel"></i> <span lang="en">Import</span></button> 
         `;
         $('div#tb_registration_filter.dataTables_filter input').hide();
         $('div#tb_registration_filter.dataTables_filter label').append(template);
@@ -584,6 +631,26 @@ function buildRegistration() {
             }
         });
     }
+}
+function viewFile(fileUrl, fileTitle) {
+    $(".systemModal").modal();
+    $(".systemModal .modal-header").html(`<h5 class="modal-title" lang="en">${fileTitle}</h5>`);
+    const ext = fileUrl.split('.').pop().toLowerCase();
+    let content = '';
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+        content = `<img src="${fileUrl}" alt="Preview" class="img-fluid" style="max-width:100%; height:auto;">`;
+    } else if (ext === 'pdf') {
+        const gviewUrl = "https://docs.google.com/gview?embedded=true&url=" + encodeURIComponent(fileUrl);
+        content = `
+            <iframe src="${gviewUrl}" width="100%" height="500px" style="border:none;"></iframe>
+        `;
+    }
+    $(".systemModal .modal-body").html(content);
+    $(".systemModal .modal-footer").html(`
+        <div class="text-center">
+            <button type="button" class="btn btn-default" data-lang="close" data-dismiss="modal">Close</button>
+        </div>
+    `);
 }
 function editRegistration(student_id) {
     $.redirect(`form?type=student&id=${student_id}`,{classroom_id: classroom_id},'post','_vlank');

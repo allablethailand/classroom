@@ -77,6 +77,16 @@
             ifnull(cjoin.payment_status, 0) as payment_status,
             date_format(cjoin.payment_status_date, '%Y/%m/%d %H:%i:%s') as payment_status_date,
             CONCAT(IFNULL(i_payment.firstname,i_payment.firstname_th),' ',IFNULL(i_payment.lastname,i_payment.lastname_th)) AS payment_status_by,
+            case
+                when stu.student_perfix = 'Other' then stu.student_perfix_other
+                else stu.student_perfix
+            end as student_perfix,
+            case
+                when stu.student_perfix = 'Other' then stu.student_perfix_other
+                when stu.student_perfix = 'Mr.' then 'นาย'
+                when stu.student_perfix = 'Mrs.' then 'นาง'
+                when stu.student_perfix = 'Miss' then 'นางสาว'
+            end as student_perfix_th,
             stu.student_firstname_en,
             stu.student_lastname_en,
             stu.student_firstname_th,
@@ -86,33 +96,32 @@
             stu.student_gender,
             stu.student_idcard,
             stu.student_passport,
+            stu.student_passport_expire,
             stu.student_image_profile,
             stu.student_email,
             concat(stu.dial_code,'',stu.student_mobile) as student_mobile,
+            stu.student_company,
+            stu.student_position,
+            stu.student_username,
+            stu.student_password,
+            n.nationality_name,
+            stu.student_reference,
             date_format(stu.student_birth_date, '%Y/%m/%d') as student_birth_date,
             CASE  WHEN stu.student_birth_date IS NULL OR stu.student_birth_date = '' THEN ''
             ELSE CONCAT(TIMESTAMPDIFF(YEAR, stu.student_birth_date, CURDATE()), ' Yrs.') END as student_age,
-            (
-                CASE
-                    when ifnull(cjoin.approve_status, 0) = 1 then stu.student_username
-                    else ''
-                END
-            ) as student_username,
-            (
-                CASE
-                    when ifnull(cjoin.approve_status, 0) = 1 then stu.student_password
-                    else ''
-                END
-            ) as student_password,
             stu.student_password_key,
-            stu.student_company,
-            stu.student_position,
             c.channel_name,
-            cjoin.student_id 
+            cjoin.student_id,
+            stu.copy_of_idcard,
+            stu.copy_of_passport,
+            stu.work_certificate,
+            stu.company_certificate
         FROM 
             classroom_student_join cjoin
         LEFT JOIN 
             classroom_student stu on stu.student_id = cjoin.student_id 
+        LEFT JOIN 
+            m_nationality n on n.nationality_id = stu.student_nationality
         LEFT JOIN 
             m_employee_info i_invite on i_invite.emp_id = cjoin.invite_by
         LEFT JOIN 
@@ -138,6 +147,8 @@
             array('db' => 'payment_status', 'dt' => 'payment_status'),
             array('db' => 'payment_status_date', 'dt' => 'payment_status_date'),
             array('db' => 'payment_status_by', 'dt' => 'payment_status_by'),
+            array('db' => 'student_perfix', 'dt' => 'student_perfix'),
+            array('db' => 'student_perfix_th', 'dt' => 'student_perfix_th'),
             array('db' => 'student_firstname_en', 'dt' => 'student_firstname_en'),
             array('db' => 'student_lastname_en', 'dt' => 'student_lastname_en'),
             array('db' => 'student_firstname_th', 'dt' => 'student_firstname_th'),
@@ -147,22 +158,60 @@
             array('db' => 'student_gender', 'dt' => 'student_gender'),
             array('db' => 'student_idcard', 'dt' => 'student_idcard'),
             array('db' => 'student_passport', 'dt' => 'student_passport'),
-            array('db' => 'student_image_profile', 'dt' => 'student_image_profile','formatter' => function ($d, $row) {
-                return GetUrl($d);
-			}),
+            array('db' => 'student_passport_expire', 'dt' => 'student_passport_expire'),
+            array(
+                'db' => 'student_image_profile',
+                'dt' => 'student_image_profile',
+                'formatter' => function ($d, $row) {
+                    return ($d) ? GetPublicUrl($d) : '';
+                }
+            ),
+            array(
+                'db' => 'copy_of_idcard',
+                'dt' => 'copy_of_idcard',
+                'formatter' => function ($d, $row) {
+                    return ($d) ? GetPublicUrl($d) : '';
+                }
+            ),
+            array(
+                'db' => 'copy_of_passport',
+                'dt' => 'copy_of_passport',
+                'formatter' => function ($d, $row) {
+                    return ($d) ? GetPublicUrl($d) : '';
+                }
+            ),
+            array(
+                'db' => 'work_certificate',
+                'dt' => 'work_certificate',
+                'formatter' => function ($d, $row) {
+                    return ($d) ? GetPublicUrl($d) : '';
+                }
+            ),
+            array(
+                'db' => 'company_certificate',
+                'dt' => 'company_certificate',
+                'formatter' => function ($d, $row) {
+                    return ($d) ? GetPublicUrl($d) : '';
+                }
+            ),
             array('db' => 'student_email', 'dt' => 'student_email'),
             array('db' => 'student_mobile', 'dt' => 'student_mobile'),
-            array('db' => 'student_birth_date', 'dt' => 'student_birth_date'),
-            array('db' => 'student_age', 'dt' => 'student_age'),
             array('db' => 'student_company', 'dt' => 'student_company'),
             array('db' => 'student_position', 'dt' => 'student_position'),
-            array('db' => 'channel_name', 'dt' => 'channel_name'),
             array('db' => 'student_username', 'dt' => 'student_username'),
             array('db' => 'student_password_key', 'dt' => 'student_password_key'),
-            array('db' => 'student_password', 'dt' => 'student_password','formatter' => function ($d, $row) {
-                return ($d) ? decryptToken($d, $row['student_password_key']) : '';
-			}),
-		);
+            array(
+                'db' => 'student_password',
+                'dt' => 'student_password',
+                'formatter' => function ($d, $row) {
+                    return ($d) ? decryptToken($d, $row['student_password_key']) : '';
+                }
+            ),
+            array('db' => 'student_reference', 'dt' => 'student_reference'),
+            array('db' => 'student_birth_date', 'dt' => 'student_birth_date'),
+            array('db' => 'student_age', 'dt' => 'student_age'),
+            array('db' => 'channel_name', 'dt' => 'channel_name')
+        );
 		$sql_details = array('user' => $db_username,'pass' => $db_pass_word,'db'   => $db_name,'host' => $db_host);
 		require($base_include.'/lib/ssp-subquery.class.php');
 		echo json_encode(SSP::simple($_POST, $sql_details, $table, $primaryKey, $columns));
