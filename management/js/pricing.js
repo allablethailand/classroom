@@ -225,7 +225,7 @@ function managePrice(ticket_id) {
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h5 class="modal-title" lang="en">Pricing Management</h5>    
     `);
-     $(".systemModal .modal-body").html(`
+    $(".systemModal .modal-body").html(`
         <form id="ticket_form">
             <input type="hidden" name="ticket_id" value="${ticket_id}">
             <p><span lang="en">Price Type</span> <code>*</code></p>

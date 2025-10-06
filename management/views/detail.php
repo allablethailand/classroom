@@ -100,6 +100,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.css" integrity="sha512-BB0bszal4NXOgRP9MYCyVA0NNK2k1Rhr+8klY17rj4OhwTmqdPUQibKUDeHesYtXl7Ma2+tqC6c7FzYuHhw94g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 </head>
 <body>
 <?php require_once "../../include_header.php"; ?>
@@ -161,15 +163,7 @@
             </div>
             <div class="classroom_form_tab tab-pane fade in" id="classroom_form_tab">
                 <div class="menu-container">
-                    <div 
-                        v-for="tab in formTabs" 
-                        :key="tab.name" 
-                        class="sub-menus" 
-                        :class="{ active: currentTab === tab.name }"
-                        @click="selectMune(tab.name)">
-                        <i :class="tab.icon"></i>
-                        <span>{{ tab.label }}</span>
-                    </div>
+                    <div v-for="tab in formTabs" :key="tab.name" class="sub-menus" :class="{ active: currentTab === tab.name }" @click="selectMune(tab.name)"><i :class="tab.icon"></i><span>{{ tab.label }}</span></div>
                 </div>
                 <div class="menu-content" v-loading="loading_page">
                     <div v-if="currentTab === 'classroom-form-builder'" ref="classroom-form-builder">
@@ -179,14 +173,11 @@
                                 <input v-model="formName" ref="form-name" placeholder="Form Name" class="form-name-input" maxlength="250"/>
                             </div>
                             <question-type-modal v-show="showModal" @confirm="confirmType" @close="closeModal"></question-type-modal>
-                            
                             <div v-if="questions.length && loading_menu === false">
                                 <form-builder :questions="questions"></form-builder>
                             </div>
                             <div v-else class="form-container">
-                                <div style="text-align: center;color: #ddd;">
-                                    <h4>No Question</h4>
-                                </div>
+                                <div style="text-align: center;color: #ddd;"><h4>No Question</h4></div>
                             </div>
                             <button @click="onSaveForms" class="save-question-button btn btn-warning"><i class="fas fa-save"></i> Save Form</button>
                             <button @click="addQuestion" class="add-question-button btn btn-primary"><i class="fas fa-plus"></i> Add Question</button>
@@ -197,18 +188,8 @@
                             <div class="form-container response-form">
                                 <h4 class="form-title mb-2">&ldquo;{{ formName }}&rdquo;</h4>
                                 <div class="response-menu-container mb-3">
-                                    <div 
-                                        class="response-sub-menus" 
-                                        :class="{ active: responseType === 'Summary' }"
-                                        @click="switchResponseType('Summary')">
-                                        Summary
-                                    </div>
-                                    <div 
-                                        class="response-sub-menus" 
-                                        :class="{ active: responseType === 'Question' }" 
-                                        @click="switchResponseType('Question')">
-                                        Question
-                                    </div>
+                                    <div class="response-sub-menus" :class="{ active: responseType === 'Summary' }" @click="switchResponseType('Summary')">Summary</div>
+                                    <div class="response-sub-menus" :class="{ active: responseType === 'Question' }" @click="switchResponseType('Question')">Question</div>
                                 </div>
                             </div>
                             <div v-if="questions.length && responseType === 'Summary'">
@@ -227,40 +208,17 @@
                                     <div class="row">
                                         <div class="col col-xs-12 col-sm-6 form-group export-filter">
                                             <label for="export-filter-date"><i class="far fa-calendar"></i> Time stamp</label>
-                                            <el-daterange-picker 
-                                            :value="form_export.excel.filter_date"
-                                            @update="handleUpdateDateFilter"
-                                            custom-class="form-control export-filters"
-                                            name="export-filter-date" 
-                                            id="export-filter-date"  
-                                            :disabled="exporting"
-                                            />
+                                            <el-daterange-picker :value="form_export.excel.filter_date" @update="handleUpdateDateFilter" custom-class="form-control export-filters" name="export-filter-date" id="export-filter-date"  :disabled="exporting"/>
                                         </div>
                                         <div class="col col-xs-12 col-sm-6 form-group export-filter">
                                             <label for="export-filter-gender"><i class="fas fa-venus-mars"></i> Gender</label>
-                                            <select 
-                                            v-model="form_export.excel.filter_gender"
-                                            ref="export-filter-gender" 
-                                            name="export-filter-gender" 
-                                            id="export-filter-gender" 
-                                            class="form-control select2 export-filters" 
-                                            placeholder="Select Gender"
-                                            :disabled="exporting"
-                                            >
+                                            <select v-model="form_export.excel.filter_gender" ref="export-filter-gender" name="export-filter-gender" id="export-filter-gender" class="form-control select2 export-filters" placeholder="Select Gender" :disabled="exporting">
                                                 <option value=""></option>
                                             </select>
                                         </div>
                                         <div class="col col-xs-12 col-sm-6 form-group export-filter">
                                             <label for="export-filter-user"><i class="fas fa-chalkboard-teacher"></i> User</label>
-                                            <select 
-                                            v-model="form_export.excel.filter_user"
-                                            ref="export-filter-user" 
-                                            name="export-filter-user" 
-                                            id="export-filter-user" 
-                                            class="form-control select2 export-filters" 
-                                            placeholder="Select User"
-                                            :disabled="exporting"
-                                            >
+                                            <select v-model="form_export.excel.filter_user" ref="export-filter-user" name="export-filter-user" id="export-filter-user" class="form-control select2 export-filters" placeholder="Select User" :disabled="exporting">
                                                 <option value=""></option>
                                             </select>
                                         </div>
@@ -268,12 +226,7 @@
                                 </div>
                             </div>
                             <div class="form-container export-form-actions text-right">
-                                <el-button title="Export Excel" v-loading="exporting" :disabled="exporting" class="btn btn-white success" @click="exportExcel">
-                                    <span>
-                                        <i class="far fa-file-excel"></i> 
-                                        Export Excel
-                                    </span>
-                                </el-button>
+                                <el-button title="Export Excel" v-loading="exporting" :disabled="exporting" class="btn btn-white success" @click="exportExcel"><span><i class="far fa-file-excel"></i> Export Excel</span></el-button>
                             </div>
                         </div>
                     </div>
@@ -290,6 +243,15 @@
                 <button type="button" class="close" onclick="closeTemplate()">&times;</button>
                 <h4 class="modal-title"></h4>
             </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+<div class="modal fade previewModal" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"></div>
             <div class="modal-body"></div>
             <div class="modal-footer"></div>
         </div>

@@ -6,7 +6,6 @@
     max-width: 600px;
     margin: auto;
     margin-bottom: 16px;
-    font-size: 14px;
 }
 .form-container.questions, .form-container.response-questions {
     border-left: 5px solid transparent;
@@ -28,7 +27,6 @@
     border-left: 5px solid #07006F !important;
 }
 .form-title {
-    font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
     text-align: center;
@@ -39,10 +37,6 @@
     margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 14px;
-}
-.form-control {
-    font-size: 14px !important;
 }
 .question-type > h4 {
     font-weight: bold;
@@ -51,9 +45,6 @@
     background-color: #d2d2d240;
     border-radius: 4px;
 }
-.btn {
-    font-size: 12px;
-}
 .buttons {
     color: white;
     border: none;
@@ -61,7 +52,6 @@
     padding: 10px 15px;
     cursor: pointer;
     margin: 5px 0;
-    font-size: 14px;
 }
 .buttons.default-button {
     background-color: #d5d5d5;
@@ -80,7 +70,6 @@
     padding: 10px 15px;
     cursor: pointer;
     margin: 5px 0;
-    font-size: 14px;
 }
 button.save-question-button {
     color: white;
@@ -89,7 +78,6 @@ button.save-question-button {
     padding: 10px 15px;
     cursor: pointer;
     margin: 5px 0;
-    font-size: 14px;
     width: 130px;
     position: fixed;
     z-index: 10;
@@ -139,7 +127,6 @@ input.new-option-input {
     padding: 10px 15px;
     cursor: pointer;
     margin: 5px 0;
-    font-size: 14px;
 }
 .remove-question-button:hover {
     background-color: #c20f0f;
@@ -186,7 +173,6 @@ input.new-option-input {
     background: none;
     border: none;
     color: red;
-    font-size: 16px;
     cursor: pointer;
     width: 40px;
     height: 40px;
@@ -242,7 +228,6 @@ input:checked + .slider:before {
 .label-text {
     margin-left: 10px; 
     vertical-align: middle;
-    font-size: 12px;
     color: #333;
 }
 .modal-form-type {
@@ -275,7 +260,6 @@ input:checked + .slider:before {
     width: fit-content;
     padding: 6px 9px;
     background-color: #ddd;
-    font-size: 14px;
     color: #fff;
     border-radius: 4px;
     margin: 2rem auto;
@@ -304,7 +288,6 @@ input:checked + .slider:before {
     padding: 20px;
 }
 .loading-spinner {
-    font-size: 18px;
     color: #666;
 }
 .d-flex {
@@ -318,11 +301,9 @@ input:checked + .slider:before {
     align-items: center;
 }
 .q-label {
-    font-size: 18px !important;
     font-weight: 400;
 }
 .a-lable {
-    font-size: 18px !important;
     font-weight: 400;
 }
 .text-deafault {
@@ -340,21 +321,18 @@ input:checked + .slider:before {
     color: #fff;
 }
 .count-answer-label {
-    font-size: 16px;
     background-color: #07006F15;
     color: #07006F;
     padding: 4px 8px;
     border-radius: 4px;
 }
 .zero-count-answer-label {
-    font-size: 16px;
     background-color: #eeeeeec2;
     color: #777;
     padding: 4px 8px;
     border-radius: 4px;
 }
 .text-answer-label {
-    font-size: 16px;
     color: #07006f;
     height: 26px;
 }
@@ -373,7 +351,6 @@ input:checked + .slider:before {
     padding: 2px 10px;
     border: 1px solid #ddd;
     margin-bottom: 10px;
-    font-size: 14px;
     border-radius: 4px;
     min-height: 38px;
     display: flex;
@@ -390,7 +367,6 @@ input:checked + .slider:before {
 .response-sub-menus {
     background-color: #fff;
     color: #333;
-    font-size: 16px;
     cursor: pointer;
     border: 0;
     min-width: 90px;

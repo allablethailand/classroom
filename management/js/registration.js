@@ -208,7 +208,7 @@ function buildRegistration() {
 			"responsive": true,
 			"searchDelay": 1000,
 			"deferRender": false,
-			"drawCallback": function( settings ) {
+			"drawCallback": function(settings) {
 				var lang = new Lang();
 				lang.dynamic('th', '/js/langpack/th.json?v='+Date.now());
 				lang.init({
@@ -551,7 +551,7 @@ function buildRegistration() {
                 "render": function (data,type,row,meta) {	
 					return `
                         <div class="nowarp">
-                            <button type="button" class="btn btn-warning btn-circle" onclick="editRegistration(${row['student_id']})"><i class="fas fa-pencil-alt"></i></button> 
+                            <button type="button" class="btn btn-warning btn-circle" onclick="manageRegistration(${row['student_id']})"><i class="fas fa-pencil-alt"></i></button> 
                             <button type="button" class="btn btn-red btn-circle" onclick="delRegistration(${data})"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     `;
@@ -610,6 +610,7 @@ function buildRegistration() {
         $('div#tb_registration_filter.dataTables_filter label span').remove();
         var template = `
             <input type="search" class="form-control input-sm search-datatable" placeholder="" autocomplete="off" style="margin-bottom:0px !important;">
+            <button type="button" class="btn btn-green" style="font-size:12px;" onclick="manageRegistration('')"><i class="fas fa-plus"></i> <span lang="en">Student</span></button> 
             <button type="button" class="btn btn-white text-green hidden" style="font-size:12px;" onclick="importStudent('')"><i class="fas fa-file-excel"></i> <span lang="en">Import</span></button> 
         `;
         $('div#tb_registration_filter.dataTables_filter input').hide();
@@ -633,8 +634,8 @@ function buildRegistration() {
     }
 }
 function viewFile(fileUrl, fileTitle) {
-    $(".systemModal").modal();
-    $(".systemModal .modal-header").html(`<h5 class="modal-title" lang="en">${fileTitle}</h5>`);
+    $(".previewModal").modal();
+    $(".previewModal .modal-header").html(`<h5 class="modal-title" lang="en">${(fileTitle || '')}</h5>`);
     const ext = fileUrl.split('.').pop().toLowerCase();
     let content = '';
     if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
@@ -645,15 +646,594 @@ function viewFile(fileUrl, fileTitle) {
             <iframe src="${gviewUrl}" width="100%" height="500px" style="border:none;"></iframe>
         `;
     }
-    $(".systemModal .modal-body").html(content);
-    $(".systemModal .modal-footer").html(`
+    $(".previewModal .modal-body").html(content);
+    $(".previewModal .modal-footer").html(`
         <div class="text-center">
-            <button type="button" class="btn btn-default" data-lang="close" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" lang="en">Close</button>
         </div>
     `);
 }
-function editRegistration(student_id) {
-    $.redirect(`form?type=student&id=${student_id}`,{classroom_id: classroom_id},'post','_vlank');
+function manageRegistration(student_id) {
+    $(".systemModal").modal();
+    $(".systemModal .modal-header").html(`
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h5 class="modal-title" lang="en">Student Management</h5>    
+    `);
+    $(".systemModal .modal-body").html(`
+        <form id="registrationForm">
+            <input type="hidden" name="student_id" value="${student_id}">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group input-15 text-center" style="margin-top:20px;">
+                        <div class="profile-upload" style="position:relative; display:inline-block;">
+                            <img id="profilePreview" src="/images/profile-default.jpg" onerror="this.src='/images/profile-default.jpg'" class="img-circle" style="width:120px;height:120px;object-fit:cover;border:2px solid #ddd; cursor:pointer;">
+                            <span for="student_image_profile" class="camera-icon" style="position:absolute; bottom:5px; right:5px; background:#fff; border-radius:50%; padding:6px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);"><i class="fa fa-camera"></i></span>
+                            <button type="button" id="removeProfile" style="display:none; position:absolute; top:5px; right:5px; background:#f44336; color:#fff; border:none; border-radius:50%; width:25px; height:25px; line-height:10px;  cursor:pointer;">&times;</button>
+                        </div>
+                        <input type="file" id="student_image_profile" name="student_image_profile" accept="image/*" style="display:none;">
+                        <input type="hidden" id="ex_student_image_profile" name="ex_student_image_profile">
+                        <p><label class="register-form" style="margin-top:10px;color:#888;" lang="en">Upload Image</label></p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-17">
+                        <label class="register-form" for="student_idcard" lang="en">ID Card</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control " id="student_idcard" name="student_idcard" autocomplete="off" maxlength="13">
+                            <span class="input-group-addon"><i class="fas fa-address-card"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-18">
+                        <label class="register-form" for="student_passport" lang="en">Passport</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="student_passport" name="student_passport" autocomplete="off">
+                            <span class="input-group-addon"><i class="fas fa-passport"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-24">
+                        <label class="register-form" for="student_passport_expire" lang="en">Passport Expire</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control datepicker-past" id="student_passport_expire" name="student_passport_expire" autocomplete="off">
+                            <span class="input-group-addon"><i class="far fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-16">
+                        <label class="register-form" for="studentstudent_perfix_gender" lang="en">Prefix</label>
+                        <select class="form-control" id="student_perfix" name="student_perfix">
+                            <option value=""></option>
+                            <option value="Mr.">Mr.</option>
+                            <option value="Mrs.">Mrs.</option>
+                            <option value="Miss">Miss</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" class="form-control prefix-other hidden" id="student_perfix_other" name="student_perfix_other" style="margin-top: 10px;">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-1">
+                        <label class="register-form" for="student_firstname_en" lang="en">Firstname (EN)</label>
+                        <input type="text" class="form-control" id="student_firstname_en" name="student_firstname_en" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-2">
+                        <label class="register-form" for="student_lastname_en" lang="en">Lastname (EN)</label>
+                        <input type="text" class="form-control" id="student_lastname_en" name="student_lastname_en" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-5">
+                        <label class="register-form" for="student_firstname_th" lang="en">Firstname (TH)</label>
+                        <input type="text" class="form-control" id="student_firstname_th" name="student_firstname_th" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-6">
+                        <label class="register-form" for="student_lastname_th" lang="en">Lastname (TH)</label>
+                        <input type="text" class="form-control" id="student_lastname_th" name="student_lastname_th" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-3">
+                        <label class="register-form" for="student_nickname_en" lang="en">Nickname (EN)</label>
+                        <input type="text" class="form-control" id="student_nickname_en" name="student_nickname_en" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-4">
+                        <label class="register-form" for="student_nickname_th" lang="en">Nickname (TH)</label>
+                        <input type="text" class="form-control" id="student_nickname_th" name="student_nickname_th" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-7">
+                        <label class="register-form" for="student_gender">Gender</label>
+                        <select class="form-control" id="student_gender" name="student_gender">
+                            <option value=""></option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                            <option value="O">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-14">
+                        <label class="register-form" for="student_birth_date" lang="en">Birthday</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control datepicker" id="student_birth_date" name="student_birth_date" autocomplete="off">
+                            <span class="input-group-addon"><i class="far fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-23">
+                        <label class="register-form" for="student_nationality" lang="en">Nationality</label>
+                        <select class="form-control" id="student_nationality" name="student_nationality"></select>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-8">
+                        <label class="register-form" for="student_email" lang="en">Email</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="student_email" name="student_email" autocomplete="off">
+                            <span class="input-group-addon"><i class="fas fa-envelope-open-text"></i></span>
+                        </div>
+                        <div style="font-size: 11px; color: #888888; margin-top: 10px;">example@origami.life</div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-9">
+                        <label class="register-form" for="student_mobile" lang="en">Mobile</label>
+                        <input type="tel" class="form-control" id="student_mobile" name="student_mobile" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-10">
+                        <label class="register-form" for="student_company" lang="en">Company</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="student_company" name="student_company" autocomplete="off">
+                            <span class="input-group-addon"><i class="fas fa-building"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-11">
+                        <label class="register-form" for="student_position" lang="en">Position</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="student_position" name="student_position" autocomplete="off">
+                            <span class="input-group-addon"><i class="fas fa-briefcase"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-25">
+                        <label class="register-form" for="student_reference" lang="en">Reference Person</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="student_reference" name="student_reference" autocomplete="off">
+                            <span class="input-group-addon"><i class="fas fa-user-friends"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group form-input input-19">
+                        <label class="register-form" for="copy_of_idcard"><i class="fas fa-paperclip"></i> <span lang="en">Copy of ID card</span></label>
+                        <p class="text-orange" style="margin: 10px auto;" lang="en">Supports image or PDF files with a size not exceeding 20 MB only.</p>
+                        <input type="file" class="form-control input-file" id="copy_of_idcard" name="copy_of_idcard" accept="image/*,.pdf">
+                        <input type="hidden" id="existing_copy_of_idcard" name="existing_copy_of_idcard">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group form-input input-22">
+                        <label class="register-form" for="copy_of_passport"><i class="fas fa-paperclip"></i> <span lang="en">Copy of Passport</span></label>
+                        <p class="text-orange" style="margin: 10px auto;" lang="en">Supports image or PDF files with a size not exceeding 20 MB only.</p>
+                        <input type="file" class="form-control input-file" id="copy_of_passport" name="copy_of_passport" accept="image/*,.pdf">
+                        <input type="hidden" id="existing_copy_of_passport" name="existing_copy_of_passport">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group form-input input-20">
+                        <label class="register-form" for="work_certificate"><i class="fas fa-paperclip"></i> <span lang="en">Work certificate</span></label>
+                        <p class="text-orange" style="margin: 10px auto;" lang="en">Supports image or PDF files with a size not exceeding 20 MB only.</p>
+                        <input type="file" class="form-control input-file" id="work_certificate" name="work_certificate" accept="image/*,.pdf">
+                        <input type="hidden" id="existing_work_certificate" name="existing_work_certificate">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group form-input input-21">
+                        <label class="register-form" for="company_certificate"><i class="fas fa-paperclip"></i> <span lang="en">Company Certificate (for business owners)</span></label>
+                        <p class="text-orange" style="margin: 10px auto;" lang="en">Supports image or PDF files with a size not exceeding 20 MB only.</p>
+                        <input type="file" class="form-control input-file" id="company_certificate" name="company_certificate" accept="image/*,.pdf">
+                        <input type="hidden" id="existing_company_certificate" name="existing_company_certificate">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-12">
+                        <label class="register-form" for="student_username" lang="en">Username</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="student_username" name="student_username" autocomplete="off" maxlength="20">
+                            <span class="input-group-addon"><i class="fas fa-user-lock"></i></span>
+                        </div>
+                        <div style="font-size: 11px; color: #888888; margin-top: 10px;" lang="en">Username must be 8–20 characters, consisting of English letters or numbers only. (By default, your registered mobile number will be used)</div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group form-input input-13">
+                        <label class="register-form" for="student_password" lang="en">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="student_password" name="student_password" autocomplete="off" maxlength="20">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="togglePassword">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div style="font-size: 11px; color: #888888; margin-top: 10px;" lang="en">Password must be 4–20 characters, using only English letters or numbers.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-container"></div>
+                </div>
+            </div>
+        </form>
+    `);
+    $(".systemModal .modal-footer").html(`
+        <button type="button" class="btn btn-orange" lang="en" onclick="saveRegister()">Save</button> 
+        <button type="button" class="btn btn-white" data-dismiss="modal" lang="en">Close</button>
+    `);
+    $(".loader").addClass("active");
+    $.post('/classroom/management/actions/registration.php', { 
+        action: "dataRegistration", 
+        classroom_id: classroom_id, 
+        student_id: student_id
+    }, (response) => {
+        $(".loader").removeClass("active");
+        response.register_template.forEach(value => $(".input-" + value).removeClass("hidden"));
+        response.register_require.forEach(value => {
+            const $group = $(".input-" + value);
+            $group.find("input, select, textarea").addClass("require");
+            $group.find("input[type=file]").addClass("require");
+            $group.find("label").addClass("required-field");
+        });
+        initForm(response.form_data);
+        consent_status = response.consent_status;
+        if(consent_status == 'Y') {
+            $(".input-consent").removeClass("hidden");
+        }
+        if (response.register_template.includes("23")) {
+            let nationality = response.nationality;
+            $("#student_nationality").append($('<option>', { 
+                value: nationality.nationality_id, 
+                text: nationality.nationality_name 
+            }));
+        }
+        is_logged_in = response.is_logged_in;
+        if (response.is_logged_in && response.student_data) {
+            $(".after-login").removeClass("hidden");
+            const data = response.student_data;
+            if (data.student_id) {
+                $("input[name='student_id']").val(data.student_id);
+                if ($("input[name='student_id']").length === 0) {
+                    $("form").append('<input type="hidden" name="student_id" value="' + data.student_id + '">');
+                }
+            }
+            if (data.student_firstname_en) $("#student_firstname_en").val(data.student_firstname_en);
+            if (data.student_lastname_en) $("#student_lastname_en").val(data.student_lastname_en);
+            if (data.student_nickname_en) $("#student_nickname_en").val(data.student_nickname_en);
+            if (data.student_firstname_th) $("#student_firstname_th").val(data.student_firstname_th);
+            if (data.student_lastname_th) $("#student_lastname_th").val(data.student_lastname_th);
+            if (data.student_nickname_th) $("#student_nickname_th").val(data.student_nickname_th);
+            if (data.student_email) $("#student_email").val(data.student_email);
+            if (data.student_mobile) $("#student_mobile").val(data.student_mobile);
+            if (data.student_company) $("#student_company").val(data.student_company);
+            if (data.student_position) $("#student_position").val(data.student_position);
+            if (data.student_username) $("#student_username").val(data.student_username);
+            if (data.student_birth_date) $("#student_birth_date").val(data.student_birth_date);
+            if (data.student_idcard) $("#student_idcard").val(data.student_idcard);
+            if (data.student_passport) $("#student_passport").val(data.student_passport);
+            if (data.student_passport_expire) $("#student_passport_expire").val(data.student_passport_expire);
+            if (data.student_password) $("#student_password").val(data.student_password);
+            if (data.student_reference) $("#student_reference").val(data.student_reference);
+            if (data.dial_code) {
+                $("#dialCode").val(data.dial_code);
+                $("select[name='dialCode']").val(data.dial_code);
+            }
+            if (data.student_gender) {
+                $("#student_gender").val(data.student_gender);
+                $("select[name='student_gender']").val(data.student_gender).trigger('change');
+            }
+            if (data.student_perfix) {
+                $("#student_perfix").val(data.student_perfix);
+                $("select[name='student_perfix']").val(data.student_perfix).trigger('change');
+            }
+            if (data.student_perfix_other) {
+                $("#student_perfix_other").val(data.student_perfix_other);
+                $(".input-perfix-other").removeClass("hidden");
+            }
+            if (data.student_nationality) {
+                $("#student_nationality").val(data.student_nationality);
+                $("select[name='student_nationality']").val(data.student_nationality);
+            }
+            if (data.student_image_profile) {
+                const $imgPreview = $("#profilePreview");
+                $imgPreview.attr('src', data.student_image_profile);
+                $("#removeProfile").show();
+                $("#ex_student_image_profile").val(data.student_image_profile);
+            }
+            if (data.copy_of_idcard) {
+                showDocumentPreview('copy_of_idcard', data.copy_of_idcard, 'ID Card');
+                $("#existing_copy_of_idcard").val(data.copy_of_idcard);
+            }
+            if (data.copy_of_passport) {
+                showDocumentPreview('copy_of_passport', data.copy_of_passport, 'Passport');
+                $("#existing_copy_of_passport").val(data.copy_of_passport);
+            }
+            if (data.work_certificate) {
+                showDocumentPreview('work_certificate', data.work_certificate, 'Work Certificate');
+                $("#existing_work_certificate").val(data.work_certificate);
+            }
+            if (data.company_certificate) {
+                showDocumentPreview('company_certificate', data.company_certificate, 'Company Certificate');
+                $("#existing_company_certificate").val(data.company_certificate);
+            }
+            $(".page-title, h1").append(' <span class="badge badge-info" data-lang="update_mode">Update Mode</span>');
+            $(".input-password").addClass("hidden");
+            $("input[name='student_password']").removeClass("require");
+        } 
+    }, 'json').fail(() => '');
+    const defaultProfile = "/images/default-profile.png";
+    $(".profile-upload img, .profile-upload .camera-icon").on("click", function() {
+        $("#student_image_profile").click();
+    });
+    $("#student_image_profile").on("change", function () {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            if (!file.type.startsWith("image/")) {
+                swal({
+                    type: 'warning',
+                    title: 'Warning',
+                    text: 'Please select a valid image file.',
+                    confirmButtonColor: '#FF9900'
+                });
+                $(this).val("");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $("#profilePreview").attr("src", e.target.result);
+                $("#removeProfile").show();
+                $("#ex_student_image_profile").val(e.target.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+    $("#removeProfile").on("click", function() {
+        $("#ex_student_image_profile").val("");
+        $("#profilePreview").attr("src", "/images/profile-default.jpg");
+        $(this).hide();
+    });
+    $("#removeProfile").on("click", function () {
+        $("#student_image_profile").val("");
+        $("#student_image_profile").val("");
+        $("#profilePreview").attr("src", defaultProfile);
+        $(this).hide();
+    });
+    $('.datepicker').datepicker({
+        dateFormat: 'yy/mm/dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "-100:+0",
+        autoclose: true,
+        maxDate: 0 
+    });
+    $('.datepicker-past').datepicker({
+        dateFormat: 'yy/mm/dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "-20:+20",
+        autoclose: true,
+    });
+    $(document).on("input", "#student_idcard, #student_mobile", function () {
+        this.value = this.value.replace(/[^0-9]/g, "");
+    });
+    $(document).on("input", "[id$='_en']", function () {
+        this.value = this.value.replace(/[^A-Za-z\s]/g, "");
+    });
+    $(document).on("input", "[id$='_th']", function () {
+        this.value = this.value.replace(/[^ก-๙\s]/g, "");
+    });
+    $("#student_username").on("input", function () {
+        this.value = this.value.replace(/[^A-Za-z0-9]/g, "");
+    });
+    $("#student_password").on("input", function () {
+        this.value = this.value.replace(/[^A-Za-z0-9!@#$%^&*()_\+\-=\[\]{};:'",.<>\/?]/g, "");
+    });
+    $("#togglePassword").on("click", function () {
+        const $pwd = $("#student_password");
+        const type = $pwd.attr("type") === "password" ? "text" : "password";
+        $pwd.attr("type", type);
+        $(this).html(`<i class="fa fa-${type === 'text' ? 'eye-slash' : 'eye'}"></i>`);
+    });
+    const validators = {
+        student_email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        student_mobile: /^[0-9]{9,}$/
+    };
+    $('#student_email, #student_mobile').on('blur', function () {
+        let val = $(this).val().trim();
+        const type = $(this).attr('id');
+        if (!validators[type]) return;
+        if (val && !validators[type].test(val)) {
+            $(this).addClass('has-error');
+            const msg = type === 'student_email' ? 'Invalid email format' : 'The phone number format is incorrect.';
+            swal({ 
+                type: 'warning', 
+                title: "Warning...", 
+                text: msg, 
+                confirmButtonColor: '#FF9900'
+            });
+        } else {
+            $(this).removeClass('has-error');
+            if(type === 'student_email') {
+                verifyDuplicateData(val, 'email', 'student_email');
+            }
+            if(type === 'student_mobile') {
+                verifyDuplicateData(val, 'mobile', 'student_mobile');
+            }
+        }
+    });
+    const input = document.querySelector("#student_mobile");
+    const iti = window.intlTelInput(input, {
+        initialCountry: "th",
+        separateDialCode: true,
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+    });
+}
+function showDocumentPreview(fieldName, fileUrl, label) {
+    const $input = $("input[name='" + fieldName + "']");
+    const $existingInput = $("input[name='existing_" + fieldName + "']");
+    let $container = $input.siblings('.document-preview-list-' + fieldName);
+    if ($container.length === 0) {
+        $container = $('<ul class="list-group document-preview-list-' + fieldName + ' mt-2"></ul>');
+        $input.after($container);
+    }
+    const fileExt = fileUrl.split('.').pop().toLowerCase();
+    let $item = $('<li class="list-group-item d-flex justify-content-between align-items-center"></li>');
+    let previewContent = '';
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) {
+        previewContent = `
+            <div class="text-center">
+                <img src="${fileUrl}" class="img-thumbnail" style="max-width: 80px; margin-right:10px;">
+            </div>
+        `;
+    } else {
+        previewContent = `
+            <div class="text-center">
+                <i class="fa fa-file-pdf-o fa-5x text-danger"></i>
+            </div>
+        `;
+    }
+    $item.append(previewContent);
+    const $btnGroup = $('<div class="text-center" style="margin-top: 15px;"></div>');
+    const $viewBtn = $(`<button type="button" class="btn btn-primary" onclick="viewFile('${fileUrl}')" lang="en">View</button>`);
+    const $deleteBtn = $('<button type="button" class="btn btn-warning" style="margin-left: 15px;" lang="en">Delete</button>');
+    $deleteBtn.on('click', function() {
+        const msg = "Are you sure?";
+        const text = "This file will be removed from the list.";
+        const confmsg = "Yes, delete it!";
+        const canfmsg = "Cancel";
+        swal({
+            title: msg,
+            text: text,
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: confmsg,
+            cancelButtonText: canfmsg,
+            closeOnConfirm: true,
+            closeOnCancel: true
+        }, function(isConfirm){
+            if (isConfirm) {
+                $item.remove();
+                $existingInput.val('');
+            }
+        });
+    });
+    $btnGroup.append($viewBtn).append($deleteBtn);
+    $item.append($btnGroup);
+    $container.append($item);
+}
+function initForm(form_data) {
+    if(!form_data) return;
+    let html = '';
+    form_data.forEach(q => {
+        const answerChoice = q.answer_choice_id;
+        const answerText = q.answer_text;
+        const answerOther = q.answer_other_text;
+        html += `<div class="form-group">
+            <input type="hidden" name="question_id[]" value="${q.question_id}">
+            <input type="hidden" name="question_type[]" value="${q.question_type}">
+            <hr>
+        `;
+        html += `<label class="${q.has_required == 1 ? 'required-field' : ''} question_text"><i class="fas fa-question-circle"></i> ${q.question_text}</label>`;
+        let requiredAttr = q.has_required == 1 ? 'data-required="1"' : '';
+        if(q.has_options == 1) {
+            if(q.question_type === "radio" || q.question_type === "multiple_choice") {
+                q.option_item.forEach(opt => {
+                    const checked = (answerChoice == opt.choice_id) ? 'checked' : '';
+                    html += `
+                        <div>
+                            <input type="radio" id="q_${q.question_id}_opt_${opt.choice_id}" name="q_${q.question_id}" value="${opt.choice_id}" class="option-input" data-qid="${q.question_id}" ${requiredAttr} ${checked}>
+                            <label for="q_${q.question_id}_opt_${opt.choice_id}" class="radio-label">${opt.choice_text}</label>
+                        </div>
+                    `;
+                });
+            } else if(q.question_type === "checkbox") {
+                q.option_item.forEach(opt => {
+                    const checked = (Array.isArray(answerChoice) && answerChoice.includes(opt.choice_id)) ? 'checked' : '';
+                    html += `
+                        <div>
+                            <input type="checkbox" id="q_${q.question_id}_opt_${opt.choice_id}" name="q_${q.question_id}[]" value="${opt.choice_id}" class="option-input" data-qid="${q.question_id}" ${requiredAttr} ${checked}>
+                            <label for="q_${q.question_id}_opt_${opt.choice_id}" class="checkbox-label">${opt.choice_text}</label>
+                        </div>
+                    `;
+                });
+            }
+            if(q.has_other_option == 1) {
+                const inputType = (q.question_type === 'checkbox' ? 'checkbox' : 'radio');
+                const inputName = `q_${q.question_id}_other`;
+                const otherChecked = (answerOther && answerOther !== '') ? 'checked' : '';
+                const otherDisplay = otherChecked ? 'block' : 'none';
+                html += `
+                    <div>
+                        <input type="${inputType}" id="q_${q.question_id}_other" name="${inputName}" value="other" class="option-input other-input" data-qid="${q.question_id}" ${requiredAttr} ${otherChecked}>
+                        <label for="q_${q.question_id}_other" class="${inputType==='checkbox' ? 'checkbox-label':'radio-label'}"><span data-lang="other">อื่นๆ</span></label>
+                    </div>
+                    <div id="other_box_${q.question_id}" style="display:${otherDisplay}; margin-top:5px;">
+                        <input type="text" class="form-control" name="q_${q.question_id}_other" value="${answerOther || ''}">
+                    </div>
+                `;
+            }
+        } else {
+            if(q.question_type === "short_answer") {
+                html += `<textarea name="q_${q.question_id}" class="form-control" ${requiredAttr} onclick="autoResize(this);" onkeyup="autoResize(this);">${answerText || ''}</textarea>`;
+            }
+        }
+        html += `</div>`;
+    });
+    document.querySelector(".form-container").innerHTML = html;
+    document.querySelectorAll('.option-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const qid = this.dataset.qid;
+            const otherBox = document.getElementById(`other_box_${qid}`);
+            const otherInput = otherBox ? otherBox.querySelector("input") : null;
+            if(this.type === "radio") {
+                if(this.value === "other" && this.checked) {
+                    otherBox.style.display = "block";
+                    if(otherInput) otherInput.setAttribute("data-required","1");
+                } else {
+                    if(otherBox) otherBox.style.display = "none";
+                    if(otherInput) otherInput.removeAttribute("data-required");
+                }
+            } else if(this.type === "checkbox") {
+                if(this.value === "other") {
+                    otherBox.style.display = this.checked ? "block" : "none";
+                    if(otherInput) {
+                        if(this.checked) otherInput.setAttribute("data-required","1");
+                        else otherInput.removeAttribute("data-required");
+                    }
+                }
+            }
+        });
+    });
 }
 function confirmRegistration(join_id, option) {
     event.stopPropagation();
@@ -802,6 +1382,212 @@ function paymentRegistration(join_id, option) {
         }
     });
 }
+function saveRegister() {
+    let isValid = true;
+    let firstInvalidField = null;
+    $(".require").each(function(){
+        const $field = $(this);
+        const $group = $field.closest(".form-group");
+        if ($group.hasClass("hidden")) return;
+        let val = $field.val();
+        if ($field.attr("id") === "student_idcard") {
+            const val = $field.val().trim();
+            if (!isValidThaiID(val)) {
+                isValid = false;
+                if (!firstInvalidField) firstInvalidField = $field;
+                $field.addClass("has-error");
+                $group.find("label").addClass("has-error-text");
+            } else {
+                $field.removeClass("has-error");
+                $group.find("label").removeClass("has-error-text");
+            }
+            return;
+        }
+        if ($field.attr("type") === "file") {
+            if ($field[0].files.length === 0) {
+                isValid = false;
+                if (!firstInvalidField) firstInvalidField = $field;
+                $group.find(".profile-upload").css("border", "2px solid orange");
+            } else {
+                $group.find(".profile-upload").css("border", "2px solid #ddd");
+            }
+        } else if (!$field.is(":checkbox") && !$field.is(":radio")) {
+            if (!val || val.trim() === "") {
+                $field.addClass("has-error");
+                if (!firstInvalidField) firstInvalidField = $field;
+                isValid = false;
+            } else {
+                $field.removeClass("has-error");
+            }
+        } else if ($field.is(":checkbox") || $field.is(":radio")) {
+            const name = $field.attr("name");
+            if ($(`[name='${name}']:checked`).length === 0) {
+                $field.addClass("has-error");
+                if (!firstInvalidField) firstInvalidField = $field;
+                isValid = false;
+            } else {
+                $field.removeClass("has-error");
+            }
+        }
+    });
+    let errorMessage = '';
+    const $username = $("#student_username");
+    if (!$username.closest(".form-group").hasClass("hidden")) {
+        const usernameVal = $username.val().trim();
+        if ($username.hasClass("require") || usernameVal !== "") {
+            if (usernameVal.length < 4 || usernameVal.length > 20) {
+                $username.addClass("has-error");
+                if (!firstInvalidField) firstInvalidField = $username;
+                isValid = false;
+                errorMessage + 'Username';
+            } else {
+                $username.removeClass("has-error");
+            }
+        } else {
+            $username.removeClass("has-error");
+        }
+    }
+    const $password = $("#student_password");
+    if (!$password.closest(".form-group").hasClass("hidden")) {
+        const passwordVal = $password.val().trim();
+        if ($password.hasClass("require") || passwordVal !== "") {
+            if (passwordVal.length < 4 || passwordVal.length > 20) {
+                $password.addClass("has-error");
+                if (!firstInvalidField) firstInvalidField = $password;
+                isValid = false;
+                errorMessage + ' Password';
+            } else {
+                $password.removeClass("has-error");
+            }
+        } else {
+            $password.removeClass("has-error");
+        }
+    }
+    if(errorMessage) {
+        errorMessage += 'must be 4–20 characters if provided. ';
+    }
+    $(".form-container .form-group").each(function() {
+        const $group = $(this);
+        const $question = $group.find("[name^='q_']");
+        if ($question.length === 0) return;
+        const required = $group.find("[data-required='1']").length > 0 || $group.find(".require").length > 0;
+        if (!required) return;
+        if ($question.is(":radio") || $question.is(":checkbox")) {
+            const name = $question.attr("name");
+            const $checked = $(`[name='${name}']:checked`);
+            if ($checked.length === 0) {
+                isValid = false;
+                if (!firstInvalidField) firstInvalidField = $group;
+                $group.find(".question_text").addClass("has-error-text");
+            } else {
+                $group.removeClass("has-error");
+                const $other = $checked.filter("[value='other']");
+                if ($other.length > 0) {
+                    const targetBox = $("#other_box_" + $other.data("qid"));
+                    const $otherInput = targetBox.find("input[type='text']");
+                    if ($otherInput.length && $otherInput.val().trim() === "") {
+                        isValid = false;
+                        if (!firstInvalidField) firstInvalidField = $otherInput;
+                        $otherInput.addClass("has-error");
+                    } else {
+                        $otherInput.removeClass("has-error");
+                    }
+                }
+            }
+        } else {
+            $question.each(function() {
+                if ($(this).val().trim() === "") {
+                    isValid = false;
+                    if (!firstInvalidField) firstInvalidField = $(this);
+                    $(this).addClass("has-error");
+                } else {
+                    $(this).removeClass("has-error");
+                }
+            });
+        }
+    });
+    if (!isValid) {
+        if (firstInvalidField) {
+            $('html, body').animate({ scrollTop: firstInvalidField.offset().top - 100 }, 300);
+            firstInvalidField.focus();
+        }
+        swal({
+            type: 'warning',
+            title: 'Warning',
+            text: 'Please fill in all required fields. ' + errorMessage,
+            confirmButtonColor: '#FF9900'
+        });
+        return false;
+    }
+    const $form = $('#registrationForm');
+    if ($form.length === 0) {
+        console.error('Registration form not found');
+        return;
+    }
+    const $btn = $form.find('button[type="submit"]');
+    $btn.prop('disabled', true);
+    if ($(".loader").length > 0) {
+        $(".loader").addClass("active");
+    }
+    const fd = new FormData($form[0]);
+    if (typeof classroom_id !== 'undefined' && classroom_id) {
+        fd.append('classroom_id', classroom_id);
+    }
+    const $dialCode = $(".iti__selected-dial-code");
+    if ($dialCode.length > 0) {
+        const dialCode = $dialCode.text().trim();
+        fd.append('dialCode', dialCode);
+    }
+    $.ajax({
+        url: '/classroom/management/actions/registration.php?action=saveRegister',
+        type: "POST",
+        data: fd,
+        processData: false,
+        contentType: false,
+        dataType: "JSON",
+        success: function(result) {
+            handleRegisterResponse(result);
+        },
+        error: function(xhr, status, error) {
+            console.error('Register error:', status, error);
+            $(".loader").removeClass("active");
+            $btn.prop('disabled', false);
+            const titlemsg = "Warning";
+            const msg = "Save failed, please try again.";
+            if (typeof swal === 'function') {
+                swal({
+                    type: 'warning',
+                    title: titlemsg,
+                    text: msg,
+                    confirmButtonColor: '#FF9900'
+                });
+            } else {
+                alert(msg);
+            }
+        }
+    });
+}
+function isValidThaiID(id) {
+    if (!/^\d{13}$/.test(id)) return false;
+    let sum = 0;
+    for (let i = 0; i < 12; i++) {
+        sum += parseInt(id.charAt(i)) * (13 - i);
+    }
+    let checkDigit = (11 - (sum % 11)) % 10;
+    return checkDigit === parseInt(id.charAt(12));
+}
+function handleRegisterResponse(result) {
+    $(".loader").removeClass("active");
+    swal({
+        title: 'Saved successfully',
+        text: '',
+        type: 'success',
+        confirmButtonColor: '#41a85f'
+    },function() {
+        $(".systemModal").modal("hide");
+        buildRegistration();
+    });
+}
 function importStudent() {
     $(".systemModal").modal();
     $(".systemModal .modal-header").html(`
@@ -926,6 +1712,10 @@ function delRegistration(join_id) {
             swal.close();
         }
     });
+}
+function autoResize(textarea) {
+    textarea.style.height = 'auto'; 
+    textarea.style.height = textarea.scrollHeight + 'px'; 
 }
 function copyToClipboard(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
