@@ -27,7 +27,7 @@ function renderClasses(classes, containerId, label = '') {
 
   if (label && classes.length > 0 ) {
     container.innerHTML += `
-      <div class="row">
+      <div class="row" style="margin-bottom: 1rem;">
         <div class="head-flex-menu">
           <p class="menu-title">${label}</p>
           <a href="schedule" class="menu-title-button">

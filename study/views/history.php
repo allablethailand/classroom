@@ -1,8 +1,27 @@
 <?php
 
 // บรรทัดแรกสุดของไฟล์
-session_start();
+// session_start();
 
+$base_include = $_SERVER['DOCUMENT_ROOT'];
+$base_path = '';
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $exl_path = explode('/', $request_uri);
+    if (!file_exists($base_include . "/dashboard.php")) {
+        $base_path .= "/" . $exl_path[1];
+    }
+    $base_include .= "/" . $exl_path[1];
+}
+define('BASE_PATH', $base_path);
+define('BASE_INCLUDE', $base_include);
+require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/classroom/study/actions/student_func.php';   
+
+$student_id = getStudentId();
+$alumni_list = getStudentClassroomList($student_id);
+
+// var_dump($alumni_list);
 
 
 ?>
@@ -332,7 +351,7 @@ session_start();
                 <div class="" style="display: flex; gap: 10px;">
                     <div class="account-picker">
                         <!-- <div class="account-bg-layer"></div> -->
-                        <div class="account-content">
+                        <!-- <div class="account-content">
                             <div class="visa-logo">
                                 <svg class="icon-svg" viewBox="0 0 52 20">
                                     <path d="M33.4082 0C35.203 0 36.9297 0.673828 36.9297 0.673828L36.3701 3.99414C34.6961 3.04739 30.881 2.81965 30.8809 4.56836C30.8809 6.3172 36.3457 6.83824 36.3457 10.708C36.3457 14.5778 32.3136 16 29.6416 16C26.9931 15.9999 25.25 15.1429 25.2197 15.1279L25.8027 11.6592C27.4084 12.978 32.2656 13.3539 32.2656 11.2578C32.2655 9.16176 26.8496 9.11192 26.8496 5.11816C26.8497 0.872545 31.4644 8.98359e-05 33.4082 0ZM50 15.7314H46.4023V15.7354L45.9434 13.4404H40.9658L40.1494 15.7354H36.0684L41.9072 1.43066C41.9072 1.43066 42.2615 0.277591 43.7139 0.277344H46.8652L50 15.7314ZM22.8086 15.7314H18.8936L21.3398 0.277344H25.2559L22.8086 15.7314ZM8.24121 0.272461C9.93021 0.272461 10.0988 1.65109 10.1006 1.66602L11.4209 8.61621L11.8633 10.9062L15.5977 0.277344H19.8105L13.5811 15.7275H9.50098L6.09766 2.30566C5.1277 1.70712 4.22036 1.29312 3.50684 1.01758C3.47644 1.00583 3.44667 0.993674 3.41699 0.982422C2.55561 0.656189 2 0.537109 2 0.537109L2.00098 0.533203H2L2.07227 0.272461H8.24121ZM42.0928 10.2656H45.3076L44.1494 4.48145L42.0928 10.2656Z" fill="currentColor" />
@@ -344,7 +363,15 @@ session_start();
                                     <path d="M6.42052 4.754C6.38285 4.79267 6.24062 4.958 6.10813 5.094C5.33139 5.94933 3.30508 7.34933 2.24452 7.77667C2.08346 7.84533 1.67625 7.99067 1.45868 8C1.2502 8 1.05147 7.952 0.861828 7.85467C0.625426 7.71867 0.435785 7.50467 0.331872 7.252C0.264978 7.07667 0.161065 6.552 0.161065 6.54267C0.0571521 5.96867 0 5.036 0 4.00533C0 3.02333 0.0571521 2.12867 0.142231 1.546C0.151973 1.53667 0.255886 0.884667 0.369541 0.661333C0.578016 0.253333 0.985225 0 1.42101 0H1.45868C1.74249 0.01 2.33934 0.263333 2.33934 0.272667C3.34275 0.700667 5.32229 2.032 6.11788 2.91667C6.11788 2.91667 6.34194 3.144 6.43936 3.286C6.59133 3.49 6.66667 3.74267 6.66667 3.99533C6.66667 4.27733 6.58159 4.54 6.42052 4.754Z" fill="currentColor" />
                                 </svg>
                             </div>
-                        </div>
+                        </div> -->
+
+                       <select class="form-control" name="classroom_id">
+                           <?php foreach($alumni_list as $alumni): ?>
+                                <option value="<?php echo htmlspecialchars($alumni['classroom_id']); ?>">
+                                    <?php echo htmlspecialchars($alumni['classroom_name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <button class="navbox-button" id="searchBtn">
                         <svg class="icon-svg" viewBox="0 0 45 45" style="width:150px; height:150px;">
