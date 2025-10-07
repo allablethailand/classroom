@@ -5,7 +5,33 @@ let tb_staff;
 let table_join_user;
 
 $(document).ready(function() {
-    // initializeClassroomManagement();
+    // Dropdown change event
+    $('select[name="classroom_id"]').on('change', function() {
+        var classroomId = $(this).val();
+
+        // Send AJAX POST request with selected classroom_id
+        $.ajax({
+            url: '/classroom/study/actions/history.php', // Your backend endpoint
+            type: 'POST',
+            data: {
+                action: 'fetch_history',
+                classroom_id: classroomId,
+            },
+            success: function(response) {
+                var result = JSON.parse(response);
+                if (result.status === 'success') {
+                    // Process the returned alumni data
+                    updateAlumniDisplay(result.data);
+                } else {
+                    alert('Failed to fetch alumni data');
+                }
+            },
+            error: function() {
+                alert('Error sending request');
+            }
+        });
+    });
+    
 
     $('#filterBtn').on('click', function () {
         $('#bottomModal').modal('show');

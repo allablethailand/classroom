@@ -47,7 +47,7 @@ session_start();
             <div id="other-upcoming-class-container"></div>
             <!-- <div id="overdue-class-container"></div> -->
 
-            <div class="row" style="margin-top: 1rem;">
+            <div class="row">
                 <p class="menu-title">Academy Menu</p>
             </div>
             <div class="row" style="margin-top: 1rem; ">

@@ -14,6 +14,12 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/classroom/study/actions/student_func.php';
+
+$student_id = getStudentId();
+$alumni_list = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
+
+$student_attendant = select_data("*", "ot_workshop_emp", "workshop_id = '{$workshop_id}' AND emp_id = '{$student_id}' AND status = 0");
 
 $table = "SELECT 
         course.course_id,
@@ -44,27 +50,72 @@ $table = "SELECT
     WHERE 
         course.classroom_id = '{$classroom_id}' and course.status = 0";
 
+        $topic = select_data(
+        "p.topic_id,p.topic_no,p.topic_option,p.topic_item,ifnull(p.learn_flag,'N') as learn_flag,p.topic_duration,p.topic_views,p.topic_percent,p.topic_percent_pass,p.topic_percent_value,p.learn_button_flag,p.topic_time,s.topic_name,s.topic_speed,s.topic_skip",
+        "ot_learning_plan p",
+        "left join ot_training_topic_setup s on s.topic_id = p.topic_id where p.trn_id = '{$course_id}' and p.emp_id = '{$emp_id}' and p.status = 0 group by p.topic_id order by p.topic_no asc"
+    );
+
+
+    $topic_type = 'Workshop';
+    $workshop++;
+    $percent = 0;
+    $stamp_in = '';
+    $stamp_out = '';
+    $activity = select_data(
+        "activity_id",
+        "ot_workshop_emp",
+        "WHERE emp_id = '{$emp_id}' AND workshop_id = '{$topic_item}' AND activity_id <> 0 AND status = 0"
+    );
+    if (!empty($activity)) {
+        $activity_id = $activity[0]['activity_id'];
+        $TimeIn = select_data(
+            "DATE_FORMAT(date_time, '%Y/%m/%d %H:%i:%s') AS stamp_in",
+            "temp_attendance",
+            "WHERE emp_id = '{$emp_id}' AND status = 'in' AND IFNULL(activity_id, 'X') = '{$activity_id}'"
+        );
+        if (!empty($TimeIn)) {
+            $stamp_in = $TimeIn[0]['stamp_in'];
+            $percent += 50;
+        }
+        $TimeOut = select_data(
+            "DATE_FORMAT(date_time, '%Y/%m/%d %H:%i:%s') AS stamp_out",
+            "temp_attendance",
+            "WHERE emp_id = '{$emp_id}' AND status = 'out' AND IFNULL(activity_id, 'X') = '{$activity_id}'"
+        );
+        if (!empty($TimeOut)) {
+            $stamp_out = $TimeOut[0]['stamp_out'];
+            $percent += 50;
+        }
+    }
+    $topic_info    = 'Workshop ' . $workshop . ' ' . $topic_name;
+    $description1  = 'Stamp In ' . $stamp_in;
+    $description2  = 'Stamp Out ' . $stamp_out;
+    $description3  = 'Progress ' . number_format($percent, 2);
+    break;
+
 
 if($_POST && $_POST['action'] == 'fetch_history'){
-    $user_id = $_SESSION['user_id'];
+
+    $std_id = $student_id;
     $classroom_id = $_POST['classroom_id'];
     
     // TO DO;
     // GET HISTORY BASED ON USER ID AND CLASSROOM ID
 
 
-    
-    $data = array();
-    $query = "SELECT * FROM study_history WHERE user_id = ? AND classroom_id = ? ORDER BY history_id DESC";
-    $stmt = $db->prepare($query);
-    $stmt->bind_param("ii", $user_id, $classroom_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
-    }
-    echo json_encode(array('status' => 'success', 'data' => $data));
-    exit;
+
+    // $data = array();
+    // $query = "SELECT * FROM study_history WHERE user_id = ? AND classroom_id = ? ORDER BY history_id DESC";
+    // $stmt = $db->prepare($query);
+    // $stmt->bind_param("ii", $user_id, $classroom_id);
+    // $stmt->execute();
+    // $result = $stmt->get_result();
+    // while ($row = $result->fetch_assoc()) {
+    //     $data[] = $row;
+    // }
+    // echo json_encode(array('status' => 'success', 'data' => $data));
+    // exit;
 }
 
 
