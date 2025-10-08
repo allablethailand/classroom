@@ -28,7 +28,7 @@ $student_class = select_data($columnStudent, $tableStudent, $whereStudent);
 $our_class = $student_class[0]["classroom_id"];
 $our_group = $student_class[0]["group_id"];
 
-$columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster";
+$columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, DATE_FORMAT(classroom_start, '%d/%m/%Y') AS class_start, DATE_FORMAT(classroom_end, '%d/%m/%Y') AS class_end";
 $tableCourseGroup = "classroom_template";
 $whereCourseGroup = "where classroom_id = '{$our_class}'";
 
@@ -107,8 +107,10 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                     <div class="class-menu">
                                     <span class="title-menu" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden;"><?php echo $item['classroom_name']; ?></span>
                                     <div class="progress-section">
-                                        <div class="progress-header">
-                                        <span class="progress-text" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;"><?php echo $item['classroom_information']; ?></span>
+                                        
+                                        <div class="time-schedule-class" style="margin-left: 0.5rem;">
+                                            <span class="small-text-gray"><?php echo $item['class_start'] . "-"  ;?></span>
+                                            <span class="small-text-gray"><?php echo $item['class_end']; ?></span>
                                         </div>
                                         <div class="progress-header-flex">
                                         <span class="progress-text-end"></span>

@@ -70,9 +70,9 @@ function renderCurriculum(courses) {
 
 function renderCourseCard(course) {
   const initial = course.instructor ? course.instructor.charAt(0) : "";
-  const courseCover = course.course_cover
-    ? `<img src="${course.course_cover}" alt="${course.course_name}" class="transparent-bg" style="width: 50px; height: 50px; border-radius: 100%;">`
-    : "";
+  // const courseCover = course.course_cover
+  //   ? `<img src="${course.course_cover}" alt="${course.course_name}" class="transparent-bg" style="width: 50px; height: 50px; border-radius: 100%;">`
+  //   : "";
 
   const courseCoverGT = ` <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="" style="width: 50px; height: 50px; border-radius: 100%;" >`
   return `
@@ -87,6 +87,11 @@ function renderCourseCard(course) {
             <div class="class-menu">
             <span class="title-menu" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden;">${course.classroom_name}</span>
               <div class="progress-section">
+                 <div class="time-schedule-class" style="margin-left: 0.5rem;">
+                    <span class="small-text-gray">${course.course_timestart}</span>
+                    <span class="small-text-gray">| ${course.course_timeend}</span>
+                    </div>
+
                 <div class="progress-header-flex">
                   <span class="progress-text-end"></span>
                 </div>
