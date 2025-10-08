@@ -115,6 +115,11 @@ $student_name = $row_name['student_name'] ? $row_name['student_name'] : "User";
 $stmt_name->close();
 
 $hide_profile = ["Profile", "Edit Profile", "Setting"];
+
+// $notifications = select_data("*", "ogm_notification", "WHERE FIND_IN_SET('" . mysqli_real_escape_string($mysqli, $emp_id) . "', noti_emp_id) AND noti_comp_id = '" . mysqli_real_escape_string($mysqli, $comp_id) . "' AND noti_status = 0 AND noti_read is null limit 100");
+// $count_notification = count($notifications);
+
+
 ?>
 
 <head>

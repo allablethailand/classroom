@@ -1,8 +1,4 @@
 <?php
-// $class_id = isset($_GET['id']) ? $_GET['id'] :  null;
-
-// var_dump($class_id);
-// // $classroom_group = $_POST['classroom_group'];
 
 $base_include = $_SERVER['DOCUMENT_ROOT'];
 $base_path = '';

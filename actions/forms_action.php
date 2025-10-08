@@ -648,7 +648,7 @@
             "{$result['student_firstname_en']} {$result['student_lastname_en']}" : 
             "{$result['student_firstname_th']} {$result['student_lastname_th']}";
         }
-        return $student_name ? $emp_nstudent_nameame : '';
+        return $student_name ? $student_name : '';
     }
     function getUserForm($formId, $filterConditions, $joinConditions) { 
         $data = [];

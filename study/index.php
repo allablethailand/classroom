@@ -92,6 +92,10 @@
         case '/classroom/study/classinfo':
             require __DIR__.'/views/classinfo.php';
         break;
+        case '/classroom/study/class_subinfo/':
+        case '/classroom/study/class_subinfo':
+            require __DIR__.'/views/class_subinfo.php';
+        break;
         case '/classroom/study/history/':
         case '/classroom/study/history':
             require __DIR__.'/views/history.php';

@@ -299,5 +299,44 @@ main {
      overflow: hidden;
   }
 
-
   
+  .actions-grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 0.5rem 1.8rem;
+}
+
+.action-card-two {
+  background: white;
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.13);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-items: center; 
+  cursor: pointer;
+  border: none;
+
+}
+
+.action-card-two:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.action-icon-two {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: white;
+}
+
+
+.action-card-two svg{
+    font-size: 50px;
+}
