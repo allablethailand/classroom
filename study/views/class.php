@@ -28,7 +28,7 @@ $student_class = select_data($columnStudent, $tableStudent, $whereStudent);
 $our_class = $student_class[0]["classroom_id"];
 $our_group = $student_class[0]["group_id"];
 
-$columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_bg";
+$columnCourseGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster";
 $tableCourseGroup = "classroom_template";
 $whereCourseGroup = "where classroom_id = '{$our_class}'";
 
