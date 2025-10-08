@@ -278,22 +278,22 @@ function buildRegistration() {
 								${student_gender || ''}
 							</div>
                             ${ (student_idcard) ? `
-                                <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                <div class="hidden" style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
                                     <i class="fas fa-address-card"></i>
                                     <span>${student_idcard || '-'}</span>
                                 </div>` : ''}
                             ${ (student_passport) ? `
-                                <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                <div class="hidden" style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
                                     <i class="fas fa-passport"></i>
                                     <span>${student_passport || '-'}</span>
                                 </div>` : ''}
                             ${ (student_passport_expire && student_passport_expire !== '0000/00/00') ? `
-                                <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                <div class="hidden" style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
                                     <i class="far fa-calendar-alt"></i>
                                     <span>${student_passport_expire || '-'}</span>
                                 </div>` : ''}
                             ${ (nationality_name) ? `
-                                <div style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
+                                <div class="hidden" style="font-size:11px; margin-top:10px; display:flex; gap:6px; word-break: break-all;">
                                     <i class="fas fa-globe"></i>
                                     <span>${nationality_name || '-'}</span>
                                 </div>` : ''}
@@ -301,7 +301,7 @@ function buildRegistration() {
                                 <i class="fas fa-building"></i>
                                 <span>${student_company || '-'}</span>
                             </div>
-                            <div style="font-size:11px; display:flex; gap:6px; word-break: break-all;">
+                            <div class="hidden" style="font-size:11px; display:flex; gap:6px; word-break: break-all;">
                                 <i class="fas fa-briefcase"></i>
                                 <span>${student_position || '-'}</span>
                             </div>
@@ -612,6 +612,7 @@ function buildRegistration() {
             <input type="search" class="form-control input-sm search-datatable" placeholder="" autocomplete="off" style="margin-bottom:0px !important;">
             <button type="button" class="btn btn-green" style="font-size:12px;" onclick="manageRegistration('')"><i class="fas fa-plus"></i> <span lang="en">Student</span></button> 
             <button type="button" class="btn btn-white text-green hidden" style="font-size:12px;" onclick="importStudent('')"><i class="fas fa-file-excel"></i> <span lang="en">Import</span></button> 
+            <button type="button" class="btn btn-white text-green" style="font-size:12px;" onclick="exportStudent('')"><i class="fas fa-file-excel"></i> <span lang="en">Export</span></button> 
         `;
         $('div#tb_registration_filter.dataTables_filter input').hide();
         $('div#tb_registration_filter.dataTables_filter label').append(template);
@@ -632,6 +633,156 @@ function buildRegistration() {
             }
         });
     }
+}
+function exportStudent() {
+    $(".systemModal").modal();
+    $(".systemModal .modal-header").html(`
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h5 class="modal-title" lang="en">Student Export (Excel)</h5>    
+    `);
+    $(".systemModal .modal-body").html(`
+        <h5 lang="en">Student Status</h5>
+        <p lang="en">Please choose status to export data.</p>
+        <div class="form-input">
+            <div class="row">
+                <div class="col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-info">
+                        <input class="styled" id="status_all" type="checkbox" value="all">
+                        <label for="status_all"><span lang="en">All</span></label>
+                    </div>
+                </div>
+                <div class="col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-warning">
+                        <input class="styled" id="status_lead" name="status_id[]" type="checkbox" value="lead">
+                        <label for="status_lead"><span lang="en">Lead</span></label>
+                    </div>
+                </div>
+                <div class="col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-primary">
+                        <input class="styled" id="status_register" type="checkbox" value="register" checked>
+                        <label for="status_register"><span lang="en">Register</span></label>
+                    </div>
+                </div>
+                <div class="col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-warning" style="margin-left: 20px;">
+                        <input class="styled sub-register" id="status_wait" name="status_id[]" type="checkbox" value="wait" checked>
+                        <label for="status_wait"><span lang="en">Waiting Approve</span></label>
+                    </div>
+                </div>
+                <div class="col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-success" style="margin-left: 20px;">
+                        <input class="styled sub-register" id="status_approve" name="status_id[]" type="checkbox" value="approve" checked>
+                        <label for="status_approve"><span lang="en">Approve</span></label>
+                    </div>
+                </div>
+                <div class="col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-success" style="margin-left: 20px;">
+                        <input class="styled sub-register" id="status_payment" name="status_id[]" type="checkbox" value="payment" checked>
+                        <label for="status_payment"><span lang="en">Payment</span></label>
+                    </div>
+                </div>
+                <div class="col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-danger">
+                        <input class="styled" id="status_cancels" type="checkbox" value="cancels">
+                        <label for="status_cancels"><span lang="en">Cancel Status</span></label>
+                    </div>
+                </div>
+                <div class="col-sm-12" style="margin-left: 20px; margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-danger">
+                        <input class="styled sub-cancels" id="status_notapprove" name="status_id[]" type="checkbox" value="notapprove">
+                        <label for="status_notapprove"><span lang="en">Not Approve</span></label>
+                    </div>
+                </div>
+                <div class="col-sm-12" style="margin-left: 20px; margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-danger">
+                        <input class="styled sub-cancels" id="status_notpayment" name="status_id[]" type="checkbox" value="notpayment">
+                        <label for="status_notpayment"><span lang="en">Not Payment</span></label>
+                    </div>
+                </div>
+                <div class="col-sm-12" style="margin-left: 20px; margin-top: 10px; margin-bottom: 10px;">
+                    <div class="checkbox checkbox-danger">
+                        <input class="styled sub-cancels" id="status_cancel" name="status_id[]" type="checkbox" value="cancel">
+                        <label for="status_cancel"><span lang="en">Cancel</span></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
+    $(".systemModal .modal-footer").html(`
+        <button type="button" class="btn btn-green" lang="en" onclick="exportToExcel();">Export</button>
+        <button type="button" class="btn btn-white" data-dismiss="modal" lang="en">Close</button>
+    `);
+    $('#status_all').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('input[name="status_id[]"]').prop('checked', true);
+        } else {
+            $('input[name="status_id[]"]').prop('checked', true);
+        }
+    });
+    $('#status_register').on('change', function() {
+        $('.sub-register').prop('checked', $(this).is(':checked'));
+        updateAllCheckbox();
+    });
+    $('#status_cancels').on('change', function() {
+        $('.sub-cancels').prop('checked', $(this).is(':checked'));
+        updateAllCheckbox();
+    });
+    $('.sub-register').on('change', function() {
+        updateParentCheckbox('#status_register', '.sub-register');
+        updateAllCheckbox();
+    });
+    $('.sub-cancels').on('change', function() {
+        updateParentCheckbox('#status_cancels', '.sub-cancels');
+        updateAllCheckbox();
+    });
+    $('#status_lead').on('change', function() {
+        updateAllCheckbox();
+    });
+    function updateParentCheckbox(parentId, childrenClass) {
+        const total = $(childrenClass).length;
+        const checked = $(childrenClass + ':checked').length;
+        if (checked === total) {
+            $(parentId).prop('checked', true);
+            $(parentId).prop('indeterminate', false);
+        } else if (checked === 0) {
+            $(parentId).prop('checked', false);
+            $(parentId).prop('indeterminate', false);
+        } else {
+            $(parentId).prop('indeterminate', true);
+        }
+    }
+    function updateAllCheckbox() {
+        const total = $('input[name="status_id[]"]').length;
+        const checked = $('input[name="status_id[]"]:checked').length;
+        if (checked === total) {
+            $('#status_all').prop('checked', true);
+            $('#status_all').prop('indeterminate', false);
+        } else if (checked === 0) {
+            $('#status_all').prop('checked', false);
+            $('#status_all').prop('indeterminate', false);
+        } else {
+            $('#status_all').prop('indeterminate', true);
+        }
+    }
+    updateParentCheckbox('#status_register', '.sub-register');
+    updateParentCheckbox('#status_cancels', '.sub-cancels');
+    updateAllCheckbox();
+}
+function exportToExcel() {
+    var status_id = [];
+	$('input[name="status_id[]"]:checked').each(function() {
+		status_id.push(this.value); 
+	});
+    if(status_id.length == 0) {
+		swal({type: 'warning',title: "Warning...",text: 'Please select at least 1 status.',showConfirmButton: false,timer: 2000,});
+	} else {
+		$.redirect("/classroom/management/export/registration.php",{ 
+			'classroom_id': classroom_id,
+			'status_id': status_id,
+            'filter_date': $("#filter_date").val(),
+            'filter_channel': $("#filter_channel").val()
+		},'post','_blank');
+	}
 }
 function viewFile(fileUrl, fileTitle) {
     $(".previewModal").modal();

@@ -504,7 +504,7 @@
                 'student_image_profile'=> !empty($information['image_profile']) ? escape_string($information['image_profile']) : '',
                 'student_email' => !empty($information['email']) ? strtolower(escape_string($information['email'])) : '',
                 'student_mobile' => !empty($information['mobile']) ? str_replace(['-', ' ', '(', ')'], '', escape_string($information['mobile'])) : '',
-                'student_company' => !empty($information['company']) ? scape_string($information['company']) : '',
+                'student_company' => !empty($information['company']) ? escape_string($information['company']) : '',
                 'student_position' => !empty($information['position']) ? escape_string($information['position']) : '',
                 'student_username' => !empty($information['username']) ? escape_string($information['username']) : '',
                 'student_password' => !empty($information['password']) ? $information['password'] : null,
@@ -1041,9 +1041,6 @@
         exit;
     }
     if(isset($_GET['action']) && $_GET['action'] == 'saveRegister') {
-        ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
         $classroom_id = isset($_POST['classroom_id']) ? intval($_POST['classroom_id']) : 0;
         if(!$classroom_id) {
             echo json_encode(array('status' => false, 'message' => 'Invalid classroom ID'));
