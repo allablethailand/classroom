@@ -75,7 +75,7 @@ function buildEmail() {
                                     <button type="button" class="btn btn-info btn-circle" onclick="previewTemplated(${mail_template_id})">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button type="button" class="btn btn-orange btn-circle" onclick="manageTemplate(${mail_template_id})">
+                                    <button type="button" class="btn btn-orange btn-circle" onclick="manageEmailTemplate(${mail_template_id})">
                                         <i class="fas fa-pencil-alt"></i>
                                     </button>
                                     ${mail_reference == 0 ? `
@@ -151,7 +151,7 @@ function restoreTemplate(template_id, event) {
                         showConfirmButton: false,
                         timer: 1500
                     });
-                    manageTemplate(template_id);
+                    manageEmailTemplate(template_id);
                 } else {
                     swal({
                         type: "error",
@@ -174,7 +174,7 @@ function restoreTemplate(template_id, event) {
         });
     });
 }
-function manageTemplate(template_id) {
+function manageEmailTemplate(template_id) {
 	$(".modal-template").modal();
     $(".modal-template .modal-title").html(`
         <button type="button" class="btn btn-white restore-template hidden" onclick="restoreTemplate(${template_id});" style="font-size:12px;">

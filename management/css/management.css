@@ -274,7 +274,7 @@ form p {
 .has-error-text {
     color: #FF9900 !important;
 }
-input[type="checkbox"],input[type="radio"] {
+.form-input input[type="checkbox"],.form-input input[type="radio"], .form-container input[type="checkbox"], .form-container input[type="radio"] {
     display: none;
 }
 .checkbox-label {
