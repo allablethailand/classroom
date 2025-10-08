@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </ul>
                     </div>
                     
-                    <p class="text-muted small text-center">${filename}</p>
+                    
                 </div>
             `;
             

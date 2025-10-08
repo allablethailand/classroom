@@ -314,7 +314,7 @@ if (isset($_GET['status']) && $_GET['status'] == 'success' && isset($_GET['msg']
             <button type="submit" class="btn btn-primary">อัปโหลดและบันทึก</button>
         </form>
         <hr>
-        <p>Path การอัปโหลดใน Server: `<?php echo $_SERVER['DOCUMENT_ROOT'] . BASE_PATH . '/uploads/classroom/'; ?>`</p>
+        <!-- <p>Path การอัปโหลดใน Server: `<?php echo $_SERVER['DOCUMENT_ROOT'] . BASE_PATH . '/uploads/classroom/'; ?>`</p> -->
     </div>
 </div>
 <?php  require_once("component/footer.php") // สมมติว่ามีไฟล์ footer ?>
