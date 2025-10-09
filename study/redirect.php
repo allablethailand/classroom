@@ -109,6 +109,7 @@
             
         }
     }
+    $_SESSION['student_id'] = $student_id;
     $_SESSION['emp_id'] = $emp_id;
     $_SESSION['comp_id'] = $comp_id;
     $_SESSION['classroom_id'] = $classroom_id;
