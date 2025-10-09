@@ -79,6 +79,8 @@
     </div>
 </nav>
 
+
+<!-- Footer Animation -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
   // Get current path or file from URL (e.g., "/chat", "/home", or "/setting")

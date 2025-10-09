@@ -1,5 +1,6 @@
 <?php
 
+@session_start();
 $base_include = $_SERVER['DOCUMENT_ROOT'];
 $base_path = '';
 if ($_SERVER['HTTP_HOST'] == 'localhost') {
@@ -13,43 +14,21 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
-require_once $base_include . '/actions/func.php';
+require_once $base_include . '/classroom/study/actions/student_func.php';
 
 $std_id = $_SESSION['student_id'];
 
-$columnStudent  = "classroom_id, group_id";
-$tableStudent = "classroom_student_join";
-$whereStudent = "where student_id = '{$std_id}'";
+$classroom_group = getStudentClassroomGroup($std_id);
 
+// $teacher_group = getTeacherMember($)
 
-$student_class = select_data($columnStudent, $tableStudent, $whereStudent);
+// $our_class = $student_class[0]["classroom_id"];
+// $our_group = $student_class[0]["group_id"];
 
-$our_class = $student_class[0]["classroom_id"];
-$our_group = $student_class[0]["group_id"];
-
-
-
-// var_dump($our_class);
-
-
-
-// $class_generation_id = $_POST['class_gen_id'];
-// $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
-// $tableGroup = "classroom_template";
-// $whereGroup = "where classroom_id = '{$our_class}'";
-// $whereGroup = "where classroom_id = '1' AND status = 0";
-
-$columnCourseGroup  = "group_id, group_name, group_logo, group_description, group_color";
-$tableCourseGroup = "classroom_group";
-$whereCourseGroup = "where classroom_id = '{$our_class}' AND group_id = '{$our_group}'";
-
-$classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
-
-// var_dump($our_class);
-
+$our_class = $classroom_group[0]["classroom_id"];
+$our_group = $classroom_group[0]["group_id"];
 
 // $classroom_group = select_data($columnGroup, $tableGroup, $whereGroup);
-
 // var_dump($classroom_group["classroom_id"]);
 // $class_id = $classroom_group['classroom_id'];
 
@@ -131,16 +110,14 @@ $count_student = $count_total[0]['total_student'];
 
 
             <?php
-            if ($classroom_group === [] || count($classroom_group) === 0) {
+            if (empty($classroom_group)) {
                 echo '<span class="display-4 fw-bold text-dark mb-bs-5 text-center">
                             ไม่พบข้อมูลกลุ่มที่คุณอยู่
                 </span>';
             }
 
             // Add animation on clikc transform color to group color.
-            
-            foreach ($classroom_group as $item): {
-            ?>
+            foreach ($classroom_group as $item): ?>
                     <div id="rowData" class="g-4 justify-content-center mb-bs-3 ">
                         <div class="col-12 col-md-6 col-lg-3">
                             <a href="student?<?php echo $item['group_id']; ?>" style="color: black; font-family: 'Kanit', sans-serif !important;">
@@ -166,7 +143,6 @@ $count_student = $count_total[0]['total_student'];
                         </div>
                     </div>
             <?php
-                }
             endforeach; ?>
 
             <div id="menu"></div>
@@ -177,7 +153,7 @@ $count_student = $count_total[0]['total_student'];
             </div>
             <div class="g-4 justify-content-center mb-bs-3 ">
                 <div class="col-12 col-md-6 col-lg-3">
-                    <a href="teacher?<?php echo $item['group_id']; ?>" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
+                    <a href="teacher" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
                         <div class="card group-card h-100 bg-teacher rounded-small " style="padding: 10px;  ">
                             <div class="panel-heading border-0" style="padding:0;">
                                 <div class="d-flex-bs align-items-center gap-3">
@@ -283,32 +259,6 @@ $count_student = $count_total[0]['total_student'];
                 </div>
 
 
-            </div>
-            <div class="g-4 justify-content-center bg-element-wind-two mx-3 mb-bs-3 rounded-small">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card group-card h-100 ">
-                        <div class="panel-heading border-0">
-                            <div class="d-flex-bs align-items-center gap-3">
-                                <div class="group-icon-large" style="color: #FFF;">
-                                   
-                                    <i class="fas fa-wind" style="width: 50px;"></i>
-                                </div>
-
-                                
-                                <div class="flex-grow-bs-1" style=" min-Width: 0 ">
-                                    <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                        <h4 class="panel-title mb-0 text-truncate">Fire</h4>
-                                    </div>
-                                    <p class="text-secondary mb-0 small text-truncate-2">
-                                        สมาชิกปัจจุบัน 50 คน
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
             </div> -->
         </div>
     </div>

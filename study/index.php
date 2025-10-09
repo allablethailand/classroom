@@ -51,6 +51,14 @@
         case '/classroom/study/studentinfo':
             require __DIR__.'/views/studentinfo.php';
         break;
+        case '/classroom/study/teacher/':
+        case '/classroom/study/teacher':
+            require __DIR__.'/views/teacher.php';
+        break;
+        case '/classroom/study/teacherinfo/':
+        case '/classroom/study/teacherinfo':
+            require __DIR__.'/views/teacherinfo.php';
+        break;
         case '/classroom/study/profile/':
         case '/classroom/study/profile':
             require __DIR__.'/views/profile.php';
