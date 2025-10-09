@@ -284,7 +284,14 @@ if ($stmt_name) {
 <body>
     <?php require_once 'component/header.php'; ?>
 <div class="main-content">
+    <div class="container-fluid">
+        <h1 class="heading-1">My Photo</h1>
+                    <div class="divider-1"> 
+                        <span></span>
+                    </div>
+    </div>
 <div class="container-fluid1" >
+    
 <h1 style="font-size: 20px; padding: 2em 1em 2em 1em;">My Photo: รูปภาพที่มี <?php echo $display_name; ?></h1>
 
 <div class="photo-container" id="myPhotoGallery">
