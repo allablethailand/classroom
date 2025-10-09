@@ -62,6 +62,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
     <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="/dist/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/dist/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/dist/css/sweetalert.css">
     <link rel="stylesheet" href="/dist/css/select2.min.css">
     <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
@@ -109,7 +110,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                     <div class="progress-section">
                                         
                                         <div class="time-schedule-class" style="margin-left: 0.5rem;">
-                                            <span class="small-text-gray"><?php echo $item['class_start'] . "-"  ;?></span>
+                                            <span class="small-text-gray"><?php echo "Period: ". $item['class_start'] . " - "  ;?></span>
                                             <span class="small-text-gray"><?php echo $item['class_end']; ?></span>
                                         </div>
                                         <div class="progress-header-flex">

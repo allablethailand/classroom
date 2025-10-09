@@ -116,8 +116,8 @@ $stmt_name->close();
 
 $hide_profile = ["Profile", "Edit Profile", "Setting"];
 
-// $notifications = select_data("*", "ogm_notification", "WHERE FIND_IN_SET('" . mysqli_real_escape_string($mysqli, $emp_id) . "', noti_emp_id) AND noti_comp_id = '" . mysqli_real_escape_string($mysqli, $comp_id) . "' AND noti_status = 0 AND noti_read is null limit 100");
-// $count_notification = count($notifications);
+$notifications = select_data("*", "ogm_notification", "WHERE FIND_IN_SET('" . mysqli_real_escape_string($mysqli, $emp_id) . "', noti_emp_id) AND noti_comp_id = '" . mysqli_real_escape_string($mysqli, $comp_id) . "' AND noti_status = 0 AND noti_read is null limit 100");
+$count_notification = count($notifications);
 
 
 ?>
@@ -166,8 +166,13 @@ $hide_profile = ["Profile", "Edit Profile", "Setting"];
                     <div class="dropdown" style="display: inline-block;">
                         <button class="bell-button btn btn-default dropdown-toggle" type="button" id="bellDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background: none; border: none; padding: 0;">
                             <i class="far fa-bell" style="font-size: 20px;"></i>
+                            <span class="notification-badge">4</span>
                         </button>
                        <ul class="dropdown-menu centered" aria-labelledby="bellDropdown">
+                            <li><a href="#" class="notification-item" data-message="แจ้งเตือนเวอร์ชั่นปัจจุบัน คือ BETA 1.1">Version alert: New!</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#" class="notification-item" data-message="แจ้งเตือนเวอร์ชั่นปัจจุบัน คือ BETA 1.1">Version alert: New!</a></li>
+                            <li class="divider"></li>
                             <li><a href="#" class="notification-item" data-message="แจ้งเตือนเวอร์ชั่นปัจจุบัน คือ BETA 1.1">Version alert: New!</a></li>
                             <li class="divider"></li>
                             <li><a href="#" class="notification-item" data-message="ข้อความแจ้งเตือนอื่น ๆ">Other notification</a></li>
@@ -216,6 +221,21 @@ $hide_profile = ["Profile", "Edit Profile", "Setting"];
             </a>
             <?php endif; ?>
         </div>
+        <script>
+            const currentPage = window.location.pathname.split('/').pop();
+            const backButton = document.getElementsByClassName('back-button'); // or get button by other selector
+            console.log(currentPage);
+
+            backButton.onclick = function() {
+                if (currentPage === 'classroominfo') {
+                    // Redirect to class.php when on classroominfo.php
+                    window.location.href = 'class';
+                } else {
+                    // Otherwise, go back in history
+                    window.history.back();
+                }
+            };
+        </script>
     <?php
     }
     ?>
