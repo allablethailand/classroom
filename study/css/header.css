@@ -165,8 +165,10 @@
 /* Center the dropdown menu relative to the bell button */
   .dropdown-menu.centered {
     left: 50% !important;
-    transform: translate(-50%, 10%);
-    min-width: 12rem;
+    transform: translate(-80%, 10%);
+    min-width: 25rem;
+    /* max-width: 30vh; */
+    /* max-width: 100rem; */
     border-radius: 10px;
   }
 
@@ -175,7 +177,7 @@
     content: "";
     position: absolute;
     top: -8px; /* above the menu */
-    left: 50%;
+    left: 80%;
     transform: translateX(-50%);
     border-width: 0 10px 10px 10px;
     border-style: solid;
