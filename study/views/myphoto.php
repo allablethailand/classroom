@@ -1,5 +1,4 @@
 <?php
-// myphoto.php (หน้าแสดงผล)
 session_start();
 // ตรวจสอบ session และดึง student_id
 $student_id = $_SESSION['student_id'] ? $_SESSION['student_id'] : null;
@@ -11,11 +10,6 @@ if (!$student_id) {
     // จัดการกรณีที่ไม่พบ session
     die("กรุณาเข้าสู่ระบบ");
 }
-
-// ------------------------------------------------------------------------------------------------------
-// NEW: ดึงข้อมูลชื่อนักเรียน
-// ------------------------------------------------------------------------------------------------------
-
 // *** จำลองการเรียกไฟล์ตั้งค่าและเชื่อมต่อฐานข้อมูล (ต้องให้เหมือนกับ myphoto_process.php) ***
 date_default_timezone_set('Asia/Bangkok');
 $base_include = $_SERVER['DOCUMENT_ROOT'];
@@ -207,11 +201,11 @@ if ($stmt_name) {
 
         .container-fluid1 {
            margin-right: 1em;
-            margin-left: 1em;
-            /* margin-right: auto; */
-            /* margin-left: auto; */
-            background-color: #ffffff;
-            border-radius: 8px;
+           margin-left: 1em;
+           /* margin-right: auto; */
+           /* margin-left: auto; */
+           background-color: #ffffff;
+           border-radius: 8px;
         }
         
         /* NEW: Responsive สำหรับ Mobile View (ปรับให้เล็กกว่า Desktop เดิม) */
@@ -322,6 +316,8 @@ if ($stmt_name) {
 <script>
 // ข้อมูลรูปภาพที่ดึงมาจาก API (ใช้เก็บข้อมูล Event ทั้งหมดไว้ในตัวแปรนี้)
 let allGroupedPhotos = {}; 
+// NEW: ตัวแปรสำหรับเก็บชื่อ Event และวันที่สร้าง เพื่อใช้ในการเรียงอัลบั้ม
+let eventCreationDates = {}; 
 
 document.addEventListener('DOMContentLoaded', function() {
     const gallery = document.getElementById('myPhotoGallery');
@@ -398,27 +394,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ฟังก์ชันสำหรับเรียก PHP process และสร้าง Album View
     function fetchMyPhotos() {
-        fetch(`myphoto_process?student_id=${studentId}`)
+        fetch(`actions/myphoto.php?student_id=${studentId}`)
             .then(response => response.json())
             .then(data => {
                 gallery.innerHTML = ''; 
                 
                 if (data.status === 'success' && data.data && data.data.length > 0) {
                     
-                    // 1. จัดกลุ่มรูปภาพตาม Event (description)
+                    // 1. จัดกลุ่มรูปภาพตาม Event (description) และเก็บวันที่สร้าง
                     const groupedPhotos = data.data.reduce((acc, current) => {
                         const eventName = current.description || 'รูปภาพที่ไม่มีชื่อ Event'; 
                         if (!acc[eventName]) {
                             acc[eventName] = [];
                         }
                         acc[eventName].push(current);
+                        // เก็บวันที่สร้างอัลบั้มเพื่อใช้เรียงลำดับในขั้นตอนถัดไป
+                        // ใช้ตัวแปรแยกเพื่อไม่ให้ซับซ้อน
+                        if (!eventCreationDates[eventName]) {
+                            eventCreationDates[eventName] = current.date_create;
+                        }
                         return acc;
                     }, {});
                     
                     allGroupedPhotos = groupedPhotos; 
                     
-                    // 2. สร้าง HTML เพื่อแสดงผลเป็น Album Stack
-                    for (const eventName in groupedPhotos) {
+                    // 2. เรียงลำดับชื่อ Event ตามวันที่สร้าง (ล่าสุดก่อน)
+                    const sortedEventNames = Object.keys(groupedPhotos).sort((a, b) => {
+                        // เปรียบเทียบวันที่สร้างเป็น ISO string
+                        // b > a จะเป็นการเรียงจากใหม่ไปเก่า (DESC)
+                        return eventCreationDates[b].localeCompare(eventCreationDates[a]);
+                    });
+                    
+                    // 3. สร้าง HTML เพื่อแสดงผลเป็น Album Stack ตามลำดับที่เรียงแล้ว
+                    sortedEventNames.forEach(eventName => { // <== วนลูปตามลำดับที่เรียงแล้ว
                         const eventPhotos = groupedPhotos[eventName];
                         const photoCount = eventPhotos.length;
 
@@ -450,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         `;
 
                         gallery.appendChild(albumBox);
-                    }
+                    });
                 } else {
                     gallery.innerHTML = `<p>⚠️ ไม่พบรูปภาพที่มีคุณอยู่ในอัลบั้มรวม. ${data.message || ''}</p>`;
                 }
@@ -465,6 +473,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-   <?php require_once("component/footer.php") ?>
+    <?php require_once("component/footer.php") ?>
 </body>
 </html>

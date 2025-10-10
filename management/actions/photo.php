@@ -1,5 +1,4 @@
 <?php
-
 // add_group_photo.php
 
 // ------------------------------------------------------------------------------------------------------
@@ -79,18 +78,18 @@ function runFaceDetectionBatch($mysqli, $group_photo_id, $group_db_path) {
     $document_root = rtrim($_SERVER['DOCUMENT_ROOT'] . $base_path, '/') . '/'; 
 
     $python_interpreter = '"C:\Program Files\Python310\python.exe"'; 
-    $python_script = BASE_INCLUDE . '/classroom/study/views/myphoto1.py'; 
+    $python_script = BASE_INCLUDE . '/classroom/management/actions/python/myphoto1.py'; 
 
     // 1. ดึงรูปโปรไฟล์ของนักเรียนทุกคน
     $ref_paths_all = [];
     $student_ids = []; 
     $sql_all_students = "SELECT DISTINCT t1.student_id, t2.file_path 
-                         FROM `classroom_student` t1
-                         JOIN `classroom_file_student` t2 ON t1.student_id = t2.student_id
-                         WHERE t2.`file_type` = 'profile_image' 
-                         AND t2.`is_deleted` = 0 
-                         ORDER BY t1.student_id, t2.file_id DESC";
-                         
+                          FROM `classroom_student` t1
+                          JOIN `classroom_file_student` t2 ON t1.student_id = t2.student_id
+                          WHERE t2.`file_type` = 'profile_image' 
+                          AND t2.`is_deleted` = 0 
+                          ORDER BY t1.student_id, t2.file_id DESC";
+                           
     $result_all = $mysqli->query($sql_all_students);
     
     // Grouping file_path by student_id
@@ -155,7 +154,7 @@ function runFaceDetectionBatch($mysqli, $group_photo_id, $group_db_path) {
 
             $mysqli->query($sql_insert_batch);
             
-            return "พบนักเรียน {$group_photo_id} ในรูป: " . count($found_student_ids) . " คน";
+            return "อัพโหลดสำเร็จ";
         }
         return "ไม่พบนักเรียนคนใดในรูปกลุ่ม";
 
@@ -178,7 +177,8 @@ if (!$student_id) {
 }
 
 $message = '';
-$redirect_to = $_SERVER['PHP_SELF']; // URL ของไฟล์ปัจจุบัน
+// ใช้ URL ของไฟล์ปัจจุบันสำหรับ Redirect (ถ้าไฟล์นี้ถูกเรียกผ่าน AJAX/Modal ควรจะจัดการ Client-side)
+$redirect_to = $_SERVER['REQUEST_URI']; 
 
 // **✅ NEW: เพิ่ม Logic สำหรับ Multiple File Upload**
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && isset($_POST['event_name'])) {
@@ -213,8 +213,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && is
         if ($db_file_path) {
             // 1. บันทึก Path ลงในตาราง classroom_photo_album_group
             $sql = "INSERT INTO `classroom_photo_album_group` 
-                    (`group_photo_path`, `description`, `emp_create`, `date_create`) 
-                    VALUES (?, ?, ?, NOW())";
+                     (`group_photo_path`, `description`, `emp_create`, `date_create`) 
+                     VALUES (?, ?, ?, NOW())";
             
             $stmt = $mysqli->prepare($sql);
             if ($stmt) {
@@ -241,82 +241,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && is
         }
     }
     
-    // สรุปผลลัพธ์และ Redirect
+    // สรุปผลลัพธ์และส่งกลับไปยัง Client-side
+    // เนื่องจากอยู่ภายใน Modal เราจะส่ง JSON response กลับไป
+    header('Content-Type: application/json');
     if ($total_uploaded > 0) {
-        $msg_summary = "✅ อัปโหลดรูปภาพกลุ่มสำเร็จ: **{$total_uploaded}** รูป, ตรวจจับพบนักเรียนในรูป: **{$total_detected}** รูป";
-        if (!empty($errors)) {
-             $msg_summary .= " (มีข้อผิดพลาด {$msg_count} รูป)";
-        }
-        $success_msg = urlencode($msg_summary);
-        header("Location: {$redirect_to}?msg={$success_msg}&status=success");
-        exit;
+        $msg_summary = " อัปโหลดรูปภาพกลุ่มสำเร็จ";
+        $response = [
+            'status' => 'success',
+            'message' => $msg_summary,
+            'errors' => $errors
+        ];
     } else {
-        $message = "<div class='alert alert-danger'>❌ Error: ไม่สามารถอัปโหลดไฟล์ใดๆ ได้ (ตรวจสอบสิทธิ์ไฟล์หรือขนาดไฟล์)</div>";
-        if (!empty($errors)) {
-            $message .= "<div class='alert alert-warning'>รายละเอียด: " . implode('<br>', $errors) . "</div>";
-        }
+        $msg_error = "❌ Error: ไม่สามารถอัปโหลดไฟล์ใดๆ ได้ (ตรวจสอบสิทธิ์ไฟล์หรือขนาดไฟล์)";
+        $response = [
+            'status' => 'error',
+            'message' => $msg_error,
+            'errors' => $errors
+        ];
     }
+    echo json_encode($response);
+    exit; 
 }
 
-// **แสดง Message จาก Query Parameter หลัง Redirect**
-if (isset($_GET['status']) && $_GET['status'] == 'success' && isset($_GET['msg'])) {
-    $message = "<div class='alert alert-success'>" . htmlspecialchars(urldecode($_GET['msg'])) . "</div>";
-}
+
+// **แสดง HTML Form สำหรับ Modal Body**
+// หากมีการเรียกไฟล์นี้โดยไม่มี POST (เช่น ถูกโหลดครั้งแรกผ่าน AJAX เพื่อแสดง Form)
 ?>
-
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
-<title>Add Group Photo • ORIGAMI SYSTEM</title>
-<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
-<link rel="stylesheet" href="/dist/css/dataTables.bootstrap.min.css">
-<link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
-<link rel="stylesheet" href="/dist/css/sweetalert.css">
-<link rel="stylesheet" href="/dist/css/select2.min.css">
-<link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
-<link rel="stylesheet" href="/dist/css/jquery-ui.css">
-<link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
-<link rel="stylesheet" href="/classroom/study/css/myphoto.css?v=<?php echo time(); ?>">
-<script src="/dist/js/jquery/3.6.3/jquery.js"></script>
-<script src="/bootstrap/3.3.6/js/jquery-2.2.3.min.js" type="text/javascript"></script>
-<script src="/dist/js/sweetalert.min.js"></script>
-<script src="/dist/js/jquery.dataTables.min.js"></script>
-<script src="/dist/js/dataTables.bootstrap.min.js"></script>
-<script src="/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
-<script src="/dist/js/select2-build.min.js?v=<?php echo time(); ?>" type="text/javascript" ></script>
-<script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
-<script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
-<script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
-<script src="/classroom/study/js/myphoto.js?v=<?php echo time(); ?>" type="text/javascript"></script>
-</head>
-
-<body>
-    <?php  require_once 'component/header.php'; // สมมติว่ามีไฟล์ header ?>
-
 <div class="container-fluid">
-    <div class="container-fluid">
-        <h2>เพิ่มรูปภาพกลุ่มสำหรับ Face Recognition</h2>
-        <?php echo $message; ?>
-        <form action="" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="event_name">ชื่อ Event / คำอธิบาย (จะใช้จัดกลุ่มภาพ):</label>
-                <input type="text" class="form-control" name="event_name" id="event_name" maxlength="255" required>
-            </div>
-            <div class="form-group">
-                <label for="group_photo">เลือกรูปภาพกลุ่ม (สามารถเลือกได้หลายไฟล์):</label>
-                <input type="file" class="form-control" name="group_photo[]" id="group_photo" accept="image/jpeg, image/png" multiple required>
-            </div>
-            <button type="submit" class="btn btn-primary">อัปโหลดและบันทึก</button>
-        </form>
-        <hr>
-        <!-- <p>Path การอัปโหลดใน Server: `<?php echo $_SERVER['DOCUMENT_ROOT'] . BASE_PATH . '/uploads/classroom/'; ?>`</p> -->
+    <h2>เพิ่มรูปภาพกลุ่มสำหรับ Face Recognition</h2>
+    <div id="upload-message-area">
+    <?php 
+    // ถ้ามีการ Redirect มาพร้อม Message ใน Query Param 
+    if (isset($_GET['status']) && isset($_GET['msg'])) {
+        $status = htmlspecialchars($_GET['status']);
+        $message = htmlspecialchars(urldecode($_GET['msg']));
+        $alert_class = ($status == 'success') ? 'alert-success' : 'alert-danger';
+        echo "<div class='alert {$alert_class}'>{$message}</div>";
+    }
+    ?>
     </div>
+    
+    <form action="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>" method="POST" enctype="multipart/form-data" id="photo-upload-form">
+        <div class="form-group">
+            <label for="event_name">ชื่อ Event / คำอธิบาย (จะใช้จัดกลุ่มภาพ):</label>
+            <input type="text" class="form-control" name="event_name" id="event_name_modal" maxlength="255" required>
+        </div>
+        <div class="form-group">
+            <label for="group_photo">เลือกรูปภาพกลุ่ม (สามารถเลือกได้หลายไฟล์):</label>
+            <input type="file" class="form-control" name="group_photo[]" id="group_photo_modal" accept="image/jpeg, image/png" multiple required>
+        </div>
+        <button type="submit" style="background-color: #00C292;" class="btn btn-primary" id="upload-photo-btn">อัปโหลดและบันทึก</button>
+    </form>
 </div>
-<?php  require_once("component/footer.php") // สมมติว่ามีไฟล์ footer ?>
-</body>
-</html>
+
+<script>
+// สคริปต์สำหรับการจัดการฟอร์มผ่าน AJAX เพื่อให้ Modal ไม่ปิด
+// ต้องแน่ใจว่าได้โหลด jQuery แล้ว
+$(document).ready(function() {
+    $('#photo-upload-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        var form = $(this);
+        var formData = new FormData(form[0]);
+        var submitBtn = $('#upload-photo-btn');
+        var messageArea = $('#upload-message-area');
+
+        // ปิดปุ่ม, แสดง Loading
+        submitBtn.prop('disabled', true).text('กำลังอัปโหลด...');
+        messageArea.empty();
+
+        $.ajax({
+            url: form.attr('action'),
+            type: form.attr('method'),
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json', // คาดหวัง JSON Response
+            success: function(response) {
+                if (response.status === 'success') {
+                    messageArea.html('<div class="alert alert-success">' + response.message + '</div>');
+                    // อาจจะ clear form ได้ที่นี่
+                    form[0].reset();
+                } else {
+                    var errorHtml = '<div class="alert alert-danger">' + response.message + '</div>';
+                    if (response.errors && response.errors.length > 0) {
+                         errorHtml += '<div class="alert alert-warning">รายละเอียดข้อผิดพลาด: ' + response.errors.join('<br>') + '</div>';
+                    }
+                    messageArea.html(errorHtml);
+                }
+            },
+            error: function(xhr, status, error) {
+                messageArea.html('<div class="alert alert-danger">เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: ' + error + '</div>');
+            },
+            complete: function() {
+                // เปิดปุ่มกลับมา
+                submitBtn.prop('disabled', false).html('<i class="fas fa-camera-retro"></i> อัปโหลดและบันทึก');
+            }
+        });
+    });
+});
+</script>
