@@ -78,7 +78,7 @@ function runFaceDetectionBatch($mysqli, $group_photo_id, $group_db_path) {
     $document_root = rtrim($_SERVER['DOCUMENT_ROOT'] . $base_path, '/') . '/'; 
 
     $python_interpreter = '"C:\Program Files\Python310\python.exe"'; 
-    $python_script = BASE_INCLUDE . '/classroom/management/actions/python/myphoto1.py'; 
+    $python_script = BASE_INCLUDE . '/classroom/management/actions/python/myphoto.py'; 
 
     // 1. ดึงรูปโปรไฟล์ของนักเรียนทุกคน
     $ref_paths_all = [];
