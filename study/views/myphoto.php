@@ -118,7 +118,7 @@ if ($stmt_name) {
         .photo-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
             margin-top: 0px; 
             /* NEW: จัดเรียงให้อยู่ตรงกลางเมื่อมีที่ว่าง */
             justify-content: center; 
@@ -207,6 +207,37 @@ if ($stmt_name) {
            background-color: #ffffff;
            border-radius: 8px;
         }
+        .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: -85px;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 100px;
+    padding: 5px 5px;
+    margin: 2px 0 0;
+    font-size: 14px;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+.dropdown-menu>li>a {
+    display: block;
+    padding: 3px 10px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}
         
         /* NEW: Responsive สำหรับ Mobile View (ปรับให้เล็กกว่า Desktop เดิม) */
         @media (max-width: 767px) {
@@ -246,8 +277,7 @@ if ($stmt_name) {
                 padding-left: 5px;
                 padding-right: 5px;
             }
-        }
-        .photo-container {
+            photo-container {
             display: flex;
             flex-wrap: wrap;
             gap: 0px;
@@ -255,6 +285,8 @@ if ($stmt_name) {
             /* NEW: จัดเรียงให้อยู่ตรงกลางเมื่อมีที่ว่าง */
             justify-content: center; 
         }
+        }
+        .
         /* ... (CSS ส่วนปุ่มดาวน์โหลดใน Modal คงเดิม) ... */
         .modal-photo-wrapper {
             position: relative;
@@ -262,8 +294,8 @@ if ($stmt_name) {
         }
         .download-menu {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 3px;
+            right: 8px;
             z-index: 10;
             opacity: 0.7; 
             transition: opacity 0.2s;
@@ -289,6 +321,12 @@ if ($stmt_name) {
             border-bottom: 1px solid #e5e5e5;
             background-color: #fbe299;
             border-radius: 8px;
+        }
+        #modalGallery .col-xs-6,
+        #modalGallery .col-sm-4 {
+            padding-left: 5px !important; /* ใช้ !important เพื่อให้แน่ใจว่า Override Bootstrap default */
+            padding-right: 5px !important; /* ใช้ !important เพื่อให้แน่ใจว่า Override Bootstrap default */
+            padding-bottom: 5px;
         }
 </style>
 </head>
@@ -372,11 +410,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const filename = photo.path.substring(photo.path.lastIndexOf('/') + 1);
 
             const colDiv = document.createElement('div');
-            colDiv.className = 'col-xs-6 col-sm-4 col-md-3'; 
+            colDiv.className = 'col-xs-6 col-sm-4'; 
             
             // โครงสร้างสำหรับปุ่มดาวน์โหลด
             colDiv.innerHTML = `
-                <div class="modal-photo-wrapper">
+                <div class="modal-photo-wrapper" >
                     <a href="${full_url}" target="_blank" title="${filename}">
                         <img src="${full_url}" class="img-responsive" style="width: 100%; height: 130px; object-fit: cover; border: 1px solid #ccc; border-radius: 4px;">
                     </a>
