@@ -36,6 +36,12 @@
 
   <!-- work ON mobile screen ONLY -->
   <div class="main-content">
+    <div class="container-fluid">
+      <h1 class="heading-1" >Origami AI</h1>
+       <div class="divider-1">
+           <span></span>
+       </div>
+    </div>
     <div class="text-center space-y-8 max-w-4xl mx-auto">
       <div class="relative mx-auto w-32 h-32 md:w-40 md:h-40 mb-8" style="margin-bottom: 1rem;">
         <div class="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full animate-ping opacity-75"></div>

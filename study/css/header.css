@@ -165,7 +165,7 @@
 /* Center the dropdown menu relative to the bell button */
   .dropdown-menu.centered {
     left: 50% !important;
-    transform: translate(-80%, 10%);
+    transform: translate(-80%, 5%);
     min-width: 25rem;
     /* max-width: 30vh; */
     /* max-width: 100rem; */
@@ -209,6 +209,13 @@
     animation: pulse 2s infinite;
   }
 
+  .menu-readall {
+    text-align: center;
+    display: block;
+    padding: 5px;
+    color: #FF7B47;
+  }
+
 
   /* CLADUE CODE */
 
@@ -239,9 +246,9 @@
 
         /* Notification Items */
         .notification-item {
-            display: block !important;
+            display: inline-block !important;
             padding: 12px 15px !important;
-            color: #333 !important;
+            /* color: #333 !important; */
             text-decoration: none !important;
             transition: background-color 0.2s ease;
         }
@@ -304,3 +311,5 @@
             margin: 0 !important;
             background-color: rgba(0, 0, 0, 0.05) !important;
         }
+
+       

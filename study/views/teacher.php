@@ -35,7 +35,7 @@ $teacher_count = count($teacher_list);
     <title>Teacher • ORIGAMI SYSTEM</title>
     <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/classroom/study/css/schedule.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/classroom/study/css/teacher.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/dist/css/sweetalert.css">
     <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
@@ -86,52 +86,55 @@ $teacher_count = count($teacher_list);
                 <input type="text" id="studentSearch" onkeyup="searchStudents()" placeholder="ค้นหาอาจารย์...">
             </div>
 
-            <?php
-            if ($teacher_count > 0) {
-                foreach ($teacher_list as $row) {
-                    $teacher_pic = !empty($row['teacher_image_profile']) ? GetUrl($row['teacher_image_profile']) : '../../../images/default.png';
-                    
-                    $border_color = '#ff8c00';
-            ?>
-                    <a href="teacherinfo?id=<?= htmlspecialchars($row['teacher_id']); ?>" class="teacher-card">
-                        <p class="teacher-id-display">
-                            ID: <?= htmlspecialchars($row['teacher_id']); ?>
-                        </p>
+            <div class="group-list">
+                <?php
+                if ($teacher_count > 0) {
+                    foreach ($teacher_list as $row) {
+                        $teacher_pic = !empty($row['teacher_image_profile']) ? GetUrl($row['teacher_image_profile']) : '../../../images/default.png';
+                        
+                        $border_color = '#ff8c00';
+                ?>
+                        <a href="teacherinfo?id=<?= htmlspecialchars($row['teacher_id']); ?>" class="teacher-card">
+                            <p class="teacher-id-display">
+                                ID: <?= htmlspecialchars($row['teacher_id']); ?>
+                            </p>
 
-                        <div class="teacher-avatar" style="border-color: <?= $border_color; ?>;">
-                            <img src="<?= htmlspecialchars($teacher_pic); ?>" alt="Teacher Avatar"
-                              style="width:50px; height:50px;" onerror="this.src='../../../images/default.png'">
-                        </div>
+                            <div class="teacher-avatar" style="border-color: <?= $border_color; ?>;">
+                                <img src="<?= htmlspecialchars($teacher_pic); ?>" alt="Teacher Avatar"
+                                style="width:100%; height:100%;" onerror="this.src='../../../images/default.png'">
+                            </div>
 
-                        <div class="teacher-info">
-                            <h4 class="teacher-name">
-                                <i class="fas fa-chalkboard-teacher" style="margin-right:10px"></i>
-                                <?= htmlspecialchars($row['teacher_firstname_th'] . " " . $row['teacher_lastname_th']); ?>
-                            </h4>
-                            <p class="teacher-nickname">
-                                <i class="fas fa-user" style="margin-right:10px"></i>
-                                <?= !empty($row['teacher_nickname_th']) ? htmlspecialchars($row['teacher_nickname_th']) : "-"; ?>
-                            </p>
-                            <p class="teacher-email">
-                                <i class="fas fa-envelope" style="margin-right:10px"></i>
-                                <?= !empty($row['teacher_email']) ? htmlspecialchars($row['teacher_email']) : "-"; ?>
-                            </p>
-                            <p class="teacher-mobile">
-                                <i class="fas fa-phone" style="margin-right:10px"></i>
-                                <?= !empty($row['teacher_mobile']) ? htmlspecialchars($row['teacher_mobile']) : "-"; ?>
-                            </p>
-                            <p class="teacher-address">
-                                <i class="fas fa-map-marker-alt" style="margin-right:10px"></i>
-                                <?= !empty($row['teacher_address']) ? htmlspecialchars($row['teacher_address']) : "-"; ?>
-                            </p>
-                        </div>
-                    </a>
-            <?php
+                            <div class="teacher-info">
+                                <h4 class="teacher-name">
+                                    <i class="fas fa-chalkboard-teacher" style="margin-right:10px"></i>
+                                    <?= "ชื่อ: ". htmlspecialchars($row['teacher_firstname_th'] . " " . $row['teacher_lastname_th']); ?>
+                                </h4>
+                                <p class="teacher-nickname">
+                                    <i class="fas fa-user" style="margin-right:10px"></i>ชื่อเล่น:
+                                    <?= !empty($row['teacher_nickname_th']) ? htmlspecialchars($row['teacher_nickname_th']) : "-"; ?>
+                                </p>
+                                <p class="teacher-email">
+                                    <i class="fas fa-envelope" style="margin-right:10px"></i>
+                                    <?= !empty($row['teacher_email']) ? htmlspecialchars($row['teacher_email']) : "-"; ?>
+                                </p>
+                                <p class="teacher-mobile">
+                                    <i class="fas fa-phone" style="margin-right:10px"></i>
+                                    <?= !empty($row['teacher_mobile']) ? htmlspecialchars($row['teacher_mobile']) : "-"; ?>
+                                </p>
+                                <p class="teacher-address">
+                                    <i class="fas fa-map-marker-alt" style="margin-right:10px"></i>
+                                    <?= !empty($row['teacher_address']) ? htmlspecialchars($row['teacher_address']) : "-"; ?>
+                                </p>
+                            </div>
+                        </a>
+                <?php
+                    }
+                } else {
+                    echo "<p style='text-align: center; color: #888;'>ไม่พบข้อมูลอาจารย์ผู้สอน</p>";
                 }
-            } else {
-                echo "<p style='text-align: center; color: #888;'>ไม่พบข้อมูลอาจารย์ผู้สอน</p>";
-            }
-            ?>
+                ?>
+            </div>
+           
         </div>
         <?php require_once("component/footer.php"); ?>
 
