@@ -43,6 +43,7 @@ $alumni_list = getStudentClassroomList($student_id);
     <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
     <link rel="stylesheet" href="/dist/css/jquery-ui.css">
     <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/classroom/study/css/header.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/classroom/study/css/history.css?v=<?php echo time(); ?>">
     <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
     <script src="/bootstrap/3.3.6/js/jquery-2.2.3.min.js" type="text/javascript"></script>
@@ -110,8 +111,9 @@ $alumni_list = getStudentClassroomList($student_id);
 
         .tabs-section {
             padding: 15px 20px 10px;
-            background: white;
+            background: #fff;
             margin-inline: 10px;
+            border-radius: 15px;
         }
 
         .main-tabs {
@@ -135,9 +137,9 @@ $alumni_list = getStudentClassroomList($student_id);
         }
 
         .main-tab.active {
-            background: white;
-            color: #333;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            background: #F68D26;
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         }
 
         .filter-tabs {
@@ -164,9 +166,9 @@ $alumni_list = getStudentClassroomList($student_id);
         }
 
         .filter-tab.active {
-            background: #4a5cff;
+            background: #f57c00;
             color: white;
-            border-color: #4a5cff;
+            border-color: #fff3e0;
         }
 
         .badge-count {
@@ -188,6 +190,7 @@ $alumni_list = getStudentClassroomList($student_id);
         }
 
         .order-card {
+            display: flex;
             background: white;
             border-radius: 12px;
             padding: 16px;
@@ -223,17 +226,17 @@ $alumni_list = getStudentClassroomList($student_id);
         }
 
         .order-icon {
-            width: 45px;
+            /* width: 45px;
             height: 45px;
-            background: #f5f5f5;
+            background: #f5f5f5; */
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
             color: #666;
-            float: left;
-            margin-right: 12px;
+            /* float: left; */
+            margin-right: 20px;
         }
 
         .order-info {
@@ -342,30 +345,27 @@ $alumni_list = getStudentClassroomList($student_id);
 
     <div class="main-content">
         <!-- Tabs Section -->
-            <h1 class="heading-1" style=" padding: 5px; margin-inline: 10px;" >ประวัติการเข้าเรียน</h1>
-            <!-- <div class="divider-1">
-                <span></span>
-            </div> -->
+         <div class="container-fluid">
+             <h1 class="heading-1" >ประวัติการเข้าเรียน</h1>
+             <div class="divider-1">
+                 <span></span>
+             </div>
+         </div>
             <div class="tabs-section">
                 
                 <div class="" style="display: flex; gap: 10px;">
+                     <!-- <button class="navbox-button" id="searchBtn">
+                        <svg class="icon-svg" viewBox="0 0 45 45" style="width:150px; height:150px;">
+                            <g>
+                                <path d="M22.2356 14.7298C25.828 14.7301 28.7405 17.6431 28.7405 21.2356C28.7403 22.616 28.3079 23.8947 27.5745 24.9475L29.9329 27.3069C30.382 27.756 30.382 28.4838 29.9329 28.9329C29.4838 29.382 28.756 29.382 28.3069 28.9329L25.9475 26.5745C24.8946 27.3079 23.616 27.7404 22.2356 27.7405C18.6431 27.7405 15.7301 24.828 15.7297 21.2356C15.7297 17.6429 18.6429 14.7298 22.2356 14.7298ZM22.2356 17.0305C19.9131 17.0305 18.0305 18.9132 18.0305 21.2356C18.0309 23.5578 19.9134 25.4407 22.2356 25.4407C24.5575 25.4403 26.4403 23.5576 26.4407 21.2356C26.4407 18.9134 24.5578 17.0309 22.2356 17.0305Z" fill="#26273A" />
+                            </g>
+                        </svg>
+                    </button> -->
+                    <div style="display: flex; align-items: center;">
+                        <p>หลักสูตร: </p>
+                    </div>
                     <div class="account-picker">
-                        <!-- <div class="account-bg-layer"></div> -->
-                        <!-- <div class="account-content">
-                            <div class="visa-logo">
-                                <svg class="icon-svg" viewBox="0 0 52 20">
-                                    <path d="M33.4082 0C35.203 0 36.9297 0.673828 36.9297 0.673828L36.3701 3.99414C34.6961 3.04739 30.881 2.81965 30.8809 4.56836C30.8809 6.3172 36.3457 6.83824 36.3457 10.708C36.3457 14.5778 32.3136 16 29.6416 16C26.9931 15.9999 25.25 15.1429 25.2197 15.1279L25.8027 11.6592C27.4084 12.978 32.2656 13.3539 32.2656 11.2578C32.2655 9.16176 26.8496 9.11192 26.8496 5.11816C26.8497 0.872545 31.4644 8.98359e-05 33.4082 0ZM50 15.7314H46.4023V15.7354L45.9434 13.4404H40.9658L40.1494 15.7354H36.0684L41.9072 1.43066C41.9072 1.43066 42.2615 0.277591 43.7139 0.277344H46.8652L50 15.7314ZM22.8086 15.7314H18.8936L21.3398 0.277344H25.2559L22.8086 15.7314ZM8.24121 0.272461C9.93021 0.272461 10.0988 1.65109 10.1006 1.66602L11.4209 8.61621L11.8633 10.9062L15.5977 0.277344H19.8105L13.5811 15.7275H9.50098L6.09766 2.30566C5.1277 1.70712 4.22036 1.29312 3.50684 1.01758C3.47644 1.00583 3.44667 0.993674 3.41699 0.982422C2.55561 0.656189 2 0.537109 2 0.537109L2.00098 0.533203H2L2.07227 0.272461H8.24121ZM42.0928 10.2656H45.3076L44.1494 4.48145L42.0928 10.2656Z" fill="currentColor" />
-                                </svg>
-                            </div>
-                            <div class="account-text">ending with***9749</div>
-                            <div class="account-arrow">
-                                <svg class="icon-svg" viewBox="0 0 7 8">
-                                    <path d="M6.42052 4.754C6.38285 4.79267 6.24062 4.958 6.10813 5.094C5.33139 5.94933 3.30508 7.34933 2.24452 7.77667C2.08346 7.84533 1.67625 7.99067 1.45868 8C1.2502 8 1.05147 7.952 0.861828 7.85467C0.625426 7.71867 0.435785 7.50467 0.331872 7.252C0.264978 7.07667 0.161065 6.552 0.161065 6.54267C0.0571521 5.96867 0 5.036 0 4.00533C0 3.02333 0.0571521 2.12867 0.142231 1.546C0.151973 1.53667 0.255886 0.884667 0.369541 0.661333C0.578016 0.253333 0.985225 0 1.42101 0H1.45868C1.74249 0.01 2.33934 0.263333 2.33934 0.272667C3.34275 0.700667 5.32229 2.032 6.11788 2.91667C6.11788 2.91667 6.34194 3.144 6.43936 3.286C6.59133 3.49 6.66667 3.74267 6.66667 3.99533C6.66667 4.27733 6.58159 4.54 6.42052 4.754Z" fill="currentColor" />
-                                </svg>
-                            </div>
-                        </div> -->
-
-                       <select class="form-control" name="classroom_id">
+                       <select class="form-control" name="classroom_id" style="border: 1.8px solid #ccc; border-radius: 10px">
                            <?php foreach($alumni_list as $alumni): ?>
                                 <option value="<?php echo htmlspecialchars($alumni['classroom_id']); ?>">
                                     <?php echo htmlspecialchars($alumni['classroom_name']); ?>
@@ -373,14 +373,12 @@ $alumni_list = getStudentClassroomList($student_id);
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <button class="navbox-button" id="searchBtn">
-                        <svg class="icon-svg" viewBox="0 0 45 45" style="width:150px; height:150px;">
-                            <g>
-                                <path d="M22.2356 14.7298C25.828 14.7301 28.7405 17.6431 28.7405 21.2356C28.7403 22.616 28.3079 23.8947 27.5745 24.9475L29.9329 27.3069C30.382 27.756 30.382 28.4838 29.9329 28.9329C29.4838 29.382 28.756 29.382 28.3069 28.9329L25.9475 26.5745C24.8946 27.3079 23.616 27.7404 22.2356 27.7405C18.6431 27.7405 15.7301 24.828 15.7297 21.2356C15.7297 17.6429 18.6429 14.7298 22.2356 14.7298ZM22.2356 17.0305C19.9131 17.0305 18.0305 18.9132 18.0305 21.2356C18.0309 23.5578 19.9134 25.4407 22.2356 25.4407C24.5575 25.4403 26.4403 23.5576 26.4407 21.2356C26.4407 18.9134 24.5578 17.0309 22.2356 17.0305Z" fill="#26273A" />
-                            </g>
-                        </svg>
-                    </button>
-                    <button class="navbox-button" id="filterBtn">
+                </div>
+                <div class="main-tabs">
+                    <button class="main-tab active" onclick="switchMainTab(this, 'ongoing')">Summarize</button>
+                    <button class="main-tab" onclick="switchMainTab(this, 'ongoing')">Online</button>
+                    <button class="main-tab" onclick="switchMainTab(this, 'history')">Onsite</button>
+                     <button class="navbox-button" id="filterBtn" style="border: 1px solid #ccc">
                         <svg class="icon-svg" viewBox="0 0 14 13">
                             <g>
                                 <path d="M5.55726 8.90859H1.03659C0.464442 8.90859 -8.3819e-08 9.36489 -8.3819e-08 9.92701C-8.3819e-08 10.4884 0.464442 10.9454 1.03659 10.9454H5.55726C6.12941 10.9454 6.59385 10.4884 6.59385 9.92701C6.59385 9.36489 6.12941 8.90859 5.55726 8.90859Z" ," fill="#26273A" opacity="0.4" />
@@ -391,11 +389,6 @@ $alumni_list = getStudentClassroomList($student_id);
                         </svg>
                     </button>
                 </div>
-                <div class="main-tabs">
-                    <button class="main-tab active" onclick="switchMainTab(this, 'ongoing')">Ongoing</button>
-                    <button class="main-tab" onclick="switchMainTab(this, 'history')">History</button>
-                </div>
-
                 <div class="filter-tabs">
                     <button class="filter-tab active" onclick="switchFilterTab(this, 'all')">
                         All
@@ -412,20 +405,12 @@ $alumni_list = getStudentClassroomList($student_id);
                 </div>
             </div>
         <div class="mobile-container">
-
-            
-
-            <!-- List Indicator -->
-            <!-- <div class="list-indicator">
-            <span>All active<br>orders list</span>
-        </div> -->
-
-            <!-- Orders Container -->
             <div class="orders-container" id="ordersContainer">
                 <!-- Order Card 1 -->
                 <div class="order-card" data-type="current">
                     <div class="order-icon">
-                        <i class="fa-solid fa-bag-shopping"></i>
+                        <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 60px; height: 60px; border-radius: 100%; ">
+                        <!-- <i class="fa-solid fa-bag-shopping"></i> -->
                     </div>
                     <div class="order-info">
                         <span class="order-status status-current">Current Order</span>
