@@ -212,12 +212,20 @@ if ($stmt_name) {
         @media (max-width: 767px) {
             .album-box {
                 /* ปรับขนาดให้เป็น 2 ต่อแถวใน Mobile View (ขนาดประมาณ 150-160px จะดีกว่า 180px) */
-                width: 150px; 
-                height: 150px;
+                width: 100px; 
+                height: 100px;
                 /* จัดให้กล่องอัลบั้มอยู่ในแนวกึ่งกลางใน Mobile View */
-                margin-left: auto;
-                margin-right: auto;
+                margin-left: 5px;
+                margin-right: 5px;
             }
+            .photo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0px;
+            margin-top: 0px; 
+            /* NEW: จัดเรียงให้อยู่ตรงกลางเมื่อมีที่ว่าง */
+            justify-content: center; 
+        }
             .album-stack-item:nth-child(1) {
                 transform: translate(5px, 5px); /* ปรับการซ้อนสำหรับมือถือ */
             }
@@ -227,20 +235,30 @@ if ($stmt_name) {
             .album-info {
                 font-size: 12px;
             }
+            
         }
+        
         
         /* ปรับ Modal Gallery ให้สวยงามขึ้นใน Mobile/Small Screen */
         @media (max-width: 576px) {
             .modal-body .col-xs-6 {
-                width: 50%; /* ให้รูปใน Modal เป็น 2 ต่อแถว */
+                width: 33.33%; /* ให้รูปใน Modal เป็น 2 ต่อแถว */
                 padding-left: 5px;
                 padding-right: 5px;
             }
         }
+        .photo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0px;
+            margin-top: 0px; 
+            /* NEW: จัดเรียงให้อยู่ตรงกลางเมื่อมีที่ว่าง */
+            justify-content: center; 
+        }
         /* ... (CSS ส่วนปุ่มดาวน์โหลดใน Modal คงเดิม) ... */
         .modal-photo-wrapper {
             position: relative;
-            margin-bottom: 15px; 
+            margin-bottom: 10px; 
         }
         .download-menu {
             position: absolute;
@@ -360,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
             colDiv.innerHTML = `
                 <div class="modal-photo-wrapper">
                     <a href="${full_url}" target="_blank" title="${filename}">
-                        <img src="${full_url}" class="img-responsive" style="width: 100%; height: 150px; object-fit: cover; border: 1px solid #ccc; border-radius: 4px;">
+                        <img src="${full_url}" class="img-responsive" style="width: 100%; height: 130px; object-fit: cover; border: 1px solid #ccc; border-radius: 4px;">
                     </a>
                     
                     <div class="dropdown download-menu">
