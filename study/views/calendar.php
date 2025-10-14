@@ -16,6 +16,57 @@
     define('BASE_PATH', $base_path);
     define('BASE_INCLUDE', $base_include);
     require_once $base_include.'/lib/connect_sqli.php';
+    require_once $base_include . '/classroom/study/actions/student_func.php'; 
+    
+    $student_id = getStudentId();
+    $class_id = getStudentClassroomId($student_id);
+    
+    $course_data = select_data(
+        "cc.course_type,
+        c.trn_id AS course_id,
+        c.trn_subject AS course_name,
+        c.picture_title AS course_cover,
+        c.trn_location AS course_location,
+        c.trn_from_time AS course_timestart,
+        c.trn_to_time AS course_timeend,
+        c.trn_by AS course_instructor,
+        c.trn_date AS course_date,
+        LENGTH(REPLACE(trn_by, ' ', '')) - LENGTH(REPLACE(REPLACE(trn_by, ' ', ''), ',', '')) + 1 AS trn_count_by
+        ",
+        "classroom_course AS cc JOIN ot_training_list AS c on cc.course_ref_id = c.trn_id",
+        "WHERE cc.classroom_id = '{$class_id}' 
+            AND cc.status = 0"
+        );
+
+    foreach ($course_data as $course) {
+        $formattedDate = $course['course_date'];
+        // Prepare time string
+        $timeStart = $course['course_timestart'];
+        $timeEnd = $course['course_timeend'];
+        if (!empty($timeStart) && !empty($timeEnd) && $timeStart !== $timeEnd) {
+            $time = $timeStart . ' - ' . $timeEnd;
+        } elseif (!empty($timeStart)) {
+            $time = $timeStart;
+        } else {
+            $time = 'TBA'; // or 'ทั้งวัน' if all-day
+        }
+
+        // Prepare the entry
+        $entry = [
+            'subject' => $course['course_name'],
+            'time' => $time,
+            'status' => 'not_checked_in',  // default value
+            'id' => $course['course_id']   // using course_id as unique id
+        ];
+
+        // Add to schedule_data grouped by date
+        $schedule_data[$formattedDate][] = $entry;
+    }
+
+    // Optionally sort by date keys ascending
+    ksort($schedule_data);
+
+    // var_dump($schedule_data);
 
 // require_once("actions/login.php");
 // // ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
@@ -28,73 +79,72 @@ global $mysqli;
 
 // --- ส่วน PHP จำลองข้อมูลตารางเรียน (เหมือนเดิม) ---
 
-$schedule_data = [
-    '2025-10-01' => [
-        ['subject' => 'ลงทะเบียนผู้เข้าอบรม, รายงานตัว, ตัดสูท, ถ่ายรูป, แจกเสื้อโปโล หมวก, ป้ายชื่อ, สแกน QR เข้ากลุ่ม 3 กลุ่ม, sign PDPA, สมุดโทรศัพท์', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 1],
-        ['subject' => 'พิธีเปิด ประธานกล่าวเปิดหลักสูตร, ผอ.หลักสูตร อธิบายรายละเอียดหลักสูตร, กิจกรรมละลายพฤติกรรม', 'time' => '13:00 - 17:00', 'status' => 'not_checked_in', 'id' => 2],
-        ['subject' => 'แต่ละกลุ่มคุยเรื่องการแสดงโชว์ในช่วงกินเลี้ยง, กินเลี้ยง, แสดงโชว์แต่ละกลุ่ม ("หลักสูตร เป็นเจ้าภาพจัดเลี้ยง")', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 3]
-    ],
-    '2025-10-02' => [
-        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Deep drive in AI', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 4],
-        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Knowledge Base and Business AI in Organization', 'time' => '13:00 - 16:00', 'status' => 'not_checked_in', 'id' => 5]
-    ],
-    '2025-10-03' => [
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: Green : Shift & Sustainability Landscape', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 6],
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: กลยุทธ์และธรรมมาภิบาล ESG', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 7],
-        ['subject' => 'กลุ่มดิน เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 8]
-    ],
-    '2025-10-04' => [
-        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: AWS Deep AI Technology', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 9],
-        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Transform your organization by Huawei cloud', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 10],
-        ['subject' => 'กลุ่มน้ำ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 11]
-    ],
-    '2025-10-05' => [
-        ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 12]
-    ],
-    '2025-10-06' => [
-        ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 13]
-    ],
-    '2025-10-07' => [
-        ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 14]
-    ],
-    '2025-10-08' => [
-        ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 15]
-    ],
-    '2025-10-09' => [
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: การเงินสีเขียว & ความเสี่ยงสภาพภูมิอากาศ', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 16],
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: Green Innovation & Cirular Models', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 17],
-        ['subject' => 'กลุ่มลม เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 18]
-    ],
-    '2025-10-10' => [
-        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Digital Transformation by AI in Organization', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 19],
-        ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Organization Digital Technology', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 20],
-        ['subject' => 'กลุ่มไฟ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 21]
-    ],
-    '2025-10-11' => [
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: Sector Deep Dive (เลือกตามกลุ่มเป้าหมาย)', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 22],
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: ผู้นำ องค์กร และอนาคต', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 23],
-        ['subject' => 'กลุ่มหลักสูตร เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 24]
-    ],
-    '2025-10-12' => [
-        ['subject' => 'เยี่ยมชม โรงงาน', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 25],
-        ['subject' => 'เยี่ยมชม โรงงาน', 'time' => '14:30 - 16:00', 'status' => 'not_checked_in', 'id' => 26]
-    ],
-    '2025-10-13' => [
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: การพัฒนาอุตสหกรรมสู่สังคมคาร์บอนเครดิตต่ำ ในสถานประกอบการ', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 27],
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: การส่งเสริมยกระดับมาตรฐานสถานประกอบการสู่อุตสาหกรรมสีเขียว', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 28],
-        ['subject' => '**กลุ่มดิน+น้ำ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 29]
-    ],
-    '2025-10-14' => [
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: แนวการจัดการกากอุตสาหกรรมตามหลักกฎหมาย', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 30],
-        ['subject' => 'รับฟังการบรรยาย, หัวข้อ: โอกาสทองของอุตสาหกรรมกับพื้นที่ EEC', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 31],
-        ['subject' => '**กลุ่มลม+ไฟ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 32]
-    ],
-    '2025-10-15' => [
-        ['subject' => 'สรุปประสบการณ์และผลการเรียนรู้ ปิดหลักสูตร', 'time' => '09:30 - 16:00', 'status' => 'not_checked_in', 'id' => 33],
-        ['subject' => 'หลักสูตรเป็นเจ้าภาพจัดเลี้ยง, theme กาล่าดินเนอร์ เดินพรมแดง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 34]
-    ]
-];
-
+// $schedule_data = [
+//     '2025-10-01' => [
+//         ['subject' => 'ลงทะเบียนผู้เข้าอบรม, รายงานตัว, ตัดสูท, ถ่ายรูป, แจกเสื้อโปโล หมวก, ป้ายชื่อ, สแกน QR เข้ากลุ่ม 3 กลุ่ม, sign PDPA, สมุดโทรศัพท์', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 1],
+//         ['subject' => 'พิธีเปิด ประธานกล่าวเปิดหลักสูตร, ผอ.หลักสูตร อธิบายรายละเอียดหลักสูตร, กิจกรรมละลายพฤติกรรม', 'time' => '13:00 - 17:00', 'status' => 'not_checked_in', 'id' => 2],
+//         ['subject' => 'แต่ละกลุ่มคุยเรื่องการแสดงโชว์ในช่วงกินเลี้ยง, กินเลี้ยง, แสดงโชว์แต่ละกลุ่ม ("หลักสูตร เป็นเจ้าภาพจัดเลี้ยง")', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 3]
+//     ],
+//     '2025-10-02' => [
+//         ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Deep drive in AI', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 4],
+//         ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Knowledge Base and Business AI in Organization', 'time' => '13:00 - 16:00', 'status' => 'not_checked_in', 'id' => 5]
+//     ],
+//     '2025-10-03' => [
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: Green : Shift & Sustainability Landscape', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 6],
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: กลยุทธ์และธรรมมาภิบาล ESG', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 7],
+//         ['subject' => 'กลุ่มดิน เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 8]
+//     ],
+//     '2025-10-04' => [
+//         ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: AWS Deep AI Technology', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 9],
+//         ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Transform your organization by Huawei cloud', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 10],
+//         ['subject' => 'กลุ่มน้ำ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 11]
+//     ],
+//     '2025-10-05' => [
+//         ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 12]
+//     ],
+//     '2025-10-06' => [
+//         ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 13]
+//     ],
+//     '2025-10-07' => [
+//         ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 14]
+//     ],
+//     '2025-10-08' => [
+//         ['subject' => 'ดูงานต่างประเทศ, เซินเจิ้น ประเทศจีน', 'time' => 'ทั้งวัน', 'status' => 'not_checked_in', 'id' => 15]
+//     ],
+//     '2025-10-09' => [
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: การเงินสีเขียว & ความเสี่ยงสภาพภูมิอากาศ', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 16],
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: Green Innovation & Cirular Models', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 17],
+//         ['subject' => 'กลุ่มลม เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 18]
+//     ],
+//     '2025-10-10' => [
+//         ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Digital Transformation by AI in Organization', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 19],
+//         ['subject' => 'รับฟังการบรรยาย AI, หัวข้อ: Organization Digital Technology', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 20],
+//         ['subject' => 'กลุ่มไฟ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 21]
+//     ],
+//     '2025-10-11' => [
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: Sector Deep Dive (เลือกตามกลุ่มเป้าหมาย)', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 22],
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: ผู้นำ องค์กร และอนาคต', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 23],
+//         ['subject' => 'กลุ่มหลักสูตร เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 24]
+//     ],
+//     '2025-10-12' => [
+//         ['subject' => 'เยี่ยมชม โรงงาน', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 25],
+//         ['subject' => 'เยี่ยมชม โรงงาน', 'time' => '14:30 - 16:00', 'status' => 'not_checked_in', 'id' => 26]
+//     ],
+//     '2025-10-13' => [
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: การพัฒนาอุตสหกรรมสู่สังคมคาร์บอนเครดิตต่ำ ในสถานประกอบการ', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 27],
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: การส่งเสริมยกระดับมาตรฐานสถานประกอบการสู่อุตสาหกรรมสีเขียว', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 28],
+//         ['subject' => '**กลุ่มดิน+น้ำ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 29]
+//     ],
+//     '2025-10-14' => [
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: แนวการจัดการกากอุตสาหกรรมตามหลักกฎหมาย', 'time' => '09:30 - 12:00', 'status' => 'not_checked_in', 'id' => 30],
+//         ['subject' => 'รับฟังการบรรยาย, หัวข้อ: โอกาสทองของอุตสาหกรรมกับพื้นที่ EEC', 'time' => '13:00 - 16:30', 'status' => 'not_checked_in', 'id' => 31],
+//         ['subject' => '**กลุ่มลม+ไฟ เป็นเจ้าภาพจัดเลี้ยง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 32]
+//     ],
+//     '2025-10-15' => [
+//         ['subject' => 'สรุปประสบการณ์และผลการเรียนรู้ ปิดหลักสูตร', 'time' => '09:30 - 16:00', 'status' => 'not_checked_in', 'id' => 33],
+//         ['subject' => 'หลักสูตรเป็นเจ้าภาพจัดเลี้ยง, theme กาล่าดินเนอร์ เดินพรมแดง', 'time' => '18:00', 'status' => 'not_checked_in', 'id' => 34]
+//     ]
+// ];
 
 
 // เพิ่มฟังก์ชันสำหรับดึงข้อมูลทั้งเดือน
@@ -188,6 +238,8 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     <script src="/dist/js/sweetalert.min.js"></script>
     <script src="/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
+    <script src="/classroom/study/js/calendar.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+
 </head>
 <style>
 /* ตั้งค่า Font และพื้นหลังโดยรวมให้ดูสะอาดตา */

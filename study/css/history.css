@@ -223,10 +223,40 @@
   padding: 8px 12px;
 }
 
-.filter-text {
+.daterange-filter {
+  margin-bottom: 0.8rem;
+}
+
+.remove-btn {
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.filter-tag {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  font-size: 18px;
+  color: #666;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.filter-tag.active {
+  border-color: orange;
+  color: orange;
+  background: #fff7e6;
+  transform: scale(1.05);
+}
+
+.filter-tag .filter-text {
   font-weight: 500;
-  font-size: 14px;
-  color: #ffffff;
+  font-size: 16px;
+  color: inherit; /* inherits color from .filter-tag */
   white-space: nowrap;
 }
 

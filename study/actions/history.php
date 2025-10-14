@@ -16,6 +16,54 @@ define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
 require_once $base_include . '/classroom/study/actions/student_func.php';
 
+// $hist_table = select_data(
+//     "olh_id, 
+//     olh_course_id,
+//     ott.trn_subject,
+//     ott.trn_by,
+//     ott.trn_date, 
+//     ott.trn_from_time,
+//     ott.trn_to_time,
+//     ott.trn_location,
+//     (CASE 
+//         WHEN ott.trn_type = 'inhouse' THEN 'inhouse'
+//         WHEN ott.trn_type = 'public' THEN 'public'
+//         WHEN ott.trn_type = 'both' THEN 'both'
+//         WHEN ott.trn_type IS NULL THEN 'ไม่ระบุ'
+//         ELSE 'ไม่ระบุ'
+//     END) AS trn_type_description,
+//     olh_learning_map_id, 
+//     olh_topic,
+//     olh_datetime_in, 
+//     olh_emp, 
+//     olh_comp, 
+//     oth.learning_device",
+//     "ot_learning_history AS oth JOIN ot_training_list AS ott on ott.olh_course_id = oth.trn_id",
+//     "WHERE oth.olh_emp = '{$student_id}'");
+
+       $course_data = select_data(
+        "cc.course_type,
+        c.trn_id AS course_id,
+        c.trn_subject AS course_name,
+        c.picture_title AS course_cover,
+        c.trn_location AS course_location,
+        c.trn_from_time AS course_timestart,
+        c.trn_to_time AS course_timeend,
+        c.trn_by AS course_instructor,
+        DATE_FORMAT(c.trn_date, '%d/%m/%Y') AS course_date,
+        LENGTH(REPLACE(trn_by, ' ', '')) - LENGTH(REPLACE(REPLACE(trn_by, ' ', ''), ',', '')) + 1 AS trn_count_by
+        ",
+        "classroom_course AS cc JOIN ot_training_list AS c on cc.course_ref_id = c.trn_id",
+        "WHERE cc.classroom_id = '{$class_id}' 
+            AND cc.status = 0"
+        );
+
+//  search by filter function
+if($_POST['action'] = 'searchFilter')
+{
+
+}
+
 $student_id = getStudentId();
 $alumni_list = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
 

@@ -3,10 +3,57 @@ let management_template;
 let join_template;
 let tb_staff;
 let table_join_user;
+var start;
+var end;
+var default_date;
 
-$(document).ready(function() {
+function applyFilter(filter) {
+    let startDate, endDate;
+    const now = moment();
+
+    switch(filter) {
+        case 'today':
+            startDate = now.clone().startOf('day');
+            endDate = now.clone().endOf('day');
+            break;
+        case 'lastmonth':
+            startDate = now.clone().subtract(1, 'month').startOf('month');
+            endDate = now.clone().subtract(1, 'month').endOf('month');
+            break;
+        case 'lastweek':
+            startDate = now.clone().subtract(1, 'week').startOf('week');
+            endDate = now.clone().subtract(1, 'week').endOf('week');
+            break;
+        case 'thismonth':
+            startDate = now.clone().startOf('month');
+            endDate = now.clone().endOf('month');
+            break;
+        case 'thisweek':
+            startDate = now.clone().startOf('week');
+            endDate = now.clone().endOf('week');
+            break;
+        case 'all':
+            // Clear the date pickers and filters
+            $('#start_date').val('');
+            $('#end_date').val('');
+            return;
+        default:
+            return;
+    }
+
+    // Update the date picker inputs
+    $('#start_date').data('daterangepicker').setStartDate(startDate);
+    $('#end_date').data('daterangepicker').setStartDate(endDate);
+
+    $('#start_date').val(startDate.format('DD/MM/YYYY'));
+    $('#end_date').val(endDate.format('DD/MM/YYYY'));
+}
+
+
+
+$(document).ready(function () {
     // Dropdown change event
-    $('select[name="classroom_id"]').on('change', function() {
+    $('select[name="classroom_id"]').on('change', function () {
         var classroomId = $(this).val();
 
         // Send AJAX POST request with selected classroom_id
@@ -17,7 +64,7 @@ $(document).ready(function() {
                 action: 'fetch_history',
                 classroom_id: classroomId,
             },
-            success: function(response) {
+            success: function (response) {
                 var result = JSON.parse(response);
                 if (result.status === 'success') {
                     // Process the returned alumni data
@@ -26,16 +73,59 @@ $(document).ready(function() {
                     alert('Failed to fetch alumni data');
                 }
             },
-            error: function() {
+            error: function () {
                 alert('Error sending request');
             }
         });
     });
-    
 
-    $('#filterBtn').on('click', function () {
-        $('#bottomModal').modal('show');
+
+    $('#bottomModal').on('shown.bs.modal', function () {
+        var today = moment();
+        // Initialize start date picker
+        $('#start_date').daterangepicker({
+            singleDatePicker: true,
+            startDate: today,
+            showDropdowns: true,
+            autoUpdateInput: true,
+            opens: 'left',
+            drops: 'up',
+            locale: {
+                cancelLabel: 'Clear',
+                applyLabel: 'Ok',
+                format: 'DD/MM/YYYY',
+            },
+        }, function(startSelected) {
+            $('#start_date').val(startSelected.format('DD/MM/YYYY'));
+            // Update the minimum date for end_date picker
+            $('#end_date').data('daterangepicker').minDate = startSelected;
+            var endPicker = $('#end_date').data('daterangepicker');
+            if (endPicker.startDate.isBefore(startSelected, 'day')) {
+                $('#end_date').val('');
+                endPicker.setStartDate(startSelected);
+            }
+        });
+
+        // Initialize end date picker
+        $('#end_date').daterangepicker({
+            singleDatePicker: true,
+            startDate: today,
+            minDate: today, // set initial minimum date as start date
+            showDropdowns: true,
+            autoUpdateInput: true,
+            opens: 'left',
+            drops: 'up',
+            locale: {
+                cancelLabel: 'Clear',
+                applyLabel: 'Ok',
+                format: 'DD/MM/YYYY',
+            },
+        }, function(endSelected) {
+            $('#end_date').val(endSelected.format('DD/MM/YYYY'));
+        });
     });
+
+
 
     // $('#toggleStudent').click(function (e) {
     //     e.stopPropagation();
@@ -63,7 +153,7 @@ $(document).ready(function() {
     //                     var group_logo = row.group_logo ? row.group_logo : '../../../images/default.png';
     //                     var border_color = row.group_color ? row.group_color : '#ff8c00';
 
-                        
+
 
     //                     html += '<a href="studentinfo?id=' + encodeURIComponent(row.student_id) + '" class="student-card">';
     //                     html += '<div class="student-avatar" style="border-color:' + border_color + ';">';
@@ -105,16 +195,45 @@ $(document).ready(function() {
     //             var students = JSON.parse(data);
     //             var html = '<div class="student-list">';
 
-     $('#toggleStudent').click(function (e) {
-        e.stopPropagation();
-        var $btn = $(this);
-        $.ajax({
-                url: '/classroom/study/actions/history.php',
-                type: "GET",
-                success: function(data) {
+    // $('#toggleStudent').click(function (e) {
+    //     e.stopPropagation();
+    //     var $btn = $(this);
+    //     $.ajax({
+    //         url: '/classroom/study/actions/history.php',
+    //         type: "GET",
+    //         success: function (data) {
 
-            }
-        });
-    });
+    //         }
+    //     });
+    // });
 
 });
+
+
+
+
+// $classroom_id = $_POST['classroom_id'];
+//         $table = "SELECT 
+//             course.course_id,
+//             (
+//                 CASE
+//                     WHEN course.course_type = 'course' then c.trn_subject
+//                     ELSE l.learning_map_name
+//                 END
+//             ) as course_name,
+//             course.course_type,
+//             (
+//                 CASE
+//                     WHEN course.course_type = 'course' then c.picture_title
+//                     ELSE l.learning_map_pic
+//                 END
+//             ) as course_cover,
+//             date_format(course.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
+//             CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
+//             course.course_ref_id
+//         FROM 
+//             classroom_course course
+//         LEFT JOIN 
+//             ot_training_list c on c.trn_id = course.course_ref_id and course.course_type = 'course'
+//         LEFT JOIN 
+//             ot_learning_map_list l on l.learning_map_id = course.course_ref_id and course.course_type = 'learning_map'
