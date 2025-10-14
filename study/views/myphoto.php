@@ -1,5 +1,4 @@
 <?php
-// myphoto.php (หน้าแสดงผล)
 session_start();
 // ตรวจสอบ session และดึง student_id
 $student_id = $_SESSION['student_id'] ? $_SESSION['student_id'] : null;
@@ -11,11 +10,6 @@ if (!$student_id) {
     // จัดการกรณีที่ไม่พบ session
     die("กรุณาเข้าสู่ระบบ");
 }
-
-// ------------------------------------------------------------------------------------------------------
-// NEW: ดึงข้อมูลชื่อนักเรียน
-// ------------------------------------------------------------------------------------------------------
-
 // *** จำลองการเรียกไฟล์ตั้งค่าและเชื่อมต่อฐานข้อมูล (ต้องให้เหมือนกับ myphoto_process.php) ***
 date_default_timezone_set('Asia/Bangkok');
 $base_include = $_SERVER['DOCUMENT_ROOT'];
@@ -124,7 +118,7 @@ if ($stmt_name) {
         .photo-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
             margin-top: 0px; 
             /* NEW: จัดเรียงให้อยู่ตรงกลางเมื่อมีที่ว่าง */
             justify-content: center; 
@@ -207,23 +201,62 @@ if ($stmt_name) {
 
         .container-fluid1 {
            margin-right: 1em;
-            margin-left: 1em;
-            /* margin-right: auto; */
-            /* margin-left: auto; */
-            background-color: #ffffff;
-            border-radius: 8px;
+           margin-left: 1em;
+           /* margin-right: auto; */
+           /* margin-left: auto; */
+           background-color: #ffffff;
+           border-radius: 8px;
         }
+        .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: -85px;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 100px;
+    padding: 5px 5px;
+    margin: 2px 0 0;
+    font-size: 14px;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+.dropdown-menu>li>a {
+    display: block;
+    padding: 3px 10px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}
         
         /* NEW: Responsive สำหรับ Mobile View (ปรับให้เล็กกว่า Desktop เดิม) */
         @media (max-width: 767px) {
             .album-box {
                 /* ปรับขนาดให้เป็น 2 ต่อแถวใน Mobile View (ขนาดประมาณ 150-160px จะดีกว่า 180px) */
-                width: 150px; 
-                height: 150px;
+                width: 100px; 
+                height: 100px;
                 /* จัดให้กล่องอัลบั้มอยู่ในแนวกึ่งกลางใน Mobile View */
-                margin-left: auto;
-                margin-right: auto;
+                margin-left: 5px;
+                margin-right: 5px;
             }
+            .photo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0px;
+            margin-top: 0px; 
+            /* NEW: จัดเรียงให้อยู่ตรงกลางเมื่อมีที่ว่าง */
+            justify-content: center; 
+        }
             .album-stack-item:nth-child(1) {
                 transform: translate(5px, 5px); /* ปรับการซ้อนสำหรับมือถือ */
             }
@@ -233,25 +266,36 @@ if ($stmt_name) {
             .album-info {
                 font-size: 12px;
             }
+            
         }
+        
         
         /* ปรับ Modal Gallery ให้สวยงามขึ้นใน Mobile/Small Screen */
         @media (max-width: 576px) {
             .modal-body .col-xs-6 {
-                width: 50%; /* ให้รูปใน Modal เป็น 2 ต่อแถว */
+                width: 33.33%; /* ให้รูปใน Modal เป็น 2 ต่อแถว */
                 padding-left: 5px;
                 padding-right: 5px;
             }
+            photo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0px;
+            margin-top: 0px; 
+            /* NEW: จัดเรียงให้อยู่ตรงกลางเมื่อมีที่ว่าง */
+            justify-content: center; 
         }
+        }
+        .
         /* ... (CSS ส่วนปุ่มดาวน์โหลดใน Modal คงเดิม) ... */
         .modal-photo-wrapper {
             position: relative;
-            margin-bottom: 15px; 
+            margin-bottom: 10px; 
         }
         .download-menu {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 3px;
+            right: 8px;
             z-index: 10;
             opacity: 0.7; 
             transition: opacity 0.2s;
@@ -278,13 +322,26 @@ if ($stmt_name) {
             background-color: #fbe299;
             border-radius: 8px;
         }
+        #modalGallery .col-xs-6,
+        #modalGallery .col-sm-4 {
+            padding-left: 5px !important; /* ใช้ !important เพื่อให้แน่ใจว่า Override Bootstrap default */
+            padding-right: 5px !important; /* ใช้ !important เพื่อให้แน่ใจว่า Override Bootstrap default */
+            padding-bottom: 5px;
+        }
 </style>
 </head>
 
 <body>
     <?php require_once 'component/header.php'; ?>
 <div class="main-content">
+    <div class="container-fluid">
+        <h1 class="heading-1">My Photo</h1>
+                    <div class="divider-1"> 
+                        <span></span>
+                    </div>
+    </div>
 <div class="container-fluid1" >
+    
 <h1 style="font-size: 20px; padding: 2em 1em 2em 1em;">My Photo: รูปภาพที่มี <?php echo $display_name; ?></h1>
 
 <div class="photo-container" id="myPhotoGallery">
@@ -315,6 +372,8 @@ if ($stmt_name) {
 <script>
 // ข้อมูลรูปภาพที่ดึงมาจาก API (ใช้เก็บข้อมูล Event ทั้งหมดไว้ในตัวแปรนี้)
 let allGroupedPhotos = {}; 
+// NEW: ตัวแปรสำหรับเก็บชื่อ Event และวันที่สร้าง เพื่อใช้ในการเรียงอัลบั้ม
+let eventCreationDates = {}; 
 
 document.addEventListener('DOMContentLoaded', function() {
     const gallery = document.getElementById('myPhotoGallery');
@@ -351,13 +410,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const filename = photo.path.substring(photo.path.lastIndexOf('/') + 1);
 
             const colDiv = document.createElement('div');
-            colDiv.className = 'col-xs-6 col-sm-4 col-md-3'; 
+            colDiv.className = 'col-xs-6 col-sm-4'; 
             
             // โครงสร้างสำหรับปุ่มดาวน์โหลด
             colDiv.innerHTML = `
-                <div class="modal-photo-wrapper">
+                <div class="modal-photo-wrapper" >
                     <a href="${full_url}" target="_blank" title="${filename}">
-                        <img src="${full_url}" class="img-responsive" style="width: 100%; height: 150px; object-fit: cover; border: 1px solid #ccc; border-radius: 4px;">
+                        <img src="${full_url}" class="img-responsive" style="width: 100%; height: 130px; object-fit: cover; border: 1px solid #ccc; border-radius: 4px;">
                     </a>
                     
                     <div class="dropdown download-menu">
@@ -391,27 +450,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ฟังก์ชันสำหรับเรียก PHP process และสร้าง Album View
     function fetchMyPhotos() {
-        fetch(`myphoto_process?student_id=${studentId}`)
+        fetch(`actions/myphoto.php?student_id=${studentId}`)
             .then(response => response.json())
             .then(data => {
                 gallery.innerHTML = ''; 
                 
                 if (data.status === 'success' && data.data && data.data.length > 0) {
                     
-                    // 1. จัดกลุ่มรูปภาพตาม Event (description)
+                    // 1. จัดกลุ่มรูปภาพตาม Event (description) และเก็บวันที่สร้าง
                     const groupedPhotos = data.data.reduce((acc, current) => {
                         const eventName = current.description || 'รูปภาพที่ไม่มีชื่อ Event'; 
                         if (!acc[eventName]) {
                             acc[eventName] = [];
                         }
                         acc[eventName].push(current);
+                        // เก็บวันที่สร้างอัลบั้มเพื่อใช้เรียงลำดับในขั้นตอนถัดไป
+                        // ใช้ตัวแปรแยกเพื่อไม่ให้ซับซ้อน
+                        if (!eventCreationDates[eventName]) {
+                            eventCreationDates[eventName] = current.date_create;
+                        }
                         return acc;
                     }, {});
                     
                     allGroupedPhotos = groupedPhotos; 
                     
-                    // 2. สร้าง HTML เพื่อแสดงผลเป็น Album Stack
-                    for (const eventName in groupedPhotos) {
+                    // 2. เรียงลำดับชื่อ Event ตามวันที่สร้าง (ล่าสุดก่อน)
+                    const sortedEventNames = Object.keys(groupedPhotos).sort((a, b) => {
+                        // เปรียบเทียบวันที่สร้างเป็น ISO string
+                        // b > a จะเป็นการเรียงจากใหม่ไปเก่า (DESC)
+                        return eventCreationDates[b].localeCompare(eventCreationDates[a]);
+                    });
+                    
+                    // 3. สร้าง HTML เพื่อแสดงผลเป็น Album Stack ตามลำดับที่เรียงแล้ว
+                    sortedEventNames.forEach(eventName => { // <== วนลูปตามลำดับที่เรียงแล้ว
                         const eventPhotos = groupedPhotos[eventName];
                         const photoCount = eventPhotos.length;
 
@@ -443,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         `;
 
                         gallery.appendChild(albumBox);
-                    }
+                    });
                 } else {
                     gallery.innerHTML = `<p>⚠️ ไม่พบรูปภาพที่มีคุณอยู่ในอัลบั้มรวม. ${data.message || ''}</p>`;
                 }
@@ -458,6 +529,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-   <?php require_once("component/footer.php") ?>
+    <?php require_once("component/footer.php") ?>
 </body>
 </html>

@@ -331,7 +331,7 @@ if (isset($_SESSION['student_id'])) {
     ?>
     
     <div class="settings-container">
-        <div class="settings-card" style="margin-top: 10px;">
+        <div class="settings-card" style="margin-top: 10px">
             <div class="settings-header">
              
                 <div class="settings-list">

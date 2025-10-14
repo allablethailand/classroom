@@ -20,6 +20,10 @@
         case '/classroom/management/group':
             require __DIR__.'/views/group.php'; 
         break;
+        case '/classroom/management/photo/':
+        case '/classroom/management/photo':
+            require __DIR__.'/views/photo.php'; 
+        break;
         default: 
             header('Location: /classroom/management/');
     }

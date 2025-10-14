@@ -1,5 +1,7 @@
 <?php
 
+
+
 // iniate session start before calling this function
 function recheckUserSession() {
     if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
@@ -64,5 +66,61 @@ function getStudentClassroomCourseAll($student_id, $classroom_id) {
     return !empty($result) ? $result : [];
 }
 
+function getStudentClassroomGroup($student_id){
+    $result = select_data(
+        "csj.classroom_id, csj.group_id, cg.group_name, cg.group_logo, cg.group_description,cg.group_color",
+        "classroom_student_join csj",
+        "LEFT JOIN classroom_group cg ON csj.classroom_id = cg.classroom_id 
+            AND csj.group_id = cg.group_id
+            WHERE csj.student_id = '{$student_id}'");
+
+    return !empty($result) ? $result : [];
+}
+
+function getStudentClassroomGroupCount($group_id, $classroom_id)
+{
+    $result = select_data(
+        "COUNT(student_id) AS total_student",
+        "classroom_student_join",
+        "WHERE classroom_id = '{$classroom_id}' AND group_id = '{$group_id}'");
+
+    return !empty($result) ? $result : [];
+}
+
+function getTeacherList()
+{
+    $result = select_data("ct.teacher_id,
+        ct.teacher_perfix,
+        ct.teacher_firstname_en,
+        ct.teacher_lastname_en,
+        ct.teacher_firstname_th,
+        ct.teacher_lastname_th,
+        ct.teacher_nickname_en,
+        ct.teacher_nickname_th,
+        ct.teacher_idcard,
+        ct.teacher_passport,
+        ct.teacher_image_profile,
+        ct.teacher_card_front,
+        ct.teacher_card_back,
+        ct.teacher_email,
+        ct.teacher_mobile,
+        ct.teacher_address",
+        "classroom_teacher_join ctj",
+        "INNER JOIN classroom_teacher ct ON ctj.teacher_id = ct.teacher_id
+        WHERE ctj.classroom_id = '2'"
+    );
+
+    return !empty($result) ? $result : [];
+}
+
+function getStaffMemberlist($classroom_id)
+{
+    $result = select_data("cst.staff_id, cst.comp_id, cst.emp_id, empinfo.firstname, empinfo.lastname",
+    "classroom_staff cst",
+    "LEFT JOIN m_employee_info empinfo ON cst.emp_id = empinfo.emp_id
+    WHERE cst.classroom_id = '{$classroom_id}'");
+    
+    return !empty($result) ? $result : [];
+}
 
 ?>

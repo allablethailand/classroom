@@ -75,7 +75,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                         type="button">
                         ‹
                     </button>
-                    <span id="current-date" style="margin: 0 1rem; font-weight: bold; font-size: 2rem; padding-bottom: 5px">
+                    <span id="current-date" style="margin: 0 1rem; font-weight: bold; font-size: 1.6rem; padding-bottom: 5px">
                         Tue, 9 Aug, 2025
                     </span>
 

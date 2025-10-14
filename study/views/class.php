@@ -62,6 +62,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
     <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="/dist/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/dist/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/dist/css/sweetalert.css">
     <link rel="stylesheet" href="/dist/css/select2.min.css">
     <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
@@ -85,17 +86,16 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
 
 <body>
     <?php require_once 'component/header.php'; ?>
-    <div class="min-vh-100 bg-ori-gray">
-
-        <div class="container-fluid px-4 py-2" style="margin-bottom: 20rem;">
-
-            <?php foreach ($classroom_group as $item):  ?>
+    <div class="main-transparent-content">
+        <div class="container-fluid">
+            <h1 class="heading-1">หลักสูตรชั้นเรียน</h1>
+            <div class="divider-1"> 
+                <span></span>
+            </div>
+             <?php foreach ($classroom_group as $item):  ?>
 
             <div class="g-4 justify-content-center mb-bs-3 " style="margin-top: 2rem;">
-                <h1 class="heading-1">หลักสูตรชั้นเรียน</h1>
-                    <div class="divider-1"> 
-                        <span></span>
-                    </div>
+                
                 <div class="col-12">
                     <a href="classinfo?classroom_id=<?php echo $item['classroom_id']; ?>" style="font-family: 'Kanit', sans-serif !important;">
                         <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 1.8rem">
@@ -109,7 +109,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                     <div class="progress-section">
                                         
                                         <div class="time-schedule-class" style="margin-left: 0.5rem;">
-                                            <span class="small-text-gray"><?php echo $item['class_start'] . "-"  ;?></span>
+                                            <span class="small-text-gray"><?php echo "Period: ". $item['class_start'] . " - "  ;?></span>
                                             <span class="small-text-gray"><?php echo $item['class_end']; ?></span>
                                         </div>
                                         <div class="progress-header-flex">
@@ -128,6 +128,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             </div>
             <?php endforeach ?>
         </div>
+        
     </div>
     <?php require_once 'component/footer.php'; ?>
 
