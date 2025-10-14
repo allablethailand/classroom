@@ -380,7 +380,7 @@
         $classroom_open_register = initVal($sql_classroom_open_register);
         $classroom_close_register = initVal($sql_classroom_close_register);
         $contact_us = initVal($_POST['contact_us']);
-        $shortcut_status = initVal($_POST['shortcut_status']);
+        $shortcut_status = ($_POST['shortcut_status']) ? $_POST['shortcut_status'] : 1;
         $auto_approve = $_POST['auto_approve'];
         $auto_username = $_POST['auto_username'];
         $auto_username_type = ($_POST['auto_username_type']) ? "'" . implode(',', $_POST['auto_username_type']) . "'" : "null";

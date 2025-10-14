@@ -399,13 +399,17 @@
         $copy_of_passport = uploadSecureFile('copy_of_passport', $comp_id, $classroom_id, 'student/passport', array('pdf', 'jpg', 'jpeg', 'png'), 5242880);
         $work_certificate = uploadSecureFile('work_certificate', $comp_id, $classroom_id, 'student/work_certificate', array('pdf', 'jpg', 'jpeg', 'png'), 5242880);
         $company_certificate = uploadSecureFile('company_certificate', $comp_id, $classroom_id, 'student/company_certificate', array('pdf', 'jpg', 'jpeg', 'png'), 5242880);
-        if($student_email !== "null" || $student_mobile !== "null") {
+        $duplicate_student_id = null;
+        if($student_email !== "null" || $student_mobile !== "null" || $student_idcard !== "null") {
+            $join = "LEFT JOIN classroom_student_join stu_join ON stu_join.student_id = stu.student_id AND stu_join.classroom_id = $classroom_id";
+            $condition = "";
+            if($student_id) {
+                $condition .= "and stu.student_id != " . intval($student_id);
+            }
+            $condition_join = " AND (stu_join.join_id IS NULL OR stu_join.status = 0) ";
             if($student_email !== "null") {
-                $where_email = "where LOWER(student_email) = LOWER($student_email) and status = 0";
-                if($student_id) {
-                    $where_email .= " and student_id != " . intval($student_id);
-                }
-                $exits_email = select_data("student_id", "classroom_student", $where_email);
+                $where_email = "where LOWER(stu.student_email) = LOWER($student_email) and status = 0";
+                $exits_email = select_data("stu.student_id", "classroom_student stu","$join $where_email $condition $condition_join");
                 if(!empty($exits_email)) {
                     echo json_encode(array(
                         'status' => false,
@@ -415,11 +419,8 @@
                 }
             }
             if($student_mobile !== "null") {
-                $where_mobile = "where student_mobile = $student_mobile and status = 0";
-                if($student_id) {
-                    $where_mobile .= " and student_id != " . intval($student_id);
-                }
-                $exits_mobile = select_data("student_id", "classroom_student", $where_mobile);
+                $where_mobile = "where stu.student_mobile = $student_mobile and stu.status = 0";
+                $exits_mobile = select_data("stu.student_id", "classroom_student stu","$join $where_mobile $condition $condition_join");
                 if(!empty($exits_mobile)) {
                     echo json_encode(array(
                         'status' => false,
@@ -428,8 +429,45 @@
                     exit;
                 }
             }
+            if($student_idcard !== "null") {
+                $where_idcard = "where stu.student_idcard = $student_idcard and stu.status = 0";
+                $exits_idcard = select_data("stu.student_id", "classroom_student stu","$join $where_idcard $condition $condition_join");
+                if(!empty($exits_idcard)) {
+                    echo json_encode(array(
+                        'status' => false,
+                        'message' => ($currentLang == 'en') ? 'This ID card number is already registered. Please use another number.' : 'หมายเลขบัตรประชาชนนี้ถูกลงทะเบียนแล้ว กรุณาใช้หมายเลขอื่น'
+                    ));
+                    exit;
+                }
+            }
+            if($student_email !== "null") {
+                $where_email = "where LOWER(stu.student_email) = LOWER($student_email) and status = 0";
+                $exits_email = select_data("stu.student_id", "classroom_student stu","$join $where_email $condition");
+                if(!empty($exits_email)) {
+                    $duplicate_student_id = $exits_idcard[0]['student_id'];
+                }
+            }
+            if($student_mobile !== "null") {
+                $where_mobile = "where stu.student_mobile = $student_mobile and stu.status = 0";
+                $exits_mobile = select_data("stu.student_id", "classroom_student stu","$join $where_mobile $condition");
+                if(!empty($exits_mobile)) {
+                    $duplicate_student_id = $exits_idcard[0]['student_id'];
+                }
+            }
+            if($student_idcard !== "null") {
+                $where_idcard = "where stu.student_idcard = $student_idcard and stu.status = 0";
+                $exits_idcard = select_data("stu.student_id", "classroom_student stu","$join $where_idcard $condition");
+                if(!empty($exits_idcard)) {
+                    $duplicate_student_id = $exits_idcard[0]['student_id'];
+                }
+            }
         }
         mysqli_begin_transaction($mysqli);
+        if(!$student_id) {
+            if($duplicate_student_id) {
+                $student_id = $duplicate_student_id;
+            } 
+        }
         try {
             if($student_id) {
                 $student_password_key_update = "";
@@ -483,6 +521,9 @@
                         student_reference = $student_reference
                     ",
                     "student_id = " . intval($student_id)
+                );
+                update_data(
+                    "classroom_student_join", "status = 0, date_modify = NOW()", "classroom_id = '{$classroom_id}' and student_id = '{$student_id}'"
                 );
             } else {
                 $student_password_key = "null";
@@ -755,33 +796,47 @@
 		}
         echo json_encode($data);
     }
-    if(isset($_POST) && $_POST['action'] == 'verifyDuplicateData') {
+    if(isset($_POST['action']) && $_POST['action'] == 'verifyDuplicateData') {
+        $classroom_id = isset($_POST['classroom_id']) ? intval($_POST['classroom_id']) : 0;
         $currentLang = isset($_POST['currentLang']) ? trim($_POST['currentLang']) : 'th';
         $verify_val = isset($_POST['verify_val']) ? trim($_POST['verify_val']) : '';
         $verify_type = isset($_POST['verify_type']) ? trim($_POST['verify_type']) : '';
-        $condition = ($student_id) ? "and student_id <> " . intval($student_id) : "";
+        $condition = $student_id ? "AND stu.student_id <> $student_id" : "";
+        $join = "LEFT JOIN classroom_student_join stu_join 
+                ON stu_join.student_id = stu.student_id 
+                AND stu_join.classroom_id = $classroom_id";
+        $condition .= " AND (stu_join.join_id IS NULL OR stu_join.status = 0) ";
+        $duplicate_message = '';
+        $where = '';
         switch($verify_type) {
             case 'idcard':
-                $exits = select_data("student_id", "classroom_student", "where student_idcard = '" . mysqli_real_escape_string($mysqli, $verify_val) . "' and status = 0 $condition");
-                $duplicate_message = ($currentLang == 'th') ? 'หมายเลขบัตรประชาชนนี้ถูกลงทะเบียนแล้ว กรุณาใช้หมายเลขอื่น' : 'This ID card number is already registered. Please use another number.';
+                $where = "WHERE stu.student_idcard = '" . mysqli_real_escape_string($mysqli, $verify_val) . "' AND stu.status = 0 $condition";
+                $duplicate_message = ($currentLang == 'th') ? 
+                    'หมายเลขบัตรประชาชนนี้ถูกลงทะเบียนแล้ว กรุณาใช้หมายเลขอื่น' : 
+                    'This ID card number is already registered. Please use another number.';
                 break;
-            case 'email':   
-                $exits = select_data("student_id", "classroom_student", "where LOWER(student_email) = LOWER('" . mysqli_real_escape_string($mysqli, $verify_val) . "') and status = 0 $condition");
-                $duplicate_message = ($currentLang == 'th') ? 'อีเมลนี้ถูกลงทะเบียนแล้ว กรุณาใช้เมลอื่น' : 'This email is already registered. Please use another email.';
+            case 'email':
+                $where = "WHERE LOWER(stu.student_email) = LOWER('" . mysqli_real_escape_string($mysqli, $verify_val) . "') AND stu.status = 0 $condition";
+                $duplicate_message = ($currentLang == 'th') ? 
+                    'อีเมลนี้ถูกลงทะเบียนแล้ว กรุณาใช้เมลอื่น' : 
+                    'This email is already registered. Please use another email.';
                 break;
-            case 'mobile':  
+            case 'mobile':
                 $mobile = preg_replace('/[^0-9]/', '', $verify_val);
-                if(substr($mobile, 0, 1) === '0') {
-                    $mobile = substr($mobile, 1);
-                } 
-                $exits = select_data("student_id", "classroom_student", "where student_mobile = '" . mysqli_real_escape_string($mysqli, $mobile) . "' and status = 0 $condition");
-                $duplicate_message = ($currentLang == 'th') ? 'หมายเลขโทรศัพท์มือถือถูกลงทะเบียนแล้ว กรุณาใช้หมายเลขอื่น' : 'This mobile number is already registered. Please use another number.';
+                if(substr($mobile, 0, 1) === '0') $mobile = substr($mobile, 1);
+                $where = "WHERE stu.student_mobile = '" . mysqli_real_escape_string($mysqli, $mobile) . "' AND stu.status = 0 $condition";
+                $duplicate_message = ($currentLang == 'th') ? 
+                    'หมายเลขโทรศัพท์มือถือถูกลงทะเบียนแล้ว กรุณาใช้หมายเลขอื่น' : 
+                    'This mobile number is already registered. Please use another number.';
                 break;
         }
+        $exits = select_data(
+            "stu.student_id", "classroom_student stu", "$join $where LIMIT 1"
+        );
         if(!empty($exits)) {
-            echo json_encode(array('status' => false, 'message' => $duplicate_message));
+            echo json_encode(['status' => false, 'message' => $duplicate_message]);
         } else {
-            echo json_encode(array('status' => true, 'message' => ''));
+            echo json_encode(['status' => true, 'message' => '']);
         }
     }
 ?>

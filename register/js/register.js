@@ -636,7 +636,8 @@ function verifyDuplicateData(value, type, fieldId) {
             action:'verifyDuplicateData',
             verify_val: value,
             verify_type: type,
-            currentLang: currentLang
+            currentLang: currentLang,
+            classroom_id: classroom_id
         },
         dataType: "JSON",
         type: 'POST',
