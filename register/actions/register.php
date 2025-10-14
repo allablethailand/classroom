@@ -68,7 +68,16 @@
                 comp.comp_id,
                 comp.comp_logo,
                 comp.comp_logo_target,
-                template.classroom_allow_register
+                template.classroom_allow_register,
+                (
+                    CASE
+                        WHEN template.classroom_allow_register = 1 then 'Close Register'
+                        WHEN template.classroom_allow_register = 0 and NOW() between template.classroom_open_register and template.classroom_close_register then 'open'
+                        WHEN template.classroom_allow_register = 0 and NOW() < template.classroom_open_register then 'Not yet open for registration'
+                        WHEN template.classroom_allow_register = 0 and NOW() > template.classroom_close_register then 'Close Register'
+                        ELSE 'Close Register'
+                    END
+                ) as classroom_register
             ",
             "classroom_template template",
             "
@@ -80,12 +89,31 @@
         if (empty($classrooms)) {
             echo json_encode(array(
                 'status' => false,
-                'message' => 'Classroom not found'
+                'message' => 'not found'
             ));
             exit;
         }
         $classroom = $classrooms[0];
         $comp_id = $classroom['comp_id'];
+        $classroom_register = $classroom['classroom_register'];
+        $tenant = select_data("tenant_key", "ogm_tenant", "where comp_id = '{$comp_id}' and status = 0");
+        $tenant_url = $domain_name;
+        if (!empty($tenant)) {
+            $tenant_url .= $tenant[0]['tenant_key'];
+        }
+        if($classroom_register !== 'open' && !$student_id) {
+            $messages = select_data(
+                "template_body", "classroom_message_template", "where classroom_id = '{$classroom['classroom_id']}' and status = 0 and template_subject = '{$classroom_register}'"
+            );
+            echo json_encode(array(
+                'status' => false,
+                'message' => 'not register',
+                'notification' => previewTemplate($classroom['classroom_id'], $messages[0]['template_body'], ''),
+                'tenant_url' => $tenant_url,
+                'classroom_register' => $classroom_register
+            ));
+            exit;
+        }
         $host = select_data(
             "tenant_key", 
             "ogm_tenant", 
@@ -274,9 +302,7 @@
         $answerData = select_data(
             "question_id, choice_id, answer_type, answer_text, other_text, is_other",
             "classroom_form_answer_users",
-            "WHERE student_id = " . intval($student_id) . " 
-            AND status = 0 
-            AND classroom_id = " . intval($classroom['classroom_id'])
+            "WHERE student_id = " . intval($student_id) . " AND status = 0 AND classroom_id = " . intval($classroom['classroom_id'])
         );
         foreach($answerData as $ans) {
             foreach($form_data as $k => $f) {

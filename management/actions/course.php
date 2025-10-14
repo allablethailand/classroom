@@ -41,7 +41,19 @@
             ) as course_cover,
             date_format(course.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
             CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
-            course.course_ref_id
+            course.course_ref_id,
+            (
+                CASE
+                    WHEN course.course_type = 'course' then date_format(c.trn_date, '%Y/%m/%d')
+                    ELSE date_format(l.learning_map_start, '%Y/%m/%d')
+                END
+            ) as course_start,
+            (
+                CASE
+                    WHEN course.course_type = 'course' then date_format(c.trn_to_date, '%Y/%m/%d')
+                    ELSE date_format(l.learning_map_end, '%Y/%m/%d')
+                END
+            ) as course_end
         FROM 
             classroom_course course
         LEFT JOIN 
@@ -68,6 +80,12 @@
                 } else {
                     return '/images/training.jpg';
                 }
+			}),
+            array('db' => 'course_start', 'dt' => 'course_start','formatter' => function ($d, $row) {
+				return ($d) ? $d : '';
+			}),
+            array('db' => 'course_end', 'dt' => 'course_end','formatter' => function ($d, $row) {
+				return ($d) ? $d : '';
 			}),
             array('db' => 'date_create', 'dt' => 'date_create'),
             array('db' => 'emp_create', 'dt' => 'emp_create'),

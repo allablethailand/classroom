@@ -10,6 +10,8 @@ function getCoursetTemplate() {
                     <th></th>
                     <th style="width: 100px;"></th>
                     <th lang="en">Course</th>
+                    <th lang="en">Start Date</th>
+                    <th lang="en">End Date</th>
                     <th lang="en">Create Date</th>
                     <th lang="en">Create By</th>
                     <th></th>
@@ -72,12 +74,18 @@ function buildCourse() {
                 }
             },{ 
                 "targets": 3,
-                "data": "date_create",
+                "data": "course_start",
             },{ 
                 "targets": 4,
-                "data": "emp_create",
+                "data": "course_end",
             },{ 
                 "targets": 5,
+                "data": "date_create",
+            },{ 
+                "targets": 6,
+                "data": "emp_create",
+            },{ 
+                "targets": 7,
                 "data": "course_id",
                 "className": "text-center",
                 "orderable": false,

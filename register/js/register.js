@@ -39,6 +39,7 @@ const translations = {
         consent_paragraph: "This form has been created by the form owner. Any information you submit will be sent directly to the form owner. Allable is not responsible for the privacy practices or actions of third-party form owners. Please avoid submitting personal, sensitive, or confidential information, and never share your password.",
         consent_footer: "Please do not provide personal or sensitive information. Thank you for your understanding!",
         reference: "Reference Person (if any, please specify)",
+        warning: "Warning",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
@@ -74,6 +75,7 @@ const translations = {
         consent_paragraph: "แบบฟอร์มนี้ถูกสร้างขึ้นโดยเจ้าของฟอร์ม ข้อมูลใด ๆ ที่คุณส่ง จะถูกส่งไปยังเจ้าของฟอร์มโดยตรง Allable จะไม่รับผิดชอบต่อการปฏิบัติด้านความเป็นส่วนตัวหรือการดำเนินการใด ๆ ของเจ้าของฟอร์มภายนอก โปรดหลีกเลี่ยงการส่งข้อมูลส่วนบุคคล ข้อมูลที่อ่อนไหว หรือข้อมูลลับ และอย่าเปิดเผยรหัสผ่านของคุณโดยเด็ดขาด",
         consent_footer: "กรุณางดให้ข้อมูลส่วนบุคคลหรือข้อมูลที่อ่อนไหว ขอบคุณในความเข้าใจของท่าน",
         reference: "ผู้แนะนำให้มาสมัคร (ถ้ามีโปรดระบุ)",
+        warning: "คำเตือน",
     }
 };
 $(document).ready(function () {
@@ -223,7 +225,32 @@ $(document).ready(function () {
         classroomCode: classroomCode, 
         channel: channel
     }, (response) => {
-        if (!response.status) return window.location.href = '/';
+        if(!response.status) {
+            $(".registration-container").html("");
+            const $modal = $(".systemModal");
+            if ($modal.length === 0) {
+                console.error('System modal not found');
+                location.reload();
+                return;
+            }
+            $modal.modal('show');
+            $modal.find(".modal-header").html(`
+                <h5 class="modal-title" data-lang="warning"></h5>
+            `);
+            if(response.message == 'not found') {
+                const msg = currentLang === 'en' ? "Course information not found. Please check the link again." : "ไม่พบข้อมูลหลักสูตร กรุณาตรวจสอบลิงก์อีกครั้ง";
+                $modal.find(".modal-body").html(msg);
+            } else if(response.message == 'not register') {
+                let notification = response.notification;
+                $modal.find(".modal-body").html(notification);
+            }
+            $modal.find(".modal-footer").html(`
+                <div class="text-center w-100">
+                    <a href="${response.tenant_url}" class="btn btn-primary" data-lang="close"></a>
+                </div>
+            `);
+            return;
+        }
         classroom_id = response.classroom_data.classroom_id;
         channel_id = response.channel_id;
         tenant_key = response.classroom_data.tenant_key;
