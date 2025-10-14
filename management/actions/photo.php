@@ -245,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && is
     // เนื่องจากอยู่ภายใน Modal เราจะส่ง JSON response กลับไป
     header('Content-Type: application/json');
     if ($total_uploaded > 0) {
-        $msg_summary = " อัปโหลดรูปภาพกลุ่มสำเร็จ";
+        $msg_summary = "อัปโหลดรูปภาพกลุ่มสำเร็จ ({$total_uploaded} ไฟล์) และประมวลผล Face Recognition เรียบร้อย";
         $response = [
             'status' => 'success',
             'message' => $msg_summary,
@@ -267,8 +267,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && is
 // **แสดง HTML Form สำหรับ Modal Body**
 // หากมีการเรียกไฟล์นี้โดยไม่มี POST (เช่น ถูกโหลดครั้งแรกผ่าน AJAX เพื่อแสดง Form)
 ?>
-<div class="container-fluid">
-    <h2>เพิ่มรูปภาพกลุ่มสำหรับ Face Recognition</h2>
+<div class="container-fluid" style="padding: 15px;">
+    <h3 style="border-left: 5px solid #00C292; padding-left: 10px; margin-bottom: 20px;">
+        <i class="fas fa-camera-retro fa-fw"></i> เพิ่มรูปภาพกลุ่มสำหรับ Face Recognition
+    </h3>
+    
     <div id="upload-message-area">
     <?php 
     // ถ้ามีการ Redirect มาพร้อม Message ใน Query Param 
@@ -276,28 +279,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && is
         $status = htmlspecialchars($_GET['status']);
         $message = htmlspecialchars(urldecode($_GET['msg']));
         $alert_class = ($status == 'success') ? 'alert-success' : 'alert-danger';
-        echo "<div class='alert {$alert_class}'>{$message}</div>";
+        echo "<div class='alert {$alert_class}'><i class='fas fa-info-circle'></i> {$message}</div>";
     }
     ?>
     </div>
     
-    <form action="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>" method="POST" enctype="multipart/form-data" id="photo-upload-form">
-        <div class="form-group">
-            <label for="event_name">ชื่อ Event / คำอธิบาย (จะใช้จัดกลุ่มภาพ):</label>
-            <input type="text" class="form-control" name="event_name" id="event_name_modal" maxlength="255" required>
+    <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: #f7f7f7; color: #333;">
+            <h4 class="panel-title"><i class="fas fa-upload fa-fw"></i> กรอกรายละเอียดและอัปโหลด</h4>
         </div>
-        <div class="form-group">
-            <label for="group_photo">เลือกรูปภาพกลุ่ม (สามารถเลือกได้หลายไฟล์):</label>
-            <input type="file" class="form-control" name="group_photo[]" id="group_photo_modal" accept="image/jpeg, image/png" multiple required>
+        <div class="panel-body">
+            <form action="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>" method="POST" enctype="multipart/form-data" id="photo-upload-form">
+                
+                <div class="form-group">
+                    <label for="event_name_modal">
+                        <i class="fas fa-tag fa-fw"></i> ชื่อ Event / คำอธิบาย:
+                        <small class="text-muted">(จะใช้จัดกลุ่มภาพ)</small>
+                    </label>
+                    <input type="text" class="form-control" name="event_name" id="event_name_modal" maxlength="255" placeholder="เช่น กิจกรรมวันปีใหม่ 2568" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="group_photo_modal">
+                        <i class="fas fa-images fa-fw"></i> เลือกรูปภาพกลุ่ม:
+                        <small class="text-muted">(สามารถเลือกได้หลายไฟล์ .jpeg, .png)</small>
+                    </label>
+                    <input type="file" class="form-control" name="group_photo[]" id="group_photo_modal" accept="image/jpeg, image/png" multiple required>
+                </div>
+                
+                <button type="submit" class="btn btn-lg btn-block" style="background-color: #00C292; color: white; margin-top: 20px;" id="upload-photo-btn">
+                    <i class="fas fa-cloud-upload-alt fa-fw"></i> อัปโหลดและบันทึก
+                </button>
+                
+            </form>
         </div>
-        <button type="submit" style="background-color: #00C292;" class="btn btn-primary" id="upload-photo-btn">อัปโหลดและบันทึก</button>
-    </form>
+    </div>
 </div>
 
 <script>
 // สคริปต์สำหรับการจัดการฟอร์มผ่าน AJAX เพื่อให้ Modal ไม่ปิด
 // ต้องแน่ใจว่าได้โหลด jQuery แล้ว
 $(document).ready(function() {
+    // ตรวจสอบว่ามี Font Awesome ถูกโหลดหรือไม่
+    var iconUpload = '<i class="fas fa-cloud-upload-alt fa-fw"></i>';
+    var iconLoading = '<i class="fas fa-spinner fa-spin fa-fw"></i>';
+
     $('#photo-upload-form').on('submit', function(e) {
         e.preventDefault();
         
@@ -307,7 +333,7 @@ $(document).ready(function() {
         var messageArea = $('#upload-message-area');
 
         // ปิดปุ่ม, แสดง Loading
-        submitBtn.prop('disabled', true).text('กำลังอัปโหลด...');
+        submitBtn.prop('disabled', true).html(iconLoading + ' กำลังอัปโหลดและตรวจับใบหน้า');
         messageArea.empty();
 
         $.ajax({
@@ -319,23 +345,28 @@ $(document).ready(function() {
             dataType: 'json', // คาดหวัง JSON Response
             success: function(response) {
                 if (response.status === 'success') {
-                    messageArea.html('<div class="alert alert-success">' + response.message + '</div>');
-                    // อาจจะ clear form ได้ที่นี่
-                    form[0].reset();
+                    // แสดงผลสำเร็จด้วย Alert-success
+                    messageArea.html('<div class="alert alert-success"><i class="fas fa-check-circle fa-fw"></i> ' + response.message + '</div>');
+                    // Clear form
+                    form[0].reset(); 
+                    $('#event_name_modal').focus(); // กลับไปที่ฟิลด์แรก
                 } else {
-                    var errorHtml = '<div class="alert alert-danger">' + response.message + '</div>';
+                    // แสดงผลผิดพลาดด้วย Alert-danger
+                    var errorHtml = '<div class="alert alert-danger"><i class="fas fa-times-circle fa-fw"></i> ' + response.message + '</div>';
                     if (response.errors && response.errors.length > 0) {
-                         errorHtml += '<div class="alert alert-warning">รายละเอียดข้อผิดพลาด: ' + response.errors.join('<br>') + '</div>';
+                         // แสดงรายละเอียดข้อผิดพลาดเป็นรายการ
+                         errorHtml += '<div class="alert alert-warning" style="margin-top: 10px;"><strong>รายละเอียด:</strong><ul><li>' + response.errors.join('</li><li>') + '</li></ul></div>';
                     }
                     messageArea.html(errorHtml);
                 }
             },
             error: function(xhr, status, error) {
-                messageArea.html('<div class="alert alert-danger">เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: ' + error + '</div>');
+                // ข้อผิดพลาดจากการเชื่อมต่อ
+                messageArea.html('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle fa-fw"></i> เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: ' + error + '</div>');
             },
             complete: function() {
                 // เปิดปุ่มกลับมา
-                submitBtn.prop('disabled', false).html('<i class="fas fa-camera-retro"></i> อัปโหลดและบันทึก');
+                submitBtn.prop('disabled', false).html(iconUpload + ' อัปโหลดและบันทึก');
             }
         });
     });
