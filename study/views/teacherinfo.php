@@ -115,7 +115,7 @@
         /* เพิ่มเพื่อจัดกึ่งกลางและปรับขนาดกล่องหลักสูตร */
         .profile-card {
             display: flex;
-            justify-content: center;
+            /* justify-content: center; */
             margin: 0 auto;
             padding: 20px;
             /* max-width: fit-content;*/
@@ -130,11 +130,12 @@
         .profile-course-container {
             display: flex;
             flex-direction: column;
-            /* เปลี่ยนจาก flex-direction: row เป็น column เพื่อให้ข้อมูลลงมาเป็นบรรทัดใหม่ */
-            align-items: center;
+            /* align-items: center; */
             justify-content: center;
             gap: 10px;
+            padding-left: 3em;
         }
+
 
         .profile-course,
         .profile-company,
