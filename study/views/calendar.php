@@ -258,6 +258,9 @@ body {
     max-width: 900px;
     /* margin: auto; */
     padding-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
 }
 
 /* Header ของปฏิทิน: "Calendar" และปุ่มค้นหา */
@@ -645,6 +648,15 @@ body {
         height: 6px;
         margin: 1px;
     }
+    .container{
+    margin-left: 0px;
+    margin-right: 0px;
+}
+}
+
+.container{
+    margin-left: auto;
+    margin-right: auto;
 }
 </style>
 
@@ -652,28 +664,29 @@ body {
     <?php
     require_once ("component/header.php")
     ?>
-<div class="schedule-container">
-     <div class="calendar-header">
-            <button class="calendar-nav-btn" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-            <h2 id="currentMonthYear"></h2>
-            <button class="calendar-nav-btn" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
-        </div>
-    <div class="calendar-card">
-       
-        <div class="calendar-grid">
-            <div class="calendar-weekday">Sun</div>
-            <div class="calendar-weekday">Mon</div>
-            <div class="calendar-weekday">Tue</div>
-            <div class="calendar-weekday">Wed</div>
-            <div class="calendar-weekday">Thu</div>
-            <div class="calendar-weekday">Fri</div>
-            <div class="calendar-weekday">Sat</div>
-        </div>
-        <div class="calendar-grid" id="calendarGrid">
+    <div class="container">
+        <div class="schedule-container">
+            <div class="calendar-header">
+                    <button class="calendar-nav-btn" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                    <h2 id="currentMonthYear"></h2>
+                    <button class="calendar-nav-btn" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            <div class="calendar-card">
+            
+                <div class="calendar-grid">
+                    <div class="calendar-weekday">Sun</div>
+                    <div class="calendar-weekday">Mon</div>
+                    <div class="calendar-weekday">Tue</div>
+                    <div class="calendar-weekday">Wed</div>
+                    <div class="calendar-weekday">Thu</div>
+                    <div class="calendar-weekday">Fri</div>
+                    <div class="calendar-weekday">Sat</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
 <div id="dailyScheduleDisplay" class="daily-schedule-display-container" style="width: 100%;max-width: 900px;margin: auto; padding: 20px; padding-bottom: 80px; padding-top: 0px;"></div>
 
 <div class="modal fade" id="cameraModal" tabindex="-1" role="dialog" aria-labelledby="cameraModalLabel">
