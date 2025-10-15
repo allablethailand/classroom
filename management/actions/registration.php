@@ -13,6 +13,8 @@
     define('BASE_PATH', $base_path);
     define('BASE_INCLUDE', $base_include);
     require_once $base_include.'/lib/connect_sqli.php';
+    require_once $base_include.'/actions/func.php';
+    require_once $base_include.'/classroom/actions/mailsend.php';
     $fsData = getBucketMaster();
     $filesystem_user = $fsData['fs_access_user'];
     $filesystem_pass = $fsData['fs_access_pass'];
@@ -651,6 +653,8 @@
         ]);
     }
     if(isset($_POST) && $_POST['action'] == 'approveRegistration') {
+        $classroom_id = $_POST['classroom_id'];
+        $student_id = $_POST['student_id'];
         $join_id = $_POST['join_id'];
         $option = $_POST['option'];
         $status = 0;
@@ -660,6 +664,7 @@
             break;
             case 'Y':
                 $status = 1;
+                notiMail($classroom_id, $student_id, 'Approve');
             break;
             case 'N':
                 $status = 2;
@@ -675,6 +680,8 @@
         ]);
     }
     if(isset($_POST) && $_POST['action'] == 'paymentRegistration') {
+        $classroom_id = $_POST['classroom_id'];
+        $student_id = $_POST['student_id'];
         $join_id = $_POST['join_id'];
         $option = $_POST['option'];
         $status = 0;
@@ -684,6 +691,7 @@
             break;
             case 'Y':
                 $status = 1;
+                notiMail($classroom_id, $student_id, 'Payment');
             break;
             case 'N':
                 $status = 2;
