@@ -29,7 +29,7 @@
                 $mail_type = mysqli_real_escape_string($mysqli, $mail_type);
                 $email_key = "and mail_template_id = '{$mail_type}'";
         }
-        $template = select_data("mail_subject,mail_description", "classroom_mail_template", "where classroom_id = '{$classroom_id}' and status = 0 {$email_key}");
+        $template = select_data("mail_subject,mail_description", "classroom_mail_template", "where classroom_id = '{$classroom_id}' and status = 0 and mail_sending = 0 {$email_key}");
         if (empty($template)) return;
         $mail_subject = $template[0]['mail_subject'];
         $mail_description = $template[0]['mail_description'];

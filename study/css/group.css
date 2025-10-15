@@ -55,12 +55,33 @@
   transition: all 0.2s ease;
   cursor: pointer;
   border: 2px solid transparent;
+  padding: 1rem;
 }
 
 .group-card:hover {
   transform: scale(1.05);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
+
+.group-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+
+@media (min-width: 1000px) {
+  
+  .group-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 2.2rem 1.5rem;
+  }
+
+
+ 
+}
+
 
 .member-card {
   transition: all 0.2s ease;

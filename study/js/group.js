@@ -32,7 +32,6 @@ $(document).ready(function() {
                         var group_logo = row.group_logo ? row.group_logo : '../../../images/default.png';
                         var border_color = row.group_color ? row.group_color : '#ff8c00';
 
-                        
 
                         html += '<a href="studentinfo?id=' + encodeURIComponent(row.student_id) + '" class="student-card">';
                         html += '<div class="student-avatar" style="border-color:' + border_color + ';">';

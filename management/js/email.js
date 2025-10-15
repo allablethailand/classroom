@@ -8,6 +8,7 @@ function buildEmailTemplate() {
             <thead>
                 <tr>
                     <th></th>
+                    <th lang="en" style="width: 75px;">Send Status</th>
                     <th lang="en">Subject</th>
                 </tr>
             </thead>
@@ -38,58 +39,61 @@ function buildEmail() {
         searchDelay: 1000,
         deferRender: false,
         order: [[0, 'asc']],
-        columns: [
-            {
-                data: "mail_template_id",
-                visible: false
-            },
-            {
-                data: "mail_subject",
-                render: (data, type, row) => {
-                    const {
-                        mail_reason, mail_reference, date_create,
-                        mail_template_id, emp_name, mail_name
-                    } = row;
-                    const icon = mail_reference != 0
-                        ? '<i class="fas fa-star text-orange"></i>'
-                        : '<i class="fas fa-mail-bulk"></i>';
-                    return `
-                        <div class="row">
-                            <div class="col-sm-10">
-                                <p><b>${icon} ${data}</b></p>
-                                <div class="text-grey" style="font-size:11px;">
-                                    <i class="fas fa-tags"></i> ${mail_name}
-                                </div>
-                                ${mail_reason ? `
-                                    <p class="text-grey" style="font-size:11px;">${mail_reason}</p>
-                                ` : ''}
-                                <div class="text-grey" style="font-size:11px;">
-                                    <i class="far fa-calendar"></i> ${date_create}
-                                </div>
-                                <div class="text-grey" style="font-size:11px;">
-                                    <i class="far fa-user-circle"></i> ${emp_name}
-                                </div>
+        columns: [{
+            data: "mail_template_id",
+            visible: false
+        },{
+            data: "mail_sending",
+            className: "text-center",
+            render: (data, type, row) => {
+                return `
+                    <a class="text-${(data == 0) ? 'green' : 'grey'}" onclick="switchEmail(${row['mail_template_id']}, ${data});"><i class="fas fa-toggle-${(data == 0) ? 'on' : 'off'} fa-2x"></i></a>
+                `;
+            }
+        },{
+            data: "mail_subject",
+            render: (data, type, row) => {
+                const {
+                    mail_reason, mail_reference, date_create,
+                    mail_template_id, emp_name, mail_name
+                } = row;
+                const icon = mail_reference != 0 ? '<i class="fas fa-star text-orange"></i>' : '<i class="fas fa-mail-bulk"></i>';
+                return `
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <p><b>${icon} ${data}</b></p>
+                            <div class="text-grey" style="font-size:11px;">
+                                <i class="fas fa-tags"></i> ${mail_name}
                             </div>
-                            <div class="col-sm-2 text-right">
-                                <div class="nowrap">
-                                    <button type="button" class="btn btn-info btn-circle" onclick="previewTemplated(${mail_template_id})">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-orange btn-circle" onclick="manageEmailTemplate(${mail_template_id})">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </button>
-                                    ${mail_reference == 0 ? `
-                                        <button type="button" class="btn btn-red btn-circle" onclick="delTemplate(${mail_template_id})">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    ` : ''}
-                                </div>
+                            ${mail_reason ? `
+                                <p class="text-grey" style="font-size:11px;">${mail_reason}</p>
+                            ` : ''}
+                            <div class="text-grey" style="font-size:11px;">
+                                <i class="far fa-calendar"></i> ${date_create}
+                            </div>
+                            <div class="text-grey" style="font-size:11px;">
+                                <i class="far fa-user-circle"></i> ${emp_name}
                             </div>
                         </div>
-                    `;
-                }
+                        <div class="col-sm-2 text-right">
+                            <div class="nowrap">
+                                <button type="button" class="btn btn-info btn-circle" onclick="previewTemplated(${mail_template_id})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-orange btn-circle" onclick="manageEmailTemplate(${mail_template_id})">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                                ${mail_reference == 0 ? `
+                                    <button type="button" class="btn btn-red btn-circle" onclick="delTemplate(${mail_template_id})">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
-        ],
+        }],
         drawCallback: () => {
             const lang = new Lang();
             lang.dynamic('th', `/js/langpack/th.json?v=${Date.now()}`);
@@ -115,6 +119,55 @@ function buildEmail() {
             buildEmail();
         }
     });
+}
+function switchEmail(template_id, option) {
+    if(option == 0){
+		var message = 'Turn Off';
+		var topic = 'Turn Off';
+		var type_color = 'error';
+		var button_color = '#FF6666';
+	}else{
+		var message = 'Turn On';
+		var topic = 'Turn On';
+		var type_color = 'info';
+		var button_color = '#5bc0de';
+	}
+	event.stopPropagation();
+	swal({ 
+		html:true,
+		title: window.lang.translate(`${topic} email template?`),
+		text: ``,
+		type: type_color,
+		showCancelButton: true,
+		closeOnConfirm: false,
+		confirmButtonText: window.lang.translate(message),
+		cancelButtonText: window.lang.translate("Cancel"),	
+		confirmButtonColor: button_color,
+		cancelButtonColor: '#CCCCCC',
+		showLoaderOnConfirm: true,
+	},
+	function(isConfirm){
+		if (isConfirm) {
+			$.ajax({
+                url: "/classroom/management/actions/email.php",
+                type: "POST",
+                data: {
+                    action:'switchEmail',
+                    classroom_id: classroom_id,
+                    template_id: template_id,
+                    option: option
+                },
+                dataType: "JSON",
+                type: 'POST',
+                success: function(result){
+                    swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});							
+                    buildEmail();
+                }
+            });
+		}else{
+			swal.close();
+		}
+	});
 }
 function restoreTemplate(template_id, event) {
     if (event) event.stopPropagation();

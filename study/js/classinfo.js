@@ -114,47 +114,49 @@ function renderClassCard(course, classroomId) {
   // </div>
 
 
-  return `
-    <div class="row" onclick="redirectCurreculum('${course.course_id}', '${course.course_type
-    }', ${classroomId})">
-      <div class="container-menu" style="margin-top: 10px; padding: 2rem;">
 
-        <div class="flex-box-container">
-          <div class="header-menu">
-            <div class="small-img-banner">
-               ${courseCover}
-            </div>
-            <div class="class-menu">
-            <span class="title-menu-sec" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;">${course.course_name}</span>
-              <div class="progress-section">
-                 <div>
-                  <div class="instructor-name">
-                    <span><i class="fas fa-chalkboard-teacher"></i>&nbsp;</span>
-                    <b>ผู้สอน:</b> ${courseInstr}
+
+  return `
+      <div class="col-xs-12 col-md-4 col-lg-4" onclick="redirectCurreculum('${course.course_id}', '${course.course_type}', ${classroomId})">
+        <div class="container-menu" style="margin-top: 10px; padding: 2rem;">
+
+          <div class="flex-box-container">
+            <div class="header-menu">
+              <div class="small-img-banner">
+                ${courseCover}
+              </div>
+              <div class="class-menu">
+              <span class="title-menu-sec" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;">${course.course_name}</span>
+                <div class="progress-section">
+                  <div>
+                    <div class="instructor-name">
+                      <span><i class="fas fa-chalkboard-teacher"></i>&nbsp;</span>
+                      <b>ผู้สอน:</b> ${courseInstr}
+                    </div>
+                    <div class="instructor-info" style="margin-left: 0.5rem;">
+                    ${instructorsHtml}
+                    </div>
                   </div>
-                  <div class="instructor-info" style="margin-left: 0.5rem;">
-                  ${instructorsHtml}
+                  <div class="location-info" style="margin-left: 0.5rem;">
+                  <span><i class="fas fa-map"></i> &nbsp;</span> 
+                    สถานที่:
+                    ${courseLoca}
                   </div>
-                </div>
-                <div class="location-info" style="margin-left: 0.5rem;">
-                <span><i class="fas fa-map"></i> &nbsp;</span> 
-                  สถานที่:
-                   ${courseLoca}
-                </div>
-                 <div class="time-schedule-class" style="margin-left: 0.5rem;">
-                  <span class="small-text-gray">${courseDate}</span>
-                  <span class="small-text-gray">| ${displayTime}</span>
+                  <div class="time-schedule-class" style="margin-left: 0.5rem;">
+                    <span class="small-text-gray">${courseDate}</span>
+                    <span class="small-text-gray">| ${displayTime}</span>
+                  </div>
                 </div>
               </div>
             </div>
+            <div class="next-icon-box">
+              <i class="fas fa-chevron-right"></i>
+              </div>
           </div>
-          <div class="next-icon-box">
-            <i class="fas fa-chevron-right"></i>
-            </div>
-        </div>
 
+        </div>
       </div>
-    </div>
+
   `;
 }
 function redirectCurreculum(course_id, course_type, classroomId) {

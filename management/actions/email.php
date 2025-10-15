@@ -62,7 +62,8 @@
                     DATE_FORMAT(IFNULL(t1.date_create, t1.date_modify), '%Y/%m/%d %H:%i:%s') AS date_create,
                     IFNULL(t1.mail_reference, 0) AS mail_reference,
                     t1.mail_reason,
-                    t1.mail_name
+                    t1.mail_name,
+                    t1.mail_sending
                 FROM 
                     classroom_mail_template t1
                 LEFT JOIN 
@@ -79,6 +80,7 @@
             array('db' => 'mail_reason', 'dt' => 'mail_reason'),
             array('db' => 'emp_name', 'dt' => 'emp_name'),
             array('db' => 'mail_name', 'dt' => 'mail_name'),
+            array('db' => 'mail_sending', 'dt' => 'mail_sending'),
         );
         $sql_details = array(
             'user' => $db_username,
@@ -169,5 +171,15 @@
         $template = $Data[0]['mail_description'];
         $html = previewTemplate($classroom_id,$template,'','','');
         echo json_encode(['status' => true,'template' => htmlspecialchars_decode($html)]);
+    }
+    if(isset($_POST) && $_POST['action'] == 'switchEmail') {
+        $classroom_id = $_POST['classroom_id'];
+        $template_id = $_POST['template_id'];
+        $option = $_POST['option'];
+        $status = ($option == 0) ? 1 : 0;
+        update_data(
+            "classroom_mail_template", "mail_sending = $status", "mail_template_id = '{$template_id}' and classroom_id = '{$classroom_id}'"
+        );
+        echo json_encode(['status' => true]);
     }
 ?>
