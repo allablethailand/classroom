@@ -39,24 +39,28 @@ $alumni_list = getStudentClassroomList($student_id);
     <link rel="stylesheet" href="/dist/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/dist/css/sweetalert.css">
-    <link rel="stylesheet" href="/dist/css/select2.min.css">
-    <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
+    <!-- <link rel="stylesheet" href="/dist/css/select2.min.css">
+    <link rel="stylesheet" href="/dist/css/select2-bootstrap.css"> -->
     <link rel="stylesheet" href="/dist/css/jquery-ui.css">
     <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/classroom/study/css/header.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/classroom/study/css/history.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/dist/daterangepicker/v2/daterangepicker.css">
     <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
     <script src="/bootstrap/3.3.6/js/jquery-2.2.3.min.js" type="text/javascript"></script>
     <script src="/dist/js/sweetalert.min.js"></script>
     <script src="/dist/js/jquery.dataTables.min.js"></script>
     <script src="/dist/js/dataTables.bootstrap.min.js"></script>
+    <script src="/dist/moment/moment.min.js"></script>
     <script src="/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="/dist/js/select2-build.min.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <!-- <script src="/dist/js/select2-build.min.js?v=<?php echo time(); ?>" type="text/javascript"></script> -->
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
+    <script src="/dist/js/moment-with-locales.js"></script>
+    <script src="/dist/daterangepicker/v2/daterangepicker.js"></script>
     <script src="/classroom/study/js/history.js?v=<?php echo time(); ?>" type="text/javascript"></script>
-
+    
     <style>
         /* body {
             background: #f5f5f5;
@@ -74,7 +78,9 @@ $alumni_list = getStudentClassroomList($student_id);
             position: relative;
             padding-bottom: 70px;
         } */
-
+        /* .daterangepicker {
+            z-index: 1600 !important;
+        } */
         .top-notch {
             height: 30px;
             background: white;
@@ -114,6 +120,7 @@ $alumni_list = getStudentClassroomList($student_id);
             background: #fff;
             margin-inline: 10px;
             border-radius: 15px;
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
         }
 
         .main-tabs {
@@ -127,7 +134,7 @@ $alumni_list = getStudentClassroomList($student_id);
             padding: 12px;
             text-align: center;
             background: #f5f5f5;
-            border: none;
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
             font-size: 15px;
             font-weight: 500;
@@ -371,6 +378,9 @@ $alumni_list = getStudentClassroomList($student_id);
                                     <?php echo htmlspecialchars($alumni['classroom_name']); ?>
                                 </option>
                             <?php endforeach; ?>
+                            <option value="">
+                                ทั้งหมด
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -378,7 +388,7 @@ $alumni_list = getStudentClassroomList($student_id);
                     <button class="main-tab active" onclick="switchMainTab(this, 'ongoing')">Summarize</button>
                     <button class="main-tab" onclick="switchMainTab(this, 'ongoing')">Online</button>
                     <button class="main-tab" onclick="switchMainTab(this, 'history')">Onsite</button>
-                     <button class="navbox-button" id="filterBtn" style="border: 1px solid #ccc">
+                    <button class="navbox-button" id="filterBtn" style="border: 1px solid #ccc" data-toggle="modal" data-target="#bottomModal">
                         <svg class="icon-svg" viewBox="0 0 14 13">
                             <g>
                                 <path d="M5.55726 8.90859H1.03659C0.464442 8.90859 -8.3819e-08 9.36489 -8.3819e-08 9.92701C-8.3819e-08 10.4884 0.464442 10.9454 1.03659 10.9454H5.55726C6.12941 10.9454 6.59385 10.4884 6.59385 9.92701C6.59385 9.36489 6.12941 8.90859 5.55726 8.90859Z" ," fill="#26273A" opacity="0.4" />
@@ -388,19 +398,23 @@ $alumni_list = getStudentClassroomList($student_id);
                             </g>
                         </svg>
                     </button>
+           
                 </div>
                 <div class="filter-tabs">
                     <button class="filter-tab active" onclick="switchFilterTab(this, 'all')">
                         All
                     </button>
-                    <button class="filter-tab" onclick="switchFilterTab(this, 'waiting')">
-                        Today <span class="badge-count">3</span>
+                    <button class="filter-tab" onclick="switchFilterTab(this, 'present')">
+                        Present <span class="badge-count">1</span>
                     </button>
-                    <button class="filter-tab" onclick="switchFilterTab(this, 'current')">
-                        This Week <span class="badge-count">3</span>
+                    <button class="filter-tab" onclick="switchFilterTab(this, 'absent')">
+                        Absent <span class="badge-count">3</span>
                     </button>
-                    <button class="filter-tab" onclick="switchFilterTab(this, 'waiting')">
-                        This Month <span class="badge-count">3</span>
+                    <button class="filter-tab" onclick="switchFilterTab(this, 'early')">
+                       Early <span class="badge-count">5</span>
+                    </button>
+                    <button class="filter-tab" onclick="switchFilterTab(this, 'late')">
+                        Late <span class="badge-count">2</span>
                     </button>
                 </div>
             </div>
@@ -541,12 +555,80 @@ $alumni_list = getStudentClassroomList($student_id);
         </div>
 
     </div>
+    <div id="bottomModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog" style="position: fixed; bottom: 0; margin: 0; width: 100%; max-width: 100%;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title">Filters</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <h4 class="modal-title">Start Date:</h4>
+                                    <div class="input-group date" data-provide="datepicker">
+                                        <input type="text" id="start_date" class="form-control" style="margin-top:0px !important; margin-bottom:0px !important;">
+                                        <div class="input-group-addon">
+                                            <span><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                     <h4 class="modal-title" style="margin-top: 10px;">End Date:</h4>
+                                    <div class="input-group date" data-provide="datepicker">
+                                        <input type="text" id="end_date" class="form-control" style="margin-top:0px !important; margin-bottom:0px !important;">
+                                        <div class="input-group-addon">
+                                            <span><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    <!-- Your modal content here -->
+                                    <div class="daterange-filter">
+                                        <div class="" style="margin-top: 10px;">
+                                            <p>Select Range</p>
+                                        </div>
+                                        <div class="" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                            <div class="dropdown">
+                                                <div class="filter-tag active" id="filter-date-today" data-filter="today">
+                                                    <span class="filter-text">Today</span>
+                                                    <span class="remove-btn">×</span>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown">
+                                                <div class="filter-tag" id="filter-date-lastmonth" data-filter="lastmonth">
+                                                    <span class="filter-text">Last month</span>
+                                                    <span class="remove-btn">×</span>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown">
+                                                <div class="filter-tag" id="filter-date-lastweek" data-filter="lastweek">
+                                                    <span class="filter-text">Last week</span>
+                                                    <span class="remove-btn">×</span>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown">
+                                                <div class="filter-tag" id="filter-date-thismonth" data-filter="thismonth">
+                                                    <span class="filter-text">This month</span>
+                                                    <span class="remove-btn">×</span>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown">
+                                                <div class="filter-tag" id="filter-date-thisweek" data-filter="thisweek">
+                                                    <span class="filter-text">This week</span>
+                                                    <span class="remove-btn">×</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" style="margin-inline: 0.5rem;">
+                                        <button class="btn btn-primary btn-block">Search Result</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+        
+  
 
     <?php require_once 'component/footer.php'; ?>
 
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         function switchMainTab(element, tab) {
             // Remove active class from all main tabs
@@ -559,21 +641,48 @@ $alumni_list = getStudentClassroomList($student_id);
         }
 
         function switchFilterTab(element, filter) {
-            // Remove active class from all filter tabs
-            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-            // Add active class to clicked tab
-            element.classList.add('active');
-
-            // Filter orders
+            const allTab = document.querySelector('.filter-tab[onclick*="all"]');
+            const tabs = document.querySelectorAll('.filter-tab');
             const cards = document.querySelectorAll('.order-card');
-            cards.forEach(card => {
-                if (filter === 'all') {
-                    card.style.display = 'block';
+
+            if (filter === 'all') {
+                // Activate only the 'All' tab, deactivate others
+                tabs.forEach(tab => tab.classList.remove('active'));
+                element.classList.add('active');
+
+                // Show all cards
+                cards.forEach(card => card.style.display = 'block');
+            } else {
+                // Toggle clicked non-'all' tab active state
+                if (element.classList.contains('active')) {
+                    element.classList.remove('active');
                 } else {
-                    const cardType = card.getAttribute('data-type');
-                    card.style.display = cardType === filter ? 'block' : 'none';
+                    element.classList.add('active');
                 }
-            });
+
+                // If any non-'all' tab is active, deactivate 'All'
+                const anyActive = [...tabs].some(tab => tab !== allTab && tab.classList.contains('active'));
+                if (anyActive) {
+                    allTab.classList.remove('active');
+                } else {
+                    // If none active, activate 'All'
+                    allTab.classList.add('active');
+                }
+
+                // Show cards matching any active filters (or all if none)
+                const activeFilters = [...tabs]
+                    .filter(tab => tab !== allTab && tab.classList.contains('active'))
+                    .map(tab => tab.getAttribute('onclick').match(/'(\w+)'/)[1]);
+
+                cards.forEach(card => {
+                    if (activeFilters.length === 0) {
+                        card.style.display = 'block';
+                    } else {
+                        const cardType = card.getAttribute('data-type');
+                        card.style.display = activeFilters.includes(cardType) ? 'block' : 'none';
+                    }
+                });
+            }
         }
 
         // Add click animation to order cards
@@ -585,6 +694,53 @@ $alumni_list = getStudentClassroomList($student_id);
                 }, 100);
             });
         });
+
+
+        // Attach event listeners to filters:
+        document.querySelectorAll('.filter-tag').forEach(element => {
+            const removeBtn = element.querySelector('.remove-btn');
+            // Set remove button visibility initially
+            removeBtn.style.display = element.classList.contains('active') ? 'inline' : 'none';
+
+            element.addEventListener('click', () => {
+                // Remove active class from all, hide all remove buttons
+                document.querySelectorAll('.filter-tag').forEach(e => {
+                    e.classList.remove('active');
+                    e.querySelector('.remove-btn').style.display = 'none';
+                });
+
+                element.classList.add('active');
+                removeBtn.style.display = 'inline';
+
+                // Apply filter and update date pickers
+                applyFilter(element.getAttribute('data-filter'));
+            });
+
+            removeBtn.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent triggering element click
+                element.classList.remove('active');
+                removeBtn.style.display = 'none';
+
+                // Clear filters and daterange inputs
+                applyFilter('all');
+            });
+        });
+
+    // function applyFilter(filter) {
+    //     const cards = document.querySelectorAll('.order-card');
+    //     cards.forEach(card => {
+    //         if (filter === 'all') {
+    //             card.style.display = 'block';
+    //         } else {
+    //             const cardValue = card.getAttribute(`data-${filter}`);
+    //             card.style.display = cardValue ? 'block' : 'none';
+    //         }
+    //     });
+    // }
+
+        
+        
+
     </script>
 </body>
 

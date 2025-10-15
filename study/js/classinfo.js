@@ -129,6 +129,7 @@ function renderClassCard(course, classroomId) {
               <div class="progress-section">
                  <div>
                   <div class="instructor-name">
+                    <span><i class="fas fa-chalkboard-teacher"></i>&nbsp;</span>
                     <b>ผู้สอน:</b> ${courseInstr}
                   </div>
                   <div class="instructor-info" style="margin-left: 0.5rem;">
@@ -136,7 +137,9 @@ function renderClassCard(course, classroomId) {
                   </div>
                 </div>
                 <div class="location-info" style="margin-left: 0.5rem;">
-                  สถานที่: ${courseLoca}
+                <span><i class="fas fa-map"></i> &nbsp;</span> 
+                  สถานที่:
+                   ${courseLoca}
                 </div>
                  <div class="time-schedule-class" style="margin-left: 0.5rem;">
                   <span class="small-text-gray">${courseDate}</span>
