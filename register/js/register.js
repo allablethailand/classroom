@@ -28,7 +28,6 @@ const translations = {
         work_certificate: "Work certificate",
         company_certificate: "Company Certificate (for business owners)",
         support_upload: "Supports image or PDF files with a size not exceeding 20 MB only.",
-        payment_upload: "Supports image with a size not exceeding 20 MB only.",
         nationality: "Nationality",
         save: "Save",
         logout: "Logout",
@@ -37,11 +36,11 @@ const translations = {
         delete: "Remove",
         file_preview: "File Preview",
         consent_notice: "Consent Notice",
-        consent_paragraph: "This form has been created by the form owner. Any information you submit will be sent directly to the form owner. Allable is not responsible for the privacy practices or actions of third-party form owners. Please avoid submitting personal, sensitive, or confidential information, and never share your password.",
-        consent_footer: "Please do not provide personal or sensitive information. Thank you for your understanding!",
+        origami_form: "Origami Form",
+        consent_paragraph: "This form was created by the form owner. The information you provide will be sent directly to them. Allable is not responsible for how third-party form owners collect, use, or protect your data. Please avoid sharing any personal, sensitive, or confidential information — and never submit your password.",
+        consent_footer: "For your safety, please do not include any personal or sensitive details in your responses. Thank you for your understanding and cooperation.",
         reference: "Reference Person (if any, please specify)",
         warning: "Warning",
-        payment_title: "Attach Your Payment Slip",
         remove: "Remove",
         preview: "Preview",
     },
@@ -68,7 +67,6 @@ const translations = {
         work_certificate: "หนังสือรับรองการทำงาน",
         company_certificate: "หนังสือรับรองของบริษัท (สำหรับเจ้าของกิจการ)",
         support_upload: "รองรับไฟล์รูปภาพหรือ pdf ที่มีขนาดไม่เกิน 20 MB เท่านั้น",
-         payment_upload: "รองรับไฟล์รูปภาพ ที่มีขนาดไม่เกิน 20 MB เท่านั้น",
         nationality: "สัญชาติ",
         save: "บันทึกข้อมูล",
         logout: "ออกจากระบบ",
@@ -76,47 +74,17 @@ const translations = {
         view: "ดูเอกสาร",
         delete: "นำออก",
         file_preview: "ตัวอย่างไฟล์",
-        consent_notice: "หนังสือแจ้งเพื่อขอความยินยอม",
-        consent_paragraph: "แบบฟอร์มนี้ถูกสร้างขึ้นโดยเจ้าของฟอร์ม ข้อมูลใด ๆ ที่คุณส่ง จะถูกส่งไปยังเจ้าของฟอร์มโดยตรง Allable จะไม่รับผิดชอบต่อการปฏิบัติด้านความเป็นส่วนตัวหรือการดำเนินการใด ๆ ของเจ้าของฟอร์มภายนอก โปรดหลีกเลี่ยงการส่งข้อมูลส่วนบุคคล ข้อมูลที่อ่อนไหว หรือข้อมูลลับ และอย่าเปิดเผยรหัสผ่านของคุณโดยเด็ดขาด",
-        consent_footer: "กรุณางดให้ข้อมูลส่วนบุคคลหรือข้อมูลที่อ่อนไหว ขอบคุณในความเข้าใจของท่าน",
+        consent_notice: "ประกาศความยินยอมในการให้ข้อมูล",
+        origami_form: "แบบฟอร์ม Origami",
+        consent_paragraph: "แบบฟอร์มนี้ถูกสร้างขึ้นโดยเจ้าของแบบฟอร์ม ข้อมูลที่ท่านกรอกจะถูกส่งไปยังเจ้าของแบบฟอร์มโดยตรง Allable ไม่มีส่วนรับผิดชอบต่อวิธีการเก็บ ใช้ หรือปกป้องข้อมูลของเจ้าของแบบฟอร์มบุคคลที่สาม โปรดหลีกเลี่ยงการส่งข้อมูลส่วนบุคคล ข้อมูลที่มีความละเอียดอ่อน หรือข้อมูลลับ และ ห้ามส่งรหัสผ่านของท่านโดยเด็ดขาด",
+        consent_footer: "เพื่อความปลอดภัยของท่าน โปรดอย่าระบุข้อมูลส่วนตัวหรือข้อมูลที่มีความอ่อนไหวในแบบฟอร์มนี้ ขอขอบคุณสำหรับความเข้าใจและความร่วมมือของท่าน",
         reference: "ผู้แนะนำให้มาสมัคร (ถ้ามีโปรดระบุ)",
         warning: "คำเตือน",
-        payment_title: "แนบสลิปการชำระเงินของคุณ",
         remove: "นำออก",
         preview: "ดูรูปภาพ",
     }
 };
-function initializeDropify() {
-    try {
-        $('.dropify').dropify({
-            tpl: {
-                wrap: '<div class="dropify-wrapper"></div>',
-                loader: '<div class="dropify-loader"></div>',
-                message: '<div class="dropify-message"><span class="file-icon" /> <p>{{ default }}</p></div>',
-                preview: '<div class="dropify-preview"><span class="dropify-render"></span><div class="dropify-infos"><div class="dropify-infos-inner"><p class="dropify-infos-message">{{ replace }}</p></div></div></div>',
-                filename: '<p class="dropify-filename"><span class="file-icon"></span> <span class="dropify-filename-inner"></span></p>',
-                clearButton: '<div><button type="button" class="dropify-clear dropify-view">Preview</button><button type="button" class="dropify-clear">{{ remove }}</button></div>',
-                errorLine: '<p class="dropify-error">{{ error }}</p>',
-                errorsContainer: '<div class="dropify-errors-container"><ul></ul></div>'
-            }
-        });
-        $('.dropify-view').on('click', function(event) {
-            event.stopPropagation();
-            event.preventDefault();
-            const img = $(this).closest('.dropify-wrapper').find('.dropify-render img').attr('src');
-            if (img && $.fancybox) {
-                $.fancybox({ href: img });
-            }
-        });
-        $('.dropify').on('dropify.beforeClear', function(event, element) {
-            $('#ex_payment_slip').val('');
-        });
-    } catch (error) {
-        console.error('Error initializing Dropify:', error);
-    }
-}
 $(document).ready(function () {
-    initializeDropify();
     $("input").attr("autocomplete", "off");
     function toggleScrollBtn() {
         if ($(window).width() > 767) return $('#scrollToFormBtn').hide();
@@ -166,6 +134,12 @@ $(document).ready(function () {
             reader.readAsDataURL(file);
         }
     });
+    $("#viewProfile").on("click", function () {
+        var src = $("#profilePreview").attr("src");
+        if (src && src !== "/images/profile-default.jpg") {
+            $.fancybox({ href: src });
+        } 
+    });
     $("#removeProfile").on("click", function () {
         const msg = currentLang === 'en' ? "Are you sure?" : "คุณแน่ใจหรือไม่?";
         const text = currentLang === 'en' ? "Remove this profile picture?" : "นำรูปโปรไฟล์นี้ออกหรือไม่?";
@@ -186,8 +160,8 @@ $(document).ready(function () {
                 $("#student_image_profile").val("");
                 $("#ex_student_image_profile").val("");
                 $("#profilePreview").attr("src", defaultProfile);
-                $(this).hide();
                 $("#viewProfile").hide();
+                $("#removeProfile").hide();
                 autoSaveRegister();
             }
         });
@@ -401,7 +375,6 @@ $(document).ready(function () {
                 showDocumentPreview('company_certificate', data.company_certificate, 'Company Certificate');
                 $("#existing_company_certificate").val(data.company_certificate);
             }
-            $(".page-title, h1").append(' <span class="badge badge-info" data-lang="update_mode">Update Mode</span>');
             $(".input-password").addClass("hidden");
             $("input[name='student_password']").removeClass("require");
             $(".logout").attr("href", "/actions/logout.php");
