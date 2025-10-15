@@ -501,7 +501,7 @@ body {
     border-left-color: #ae80f061; /* ส้ม */
 }
 .daily-schedule-item .subject {
-    /* font-weight: 700; */ */
+    /* font-weight: 700; */ 
     font-size: 1.1em;
     /* color: #1a202c; */
     /* margin-bottom: 5px; */
@@ -734,6 +734,12 @@ body {
     const monthNames = ["January", "February", "March", "April", "May", "June",
                     "July", "August", "September", "October", "November", "December"];
 
+    function redirectToschedule(dateStr) {
+        // Construct the URL dynamically with the dateStr
+        const url = `schedule?date_range=${encodeURIComponent(dateStr)}`;
+        window.location.href = url;
+    }
+
     function renderCalendar() {
         calendarGrid.innerHTML = '';
         const year = currentDate.getFullYear();
@@ -799,8 +805,9 @@ body {
 
             const checkinButtonHtml = cls.status === 'checked_in'
                 ? ``
-                : `<div class="btn-checkin-container" style="padding-top:5px;"><button class="btn-checkin" >ยังไม่เช็คอิน</button></div>`;
-
+                : `<div class="btn-checkin-container" style="padding-top:5px;">
+                        <button class="btn-checkin" onclick="redirectToschedule('${cls.date}')">ดูเพิ่มเติม</button>
+                    </div>`;
             htmlContent += `
                 <div class="daily-schedule-item ${cls.status === 'checked_in' ? 'checked-in' : 'not-checked-in'}">
                     <div class="subject">${cls.subject}</div>

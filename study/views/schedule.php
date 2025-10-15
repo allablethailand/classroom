@@ -19,6 +19,8 @@ require_once $base_include . '/lib/connect_sqli.php';
 $program_name = 'Green Tech Leadership (GTL) รุ่นที่ 1';
 $program_slogan = '"CONNECT LOCAL TO GLOBAL"';
 
+$dateRange = isset($_GET['date_range']) ? $_GET['date_range'] : '';
+
 // Define date range as strings
 date_default_timezone_set('Asia/Bangkok'); // or your timezone
 ?>
@@ -53,6 +55,9 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
     <script src="/dist/js/moment-with-locales.js"></script>
 
     <script src="/dist/daterangepicker/v2/daterangepicker.js"></script>
+    <script>
+        const dateRangeFromPHP = "<?php echo htmlspecialchars($dateRange, ENT_QUOTES); ?>";
+    </script>
     <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 
 
@@ -81,14 +86,16 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                         type="button">
                         ‹
                     </button>
-                    <span id="current-date" style="margin: 0 1rem; font-weight: bold; font-size: 1.6rem; padding-bottom: 5px">
+                    <div class="">
+                         <span id="current-date" style="margin: 0 1rem; font-weight: bold; font-size: 1.6rem; padding-bottom: 5px">
                         Tue, 9 Aug, 2025
-                    </span>
-                    <button id="select-date-btn" style="font-size: 1rem;  cursor: pointer;">
-                        <span><i class="fas fa-pen"></i></span>
-                    </button>
-                    <input type="text" id="hidden-date-input" style="display: none;" />
-
+                        </span>
+                        <button id="select-date-btn" type="button" class="btn btn-warning"  style="font-size: 1rem;  cursor: pointer; border-radius: 50%;">
+                            <span><i class="fas fa-pen"></i></span>
+                        </button>
+                        <input type="text" id="hidden-date-input" style="display: none;" />
+                    </div>
+                   
                     <!-- change to next day -->
                     <button
                         id="next-day"
@@ -135,8 +142,8 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                     <p id="modalTime"><strong>ช่วงเวลาระหว่าง:</strong> <span></span></p>
                     <p id="modalSpeakers"><strong>วิทยากร:</strong> <span></span></p>
                     <div style="text-align: right;">
-                        <button type="button" class="btn btn-primary open-new-modal">เข้าร่วม</button>
-                        <button type="button" class="btn btn-secondary decline-modal" style="margin-left: 10px;">ปฎิเสธ</button>
+                        <button type="button" class="btn btn-primary open-new-modal">ดูเพิ่มเติม</button>
+                        <button type="button" class="btn btn-secondary decline-modal" style="margin-left: 10px;">ยกเลิก</button>
                     </div>
                 </div>
             </div>
@@ -153,8 +160,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                     <h4 class="modal-title" id="newModalLabel">Join Event</h4>
                 </div>
                 <div class="modal-body" style="text-align: center;">
-                    <!-- Content of the second modal -->
-                    <p>ต้องการไปยังหน้าเช็คอินเพื่อเข้าร่วมอีเว้นท์นี้เลยใช่มั้ย</p>
+                    <p>ต้องการไปยังหน้าคลาสเพื่อเข้าร่วมอีเว้นท์นี้เลยใช่มั้ย</p>
                     <div style="display: flex; margin:auto">
                         <p><b>ช่วงเวลาระหว่าง: </b></p>
                         <p id="modalTimeNew" style="margin-left: 10px;"> </p>

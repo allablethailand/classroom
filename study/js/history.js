@@ -49,9 +49,178 @@ function applyFilter(filter) {
     $('#end_date').val(endDate.format('DD/MM/YYYY'));
 }
 
+function capitalizeFirstLetter(str) {
+  if (!str) return ''; // Handle empty string
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function load_history(){
+    $.ajax({
+		url: "/classroom/study/actions/history.php",
+		data: {
+			action:'fetch_history',
+			// classroom_id: classroom_id
+		},
+		dataType: "JSON",
+		type: 'POST',
+		success: function(result){
+            console.log("hello",result);
+            if(result.length === 0){
+                $('#ordersContainer').html('<p style="margin-top: 5rem; text-align:center;">No history found.</p>');
+                return;
+            }
+            var html = '';
+            result.forEach(function(order){
+                // Format date from yyyy-mm-dd to dd/mm/yy
+                var originalDate = order.olh_date_part || order.trn_date || '';
+                // var formattedDate = '';
+                // if(originalDate){
+                //     var d = new Date(originalDate);
+                //     var day = ('0' + d.getDate()).slice(-2);
+                //     var month = ('0' + (d.getMonth()+1)).slice(-2);
+                //     var year = d.getFullYear().toString().slice(-2);
+                //     formattedDate = day + '/' + month + '/' + year;
+                // }
+
+                // Determine order type and icon
+
+                var dataType = order.trn_type_description === 'inhouse' || order.trn_type_description === 'both' ? 'current' : 'waiting';
+                
+                var iconHtml = '<img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 60px; height: 60px; border-radius: 100%;">'
+
+                    // : '<i class="fa-solid fa-motorcycle"></i>';
+
+                // <span class="order-detail-item"><i class="fast fa-solid fa-box"></i> 500 pieces</span>
+                            
+                // Construct order card HTML
+                html += `
+                <div class="order-card" data-type="${dataType}">
+                    <div class="order-icon">${iconHtml}</div>
+                    <div class="order-info">
+                        <span class="order-status status-${dataType}">${dataType === 'current' ? 'Current Order' : 'Awaiting Rider'}</span>
+                        <h3 class="order-title">${order.trn_subject || 'N/A'}</h3>
+                        <span class="order-number"><i class="fas fa-building"></i>: ${capitalizeFirstLetter(order.trn_type_description) || '-'}</span>
+                        <div class="order-details">
+                            <span class="order-detail-item"><i class="fas fa-regular fa-clock"></i> ${order.olh_time_part || '-'}</span>
+                            <span class="order-detail-item"><i class="fas fa-regular fa-calendar"></i> ${originalDate}</span>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            $('#ordersContainer').html(html);
+        },
+        error: function(){
+            $('#ordersContainer').html('<p style="text-align: center;">Error loading history.</p>');
+        }
+	});
+}
+
+
+ function switchMainTab(element, tab) {
+            // Remove active class from all main tabs
+            document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            element.classList.add('active');
+
+            // You can add logic here to load different data based on tab
+            console.log('Switched to:', tab);
+        }
+
+    
+        function switchFilterTab(element, filter) {
+            const tabsContainer = document.querySelector('.filter-tabs');
+            const allTab = tabsContainer.querySelector('button[onclick*="all"]');
+            const tabs = tabsContainer.querySelectorAll('button');
+            const cards = document.querySelectorAll('.order-card');
+
+            if (filter === 'all') {
+                // Activate only the 'All' tab, deactivate others
+                tabs.forEach(tab => tab.classList.remove('active'));
+                element.classList.add('active');
+
+                // Show all cards
+                cards.forEach(card => card.style.display = 'block');
+            } else {
+                // Toggle clicked non-'all' tab active state
+                if (element.classList.contains('active')) {
+                    element.classList.remove('active');
+                } else {
+                    element.classList.add('active');
+                }
+
+                // If any non-'all' tab is active, deactivate 'All'
+                const anyActive = [...tabs].some(tab => tab !== allTab && tab.classList.contains('active'));
+                if (anyActive) {
+                    allTab.classList.remove('active');
+                } else {
+                    // If none active, activate 'All'
+                    allTab.classList.add('active');
+                }
+
+                // Show cards matching any active filters (or all if none)
+                const activeFilters = [...tabs]
+                    .filter(tab => tab !== allTab && tab.classList.contains('active'))
+                    .map(tab => tab.getAttribute('onclick').match(/'(\w+)'/)[1]);
+
+                cards.forEach(card => {
+                    if (activeFilters.length === 0) {
+                        card.style.display = 'block';
+                    } else {
+                        const cardType = card.getAttribute('data-type');
+                        card.style.display = activeFilters.includes(cardType) ? 'block' : 'none';
+                    }
+                });
+            }
+        }
+
+        // Add click animation to order cards
+        document.querySelectorAll('.order-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-2px)';
+                }, 100);
+            });
+        });
+
+
+        // Attach event listeners to filters:
+        document.querySelectorAll('.filter-tag').forEach(element => {
+            const removeBtn = element.querySelector('.remove-btn');
+            // Set remove button visibility initially
+            removeBtn.style.display = element.classList.contains('active') ? 'inline' : 'none';
+
+            element.addEventListener('click', () => {
+                // Remove active class from all, hide all remove buttons
+                document.querySelectorAll('.filter-tag').forEach(e => {
+                    e.classList.remove('active');
+                    e.querySelector('.remove-btn').style.display = 'none';
+                });
+
+                element.classList.add('active');
+                removeBtn.style.display = 'inline';
+
+                // Apply filter and update date pickers
+                applyFilter(element.getAttribute('data-filter'));
+            });
+
+            removeBtn.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent triggering element click
+                element.classList.remove('active');
+                removeBtn.style.display = 'none';
+
+                // Clear filters and daterange inputs
+                applyFilter('all');
+            });
+        });
+
 
 
 $(document).ready(function () {
+
+    
+
+    load_history();
     // Dropdown change event
     $('select[name="classroom_id"]').on('change', function () {
         var classroomId = $(this).val();
@@ -122,6 +291,32 @@ $(document).ready(function () {
             },
         }, function(endSelected) {
             $('#end_date').val(endSelected.format('DD/MM/YYYY'));
+        });
+
+
+        $('#searchDateRange').on('click', function() {
+            var startDate = $('#start_date').val(); // e.g., '15/10/2025'
+            var endDate = $('#end_date').val(); // e.g., '17/10/2025'
+
+            // Basic validation can be added here to ensure both dates are selected
+
+            $.ajax({
+                url: '/classroom/study/actions/history.php', // Your backend endpoint
+                type: 'POST',
+                data: {
+                    action: 'searchDatePeriod',
+                    start_date: startDate,
+                    end_date: endDate
+                },
+                success: function(response) {
+                    // Handle response - e.g., update UI with fetched data
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    // Handle error
+                    console.error('Error fetching data:', error);
+                }
+            });
         });
     });
 
