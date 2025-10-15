@@ -134,7 +134,6 @@ $teacher_count = count($teacher_list);
                 }
                 ?>
             </div>
-           
         </div>
         <?php require_once("component/footer.php"); ?>
 

@@ -19,9 +19,10 @@ function getStudentClassroomId($student_id) {
     return $result ? $result[0]['classroom_id'] : null;
 }
 
+// function ซ้ำ
 function getStudentAlumni($student_id) {
     $result = select_data("classroom_id", "classroom_template", "WHERE student_id = '{$student_id}'");
-    return $result ? (bool)$result[0]['classroom_id'] : false;
+    return $result ? $result[0]['classroom_id'] : false;
 }
 
 function getStudentGroupId($student_id) {
