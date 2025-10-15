@@ -95,10 +95,9 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
              <?php foreach ($classroom_group as $item):  ?>
 
             <div class="g-4 justify-content-center mb-bs-3 " style="margin-top: 2rem;">
-                
-                <div class="col-12">
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
                     <a href="classinfo?classroom_id=<?php echo $item['classroom_id']; ?>" style="font-family: 'Kanit', sans-serif !important;">
-                        <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 1.8rem">
+                        <div class="card group-card h-100 bg-element-earth-two rounded-small">
                              <div class="flex-box-container">
                                 <div class="header-menu">
                                     <div class="img-banner">

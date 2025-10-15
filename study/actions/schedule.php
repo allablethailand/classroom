@@ -13,25 +13,15 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
-
-function getStudentClass()
-{
-    $student_id = isset($_SESSION['student_id']) ? $_SESSION['student_id'] : null;
-    if($student_id == null)
-    {
-        return "ERROR";
-    }
-        
-    $student_classroom_id = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
-    $classroom_id = $student_classroom_id[0]['classroom_id'];
-
-    return $classroom_id;
-}
+require_once $base_include . '/classroom/study/actions/student_func.php'; 
+    
+$student_id = getStudentId();
 
 if (isset($_POST) && $_POST['action'] == 'fetch_schedules') {
     $dateSchedule = $_POST['date_range'];
 
-    $classroom_id = getStudentClass();
+    $classroom_id = getStudentClassroomId($student_id);
+
 
     $scheduleItems = select_data(
         "course.trn_subject AS course_name,

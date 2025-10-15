@@ -102,7 +102,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
 
     <!-- work ON mobile screen ONLY -->
     <div class="main-transparent-content" >
-        <div class="container-fluid px-4 py-2">
+        <div class="container-fluid px-4 py-2" >
             <h1 class="heading-1" >รุ่นหลักสูตร</h1>
             <div class="divider-1">
                 <span></span>
@@ -111,9 +111,6 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                 <h1 class="display-4 fw-bold text-dark mb-bs-5 text-center">
                 </h1>
             </div> -->
-
-            
-
             <?php
             if ($classroom_group === [] || count($classroom_group) === 0) {
                 echo '<span class="display-4 fw-bold text-dark mb-bs-5 text-center">
@@ -123,9 +120,9 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
             foreach ($classroom_group as $item): {
             ?>
                 <div class="g-4 justify-content-center mb-bs-3 ">
-                    <div class="col-12 col-md-6 col-lg-3">
+                    <div class="col-12 col-md-6 col-lg-4 ">
                         <a href="group?<?php echo $item['group_id']; ?>" style="color: white; font-family: 'Kanit', sans-serif !important;">
-                        <div class="card group-card h-100 bg-element-earth-two rounded-small" style="padding: 10px;">
+                        <div class="card group-card h-100 bg-element-earth-two rounded-small">
                             <div class="panel-heading border-0" style="padding:0;">
                                 <div class="d-flex-bs align-items-center gap-3">
                                         <div class="group-icon-large" style="color: #FFF;">

@@ -4,6 +4,35 @@ $(document).ready(function () {
   let currentDate = new Date();
 
   const $currentDateSpan = $("#current-date");
+  const Buttonpos = $("#select-date-btn").offset();
+
+  console.log(Buttonpos);
+
+  $('#select-date-btn').daterangepicker({
+    singleDatePicker: true,
+    showDropdowns: true,
+    // autoApply: false, // shows apply and cancel buttons
+    locale: {
+        format: 'YYYY-MM-DD',
+        cancelLabel: 'Cancel',
+			  applyLabel: 'Ok',
+    },
+    opens: 'left'
+}, function(start, end, label) {
+    currentDate = start.toDate();
+    $('#hidden-date-input').val(start.format('YYYY-MM-DD'));
+    updateDateDisplay();
+});
+
+
+$('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
+    // You can reset or handle cancel here if needed
+    picker.hide();
+});
+
+  $("#select-date-btn").on("click", function() {
+    $(this).data('daterangepicker').show();
+});
 
   function formatDate(date) {
     const options = {
@@ -17,6 +46,7 @@ $(document).ready(function () {
 
   function updateDateDisplay() {
     $currentDateSpan.text(formatDate(currentDate));
+    $("#datepicker").daterangepicker("setDate", currentDate);
 
     console.log("formDate:", currentDate);
 
