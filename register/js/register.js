@@ -28,18 +28,22 @@ const translations = {
         work_certificate: "Work certificate",
         company_certificate: "Company Certificate (for business owners)",
         support_upload: "Supports image or PDF files with a size not exceeding 20 MB only.",
+        payment_upload: "Supports image with a size not exceeding 20 MB only.",
         nationality: "Nationality",
         save: "Save",
         logout: "Logout",
         passport_expire: "Passport Expiry Date",
-        view: "View",
-        delete: "Delete",
+        view: "Preview",
+        delete: "Remove",
         file_preview: "File Preview",
         consent_notice: "Consent Notice",
         consent_paragraph: "This form has been created by the form owner. Any information you submit will be sent directly to the form owner. Allable is not responsible for the privacy practices or actions of third-party form owners. Please avoid submitting personal, sensitive, or confidential information, and never share your password.",
         consent_footer: "Please do not provide personal or sensitive information. Thank you for your understanding!",
         reference: "Reference Person (if any, please specify)",
         warning: "Warning",
+        payment_title: "Attach Your Payment Slip",
+        remove: "Remove",
+        preview: "Preview",
     },
     th: {
         eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
@@ -64,23 +68,56 @@ const translations = {
         work_certificate: "หนังสือรับรองการทำงาน",
         company_certificate: "หนังสือรับรองของบริษัท (สำหรับเจ้าของกิจการ)",
         support_upload: "รองรับไฟล์รูปภาพหรือ pdf ที่มีขนาดไม่เกิน 20 MB เท่านั้น",
+         payment_upload: "รองรับไฟล์รูปภาพ ที่มีขนาดไม่เกิน 20 MB เท่านั้น",
         nationality: "สัญชาติ",
         save: "บันทึกข้อมูล",
         logout: "ออกจากระบบ",
         passport_expire: "วันหมดอายุของพาสปอร์ต",
-        view: "ดู",
-        delete: "ลบ",
+        view: "ดูเอกสาร",
+        delete: "นำออก",
         file_preview: "ตัวอย่างไฟล์",
         consent_notice: "หนังสือแจ้งเพื่อขอความยินยอม",
         consent_paragraph: "แบบฟอร์มนี้ถูกสร้างขึ้นโดยเจ้าของฟอร์ม ข้อมูลใด ๆ ที่คุณส่ง จะถูกส่งไปยังเจ้าของฟอร์มโดยตรง Allable จะไม่รับผิดชอบต่อการปฏิบัติด้านความเป็นส่วนตัวหรือการดำเนินการใด ๆ ของเจ้าของฟอร์มภายนอก โปรดหลีกเลี่ยงการส่งข้อมูลส่วนบุคคล ข้อมูลที่อ่อนไหว หรือข้อมูลลับ และอย่าเปิดเผยรหัสผ่านของคุณโดยเด็ดขาด",
         consent_footer: "กรุณางดให้ข้อมูลส่วนบุคคลหรือข้อมูลที่อ่อนไหว ขอบคุณในความเข้าใจของท่าน",
         reference: "ผู้แนะนำให้มาสมัคร (ถ้ามีโปรดระบุ)",
         warning: "คำเตือน",
+        payment_title: "แนบสลิปการชำระเงินของคุณ",
+        remove: "นำออก",
+        preview: "ดูรูปภาพ",
     }
 };
+function initializeDropify() {
+    try {
+        $('.dropify').dropify({
+            tpl: {
+                wrap: '<div class="dropify-wrapper"></div>',
+                loader: '<div class="dropify-loader"></div>',
+                message: '<div class="dropify-message"><span class="file-icon" /> <p>{{ default }}</p></div>',
+                preview: '<div class="dropify-preview"><span class="dropify-render"></span><div class="dropify-infos"><div class="dropify-infos-inner"><p class="dropify-infos-message">{{ replace }}</p></div></div></div>',
+                filename: '<p class="dropify-filename"><span class="file-icon"></span> <span class="dropify-filename-inner"></span></p>',
+                clearButton: '<div><button type="button" class="dropify-clear dropify-view">Preview</button><button type="button" class="dropify-clear">{{ remove }}</button></div>',
+                errorLine: '<p class="dropify-error">{{ error }}</p>',
+                errorsContainer: '<div class="dropify-errors-container"><ul></ul></div>'
+            }
+        });
+        $('.dropify-view').on('click', function(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            const img = $(this).closest('.dropify-wrapper').find('.dropify-render img').attr('src');
+            if (img && $.fancybox) {
+                $.fancybox({ href: img });
+            }
+        });
+        $('.dropify').on('dropify.beforeClear', function(event, element) {
+            $('#ex_payment_slip').val('');
+        });
+    } catch (error) {
+        console.error('Error initializing Dropify:', error);
+    }
+}
 $(document).ready(function () {
+    initializeDropify();
     $("input").attr("autocomplete", "off");
-    $('#registrationForm').on('input change', 'input, textarea, select', updateProgressBar);
     function toggleScrollBtn() {
         if ($(window).width() > 767) return $('#scrollToFormBtn').hide();
         const formOffset = $('#registration-form').offset().top;
@@ -123,21 +160,37 @@ $(document).ready(function () {
             reader.onload = function (e) {
                 $("#profilePreview").attr("src", e.target.result);
                 $("#removeProfile").show();
+                $("#viewProfile").show();
                 $("#ex_student_image_profile").val(e.target.result);
             }
             reader.readAsDataURL(file);
         }
     });
-    $("#removeProfile").on("click", function() {
-        $("#ex_student_image_profile").val("");
-        $("#profilePreview").attr("src", "/images/profile-default.jpg");
-        $(this).hide();
-    });
     $("#removeProfile").on("click", function () {
-        $("#student_image_profile").val("");
-        $("#student_image_profile").val("");
-        $("#profilePreview").attr("src", defaultProfile);
-        $(this).hide();
+        const msg = currentLang === 'en' ? "Are you sure?" : "คุณแน่ใจหรือไม่?";
+        const text = currentLang === 'en' ? "Remove this profile picture?" : "นำรูปโปรไฟล์นี้ออกหรือไม่?";
+        const confmsg = currentLang === 'en' ? "Yes, delete it!" : "ใช่, ลบเลย!";
+        const canfmsg = currentLang === 'en' ? "Cancel" : "ยกเลิก";
+        swal({
+            title: msg,
+            text: text,
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: confmsg,
+            cancelButtonText: canfmsg,
+            closeOnConfirm: true,
+            closeOnCancel: true
+        }, function(isConfirm){
+            if (isConfirm) {
+                $("#student_image_profile").val("");
+                $("#ex_student_image_profile").val("");
+                $("#profilePreview").attr("src", defaultProfile);
+                $(this).hide();
+                $("#viewProfile").hide();
+                autoSaveRegister();
+            }
+        });
     });
     $('.datepicker').datepicker({
         dateFormat: 'yy/mm/dd',
@@ -252,6 +305,7 @@ $(document).ready(function () {
             return;
         }
         classroom_id = response.classroom_data.classroom_id;
+        currentLang = response.classroom_data.register_default_lang;
         channel_id = response.channel_id;
         tenant_key = response.classroom_data.tenant_key;
         response.register_template.forEach(value => $(".input-" + value).removeClass("hidden"));
@@ -324,8 +378,12 @@ $(document).ready(function () {
             if (data.student_image_profile) {
                 const $imgPreview = $("#profilePreview");
                 $imgPreview.attr('src', data.student_image_profile);
+                $("#viewProfile").show();
                 $("#removeProfile").show();
                 $("#ex_student_image_profile").val(data.student_image_profile);
+            } else {
+                $("#viewProfile").hide();
+                $("#removeProfile").hide();
             }
             if (data.copy_of_idcard) {
                 showDocumentPreview('copy_of_idcard', data.copy_of_idcard, 'ID Card');
@@ -347,6 +405,7 @@ $(document).ready(function () {
             $(".input-password").addClass("hidden");
             $("input[name='student_password']").removeClass("require");
             $(".logout").attr("href", "/actions/logout.php");
+            $('#registrationForm').on('input change', 'input, textarea, select', updateProgressBar);
         } else {
             $(".before-login").removeClass("hidden");
             $(".login").attr("href", "/" + tenant_key);
@@ -379,8 +438,8 @@ $(document).ready(function () {
         }
         $item.append(previewContent);
         const $btnGroup = $('<div class="text-center" style="margin-top: 15px;"></div>');
-        const $viewBtn = $(`<button type="button" class="btn btn-primary" onclick="viewFile('${fileUrl}')" data-lang="view"></button>`);
-        const $deleteBtn = $('<button type="button" class="btn btn-warning" data-lang="delete" style="margin-left: 15px;"></button>');
+        const $viewBtn = $(`<button type="button" class="btn btn-primary" onclick="viewFile('${fileUrl}')" style="font-size:12px;"><i class="fas fa-search-plus"></i> <span data-lang="view"></span></button>`);
+        const $deleteBtn = $('<button type="button" class="btn btn-warning" style="margin-left: 15px; font-size:12px;"><i class="fas fa-trash-alt"></i> <span data-lang="delete"></span></button>');
         $deleteBtn.on('click', function() {
             const msg = currentLang === 'en' ? "Are you sure?" : "คุณแน่ใจหรือไม่?";
             const text = currentLang === 'en' ? "This file will be removed from the list." : "ไฟล์นี้จะถูกลบออกจากรายการ";
@@ -1067,15 +1126,11 @@ function initTemplate(data) {
     $(".contact-us").html(data.contact_us || '');
     $(".comp-logo").attr("src", data.comp_logo || '');
     $(".classroom-information img").css("cursor", "pointer");
-    $(".classroom-information img").each(function() {
-    var src = $(this).attr("src");
-    if (!$(this).parent().is("a[data-fancybox]")) {
-        $(this).wrap('<a data-fancybox="gallery" href="' + src + '"></a>');
-    }
-    });
-    Fancybox.bind("[data-fancybox='gallery']", {
-        Thumbs: { autoStart: true },
-        Toolbar: { display: ["zoom", "close"] }
+    $(".classroom-information img").click(function() {
+        var src = $(this).attr("src");
+        if (src && $.fancybox) {
+            $.fancybox({ href: src });
+        }
     });
 }
 function toggleLanguage(lang) {

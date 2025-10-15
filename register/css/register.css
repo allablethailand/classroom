@@ -469,3 +469,40 @@ textarea, input[type="text"], input[type="email"], input[type="password"], selec
     transition: width 0.3s ease;
     font-size: 10px;
 }
+.dropify-wrapper .dropify-view {
+    top: 10px;
+    right: 80px;
+}
+.profile-upload {
+    position: relative;
+    display: inline-block;
+    width: 130px;
+    height: 130px;
+}
+.profile-upload img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+.profile-upload img:hover {
+    opacity: 0.85;
+    transform: scale(1.02);
+}
+.profile-upload .camera-icon {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: #fff;
+    border-radius: 50%;
+    padding: 7px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    transition: 0.3s;
+}
+.profile-upload .camera-icon:hover {
+    background: #f5f5f5;
+}

@@ -69,7 +69,8 @@
                 template.contact_us,
                 template.shortcut_status,
                 template.shortcut_field,
-                template.shortcut_require
+                template.shortcut_require,
+                template.register_default_lang
             ",
             "classroom_template template",
             "
@@ -119,6 +120,7 @@
                 'password_sensitivity_case' => $classroom['password_sensitivity_case'],
                 'contact_us' => $classroom['contact_us'],
                 'shortcut_status' => $classroom['shortcut_status'],
+                'register_default_lang' => $classroom['register_default_lang'],
                 'staff_groups' => $staff_groups,
             ]
         ]);
@@ -392,6 +394,7 @@
         $auto_password_length = ($_POST['auto_password_length']) ? initVal($_POST['auto_password_length']) : 4;
         $password_sensitivity_case = $_POST['password_sensitivity_case'];
         $classroom_information = initVal($_POST['classroom_information']);
+        $register_default_lang = initVal($_POST['register_default_lang']);
         $register_template = implode(',', $_POST['register_template']);
         $register_require = implode(',', $_POST['register_require']);
         $shortcut_field = implode(',', $_POST['shortcut_field']);
@@ -428,7 +431,8 @@
                     register_require = '{$register_require}',
                     shortcut_status = $shortcut_status,
                     shortcut_field = '{$shortcut_field}',
-                    shortcut_require = '{$shortcut_require}'
+                    shortcut_require = '{$shortcut_require}',
+                    register_default_lang = $register_default_lang
                 ",
                 "classroom_id = '{$classroom_id}'"
             );
@@ -470,7 +474,8 @@
                     register_require,
                     shortcut_status,
                     shortcut_field,
-                    shortcut_require
+                    shortcut_require,
+                    register_default_lang
                 )",
                 "(
                     '{$classroom_key}',
@@ -506,7 +511,8 @@
                     '{$register_require}',
                     $shortcut_status,
                     '{$shortcut_field}',
-                    '{$shortcut_require}'
+                    '{$shortcut_require}',
+                    $register_default_lang
                 )"
             );
         }
