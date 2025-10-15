@@ -466,6 +466,7 @@ function populateFormData(data) {
         if (data.case_sensitivity === 'Y') {
             $("#password_sensitivity_case").prop("checked", true);
         }
+        $("#register_default_lang_" + data.register_default_lang).prop("checked", true);
         $("#emp_group").val(data.staff_groups);
     } catch (error) {
         console.error('Error populating form data:', error);
@@ -1134,6 +1135,21 @@ function getManagementTemplate() {
                                             <span class="input-group-addon"><i class="far fa-clock"></i></span>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <label lang="en" class="control-label">Language Default (Register)</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="checkbox checkbox-warning">
+                                    <input class="styled" id="register_default_lang_en" name="register_default_lang" type="radio" value="en" checked>
+                                    <label for="register_default_lang_en" lang="en">English</label>
+                                </div>
+                                <div class="checkbox checkbox-warning">
+                                    <input class="styled" id="register_default_lang_th" name="register_default_lang" type="radio" value="th">
+                                    <label for="register_default_lang_th" lang="en">Thai</label>
                                 </div>
                             </div>
                         </div>

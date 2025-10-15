@@ -11,7 +11,8 @@
 <link rel="stylesheet" href="/dist/css/jquery-ui.css">
 <link rel="stylesheet" href="/dist/css/select2.min.css">
 <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+<link rel="stylesheet" href="/dist/fancybox/source/jquery.fancybox.css">
+<link rel="stylesheet" href="/dist/dropify/dist/css/dropify.min.css">
 <link rel="stylesheet" href="/classroom/register/css/register.css?v=<?php echo time(); ?>">
 <script src="/dist/fontawesome-5.11.2/js/all.min.js"></script>
 <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js"></script>
@@ -22,10 +23,11 @@
 <script src="/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
 <script src="/dist/js/jquery-ui.min.js"></script>
 <script src="/dist/js/select2-build.min.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="/dist/dropify/dist/js/dropify.min.js"></script>
+<script src="/dist/fancybox/source/jquery.fancybox.js"></script>
 <script src="/classroom/register/js/register.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
 </head>
 <body>
 <input type="hidden" id="classroomCode" value="<?php echo $classroomCode; ?>">
@@ -78,14 +80,19 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group text-center input-15 hidden" style="margin-top:20px;">
-                                <div class="profile-upload" style="position:relative; display:inline-block;">
-                                    <img id="profilePreview" src="/images/profile-default.jpg" onerror="this.src='/images/profile-default.jpg'" class="img-circle" style="width:120px;height:120px;object-fit:cover;border:2px solid #ddd; cursor:pointer;">
-                                    <span for="student_image_profile" class="camera-icon" style="position:absolute; bottom:5px; right:5px; background:#fff; border-radius:50%; padding:6px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);"><i class="fa fa-camera"></i></span>
-                                    <button type="button" id="removeProfile" style="display:none; position:absolute; top:5px; right:5px; background:#f44336; color:#fff; border:none; border-radius:50%; width:25px; height:25px; line-height:10px;  cursor:pointer;">&times;</button>
+                                 <p><label class="register-form" style="margin-top:10px;color:#888;" data-lang="upload_image"></label></p>
+                                <div class="profile-upload">
+                                    <img id="profilePreview" src="/images/profile-default.jpg" onerror="this.src='/images/profile-default.jpg'" alt="Profile Picture">
+                                    <span class="camera-icon">
+                                        <i class="fa fa-camera"></i>
+                                    </span>
                                 </div>
                                 <input type="file" id="student_image_profile" name="student_image_profile" accept="image/*" style="display:none;">
+                                <p style="margin: 15px auto;"> 
+                                    <button type="button" class="btn btn-primary" id="viewProfile" style="font-size:12px;"><i class="fas fa-search-plus"></i> <span data-lang="preview"></span></button>
+                                    <button type="button" class="btn btn-warning" id="removeProfile" style="font-size:12px;"><i class="fas fa-trash-alt"></i> <span data-lang="remove"></span></button>
+                                </p>
                                 <input type="hidden" id="ex_student_image_profile" name="ex_student_image_profile">
-                                <p><label class="register-form" style="margin-top:10px;color:#888;" data-lang="upload_image"></label></p>
                             </div>
                             <div class="form-group form-input input-17 hidden">
                                 <label class="register-form" for="student_idcard" data-lang="idcard"></label>
@@ -239,6 +246,12 @@
                                     </span>
                                 </div>
                                 <div data-lang="password_info" style="font-size: 11px; color: #888888; margin-top: 10px;"></div>
+                            </div>
+                            <div class="form-group form-input payment hidden">
+                                <label class="register-form"><i class="fas fa-paperclip"></i> <span data-lang="payment_title"></span></label>
+                                <p class="text-orange" data-lang="payment_upload" style="margin: 10px auto;"></p>
+                                <input name="payment_slip" id="payment_slip" type="file" class="dropify" data-allowed-file-extensions='["jpg", "jpeg", "png"]' data-max-file-size="20M"  data-height="155" data-default-file="">
+                                <input name="ex_payment_slip" id="ex_payment_slip" type="hidden">
                             </div>
                         </div>
                     </div>
