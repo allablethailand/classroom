@@ -440,25 +440,26 @@ function buildRegistration() {
                     let approve_by = row['approve_by'] || "-";
                     let join_id = row['join_id'] || "-";
                     let invite_status = row['invite_status'] || "-";
+                    let student_id = row['student_id'] || "";
                     let mockup = "";
                     if(invite_status == 1) {
                         if(approve_status == 0) {
                             mockup += `
                                 <div class="nowrap">
-                                    <button type="button" class="btn btn-circle btn-green" onclick="approveRegistration(${join_id}, 'Y')">
+                                    <button type="button" class="btn btn-circle btn-green" onclick="approveRegistration(${join_id}, ${student_id}, 'Y')">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button type="button" class="btn btn-circle btn-red" onclick="approveRegistration(${join_id}, 'N')">
+                                    <button type="button" class="btn btn-circle btn-red" onclick="approveRegistration(${join_id}, ${student_id}, 'N')">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
                             `;
                         } else {
                             mockup += `
-                                <button type="button" class="btn btn-circle btn-white" onclick="approveRegistration(${join_id}, 'W')">
+                                <button type="button" class="btn btn-circle btn-white" onclick="approveRegistration(${join_id} ,${student_id}, 'W')">
                                     <i class="fas fa-sort-amount-down-alt"></i>
                                 </button>
-                                <button type="button" class="btn btn-circle btn-${approve_status == 1 ? "red" : "green"}" onclick="approveRegistration(${join_id}, '${approve_status == 1 ? "N" : "Y"}')">
+                                <button type="button" class="btn btn-circle btn-${approve_status == 1 ? "red" : "green"}" onclick="approveRegistration(${join_id}, ${student_id}, '${approve_status == 1 ? "N" : "Y"}')">
                                     <i class="fas fa-${approve_status == 1 ? "times" : "check"}"></i>
                                 </button>
                             `;
@@ -494,25 +495,26 @@ function buildRegistration() {
                     let payment_status_by = row['payment_status_by'] || "-";
                     let join_id = row['join_id'] || "-";
                     let approve_status = row['approve_status'] || "-";
+                    let student_id = row['student_id'] || "";
                     let mockup = "";
                     if(approve_status == 1) {
                         if(payment_status == 0) {
                             mockup += `
                                 <div class="nowrap">
-                                    <button type="button" class="btn btn-circle btn-green" onclick="paymentRegistration(${join_id}, 'Y')">
+                                    <button type="button" class="btn btn-circle btn-green" onclick="paymentRegistration(${join_id}, ${student_id}, 'Y')">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button type="button" class="btn btn-circle btn-red" onclick="paymentRegistration(${join_id}, 'N')">
+                                    <button type="button" class="btn btn-circle btn-red" onclick="paymentRegistration(${join_id}, ${student_id}, 'N')">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
                             `;
                         } else {
                             mockup += `
-                                <button type="button" class="btn btn-circle btn-white" onclick="paymentRegistration(${join_id}, 'W')">
+                                <button type="button" class="btn btn-circle btn-white" onclick="paymentRegistration(${join_id}, ${student_id}, 'W')">
                                     <i class="fas fa-sort-amount-down-alt"></i>
                                 </button>
-                                <button type="button" class="btn btn-circle btn-${payment_status == 1 ? "red" : "green"}" onclick="paymentRegistration(${join_id}, '${payment_status == 1 ? "N" : "Y"}')">
+                                <button type="button" class="btn btn-circle btn-${payment_status == 1 ? "red" : "green"}" onclick="paymentRegistration(${join_id}, ${student_id}, '${payment_status == 1 ? "N" : "Y"}')">
                                     <i class="fas fa-${payment_status == 1 ? "times" : "check"}"></i>
                                 </button>
                             `;
@@ -1435,7 +1437,7 @@ function confirmRegistration(join_id, option) {
         }
     });
 }
-function approveRegistration(join_id, option) {
+function approveRegistration(join_id, student_id, option) {
     event.stopPropagation();
     var title = ``;
     if(option == "Y") {
@@ -1466,7 +1468,9 @@ function approveRegistration(join_id, option) {
                 data: {
                     action: 'approveRegistration',
                     join_id: join_id,
-                    option: option
+                    option: option,
+                    classroom_id: classroom_id,
+                    student_id: student_id
                 },
                 dataType: "JSON",
                 type: 'POST',
@@ -1484,7 +1488,7 @@ function approveRegistration(join_id, option) {
         }
     });
 }
-function paymentRegistration(join_id, option) {
+function paymentRegistration(join_id, student_id, option) {
     event.stopPropagation();
     var title = ``;
     if(option == "Y") {
@@ -1515,7 +1519,9 @@ function paymentRegistration(join_id, option) {
                 data: {
                     action: 'paymentRegistration',
                     join_id: join_id,
-                    option: option
+                    option: option,
+                    classroom_id: classroom_id,
+                    student_id: student_id
                 },
                 dataType: "JSON",
                 type: 'POST',
