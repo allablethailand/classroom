@@ -59,7 +59,7 @@
                     </div>
                     <div class="origami-events-notice"><label data-lang="consent_notice"></label>
                         <p data-lang="consent_paragraph"></p>
-                        <label>Origami Form</label>
+                        <label data-lang="origami_form"></label>
                         <p data-lang="consent_footer"></p>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group text-center input-15 hidden" style="margin-top:20px;">
-                                 <p><label class="register-form" style="margin-top:10px;color:#888;" data-lang="upload_image"></label></p>
+                                <p><label class="register-form" style="margin-top:10px;color:#888;" data-lang="upload_image"></label></p>
                                 <div class="profile-upload">
                                     <img id="profilePreview" src="/images/profile-default.jpg" onerror="this.src='/images/profile-default.jpg'" alt="Profile Picture">
                                     <span class="camera-icon">
@@ -246,12 +246,6 @@
                                     </span>
                                 </div>
                                 <div data-lang="password_info" style="font-size: 11px; color: #888888; margin-top: 10px;"></div>
-                            </div>
-                            <div class="form-group form-input payment hidden">
-                                <label class="register-form"><i class="fas fa-paperclip"></i> <span data-lang="payment_title"></span></label>
-                                <p class="text-orange" data-lang="payment_upload" style="margin: 10px auto;"></p>
-                                <input name="payment_slip" id="payment_slip" type="file" class="dropify" data-allowed-file-extensions='["jpg", "jpeg", "png"]' data-max-file-size="20M"  data-height="155" data-default-file="">
-                                <input name="ex_payment_slip" id="ex_payment_slip" type="hidden">
                             </div>
                         </div>
                     </div>
