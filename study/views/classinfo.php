@@ -48,19 +48,17 @@ $class_id = $_GET['classroom_id'];
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/classinfo.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
-
 <body>
     <?php require_once 'component/header.php'; ?>
     
     <div class="main-content">
-            
-
         <div class="container-fluid" style="margin-bottom: 7rem;">
             <h1 class="heading-1">ห้องเรียน</h1>
             <div class="divider-1"> 
                 <span></span>
             </div>
             <div class="text-center mb-4 course-class-info" style="margin-top: 2rem; margin: 1rem">
+                <div class="row"></div>
             </div>
         </div>
     </div>

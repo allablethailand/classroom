@@ -268,10 +268,40 @@
   margin-bottom: 20px;
 }
 
+@media (min-width: 600px) {
+  .actions-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .actions-grid {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .action-card:hover {
+    scale: 1.05;
+  }
+
+ 
+}
+
+@media (min-width: 1300px) {
+  .actions-grid {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+}
+
 .action-card {
   background: white;
   border-radius: 20px;
-  padding: 22px 20px;
+  padding: 40px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -293,6 +323,10 @@
   justify-content: center;
   margin-bottom: 16px;
   color: white;
+}
+
+.action-icon:hover{
+  scale: 1.5;
 }
 
 .action-icon.purple {

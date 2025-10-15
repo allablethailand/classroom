@@ -79,189 +79,109 @@ $count_student = $count_total[0]['total_student'];
     <?php require_once 'component/header.php'; ?>
 
     <!-- work ON mobile screen ONLY -->
-    <div class="main-content">
-        <div class="container-fluid px-4 py-2">
-            <div class="justify-content-center mb-bs-2-5" style="display: flex; justify-content: space-between; ">
-                <div class="">
-                    <h1 class="heading-1">สมาชิกกลุ่ม</h1>
-                    <div class="divider-1"> 
-                        <span></span>
-                    </div>
-                </div>
-
-                <div style="display: flex; align-items: center;">
-                    <div class="dropdown">
-                        <button type="button" style="border: none;" class="btn btn-default blur-shadow dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter"></i><span class="caret"></span></button>
-                        <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a href="#" class="group-filter" data-group-id="all">ทั้งหมด</a></li>
-                            <?php foreach ($classroom_group as $group): ?>
-                                <li><a href="#" class="group-filter" data-group-id="<?= $group['group_id'] ?>"><?= htmlspecialchars($group['group_name']) ?></a></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-
-                    <div class="" style="margin-left: 0.8rem;">
-                        <button class="btn btn-default blur-shadow" id="toggleStudent" style="border: none;">
-                            <i class="fas fa-address-book"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-
-            <?php
-            if (empty($classroom_group)) {
-                echo '<span class="display-4 fw-bold text-dark mb-bs-5 text-center">
-                            ไม่พบข้อมูลกลุ่มที่คุณอยู่
-                </span>';
-            }
-
-            // Add animation on clikc transform color to group color.
-            foreach ($classroom_group as $item): ?>
-                    <div id="rowData" class="g-4 justify-content-center mb-bs-3 ">
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <a href="student?<?php echo $item['group_id']; ?>" style="color: black; font-family: 'Kanit', sans-serif !important;">
-                                <div class="card group-card h-100 bg-white rounded-small" style="padding: 10px; border-left: 15px solid <?php echo $item['group_color']; ?> !important;">
-                                    <div class="panel-heading border-0" style="padding:0;">
-                                        <div class="d-flex-bs align-items-center gap-3">
-                                            <div class="group-icon-large" style="color: #FFF;">
-                                                <!-- <i class="fas fa-fire-alt" style="width: 50px;"></i> -->
-                                                <img src="<?php echo $item['group_logo']; ?>" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
-                                            </div>
-                                            <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
-                                                <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                                    <h4 class="panel-title mb-0 text-truncate d-flex-bs "> <?= $item["group_name"] ?></h4>
-                                                </div>
-                                                <p class="text-secondary mb-0 small text-truncate-2">
-                                                    <?php echo "สมาชิกปัจจุบัน " . $count_student . " คน" ?>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-            <?php
-            endforeach; ?>
-
-            <div id="menu"></div>
-
-            <h1 class="heading-1" style="margin-top: 3rem;">คณะกรรมการ</h1>
-            <div class="divider-1">
-                <span></span>
-            </div>
-            <div class="g-4 justify-content-center mb-bs-3 ">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <a href="teacher" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
-                        <div class="card group-card h-100 bg-teacher rounded-small " style="padding: 10px;  ">
-                            <div class="panel-heading border-0" style="padding:0;">
-                                <div class="d-flex-bs align-items-center gap-3">
-                                    <div class="group-icon-large" style="color: #FFF;">
-                                        <div class="col-md-3"><span class="circle"><span> <i class="fas fa-chalkboard-teacher" style="color:#EED8DA; font-size: 2.5rem;"></i></span></span> </div>
-                                        <!-- <i class="fas fa-user-tie" style="width: 50px; color:#F39865;"></i> -->
-                                         
-                                        <!-- <img src="" onerror="this.src='/images/offline-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;"> -->
-                                    </div>
-                                    <div class="col-md-9 flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
-                                        <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                            <h4 class="panel-title mb-0 text-truncate d-flex-bs ">อาจารย์ผู้สอน</h4>
-                                        </div>
-                                        <p class="text-secondary mb-0 small text-truncate-2">
-                                            สมาชิกปัจจุบัน 3 คน
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="g-4 justify-content-center mb-bs-3 ">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <a href="staff?<?php echo $item['group_id']; ?>" class="blur-shadow" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
-                        <div class="card group-card h-100 bg-teacher rounded-small " style="padding: 10px;">
-                            <div class="panel-heading border-0" style="padding:0;">
-                                <div class="d-flex-bs align-items-center gap-3">
-                                    <div class="group-icon-large" style="color: #FFF;">
-                                        <div class="col-md-3"><span class="circle"><span><i class="fas fa-user-tie" style="color:#EED8DA;"></i></span></span> </div>
-                                        <!-- <i class="fas fa-user-tie" style="width: 50px; color:#F39865;"></i> -->
-                                         
-                                        <!-- <img src="" onerror="this.src='/images/offline-1.png'" class="transparent-bg" alt="error" style="width: 50px; height: 50px; border-radius: 100%;"> -->
-                                    </div>
-                                    <div class="col-md-9 flex-grow-bs-1" style="min-width: 0; padding-top: 20px">
-                                        <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                            <h4 class="panel-title mb-0 text-truncate d-flex-bs ">Staff Member</h4>
-                                        </div>
-                                        <p class="text-secondary mb-0 small text-truncate-2">
-                                            สมาชิกปัจจุบัน 3 คน
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-
-            <!-- <div class="g-4 justify-content-center bg-element-fire-two mx-3 mb-bs-3 rounded-small">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card group-card h-100 ">
-                        <div class="panel-heading border-0">
-                            <div class="d-flex-bs align-items-center gap-3">
-                                <div class="group-icon-large" style="color: #FFF;">
-                                   
-                                    <i class="fas fa-fire-alt" style="width: 50px;"></i>
-                                </div>
-
-                              
-                                <div class="flex-grow-bs-1" style=" min-Width: 0 ">
-                                    <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                        <h4 class="panel-title mb-0 text-truncate">Fire</h4>
-                                    </div>
-                                    <p class="text-secondary mb-0 small text-truncate-2">
-                                        สมาชิกปัจจุบัน 39 คน
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="g-4 justify-content-center bg-element-earth-two mx-3 mb-bs-3 rounded-small">
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card group-card h-100 ">
-                        <div class="panel-heading border-0">
-                            <div class="d-flex-bs align-items-center gap-3">
-                                <a href="student">
-
-                                    
-                                    <i class="fas fa-leaf" style="width: 50px;"></i>
-
-                            </div>
-
-                            
-                            <div class="flex-grow-bs-1" style=" min-Width: 0 ">
-                                <div class="d-flex-bs align-items-center gap-2 mb-1">
-                                    <h4 class="panel-title mb-0 text-truncate">Fire</h4>
-                                   
-                                </div>
-                                <p class="text-secondary mb-0 small text-truncate-2">
-                                    สมาชิกปัจจุบัน 50 คน
-                                </p>
-                            </div>
-                        </div>
-                        <b>TESTT</b>
-                        </a>
-
-                    </div>
-                </div>
-
-
-            </div> -->
+  <div class="main-content">
+  <div class="container-fluid px-4 py-2">
+    <div class="row justify-content-center mb-bs-2-5">
+      <div class="col-12" style="display: flex; justify-content: flex-end; margin-right:2rem;">
+        <div class="dropdown" style="margin-right: 10px;">
+          <button type="button" class="btn btn-default blur-shadow dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border:none;">
+            <i class="fas fa-filter"></i><span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li><a href="#" class="group-filter" data-group-id="all">ทั้งหมด</a></li>
+            <?php foreach ($classroom_group as $group): ?>
+              <li><a href="#" class="group-filter" data-group-id="<?= $group['group_id'] ?>"><?= htmlspecialchars($group['group_name']) ?></a></li>
+            <?php endforeach; ?>
+          </ul>
         </div>
+        <button class="btn btn-default blur-shadow" id="toggleStudent" style="border: none;">
+          <i class="fas fa-address-book"></i>
+        </button>
+      </div>
     </div>
+
+    <div class="row">
+      <div class="col-xs-12 col-md-6">
+        <h1 class="heading-1">สมาชิกกลุ่ม</h1>
+        <div class="divider-1"><span></span></div>
+        <?php if (empty($classroom_group)): ?>
+          <span class="display-4 fw-bold text-dark mb-bs-5 text-center">
+            ไม่พบข้อมูลกลุ่มที่คุณอยู่
+          </span>
+        <?php endif; ?>
+
+        <?php foreach ($classroom_group as $item): ?>
+          <div id="rowData" class="g-4 justify-content-center mb-bs-3">
+            <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12" style="padding-bottom: 2rem;">
+              <a href="student?<?= $item['group_id'] ?>" style="color: black; font-family: 'Kanit', sans-serif !important;">
+                <div class="card group-card h-100 bg-white rounded-small" style=" border-left: 15px solid <?= $item['group_color'] ?> !important;">
+                  <div class="panel-heading border-0" style="padding:0;">
+                    <div class="d-flex-bs align-items-center gap-3" style="flex-wrap: wrap;">
+                      <div class="group-icon-large" style="color: #FFF; flex-shrink: 0;">
+                        <img src="<?= $item['group_logo'] ?>" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                      </div>
+                      <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px;">
+                        <h4 class="panel-title mb-0 text-truncate d-flex-bs"><?= $item["group_name"] ?></h4>
+                        <p class="text-secondary mb-0 small text-truncate-2">สมาชิกปัจจุบัน <?= $count_student ?> คน</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+
+      <div class="col-xs-12 col-md-6">
+        <h1 class="heading-1">คณะกรรมการ</h1>
+        <div class="divider-1"><span></span></div>
+        <div class="g-4 justify-content-center mb-bs-3">
+          <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12"  style="padding-bottom: 2rem;">
+            <a href="teacher" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
+              <div class="card group-card h-100 bg-teacher rounded-small">
+                <div class="panel-heading border-0" style="padding:0;">
+                  <div class="d-flex-bs align-items-center gap-3" style="flex-wrap: wrap;">
+                    <div class="group-icon-large" style="color: #FFF; flex-shrink: 0;">
+                      <div class="circle"><i class="fas fa-chalkboard-teacher" style="color:#EED8DA; font-size: 2rem; margin-left:15px; margin-top: 15px;"></i></div>
+                    </div>
+                    <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px;">
+                      <h4 class="panel-title mb-0 text-truncate d-flex-bs">อาจารย์ผู้สอน</h4>
+                      <p class="text-secondary mb-0 small text-truncate-2">สมาชิกปัจจุบัน 3 คน</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="g-4 justify-content-center mb-bs-3">
+          <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+            <a href="staff?<?= $item['group_id'] ?>" class="blur-shadow" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
+              <div class="card group-card h-100 bg-teacher rounded-small">
+                <div class="panel-heading border-0" style="padding:0;">
+                  <div class="d-flex-bs align-items-center gap-3" style="flex-wrap: wrap;">
+                    <div class="group-icon-large" style="color: #FFF; flex-shrink: 0;">
+                      <div class="circle"><i class="fas fa-user-tie" style="color:#EED8DA; font-size: 2.5rem; margin-left:15px; margin-top: 10px;"></i></div>
+                    </div>
+                    <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px;">
+                      <h4 class="panel-title mb-0 text-truncate d-flex-bs">Staff Member</h4>
+                      <p class="text-secondary mb-0 small text-truncate-2">สมาชิกปัจจุบัน 3 คน</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="menu"></div>
+  </div>
+</div>
+
     <?php require_once 'component/footer.php'; ?>
 
 
