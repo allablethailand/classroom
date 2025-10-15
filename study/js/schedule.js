@@ -1,7 +1,25 @@
 let allSessions = [];
+let currentDate;
 
 $(document).ready(function () {
-  let currentDate = new Date();
+
+   function isValidDate(d) {
+    return d instanceof Date && !isNaN(d);
+  }
+
+  if (typeof dateRangeFromPHP !== 'undefined' && dateRangeFromPHP.trim() !== '') {
+    let parsedDate = new Date(dateRangeFromPHP);
+    if (isValidDate(parsedDate)) {
+      currentDate = parsedDate;
+    } else {
+      console.warn("dateRangeFromPHP is invalid, falling back to current date.");
+      currentDate = new Date();
+    }
+  } else {
+    currentDate = new Date();
+  }
+
+  console.log("TODAY", currentDate);
 
   const $currentDateSpan = $("#current-date");
   const Buttonpos = $("#select-date-btn").offset();
@@ -20,6 +38,7 @@ $(document).ready(function () {
     opens: 'left'
 }, function(start, end, label) {
     currentDate = start.toDate();
+
     $('#hidden-date-input').val(start.format('YYYY-MM-DD'));
     updateDateDisplay();
 });
@@ -44,14 +63,29 @@ $('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
     return date.toLocaleDateString("en-US", options);
   }
 
+  function formatDateToBangkok(date) {
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'Asia/Bangkok',
+  };
+  
+  const formatter = new Intl.DateTimeFormat('en-CA', options);
+  return formatter.format(date);
+}
+
+
   function updateDateDisplay() {
+
     $currentDateSpan.text(formatDate(currentDate));
     $("#datepicker").daterangepicker("setDate", currentDate);
 
     console.log("formDate:", currentDate);
 
-    const sqlDate = currentDate.toISOString().split("T")[0];
-    console.log("Load schedule for:", currentDate.toISOString().split("T")[0]);
+    const sqlDate = formatDateToBangkok(currentDate);
+    // const sqlDate = currentDate.toISOString().split("T")[0];
+    // console.log("Load schedule for:", formatDateToBangkok(currentDate));
 
     //  Fetch Data Schedule
     $.ajax({
@@ -63,7 +97,7 @@ $('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
       },
       dataType: "JSON",
       success: function (result) {
-        console.log(result);
+        // console.log("hello", result);
         if (result.status && Array.isArray(result.group_data)) {
           allSessions = result.group_data;
           const allInstructors = result.instructor || [];
@@ -84,7 +118,7 @@ $('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
             );
 
             let instructorsHtml = "";
-            const maxVisible = 3;
+            const maxVisible = 10;
 
             if (instructorsForSession.length <= maxVisible) {
               // Show all instructors if 3 or less

@@ -427,7 +427,6 @@
         $copy_of_passport = uploadSecureFile('copy_of_passport', $comp_id, $classroom_id, 'student/passport', array('pdf', 'jpg', 'jpeg', 'png'), 5242880);
         $work_certificate = uploadSecureFile('work_certificate', $comp_id, $classroom_id, 'student/work_certificate', array('pdf', 'jpg', 'jpeg', 'png'), 5242880);
         $company_certificate = uploadSecureFile('company_certificate', $comp_id, $classroom_id, 'student/company_certificate', array('pdf', 'jpg', 'jpeg', 'png'), 5242880);
-        $payment_slip = uploadSecureFile('payment_slip', $comp_id, $classroom_id, 'student/payment_slip', array('jpg', 'jpeg', 'png'), 5242880);
         $duplicate_student_id = null;
         if($student_email !== "null" || $student_mobile !== "null" || $student_idcard !== "null") {
             $join = "LEFT JOIN classroom_student_join stu_join ON stu_join.student_id = stu.student_id AND stu_join.classroom_id = $classroom_id";
@@ -602,11 +601,6 @@
                     )"
                 );
                 notiMail($classroom_id, $student_id, 'Register');
-            }
-            update_data("classroom_student_join", "payment_attach_file = $payment_slip", "student_id = '{$student_id}' and classroom_id = '{$classroom_id}'");
-            $ex_payment_slip = $_POST['ex_payment_slip'];
-            if($ex_payment_slip == '' && $payment_slip === "null") {
-                update_data("classroom_student_join", "payment_attach_file = NULL, payment_date = NULL", "student_id = '{$student_id}' and classroom_id = '{$classroom_id}'");
             }
             $existing_copy_of_idcard = $_POST['existing_copy_of_idcard'];
             $existing_copy_of_passport = $_POST['existing_copy_of_passport'];
