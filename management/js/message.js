@@ -69,14 +69,14 @@ function buildMessage() {
                             </div>
                             <div class="col-sm-2 text-right">
                                 <div class="nowrap">
-                                    <button type="button" class="btn btn-info btn-circle" onclick="previewTemplate(${template_id})">
+                                    <button type="button" class="btn btn-info btn-circle" onclick="previewTemplateMessage(${template_id})">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button type="button" class="btn btn-orange btn-circle" onclick="manageTemplate(${template_id})">
+                                    <button type="button" class="btn btn-orange btn-circle" onclick="manageTemplateMessage(${template_id})">
                                         <i class="fas fa-pencil-alt"></i>
                                     </button>
                                     ${master_id == 0 ? `
-                                        <button type="button" class="btn btn-red btn-circle" onclick="delTemplate(${template_id})">
+                                        <button type="button" class="btn btn-red btn-circle" onclick="delTemplateMessage(${template_id})">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     ` : ''}
@@ -113,7 +113,7 @@ function buildMessage() {
         }
     });
 }
-function delTemplate(template_id) {
+function delTemplateMessage(template_id) {
 	event.stopPropagation();
     swal({
         html: true,
@@ -154,10 +154,10 @@ function delTemplate(template_id) {
         }
     });
 }
-function manageTemplate(template_id) {
+function manageTemplateMessage(template_id) {
     $(".modal-template").modal();
     $(".modal-template .modal-title").html(`
-        <button type="button" class="btn btn-white restore-template hidden" onclick="restoreTemplate(${template_id});" style="font-size:12px;">
+        <button type="button" class="btn btn-white restore-template hidden" onclick="restoreTemplateMessage(${template_id});" style="font-size:12px;">
             <i class="fas fa-tools"></i> <span lang="en">Restore to default template</span>
         </button>  
     `);
@@ -233,8 +233,8 @@ function manageTemplate(template_id) {
 		</div>
 	`);
 	$(".modal-template .modal-footer").html(`
-		<button type="button" class="btn btn-orange" style="font-size:12px;" lang="en" onclick="saveTemplate();">Save</button> 
-		<button type="button" class="btn btn-white" style="font-size:12px;" lang="en" onclick="closeTemplate()">Cancel</button> 
+		<button type="button" class="btn btn-orange" style="font-size:12px;" lang="en" onclick="saveTemplateMessage();">Save</button> 
+		<button type="button" class="btn btn-white" style="font-size:12px;" lang="en" onclick="closeTemplateMessage()">Cancel</button> 
 	`);
 	$("#template").editable({
 		inlineMode: false,
@@ -269,7 +269,7 @@ function manageTemplate(template_id) {
 		}
 	});
 }
-function restoreTemplate(template_id, event) {
+function restoreTemplateMessage(template_id, event) {
     if (event) event.stopPropagation();
     swal({
         html: true,
@@ -303,7 +303,7 @@ function restoreTemplate(template_id, event) {
                         showConfirmButton: false,
                         timer: 1500
                     });
-                    manageTemplate(template_id);
+                    manageTemplateMessage(template_id);
                     buildMessage();
                 } else {
                     swal({
@@ -327,7 +327,7 @@ function restoreTemplate(template_id, event) {
         });
     });
 }
-function closeTemplate() {
+function closeTemplateMessage() {
 	event.stopPropagation();
     swal({
         html:true,
@@ -350,7 +350,7 @@ function closeTemplate() {
 		}
 	});
 }
-function saveTemplate() {
+function saveTemplateMessage() {
     var template_id = $("#template_id").val().trim();
     var template = $("#template").val().trim();
     var err = 0;
@@ -416,7 +416,7 @@ function saveTemplate() {
         }
     });
 }
-function previewTemplate(template_id) {
+function previewTemplateMessage(template_id) {
     $(".systemModal").modal();
     $(".systemModal .modal-body").html(`
         <div class="template_body"></div>
