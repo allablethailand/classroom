@@ -160,7 +160,11 @@ $alumni_list = getStudentClassroomList($student_id);
             display: none;
         }
 
-        .filter-tab {
+        .filter-tab,
+        .filter-tab-present, 
+        .filter-tab-absent, 
+        .filter-tab-early, 
+        .filter-tab-late {
             padding: 8px 16px;
             background: white;
             border: 1px solid #e0e0e0;
@@ -172,10 +176,70 @@ $alumni_list = getStudentClassroomList($student_id);
             transition: all 0.3s;
         }
 
+
         .filter-tab.active {
             background: #f57c00;
             color: white;
             border-color: #fff3e0;
+        }
+
+        .filter-tab-present.active {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-color: #1976d2;
+        }
+
+        .filter-tab-present.active .badge-count {
+            display: inline-block;
+            background: #c5cbf9;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .filter-tab-absent.active {
+            background: #ffbfc9;
+            color: #E13252;
+            border-color: #E13252;
+        }
+
+        .filter-tab-absent.active .badge-count {
+            display: inline-block;
+            background: #f9cfd5;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+         .filter-tab-early.active {
+            background: #c6f4eb;
+            color: #009578;
+            border-color: #009578;
+        }
+
+        .filter-tab-early.active .badge-count {
+            display: inline-block;
+            background: #82f29c;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .filter-tab-late.active {
+            background: #fff3e0;
+            color: #f57c00;
+            border-color: #f57c00;
+        }
+
+        .filter-tab-late.active .badge-count {
+            display: inline-block;
+            background: #ffe4b7;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
         }
 
         .badge-count {
@@ -378,14 +442,14 @@ $alumni_list = getStudentClassroomList($student_id);
                                     <?php echo htmlspecialchars($alumni['classroom_name']); ?>
                                 </option>
                             <?php endforeach; ?>
-                            <option value="">
+                            <!-- <option value="">
                                 ทั้งหมด
-                            </option>
+                            </option> -->
                         </select>
                     </div>
                 </div>
                 <div class="main-tabs">
-                    <button class="main-tab active" onclick="switchMainTab(this, 'ongoing')">Summarize</button>
+                    <button class="main-tab active" onclick="switchMainTab(this, 'summarize')">Summarize</button>
                     <button class="main-tab" onclick="switchMainTab(this, 'ongoing')">Online</button>
                     <button class="main-tab" onclick="switchMainTab(this, 'history')">Onsite</button>
                     <button class="navbox-button" id="filterBtn" style="border: 1px solid #ccc" data-toggle="modal" data-target="#bottomModal">
@@ -404,155 +468,25 @@ $alumni_list = getStudentClassroomList($student_id);
                     <button class="filter-tab active" onclick="switchFilterTab(this, 'all')">
                         All
                     </button>
-                    <button class="filter-tab" onclick="switchFilterTab(this, 'present')">
-                        Present <span class="badge-count">1</span>
+                    <button class="filter-tab-present" onclick="switchFilterTab(this, 'present')">
+                        Present <span class="badge-count">0</span>
                     </button>
-                    <button class="filter-tab" onclick="switchFilterTab(this, 'absent')">
-                        Absent <span class="badge-count">3</span>
+                    <button class="filter-tab-absent" onclick="switchFilterTab(this, 'absent')">
+                        Absent <span class="badge-count">0</span>
                     </button>
-                    <button class="filter-tab" onclick="switchFilterTab(this, 'early')">
-                       Early <span class="badge-count">5</span>
+                    <button class="filter-tab-early" onclick="switchFilterTab(this, 'early')">
+                       Early <span class="badge-count">0</span>
                     </button>
-                    <button class="filter-tab" onclick="switchFilterTab(this, 'late')">
-                        Late <span class="badge-count">2</span>
+                    <button class="filter-tab-late" onclick="switchFilterTab(this, 'late')">
+                        Late <span class="badge-count">0</span>
                     </button>
                 </div>
             </div>
-        <div class="mobile-container">
-            <div class="orders-container" id="ordersContainer">
-                <!-- Order Card 1 -->
-                <div class="order-card" data-type="current">
-                    <div class="order-icon">
-                        <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 60px; height: 60px; border-radius: 100%; ">
-                        <!-- <i class="fa-solid fa-bag-shopping"></i> -->
-                    </div>
-                    <div class="order-info">
-                        <span class="order-status status-current">Current Order</span>
-                        <h3 class="order-title">Shoprite Okota</h3>
-                        <p class="order-number">Order #1234</p>
-                        <div class="order-details">
-                            <span class="order-detail-item">
-                                <i class="fa-solid fa-box"></i> 500 pieces
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-clock"></i> 12:55 am
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-calendar"></i> 12-07-2024
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Card 2 -->
-                <div class="order-card" data-type="waiting">
-                    <div class="order-icon">
-                        <i class="fa-solid fa-motorcycle"></i>
-                    </div>
-                    <div class="order-info">
-                        <span class="order-status status-waiting">Awaiting Rider</span>
-                        <h3 class="order-title">Shoprite Okota</h3>
-                        <p class="order-number">Order #1234</p>
-                        <div class="order-details">
-                            <span class="order-detail-item">
-                                <i class="fa-solid fa-box"></i> 500 pieces
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-clock"></i> 12:55 am
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-calendar"></i> 12-07-2024
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Card 3 -->
-                <div class="order-card" data-type="current">
-                    <div class="order-icon">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                    </div>
-                    <div class="order-info">
-                        <span class="order-status status-current">Current Order</span>
-                        <h3 class="order-title">Shoprite Okota</h3>
-                        <p class="order-number">Order #1234</p>
-                        <div class="order-details">
-                            <span class="order-detail-item">
-                                <i class="fa-solid fa-box"></i> 500 pieces
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-clock"></i> 12:55 am
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-calendar"></i> 12-07-2024
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Card 4 -->
-                <div class="order-card" data-type="waiting">
-                    <div class="order-icon">
-                        <i class="fa-solid fa-motorcycle"></i>
-                    </div>
-                    <div class="order-info">
-                        <span class="order-status status-waiting">Awaiting Rider</span>
-                        <h3 class="order-title">Shoprite Okota</h3>
-                        <p class="order-number">Order #1234</p>
-                        <div class="order-details">
-                            <span class="order-detail-item">
-                                <i class="fa-solid fa-box"></i> 500 pieces
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-clock"></i> 12:55 am
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-calendar"></i> 12-07-2024
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Card 5 -->
-                <div class="order-card" data-type="waiting">
-                    <div class="order-icon">
-                        <i class="fa-solid fa-motorcycle"></i>
-                    </div>
-                    <div class="order-info">
-                        <span class="order-status status-waiting">Awaiting Rider</span>
-                        <h3 class="order-title">Shoprite Okota</h3>
-                        <p class="order-number">Order #1234</p>
-                        <div class="order-details">
-                            <span class="order-detail-item">
-                                <i class="fa-solid fa-box"></i> 500 pieces
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-clock"></i> 12:55 am
-                            </span>
-                            <span class="order-detail-item">
-                                <i class="fa-regular fa-calendar"></i> 12-07-2024
-                            </span>
-                        </div>
-                    </div>
+            <div class="mobile-container">
+                <div class="orders-container" id="ordersContainer">
+                    
                 </div>
             </div>
-
-            <!-- Bottom Navigation -->
-            <!-- <div class="bottom-nav">
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-house"></i>
-                <span>Home</span>
-            </a>
-            <a href="#" class="nav-item active">
-                <i class="fa-solid fa-clipboard-list"></i>
-                <span>Orders</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-user"></i>
-                <span>Profile</span>
-            </a>
-        </div> -->
-        </div>
 
     </div>
     <div id="bottomModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
@@ -617,7 +551,7 @@ $alumni_list = getStudentClassroomList($student_id);
                                     </div>
 
                                     <div class="row" style="margin-inline: 0.5rem;">
-                                        <button class="btn btn-primary btn-block">Search Result</button>
+                                        <button id="searchDateRange" class="btn btn-primary btn-block">Search Result</button>
                                     </div>
                                 </div>
                             </div>
@@ -628,120 +562,6 @@ $alumni_list = getStudentClassroomList($student_id);
   
 
     <?php require_once 'component/footer.php'; ?>
-
-    <script>
-        function switchMainTab(element, tab) {
-            // Remove active class from all main tabs
-            document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
-            // Add active class to clicked tab
-            element.classList.add('active');
-
-            // You can add logic here to load different data based on tab
-            console.log('Switched to:', tab);
-        }
-
-        function switchFilterTab(element, filter) {
-            const allTab = document.querySelector('.filter-tab[onclick*="all"]');
-            const tabs = document.querySelectorAll('.filter-tab');
-            const cards = document.querySelectorAll('.order-card');
-
-            if (filter === 'all') {
-                // Activate only the 'All' tab, deactivate others
-                tabs.forEach(tab => tab.classList.remove('active'));
-                element.classList.add('active');
-
-                // Show all cards
-                cards.forEach(card => card.style.display = 'block');
-            } else {
-                // Toggle clicked non-'all' tab active state
-                if (element.classList.contains('active')) {
-                    element.classList.remove('active');
-                } else {
-                    element.classList.add('active');
-                }
-
-                // If any non-'all' tab is active, deactivate 'All'
-                const anyActive = [...tabs].some(tab => tab !== allTab && tab.classList.contains('active'));
-                if (anyActive) {
-                    allTab.classList.remove('active');
-                } else {
-                    // If none active, activate 'All'
-                    allTab.classList.add('active');
-                }
-
-                // Show cards matching any active filters (or all if none)
-                const activeFilters = [...tabs]
-                    .filter(tab => tab !== allTab && tab.classList.contains('active'))
-                    .map(tab => tab.getAttribute('onclick').match(/'(\w+)'/)[1]);
-
-                cards.forEach(card => {
-                    if (activeFilters.length === 0) {
-                        card.style.display = 'block';
-                    } else {
-                        const cardType = card.getAttribute('data-type');
-                        card.style.display = activeFilters.includes(cardType) ? 'block' : 'none';
-                    }
-                });
-            }
-        }
-
-        // Add click animation to order cards
-        document.querySelectorAll('.order-card').forEach(card => {
-            card.addEventListener('click', function() {
-                this.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    this.style.transform = 'translateY(-2px)';
-                }, 100);
-            });
-        });
-
-
-        // Attach event listeners to filters:
-        document.querySelectorAll('.filter-tag').forEach(element => {
-            const removeBtn = element.querySelector('.remove-btn');
-            // Set remove button visibility initially
-            removeBtn.style.display = element.classList.contains('active') ? 'inline' : 'none';
-
-            element.addEventListener('click', () => {
-                // Remove active class from all, hide all remove buttons
-                document.querySelectorAll('.filter-tag').forEach(e => {
-                    e.classList.remove('active');
-                    e.querySelector('.remove-btn').style.display = 'none';
-                });
-
-                element.classList.add('active');
-                removeBtn.style.display = 'inline';
-
-                // Apply filter and update date pickers
-                applyFilter(element.getAttribute('data-filter'));
-            });
-
-            removeBtn.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent triggering element click
-                element.classList.remove('active');
-                removeBtn.style.display = 'none';
-
-                // Clear filters and daterange inputs
-                applyFilter('all');
-            });
-        });
-
-    // function applyFilter(filter) {
-    //     const cards = document.querySelectorAll('.order-card');
-    //     cards.forEach(card => {
-    //         if (filter === 'all') {
-    //             card.style.display = 'block';
-    //         } else {
-    //             const cardValue = card.getAttribute(`data-${filter}`);
-    //             card.style.display = cardValue ? 'block' : 'none';
-    //         }
-    //     });
-    // }
-
-        
-        
-
-    </script>
 </body>
 
 </html>
