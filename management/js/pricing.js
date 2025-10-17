@@ -8,6 +8,7 @@ function getPricingTemplate() {
             <thead>
                 <tr>
                     <th lang="en">Publish</th>
+                    <th lang="en">Default Price</th>
                     <th lang="en">Type</th>
                     <th lang="en">Price</th>
                     <th lang="en">Quantity</th>
@@ -48,7 +49,7 @@ function buildPricing() {
 					defaultLang: 'en'
 				});
 			},
-			"order": [[0,'asc']],
+			"order": [[0,'asc'], [1,'asc'], [2,'desc'],  [3,'asc']],
 			"columns": [{ 
                 "targets": 0,
                 "data": "is_public",
@@ -60,6 +61,18 @@ function buildPricing() {
                 }
             },{ 
                 "targets": 1,
+                "data": "ticket_default",
+                "render": function (data,type,row,meta) {	
+					let ticket_id = row['ticket_id'];
+					let is_public = row['is_public'];
+					return `
+                        ${(is_public == 0) ? `
+                            <a class="text-${(data == 0) ? 'green' : 'grey'}" onclick="switchDefault(${ticket_id}, ${data});"><i class="fas fa-toggle-${(data == 0) ? 'on' : 'off'} fa-2x"></i></a>    
+                        ` : ``}
+                    `;
+                }
+            },{ 
+                "targets": 2,
                 "data": "ticket_type",
                 "render": function (data,type,row,meta) {	
                     let description = row['description'];
@@ -77,21 +90,21 @@ function buildPricing() {
                     `;
                 }
             },{ 
-                "targets": 2,
+                "targets": 3,
                 "data": "ticket_price",
                 "className": "text-right"
             },{ 
-                "targets": 3,
+                "targets": 4,
                 "data": "ticket_quota",
                 "className": "text-right"
             },{ 
-                "targets": 4,
+                "targets": 5,
                 "data": "start_sale"
             },{ 
-                "targets": 5,
+                "targets": 6,
                 "data": "end_sale"
             },{ 
-                "targets": 6,
+                "targets": 7,
                 "data": "ticket_id",
                 "className": "text-center",
                 "render": function (data,type,row,meta) {	
@@ -163,6 +176,55 @@ function switchPrice(ticket_id,option) {
                 type: "POST",
                 data: {
                     action:'switchPrice',
+                    classroom_id: classroom_id,
+                    ticket_id: ticket_id,
+                    option: option
+                },
+                dataType: "JSON",
+                type: 'POST',
+                success: function(result){
+                    swal({type: 'success',title: "Successfully",text: "", showConfirmButton: false,timer: 1500});							
+                    buildPricing();
+                }
+            });
+		}else{
+			swal.close();
+		}
+	});
+}
+function switchDefault(ticket_id,option) {
+    if(option == 0){
+		var message = 'Remove from Default';
+		var topic = 'Yes';
+		var type_color = 'error';
+		var button_color = '#FF6666';
+	}else{
+		var message = 'Set to Default';
+		var topic = 'Yes';
+		var type_color = 'info';
+		var button_color = '#5bc0de';
+	}
+	event.stopPropagation();
+	swal({ 
+		html:true,
+		title: window.lang.translate(`${topic} Pricing?`),
+		text: ``,
+		type: type_color,
+		showCancelButton: true,
+		closeOnConfirm: false,
+		confirmButtonText: window.lang.translate(message),
+		cancelButtonText: window.lang.translate("Cancel"),	
+		confirmButtonColor: button_color,
+		cancelButtonColor: '#CCCCCC',
+		showLoaderOnConfirm: true,
+	},
+	function(isConfirm){
+		if (isConfirm) {
+			$.ajax({
+                url: "/classroom/management/actions/pricing.php",
+                type: "POST",
+                data: {
+                    action:'switchDefault',
                     classroom_id: classroom_id,
                     ticket_id: ticket_id,
                     option: option

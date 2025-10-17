@@ -23,7 +23,8 @@
             date_format(end_sale, '%Y/%m/%d') as end_sale,
             description,
             is_public,
-            ticket_quota
+            ticket_quota,
+            ticket_default
         FROM 
             classroom_ticket
         WHERE 
@@ -36,6 +37,7 @@
             array('db' => 'end_sale', 'dt' => 'end_sale'),
             array('db' => 'description', 'dt' => 'description'),
             array('db' => 'is_public', 'dt' => 'is_public'),
+            array('db' => 'ticket_default', 'dt' => 'ticket_default'),
             array('db' => 'ticket_price', 'dt' => 'ticket_price','formatter' => function ($d, $row) {
                 return number_format($d, 2);
 			}),
@@ -56,6 +58,25 @@
         update_data(
             "classroom_ticket",
             "is_public = $status, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
+            "ticket_id = '{$ticket_id}'"
+        );
+        echo json_encode([
+            'status' => true,
+        ]);
+    }
+    if(isset($_POST) && $_POST['action'] == 'switchDefault') {
+        $classroom_id = $_POST['classroom_id'];
+        $ticket_id = $_POST['ticket_id'];
+        $option = $_POST['option'];
+        $status = ($option == 0) ? 1 : 0;
+        if($status == 0) {
+            update_data(
+                "classroom_ticket", "ticket_default = 1, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()", "classroom_id = '{$classroom_id}' and ticket_default = 0"
+            );
+        }
+        update_data(
+            "classroom_ticket",
+            "ticket_default = $status, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
             "ticket_id = '{$ticket_id}'"
         );
         echo json_encode([
