@@ -17,6 +17,21 @@
         header('Location: /');
         exit;
     }
+    $data = $_SERVER['REQUEST_URI'];
+    $fragment = 'register';
+    if (strpos($data, '?') !== false) {
+        $data_parts = explode('?', $data);
+        $data = $data_parts[0];
+        parse_str($data_parts[1], $params); 
+    }
+    if (!empty($params)) {
+        $fragment = key($params);
+    }
+    if($fragment == 'payment') {
+        if(!isset($_SESSION['student_id'])) {
+            $fragment = 'register';
+        }
+    }
     switch("/" . $parts[0] . "/" . $parts[1]) {
         case '/classroom/register/':
         case '/classroom/register':

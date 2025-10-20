@@ -28,6 +28,7 @@
     if ($action == 'verifyClassroom') {
         $classroomCode = (!empty($_POST['classroomCode'])) ? escape_string($_POST['classroomCode']) : ''; 
         $channel = (!empty($_POST['channel'])) ? escape_string($_POST['channel']) : ''; 
+        $fragment = (!empty($_POST['fragment'])) ? escape_string($_POST['fragment']) : 'register'; 
         if (!$classroomCode) {
             echo json_encode(array(
                 'status' => false,
@@ -215,6 +216,7 @@
         );
         $student_data = null;
         $student_id = isset($_SESSION['student_id']) ? intval($_SESSION['student_id']) : 0;
+        $payment_flag = 1;
         if($student_id) {
             $students = select_data(
                 "
@@ -285,12 +287,15 @@
                     'student_nationality' => $student['student_nationality'],
                     'student_password' => ($student['student_password']) ? decryptToken($student['student_password'], $student['student_password_key']) : '',
                 );
+                $fragment = $fragment;
+                $payment_flag = 0;
             }
             $consent_status = 'N';
             $register_template = $register_template;
             $register_require = $register_require;
             $form_data = $form_data;
         } else {
+            $fragment = 'register';
             if($shortcut_status == 0) {
                 $register_template = $shortcut_field;
                 $register_require = $shortcut_require;
@@ -337,8 +342,133 @@
             'nationality' => $nationality,
             'student_data' => $student_data,
             'is_logged_in' => $student_id ? true : false,
+            'fragment' => $fragment,
+            'payment_flag' => $payment_flag,
         ));
         exit;
+    }
+    if(isset($_POST) && $_POST['action'] == 'buildPayment') {
+        $classroom_id = $_POST['classroom_id'];
+        $classroom = select_data(
+            "comp_id",
+            "classroom_template",
+            "where classroom_id = " . intval($classroom_id)
+        );
+        $comp_id = $classroom[0]['comp_id'];
+        $payment_data = [];
+        $ticket_data = [];
+        $method_select = '';
+        $ticket_select = '';
+        if($student_id) {
+            $payments = select_data(
+                "
+                    date_format(j.payment_date, '%Y/%m/%d %H:%i') as payment_date,
+                    date_format(j.payment_status_date, '%Y/%m/%d %H:%i') as payment_status_date,
+                    j.payment_attach_file,
+                    j.payment_status,
+                    t.ticket_id,
+                    j.method_id,
+                    t.ticket_type,
+                    t.ticket_price,
+                    j.payment_status_remark
+                ", 
+                "classroom_student_join j", 
+                "
+                    left join classroom_ticket t on t.ticket_id = j.ticket_id
+                    where j.classroom_id = '{$classroom_id}' and j.student_id = '{$student_id}'
+                "
+            );
+            if(!empty($payments)) {
+                $payment = $payments[0];
+                $method_select = $payment['method_id'];
+                $ticket_selected = $payment['ticket_id'];
+                $payment_data = [
+                    'payment_date' => $payment['payment_date'],
+                    'payment_status_date' => $payment['payment_status_date'],
+                    'payment_attach_file' => ($payment['payment_attach_file']) ? GetPublicUrl($payment['payment_attach_file']) : '',
+                    'payment_status' => $payment['payment_status'],
+                    'ticket_id' => $payment['ticket_id'],
+                    'ticket_type' => $payment['ticket_type'],
+                    'payment_status_remark' => $payment['payment_status_remark'],
+                    'ticket_price' => number_format($payment['ticket_price'], 2),
+                ];
+            }   
+            $tickets = select_data(
+                "
+                    t.ticket_id, 
+                    t.ticket_type, 
+                    t.ticket_price, 
+                    t.ticket_default,
+                    c.currency_code
+                ",
+                "classroom_ticket t",
+                "
+                    left join m_currency_master c on c.currency_id = t.ticket_value
+                    WHERE t.classroom_id = '{$classroom_id}' AND (t.status = 0 AND t.is_public = 0 OR t.ticket_id = '".($ticket_selected ?: 0)."')
+                    ORDER BY t.ticket_price ASC
+                "
+            );
+            $ticket_data = [];
+            if (!empty($tickets)) {
+                if (empty($ticket_selected)) {
+                    $found_default = false;
+                    foreach ($tickets as $t) {
+                        if ($t['ticket_default'] == 0) {
+                            $ticket_selected = $t['ticket_id'];
+                            $found_default = true;
+                            break;
+                        }
+                    }
+                    if (!$found_default && isset($tickets[0])) {
+                        $ticket_selected = $tickets[0]['ticket_id'];
+                    }
+                }
+                foreach ($tickets as $ticket) {
+                    $ticket_data[] = [
+                        'ticket_id' => $ticket['ticket_id'],
+                        'ticket_type' => $ticket['ticket_type'],
+                        'ticket_price' => number_format($ticket['ticket_price'], 2),
+                        'ticket_default' => $ticket['ticket_default'],
+                        'currency_code' => $ticket['currency_code'],
+                    ];
+                }
+            }
+        }
+        $payment_methods = [];
+        $gateways = select_data(
+            "p.id, p.method_cover, p.method_name, p.method_type, p.account_name, p.account_number, p.bank_id, 
+            ifnull(b.bank_name, b.bank_name_en) as bank_name_th, ifnull(b.bank_name_en, b.bank_name) as bank_name_en", 
+            "payment_methods p", 
+            "LEFT JOIN m_bank b on b.bank_id = p.bank_id
+            WHERE p.comp_id = '{$comp_id}' AND (p.is_active = 0 AND p.status = 0 OR p.id = '".($method_select ?: 0)."')"
+        );
+        if(!empty($gateways)) {
+            foreach($gateways as $g) {
+                $payment_methods[] = [
+                    'method_id' => $g['id'],
+                    'method_cover' => ($g['method_cover']) ? GetPublicUrl($g['method_cover']) : '',
+                    'method_type' => $g['method_type'],
+                    'account_name' => $g['account_name'],
+                    'account_number' => $g['account_number'],
+                    'bank_name_th' => $g['bank_name_th'],
+                    'bank_name_en' => $g['bank_name_en'],
+                ];
+            }
+        }
+        if (!empty($payment_methods) && !empty($method_select)) {
+            usort($payment_methods, function($a, $b) use ($method_select) {
+                if ($a['method_id'] == $method_select) return -1;
+                if ($b['method_id'] == $method_select) return 1;
+                return 0;
+            });
+        }
+        echo json_encode(array(
+            'status' => true,
+            'payment_data' => $payment_data,
+            'ticket_data' => $ticket_data,
+            'ticket_selected' => $ticket_selected,
+            'payment_methods' => $payment_methods
+        ));
     }
     if($action == 'loadTerm') {
         $classroom_id = (!empty($_POST['classroom_id'])) ? escape_string($_POST['classroom_id']) : ''; 
@@ -866,5 +996,64 @@
         } else {
             echo json_encode(['status' => true, 'message' => '']);
         }
+    }
+    if(isset($_GET) && $_GET['action'] == 'savePayment') {
+        $classroom_id = $_POST['classroom_id'];
+        $classrooms = select_data(
+            "comp_id", "classroom_template", "where classroom_id = '{$classroom_id}'"
+        );
+        $comp_id = $classrooms[0]['comp_id'];
+        $currentLang = $_POST['currentLang'];
+        $ticket_id = ($_POST['ticket_id']) ? "'{$_POST['ticket_id']}'" : "null";
+        $method_id = ($_POST['method_id']) ? "'{$_POST['method_id']}'" : "null";
+        $payment_slip_name = $_FILES['payment_slip']['name'];
+        $payment_slip_tmp = $_FILES['payment_slip']['tmp_name'];
+        $ex_payment_slip = $_POST['ex_payment_slip'];
+        if($payment_slip_name) {
+            $payment_slip = uploadSecureFile('payment_slip', $comp_id, $classroom_id, 'student/payment', array('jpg', 'jpeg', 'png', 'gif'), 5242880);
+            update_data(
+                "classroom_student_join", "method_id = $method_id, ticket_id = $ticket_id, payment_date = NOW(), payment_attach_file = $payment_slip", "classroom_id = '{$classroom_id}' and student_id = '{$student_id}'"
+            );
+        } else if($ex_payment_slip) {
+            update_data(
+                "classroom_student_join", "method_id = $method_id, ticket_id = $ticket_id, payment_date = NOW()", "classroom_id = '{$classroom_id}' and student_id = '{$student_id}'"
+            );
+        }
+        if(!$payment_slip_name && !$ex_payment_slip) {
+            update_data(
+                "classroom_student_join", "method_id = null, ticket_id = null, payment_date = null, payment_attach_file = null", "classroom_id = '{$classroom_id}' and student_id = '{$student_id}'"
+            );
+        }
+        echo json_encode([
+            'status' => true
+        ]);
+    }
+    if(isset($_POST) && $_POST['action'] == 'cancelPayment') {
+        $classroom_id = $_POST['classroom_id'];
+        $currentLang = $_POST['currentLang'];
+        if(!$student_id) {
+            echo json_encode([
+                'status' => false,
+                'message' => ($currentLang == 'en') ? 'You are disconnected from the system.' : 'คุณขาดการเชื่อมต่อจากระบบ',
+            ]);
+            exit;
+        }
+        $payments = select_data(
+            "payment_status", "classroom_student_join", "where classroom_id = '{$classroom_id}' and student_id = '{$student_id}'"
+        );
+        $payment_status = $payments[0]['payment_status'];
+        if($payment_status == 1) {
+            echo json_encode([
+                'status' => false,
+                'message' => ($currentLang == 'en') ? 'Your payment has been confirmed and cannot be cancelled.' : 'การชำระเงินของคุณได้รับการยืนยันแล้ว ไม่สามารถยกเลิกได้',
+            ]);
+            exit;
+        }
+        update_data(
+            "classroom_student_join", "method_id = null, ticket_id = null, payment_date = null, payment_attach_file = null", "classroom_id = '{$classroom_id}' and student_id = '{$student_id}'"
+        );
+         echo json_encode([
+            'status' => true,
+        ]);
     }
 ?>

@@ -26,15 +26,19 @@
 <script src="/dist/dropify/dist/js/dropify.min.js"></script>
 <script src="/dist/fancybox/source/jquery.fancybox.js"></script>
 <script src="/classroom/register/js/register.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="/classroom/register/js/payment.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="/classroom/register/js/script.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="/classroom/register/js/lang.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 </head>
 <body>
 <input type="hidden" id="classroomCode" value="<?php echo $classroomCode; ?>">
 <input type="hidden" id="channel" value="<?php echo $channel; ?>">
+<input type="hidden" id="fragment" value="<?php echo $fragment; ?>">
 <div class="container-fluid registration-container">
     <div class="row" style="height: 100vh;">
-        <div class="col-sm-9 left-section">
+        <div class="col-md-9 left-section">
             <div class="event-details">
                 <div class="detail-item">
                     <div class="poster-content">
@@ -65,7 +69,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-3 right-section" id="registration-form">
+        <div class="col-md-3 right-section" id="registration-form">
             <div class="container-header">
                 <div class="container-header-bg"></div>
                 <div class="container-header-logo">
@@ -73,14 +77,36 @@
                 </div>
             </div>
             <div class="form-section">
-                <h4 class="form-title">
-                    <span data-lang="registration_form"></span>
-                </h4>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="row">
+                            <a class="register-nav for-register" onclick="switchTab('register');">
+                                <h5 class="form-title" style="font-size: 16px;">
+                                    <span data-lang="registration_form"></span>
+                                </h5>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="row">
+                            <a class="register-nav for-payment" onclick="switchTab('payment');">
+                                <h5 class="form-title" style="font-size: 16px;">
+                                    <span data-lang="payment"></span>
+                                </h5>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="payment-container hidden">
+                <form id="paymentForm"></form>
+            </div>
+            <div class="register-container">
                 <form id="registrationForm">
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="form-group text-center input-15 hidden" style="margin-top:20px;">
-                                <p><label class="register-form" style="margin-top:10px;color:#888;" data-lang="upload_image"></label></p>
+                            <div class="form-group text-center input-15 hidden">
+                                <p><label class="register-form" data-lang="upload_image"></label></p>
                                 <div class="profile-upload">
                                     <img id="profilePreview" src="/images/profile-default.jpg" onerror="this.src='/images/profile-default.jpg'" alt="Profile Picture">
                                     <span class="camera-icon">
@@ -97,7 +123,7 @@
                             <div class="form-group form-input input-17 hidden">
                                 <label class="register-form" for="student_idcard" data-lang="idcard"></label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control " id="student_idcard" name="student_idcard" autocomplete="off" maxlength="13">
+                                    <input type="text" class="form-control" id="student_idcard" name="student_idcard" autocomplete="off" maxlength="13">
                                     <span class="input-group-addon"><i class="fas fa-address-card"></i></span>
                                 </div>
                             </div>
@@ -144,11 +170,11 @@
                             </div>
                             <div class="form-group form-input input-3 hidden">
                                 <label class="register-form" for="student_nickname_en" data-lang="nickname_en"></label>
-                                 <input type="text" class="form-control" id="student_nickname_en" name="student_nickname_en" autocomplete="off">
+                                <input type="text" class="form-control" id="student_nickname_en" name="student_nickname_en" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-4 hidden">
                                 <label class="register-form" for="student_nickname_th" data-lang="nickname_th"></label>
-                                 <input type="text" class="form-control" id="student_nickname_th" name="student_nickname_th" autocomplete="off">
+                                <input type="text" class="form-control" id="student_nickname_th" name="student_nickname_th" autocomplete="off">
                             </div>
                             <div class="form-group form-input input-7 hidden">
                                 <label class="register-form" for="student_gender" data-lang="gender"></label>
@@ -274,10 +300,10 @@
                         </div>
                     </div>
                 </form>
-            </div>
-            <div class="form-progress">
-                <div class="progress">
-                    <div id="progress_bar" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+                <div class="form-progress">
+                    <div class="progress">
+                        <div id="progress_bar" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+                    </div>
                 </div>
             </div>
         </div>

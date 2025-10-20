@@ -226,7 +226,7 @@ input:checked + .slider:before {
     transform: translateX(20px); 
 }
 .label-text {
-    margin-left: 10px; 
+    margin-left: 50px; 
     vertical-align: middle;
     color: #333;
 }
