@@ -16,19 +16,22 @@
     if(isset($_POST) && $_POST['action'] == 'buildPricing') {
         $classroom_id = $_POST['classroom_id'];
         $table = "SELECT 
-            ticket_id,
-            ticket_type,
-            ticket_price,
-            date_format(start_sale, '%Y/%m/%d') as start_sale,
-            date_format(end_sale, '%Y/%m/%d') as end_sale,
+            t.ticket_id,
+            t.ticket_type,
+            t.ticket_price,
+            date_format(t.start_sale, '%Y/%m/%d') as start_sale,
+            date_format(t.end_sale, '%Y/%m/%d') as end_sale,
             description,
-            is_public,
-            ticket_quota,
-            ticket_default
+            t.is_public,
+            t.ticket_quota,
+            t.ticket_default,
+            concat(c.currency_name, ' (', c.currency_code, ')') as currency_name
         FROM 
-            classroom_ticket
+            classroom_ticket t
+        left join 
+            m_currency_master c on c.currency_id = t.ticket_value
         WHERE 
-            classroom_id = '{$classroom_id}' and status = 0";
+            t.classroom_id = '{$classroom_id}' and t.status = 0";
         $primaryKey = 'ticket_id';
         $columns = array(
             array('db' => 'ticket_id', 'dt' => 'ticket_id'),
@@ -38,6 +41,7 @@
             array('db' => 'description', 'dt' => 'description'),
             array('db' => 'is_public', 'dt' => 'is_public'),
             array('db' => 'ticket_default', 'dt' => 'ticket_default'),
+            array('db' => 'currency_name', 'dt' => 'currency_name'),
             array('db' => 'ticket_price', 'dt' => 'ticket_price','formatter' => function ($d, $row) {
                 return number_format($d, 2);
 			}),
@@ -105,7 +109,7 @@
     if(isset($_POST) && $_POST['action'] == 'priceData') {
         $ticket_id = $_POST['ticket_id'];
         $price = select_data(
-            "ticket_type, ticket_price, ticket_quota, date_format(start_sale, '%Y/%m/%d') as start_sale, date_format(end_sale, '%Y/%m/%d') as end_sale, description, ticket_quota", "classroom_ticket", "where ticket_id = '{$ticket_id}'"
+            "t.ticket_type, t.ticket_price, t.ticket_quota, date_format(t.start_sale, '%Y/%m/%d') as start_sale, date_format(t.end_sale, '%Y/%m/%d') as end_sale, t.description, t.ticket_quota, c.currency_id,concat(c.currency_name, ' (', c.currency_code, ')') as currency_name", "classroom_ticket t", "left join m_currency_master c on c.currency_id = t.ticket_value where t.ticket_id = '{$ticket_id}'"
         );
         echo json_encode([
             'status' => true,
@@ -116,6 +120,8 @@
                 'end_sale' => $price[0]['end_sale'],
                 'description' => $price[0]['description'],
                 'ticket_quota' => $price[0]['ticket_quota'],
+                'currency_id' => $price[0]['currency_id'],
+                'currency_name' => $price[0]['currency_name'],
             ]
         ]);
     }
@@ -123,6 +129,7 @@
         $classroom_id = $_POST['classroom_id'];
         $ticket_id = $_POST['ticket_id'];
         $ticket_type = initVal($_POST['ticket_type']);
+        $ticket_value = initVal($_POST['ticket_value']);
         $ticket_price = initVal($_POST['ticket_price']);
         $ticket_quota = initVal($_POST['ticket_quota']);
         $start_sale = initVal($_POST['start_sale']);
@@ -130,18 +137,46 @@
         $description = initVal($_POST['description']);
         if($ticket_id) {
             update_data(
-                "classroom_ticket", "ticket_type = $ticket_type, ticket_price = $ticket_price, ticket_quota = $ticket_quota, start_sale = $start_sale, end_sale = $end_sale, description = $description",
+                "classroom_ticket", "ticket_value = $ticket_value, ticket_type = $ticket_type, ticket_price = $ticket_price, ticket_quota = $ticket_quota, start_sale = $start_sale, end_sale = $end_sale, description = $description",
                 "ticket_id = '{$ticket_id}'"
             );
         } else {
             insert_data(
                 "classroom_ticket",
-                "(classroom_id, comp_id, ticket_type, ticket_price, ticket_quota, start_sale, end_sale, description, is_public, status, emp_create, date_create, emp_modify, date_modify)",
-                "('{$classroom_id}', '{$_SESSION['comp_id']}', $ticket_type, $ticket_price, $ticket_quota, $start_sale, $end_sale, $description, 1, 0, '{$_SESSION['emp_id']}', NOW(), '{$_SESSION['emp_id']}', NOW())"
+                "(classroom_id, comp_id, ticket_type, ticket_value, ticket_price, ticket_quota, start_sale, end_sale, description, is_public, status, emp_create, date_create, emp_modify, date_modify)",
+                "('{$classroom_id}', '{$_SESSION['comp_id']}', $ticket_value, $ticket_type, $ticket_price, $ticket_quota, $start_sale, $end_sale, $description, 1, 0, '{$_SESSION['emp_id']}', NOW(), '{$_SESSION['emp_id']}', NOW())"
             );
         }
         echo json_encode([
             'status' => true
         ]);
+    }
+    if(isset($_GET) && $_GET['action'] == 'buildCurrency') {
+        $keyword = trim($_GET['term']);
+		$search = ($keyword) ? " where (currency_code like '%{$keyword}%' or currency_name like '%{$keyword}%) " : "";
+		$resultCount = 10;
+		$end = ($_GET['page'] - 1) * $resultCount;
+		$start = $end + $resultCount;
+        $columnData = "*";
+        $tableData = "(
+            select 
+                currency_id as data_code,
+                concat(currency_name, ' (', currency_code, ')') as data_desc
+            from 
+                m_currency_master 
+            $search
+        ) data_table";
+        $whereData = (($_GET['page']) ? "LIMIT ".$end.",".$start : "")."";
+        $Data = select_data($columnData,$tableData,$whereData);
+		$count_data = count($Data);
+		$i = 0;
+		while($i < $count_data) {
+			$data[] = ['id' => $Data[$i]['data_code'],'col' => $Data[$i]['data_desc'],'total_count' => $count_data,'code' => $Data[$i]['data_code'],'desc' => $Data[$i]['data_desc'],];
+			++$i;
+		}
+		if (empty($data)) {
+			$data[] = ['id' => '','col' => '', 'total_count' => ''];
+		}
+        echo json_encode($data);
     }
 ?>
