@@ -11,6 +11,7 @@ function getPricingTemplate() {
                     <th lang="en">Default Price</th>
                     <th lang="en">Type</th>
                     <th lang="en">Price</th>
+                    <th lang="en">Currency</th>
                     <th lang="en">Quantity</th>
                     <th lang="en">Start</th>
                     <th lang="en">End</th>
@@ -95,16 +96,22 @@ function buildPricing() {
                 "className": "text-right"
             },{ 
                 "targets": 4,
+                "data": "currency_name",
+                "render": function (data,type,row,meta) {	
+                    return (data) ? data : '';
+                }
+            },{ 
+                "targets": 5,
                 "data": "ticket_quota",
                 "className": "text-right"
             },{ 
-                "targets": 5,
+                "targets": 6,
                 "data": "start_sale"
             },{ 
-                "targets": 6,
+                "targets": 7,
                 "data": "end_sale"
             },{ 
-                "targets": 7,
+                "targets": 8,
                 "data": "ticket_id",
                 "className": "text-center",
                 "render": function (data,type,row,meta) {	
@@ -309,6 +316,10 @@ function managePrice(ticket_id) {
                     <input type="text" id="ticket_quota" name="ticket_quota" class="form-control require_obj" autocomplete="off" style="text-align:right;" onkeypress="return isNumberKeyEvent(event);" onClick="this.select();">
                 </div>
             </div>
+            <p><span lang="en">Currency</span> <code>*</code></p>
+            <select class="form-control" id="ticket_value" name="ticket_value">
+                <option value="101" selected>ไทยบาท (THB)</option>
+            </select>
             <div class="row">
                 <div class="col-sm-6">
                     <p><span lang="en">Start Sale</span> <code>*</code></p>
@@ -344,6 +355,7 @@ function managePrice(ticket_id) {
             }
         }
     });
+    buildCurrency();
     if(ticket_id) {
         $.ajax({
             url: '/classroom/management/actions/pricing.php',
@@ -362,6 +374,12 @@ function managePrice(ticket_id) {
                     $("#ticket_quota").val(data.ticket_quota);
                     $("#description").val(data.description);
                     $("#"+data.ticket_type).prop("checked", true);
+                    if(data.currency_name) {
+                        $('#ticket_value').append($('<option>', { 
+                            value: data.currency_id, 
+                            text: data.currency_name 
+                        }));
+                    }
                 } else {
                     swal({
                         type: 'warning',
@@ -372,6 +390,49 @@ function managePrice(ticket_id) {
                 }
             }
         });
+    }
+}
+function buildCurrency() {
+    try {
+        $("#ticket_value").select2({
+            theme: "bootstrap",
+            placeholder: "",
+            minimumInputLength: -1,
+            allowClear: true,
+            ajax: {
+                url: "/classroom/management/actions/pricing.php",
+                dataType: 'json',
+                delay: 250,
+                cache: false,
+                data: function(params) {
+                    return {
+                        term: params.term,
+                        page: params.page || 1,
+                        action: 'buildCurrency'
+                    };
+                },
+                processResults: function(data, params) {
+                    const page = params.page || 1;
+                    return {
+                        results: $.map(data, function(item) {
+                            return {
+                                id: item.id,
+                                text: item.col,
+                                code: item.code,
+                                desc: item.desc,
+                            };
+                        }),
+                        pagination: {
+                            more: (page * 10) <= (data[0] ? data[0].total_count : 0)
+                        }
+                    };
+                },
+            },
+            templateSelection: function(data) {
+                return data.text;
+            },
+        });
+    } catch (error) {
     }
 }
 function savePrice() {

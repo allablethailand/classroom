@@ -364,3 +364,6 @@ input[type="radio"]:checked + .radio-label::after {
     border-color: #FF9900 !important;
     box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.2) !important;
 }
+.modal.modal-template {
+    z-index: 99999990 !important;
+}

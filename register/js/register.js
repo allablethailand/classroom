@@ -3,91 +3,13 @@ let tenant_key = '';
 let currentLang = "th";
 let consent_status = 'N';
 let channel_id = '';
+let fragment = 'register';
 let is_logged_in = false;
-const translations = {
-    en: {
-        eng: "English", thai: "Thai", register: "Register", infomation: "Details",
-        contact_us: "Contact Information", registration_form: "Registration Form",
-        idcard: "ID Card", passport: "Passport", prefix: "Prefix",
-        mr: "Mr.", mrs: "Mrs.", miss: "Miss", other: "Other",
-        male: "Male", female: "Female",
-        firstname_en: "First Name (EN)", lastname_en: "Last Name (EN)",
-        firstname_th: "First Name (TH)", lastname_th: "Last Name (TH)",
-        nickname_en: "Nickname (EN)", nickname_th: "Nickname (TH)",
-        gender: "Gender", birthday: "Birthday", upload_image: "Upload Image",
-        email: "Email", mobile: "Mobile Number", company: "Company", position: "Position",
-        username: "Username", password: "Password",
-        i_accept: "I accept", policy: "Terms and Conditions & Privacy Policy",
-        password_info: "Password must be 4–20 characters, using only English letters or numbers.",
-        username_info: "Username must be 8–20 characters, consisting of English letters or numbers only. (By default, your registered mobile number will be used)",
-        close: "Close", accept: "Accept", already: "Already have an account?", login: "Log in",
-        registered: "Successfully registered.", 
-        accept_register: "Accept and register",
-        copy_of_idcard: "Copy of ID card",
-        copy_of_passport: "Copy of Passport",
-        work_certificate: "Work certificate",
-        company_certificate: "Company Certificate (for business owners)",
-        support_upload: "Supports image or PDF files with a size not exceeding 20 MB only.",
-        nationality: "Nationality",
-        save: "Save",
-        logout: "Logout",
-        passport_expire: "Passport Expiry Date",
-        view: "Preview",
-        delete: "Remove",
-        file_preview: "File Preview",
-        consent_notice: "Consent Notice",
-        origami_form: "Origami Form",
-        consent_paragraph: "This form was created by the form owner. The information you provide will be sent directly to them. Allable is not responsible for how third-party form owners collect, use, or protect your data. Please avoid sharing any personal, sensitive, or confidential information — and never submit your password.",
-        consent_footer: "For your safety, please do not include any personal or sensitive details in your responses. Thank you for your understanding and cooperation.",
-        reference: "Reference Person (if any, please specify)",
-        warning: "Warning",
-        remove: "Remove",
-        preview: "Preview",
-    },
-    th: {
-        eng: "อังกฤษ", thai: "ไทย", register: "ลงทะเบียน", infomation: "รายละเอียด",
-        contact_us: "ข้อมูลการติดต่อ", registration_form: "แบบฟอร์มลงทะเบียน",
-        idcard: "รหัสประจำตัวประชาชน", passport: "พาสปอร์ต", prefix: "คำนำหน้าชื่อ",
-        mr: "นาย", mrs: "นาง", miss: "นางสาว", other: "อื่นๆ",
-        male: "ชาย", female: "หญิง",
-        firstname_en: "ชื่อ (ภาษาอังกฤษ)", lastname_en: "นามสกุล (ภาษาอังกฤษ)",
-        firstname_th: "ชื่อ (ภาษาไทย)", lastname_th: "นามสกุล (ภาษาไทย)",
-        nickname_en: "ชื่อเล่น (ภาษาอังกฤษ)", nickname_th: "ชื่อเล่น (ภาษาไทย)",
-        gender: "เพศ", birthday: "วันเกิด", upload_image: "อัพโหดลรูปภาพ",
-        email: "อีเมล", mobile: "หมายเลขโทรศัพท์มือถือ", company: "บริษัท", position: "ตำแหน่ง",
-        username: "ชื่อผู้ใช้", password: "รหัสผ่าน",
-        i_accept: "ข้าพเจ้ายอมรับ", policy: "ข้อกำหนดและเงื่อนไข รวมถึงนโยบายความเป็นส่วนตัว",
-        password_info: "รหัสผ่านต้องมีความยาว 4–20 ตัวอักษร และใช้ได้เฉพาะตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น",
-        username_info: "ชื่อผู้ใช้ต้องมีความยาว 8–20 ตัวอักษร และประกอบด้วยตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น (ค่าเริ่มต้นคือหมายเลขโทรศัพท์มือถือที่ท่านกรอกไว้)",
-        close: "ปิด", accept: "ยอมรับ", already: "มีบัญชีผู้ใช้อยู่แล้ว?", login: "เข้าสู่ระบบ",
-        registered: "ลงทะเบียนสำเร็จ",
-        accept_register: "ยอมรับและลงทะเบียน",
-        copy_of_idcard: "สำเนาบัตรประชาชน",
-        copy_of_passport: "หนังสือเดินทาง",
-        work_certificate: "หนังสือรับรองการทำงาน",
-        company_certificate: "หนังสือรับรองของบริษัท (สำหรับเจ้าของกิจการ)",
-        support_upload: "รองรับไฟล์รูปภาพหรือ pdf ที่มีขนาดไม่เกิน 20 MB เท่านั้น",
-        nationality: "สัญชาติ",
-        save: "บันทึกข้อมูล",
-        logout: "ออกจากระบบ",
-        passport_expire: "วันหมดอายุของพาสปอร์ต",
-        view: "ดูเอกสาร",
-        delete: "นำออก",
-        file_preview: "ตัวอย่างไฟล์",
-        consent_notice: "ประกาศความยินยอมในการให้ข้อมูล",
-        origami_form: "แบบฟอร์ม Origami",
-        consent_paragraph: "แบบฟอร์มนี้ถูกสร้างขึ้นโดยเจ้าของแบบฟอร์ม ข้อมูลที่ท่านกรอกจะถูกส่งไปยังเจ้าของแบบฟอร์มโดยตรง Allable ไม่มีส่วนรับผิดชอบต่อวิธีการเก็บ ใช้ หรือปกป้องข้อมูลของเจ้าของแบบฟอร์มบุคคลที่สาม โปรดหลีกเลี่ยงการส่งข้อมูลส่วนบุคคล ข้อมูลที่มีความละเอียดอ่อน หรือข้อมูลลับ และ ห้ามส่งรหัสผ่านของท่านโดยเด็ดขาด",
-        consent_footer: "เพื่อความปลอดภัยของท่าน โปรดอย่าระบุข้อมูลส่วนตัวหรือข้อมูลที่มีความอ่อนไหวในแบบฟอร์มนี้ ขอขอบคุณสำหรับความเข้าใจและความร่วมมือของท่าน",
-        reference: "ผู้แนะนำให้มาสมัคร (ถ้ามีโปรดระบุ)",
-        warning: "คำเตือน",
-        remove: "นำออก",
-        preview: "ดูรูปภาพ",
-    }
-};
 $(document).ready(function () {
+    fragment = $("#fragment").val();
     $("input").attr("autocomplete", "off");
     function toggleScrollBtn() {
-        if ($(window).width() > 767) return $('#scrollToFormBtn').hide();
+        if ($(window).width() > 769) return $('#scrollToFormBtn').hide();
         const formOffset = $('#registration-form').offset().top;
         const scrollTop = $(window).scrollTop();
         const windowHeight = $(window).height();
@@ -106,21 +28,14 @@ $(document).ready(function () {
         if (this.files && this.files[0]) {
             const file = this.files[0];
             if (!file.type.startsWith("image/")) {
-                if(currentLang == 'en') {
-                    swal({
-                        type: 'warning',
-                        title: 'Warning',
-                        text: 'Please select a valid image file.',
-                        confirmButtonColor: '#FF9900'
-                    });
-                } else {
-                    swal({
-                        type: 'warning',
-                        title: 'คำเตือน',
-                        text: 'กรุณาเลือกไฟล์รูปภาพที่ถูกต้อง.',
-                        confirmButtonColor: '#FF9900'
-                    });
-                }
+                const msg = currentLang === 'en' ? "Warning" : "คำเตือน";
+                const text = currentLang === 'en' ? "Please select a valid image file." : "กรุณาเลือกไฟล์รูปภาพที่ถูกต้อง";
+                swal({
+                    type: 'warning',
+                    title: msg,
+                    text: text,
+                    confirmButtonColor: '#FF9900'
+                });
                 $(this).val("");
                 return;
             }
@@ -213,19 +128,19 @@ $(document).ready(function () {
         if (val && !validators[type].test(val)) {
             $(this).addClass('has-error');
             if(currentLang == 'en') {
-                const msg = type === 'student_email' ? 'Invalid email format' : 'The phone number format is incorrect.';
+                const text = type === 'student_email' ? 'Invalid email format' : 'The phone number format is incorrect.';
                 swal({ 
                     type: 'warning', 
                     title: "Warning...", 
-                    text: msg, 
+                    text: text, 
                     confirmButtonColor: '#FF9900'
                 });
             } else {    
-                const msg = type === 'student_email' ? 'รูปแบบอีเมลไม่ถูกต้อง' : 'รูปแบบหมายเลขโทรศัพท์ไม่ถูกต้อง';
+                const text = type === 'student_email' ? 'รูปแบบอีเมลไม่ถูกต้อง' : 'รูปแบบหมายเลขโทรศัพท์ไม่ถูกต้อง';
                 swal({ 
                     type: 'warning', 
                     title: "คำเตือน...", 
-                    text: msg, 
+                    text: text, 
                     confirmButtonColor: '#FF9900'
                 }); 
             }
@@ -250,13 +165,13 @@ $(document).ready(function () {
     $.post('/classroom/register/actions/register.php', { 
         action: "verifyClassroom", 
         classroomCode: classroomCode, 
-        channel: channel
+        channel: channel,
+        fragment: fragment
     }, (response) => {
         if(!response.status) {
             $(".registration-container").html("");
             const $modal = $(".systemModal");
             if ($modal.length === 0) {
-                console.error('System modal not found');
                 location.reload();
                 return;
             }
@@ -282,6 +197,14 @@ $(document).ready(function () {
         currentLang = response.classroom_data.register_default_lang;
         channel_id = response.channel_id;
         tenant_key = response.classroom_data.tenant_key;
+        $(".register-nav").removeClass("active");
+        fragment = response.fragment;
+        if(response.payment_flag == 1) {
+            $(".register-nav").addClass("hidden");
+            fragment = 'register';
+        }
+        switchTabs(fragment);
+        initTemplate(response.classroom_data);
         response.register_template.forEach(value => $(".input-" + value).removeClass("hidden"));
         response.register_require.forEach(value => {
             const $group = $(".input-" + value);
@@ -289,7 +212,6 @@ $(document).ready(function () {
             $group.find("input[type=file]").addClass("require");
             $group.find("label").addClass("required-field");
         });
-        initTemplate(response.classroom_data);
         initForm(response.form_data);
         consent_status = response.consent_status;
         if(consent_status == 'Y') {
@@ -594,21 +516,14 @@ $(document).ready(function () {
                 $('html, body').animate({ scrollTop: firstInvalidField.offset().top - 100 }, 300);
                 firstInvalidField.focus();
             }
-            if(currentLang == 'en') {
-                swal({
-                    type: 'warning',
-                    title: 'Warning',
-                    text: 'Please fill in all required fields. ' + errorMessage,
-                    confirmButtonColor: '#FF9900'
-                });
-            } else {
-                swal({
-                    type: 'warning',
-                    title: 'คำเตือน',
-                    text: 'กรุณากรอกข้อมูลในฟิลด์ที่จำเป็นทั้งหมด ' + errorMessage,
-                    confirmButtonColor: '#FF9900'
-                });
-            }
+            const msg = currentLang == 'en' ? 'Warning' : 'คำเตือน';
+            const text = currentLang == 'en' ? 'Please fill in all required fields. ' + errorMessage : 'กรุณากรอกข้อมูลในฟิลด์ที่จำเป็นทั้งหมด ' + errorMessage;
+            swal({
+                type: 'warning',
+                title: msg,
+                text: text,
+                confirmButtonColor: '#FF9900'
+            });
             return false;
         }
         if (!$('#agree').is(':checked') && consent_status == "Y") {
@@ -735,13 +650,7 @@ function viewFile(fileUrl) {
         content = `<img src="${fileUrl}" alt="Preview" class="img-fluid" style="max-width:100%; height:auto;">`;
     } else if (ext === 'pdf') {
         const gviewUrl = "https://docs.google.com/gview?embedded=true&url=" + encodeURIComponent(fileUrl);
-        content = `
-            <iframe src="${gviewUrl}" 
-                width="100%" 
-                height="500px" 
-                style="border:none;">
-            </iframe>
-        `;
+        content = `<iframe src="${gviewUrl}" width="100%" height="500px" style="border:none;"></iframe>`;
     }
     $(".systemModal .modal-body").html(content);
     $(".systemModal .modal-footer").html(`
@@ -791,17 +700,7 @@ function buildNationality() {
             },
         });
     } catch (error) {
-        console.error('Error building department dropdown:', error);
     }
-}
-function isValidThaiID(id) {
-    if (!/^\d{13}$/.test(id)) return false;
-    let sum = 0;
-    for (let i = 0; i < 12; i++) {
-        sum += parseInt(id.charAt(i)) * (13 - i);
-    }
-    let checkDigit = (11 - (sum % 11)) % 10;
-    return checkDigit === parseInt(id.charAt(12));
 }
 function autoSaveRegister() {
     const $form = $('#registrationForm');
@@ -829,7 +728,6 @@ function autoSaveRegister() {
         success: function(result) {
         },
         error: function(xhr, status, error) {
-            console.error('Register error:', status, error);
             $(".loader").removeClass("active");
             $(".systemModal").modal("hide");
             $btn.prop('disabled', false);
@@ -842,8 +740,6 @@ function autoSaveRegister() {
                     text: msg,
                     confirmButtonColor: '#FF9900'
                 });
-            } else {
-                alert(msg);
             }
         }
     });
@@ -851,7 +747,6 @@ function autoSaveRegister() {
 function saveRegister() {
     const $form = $('#registrationForm');
     if ($form.length === 0) {
-        console.error('Registration form not found');
         return;
     }
     const $btn = $form.find('button[type="submit"]');
@@ -884,7 +779,6 @@ function saveRegister() {
             handleRegisterResponse(result);
         },
         error: function(xhr, status, error) {
-            console.error('Register error:', status, error);
             $(".loader").removeClass("active");
             $(".systemModal").modal("hide");
             $btn.prop('disabled', false);
@@ -907,7 +801,6 @@ function handleRegisterResponse(result) {
     $(".loader").removeClass("active");
     $(".systemModal").modal("hide");
     if (!result || typeof result !== 'object') {
-        console.error('Invalid response:', result);
         const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'th';
         const msg = (lang === 'en') ? "Invalid response from server" : "ข้อมูลจากเซิร์ฟเวอร์ไม่ถูกต้อง";
         if (typeof swal === 'function') {
@@ -956,28 +849,6 @@ function handleRegisterResponse(result) {
     } else {
         showSuccessModal(lang, result.tenant_url, result.message_success);
     }
-}
-function showSuccessModal(lang, tenant_url, message_success) {
-    const $modal = $(".systemModal");
-    if ($modal.length === 0) {
-        console.error('System modal not found');
-        location.reload();
-        return;
-    }
-    $modal.modal('show');
-    $modal.find(".modal-header").html(`
-        <h5 class="modal-title" data-lang="registered"></h5>
-    `);
-    $modal.find(".modal-body").html(message_success);
-    $modal.find(".modal-footer").html(`
-        <div class="text-center w-100">
-            <a href="${tenant_url}" class="btn btn-primary" data-lang="close"></a>
-        </div>
-    `);
-    toggleLanguage(lang);
-    $modal.off('hidden.bs.modal').on('hidden.bs.modal', function() {
-        location.reload();
-    });
 }
 function initForm(form_data) {
     if(!form_data) return;
@@ -1064,10 +935,6 @@ function initForm(form_data) {
         });
     });
 }
-function autoResize(textarea) {
-    textarea.style.height = 'auto'; 
-    textarea.style.height = textarea.scrollHeight + 'px'; 
-}
 function initTemplate(data) {
     $(document).attr("title", `${data.classroom_name} • ORIGAMI PLATFORM`);
     $(".poster-bg").css("background-image",`url(/images/ogm_bg.png)`);
@@ -1106,15 +973,6 @@ function initTemplate(data) {
         }
     });
 }
-function toggleLanguage(lang) {
-    currentLang = lang;
-    $("[data-lang]").each(function () {
-        const key = $(this).attr("data-lang");
-        $(this).text(translations[currentLang][key] || key);
-    });
-    $(".language-menu div").removeClass("lang-active");
-    $(".language-menu div[store-translate='" + lang.toUpperCase() + "']").addClass("lang-active");
-}
 function calculateFormCompletion() {
     const fieldStatus = {};
     $('#registrationForm').find('input:visible, textarea:visible, select:visible').each(function() {
@@ -1141,21 +999,6 @@ function calculateFormCompletion() {
     const totalFields = Object.keys(fieldStatus).length;
     const filledFields = Object.values(fieldStatus).filter(v => v).length;
     return totalFields ? Math.round((filledFields / totalFields) * 100) : 0;
-}
-function isInputValid($el) {
-    const val = ($el.val() || '').trim();
-    if (!val) return false;
-    const id = $el.attr('id') || '';
-    if (id.endsWith('_en')) {
-        return /^[A-Za-z\s'-]+$/.test(val);
-    } else if (id.endsWith('_th')) {
-        return /^[ก-๙ะ-๏\s]+$/.test(val);
-    } else if (id === 'student_username') {
-        return /^[A-Za-z0-9]+$/.test(val);
-    } else if (id === 'student_password') {
-        return /^[A-Za-z0-9!@#$%^&*()_\+\-=\[\]{};:'",.<>\/?\\|`~]+$/.test(val);
-    }
-    return true;
 }
 function updateProgressBar() {
     const percent = calculateFormCompletion();
