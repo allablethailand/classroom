@@ -48,7 +48,10 @@
                 $filter .= " and cjoin.invite_status = 1 and cjoin.approve_status = 0 ";
             break;
             case 'approve':
-                $filter .= " and cjoin.invite_status = 1 and cjoin.approve_status = 1 and cjoin.payment_status = 0 ";
+                $filter .= " and cjoin.invite_status = 1 and cjoin.approve_status = 1 and cjoin.payment_status = 0 and cjoin.payment_date is null ";
+            break;
+            case 'pay':
+                $filter .= " and cjoin.invite_status = 1 and cjoin.approve_status = 1 and cjoin.payment_date is not null and cjoin.payment_status = 0 ";
             break;
             case 'payment':
                 $filter .= " and cjoin.invite_status = 1 and cjoin.approve_status = 1 and cjoin.payment_status = 1 ";
@@ -117,7 +120,15 @@
             stu.copy_of_idcard,
             stu.copy_of_passport,
             stu.work_certificate,
-            stu.company_certificate
+            stu.company_certificate,
+            date_format(cjoin.payment_date, '%Y/%m/%d %H:%i:%s') as payment_date,
+            cjoin.payment_attach_file,
+            (
+                CASE
+                    when cjoin.payment_by = 0 then 'By Student'
+                    else CONCAT(IFNULL(i_pay.firstname,i_pay.firstname_th),' ',IFNULL(i_pay.lastname,i_pay.lastname_th))
+                END
+            ) as payment_by
         FROM 
             classroom_student_join cjoin
         LEFT JOIN 
@@ -130,6 +141,8 @@
             m_employee_info i_approve on i_approve.emp_id = cjoin.approve_by
         LEFT JOIN 
             m_employee_info i_payment on i_payment.emp_id = cjoin.payment_status_by
+        LEFT JOIN 
+            m_employee_info i_pay on i_pay.emp_id = cjoin.payment_by
         LEFT JOIN 
             classroom_channel c on c.channel_id = cjoin.channel_id
         WHERE 
@@ -161,6 +174,11 @@
             array('db' => 'student_idcard', 'dt' => 'student_idcard'),
             array('db' => 'student_passport', 'dt' => 'student_passport'),
             array('db' => 'student_passport_expire', 'dt' => 'student_passport_expire'),
+            array('db' => 'payment_date', 'dt' => 'payment_date'),
+            array('db' => 'payment_by', 'dt' => 'payment_by'),
+            array('db' => 'payment_attach_file','dt' => 'payment_attach_file','formatter' => function ($d, $row) {
+                return ($d) ? GetPublicUrl($d) : '';
+            }),
             array('db' => 'student_image_profile','dt' => 'student_image_profile','formatter' => function ($d, $row) {
                 return ($d) ? GetPublicUrl($d) : '';
             }),
@@ -737,7 +755,8 @@
             'lead'       => "invite_status = 0",
             'register'   => "1=1",
             'waiting'    => "invite_status = 1 AND approve_status = 0",
-            'approve'    => "invite_status = 1 AND approve_status = 1 AND payment_status = 0",
+            'approve'    => "invite_status = 1 AND approve_status = 1 AND payment_status = 0 and cjoin.payment_date is null",
+            'pay'    => "invite_status = 1 AND approve_status = 1 AND payment_status = 0 and cjoin.payment_date is not null",
             'payment'    => "invite_status = 1 AND approve_status = 1 AND payment_status = 1",
             'notapprove' => "invite_status = 1 AND approve_status = 2",
             'notpayment' => "invite_status = 1 AND approve_status = 1 AND payment_status = 2",

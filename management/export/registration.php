@@ -86,10 +86,7 @@
         $answers = select_data(
             "answer_text, choice_id, other_text", 
             "classroom_form_answer_users", 
-            "WHERE classroom_id = '" . safe_escape($classroom_id) . "' 
-            AND student_id = '" . safe_escape($student_id) . "' 
-            AND question_id = '" . safe_escape($question_id) . "' 
-            AND status = 0"
+            "WHERE classroom_id = '" . safe_escape($classroom_id) . "' AND student_id = '" . safe_escape($student_id) . "' AND question_id = '" . safe_escape($question_id) . "' AND status = 0"
         );
         $answer_data = array();
         foreach ($answers as $ans) {
@@ -265,7 +262,8 @@
             CASE
                 when cjoin.payment_status = 1 then 'Payment'
                 when cjoin.payment_status = 2 then 'Not Payment'
-                when cjoin.approve_status = 1 and cjoin.payment_status = 0 then 'Approve'
+                when cjoin.approve_status = 1 and cjoin.payment_status = 0 and cjoin.payment_date is null then 'Approve'
+                when cjoin.approve_status = 1 and cjoin.payment_status = 0 and cjoin.payment_date is not null then 'Pay'
                 when cjoin.approve_status = 2 and cjoin.payment_status = 0 then 'Not Approve'
                 when cjoin.invite_status = 2 then 'Cancel'
                 when cjoin.invite_status = 1 and cjoin.approve_status = 0 then 'Waiting Approve'
@@ -300,44 +298,28 @@
 <body>
 <table id="myTable" style="display: none;">
     <tr>
-        <td colspan="<?php echo $column_count; ?>">
-            <?php echo htmlspecialchars($classroom_name); ?>
-        </td>
+        <td colspan="<?php echo $column_count; ?>"><?php echo htmlspecialchars($classroom_name); ?></td>
     </tr>
     <tr>
-        <td colspan="<?php echo $column_count; ?>">
-            <?php echo htmlspecialchars($classroom_start); ?> - <?php echo htmlspecialchars($classroom_end); ?>
-        </td>
+        <td colspan="<?php echo $column_count; ?>"><?php echo htmlspecialchars($classroom_start); ?> - <?php echo htmlspecialchars($classroom_end); ?></td>
     </tr>
     <tr>
-        <td colspan="<?php echo $column_count; ?>">
-            <?php echo htmlspecialchars($classroom_location); ?>
-        </td>
+        <td colspan="<?php echo $column_count; ?>"><?php echo htmlspecialchars($classroom_location); ?></td>
     </tr>
     <tr>
-        <td colspan="<?php echo $column_count; ?>">
-            <?php echo htmlspecialchars($comp_name); ?>
-        </td>
+        <td colspan="<?php echo $column_count; ?>"><?php echo htmlspecialchars($comp_name); ?></td>
     </tr>
     <tr>
-        <td colspan="<?php echo $column_count; ?>">
-            Filter Date: <?php echo htmlspecialchars($filter_date); ?>
-        </td>
+        <td colspan="<?php echo $column_count; ?>">Filter Date: <?php echo htmlspecialchars($filter_date); ?></td>
     </tr>
     <tr>
-        <td colspan="<?php echo $column_count; ?>">
-            Filter Channel: <?php echo htmlspecialchars($channel_name); ?>
-        </td>
+        <td colspan="<?php echo $column_count; ?>">Filter Channel: <?php echo htmlspecialchars($channel_name); ?></td>
     </tr>
     <tr>
-        <td colspan="<?php echo $column_count; ?>">
-            Total <?php echo number_format(count($students)); ?> results
-        </td>
+        <td colspan="<?php echo $column_count; ?>">Total <?php echo number_format(count($students)); ?> results</td>
     </tr>
     <tr>
-        <td colspan="<?php echo $column_count; ?>">
-            Report date: <?php echo htmlspecialchars($date_show); ?>
-        </td>
+        <td colspan="<?php echo $column_count; ?>">Report date: <?php echo htmlspecialchars($date_show); ?></td>
     </tr>
     <tr>
         <td>No.</td>
@@ -397,7 +379,7 @@
                 }, 500);
             } catch (error) {
                 console.error('Export error:', error);
-                alert('เกิดข้อผิดพลาดในการ export ไฟล์: ' + error.message);
+                alert('Error export: ' + error.message);
             }
         }, 800);
     });
