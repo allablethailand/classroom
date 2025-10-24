@@ -112,6 +112,11 @@ function getRegistrationTemplate() {
                 </div>
             </div>
             <div class="columns">
+                <div class="cards el-classroom el-classroompay" el="pay">
+                    <span lang="en">Pay</span> <span class="count countpay">0</span>
+                </div>
+            </div>
+            <div class="columns">
                 <div class="cards el-classroom el-classroompayment" el="payment">
                     <span lang="en">Payment</span> <span class="count countpayment">0</span>
                 </div>
@@ -156,6 +161,7 @@ function getRegistrationTemplate() {
                     <th lang="en">Channel</th>
                     <th lang="en">Lead</th>
                     <th lang="en">Approve</th>
+                    <th lang="en">Pay</th>
                     <th lang="en">Payment</th>
                     <th lang="en">Remark</th>
                     <th></th>
@@ -391,7 +397,7 @@ function buildRegistration() {
                     let mockup = "";
                     if(invite_status == 0) {
                         mockup += `
-                            <div class="nowrap">
+                            <div class="nowarp">
                                 <button type="button" class="btn btn-circle btn-green" onclick="confirmRegistration(${join_id}, 'Y')">
                                     <i class="fas fa-check"></i>
                                 </button>
@@ -422,7 +428,7 @@ function buildRegistration() {
 									<div class="${text_class} line-clamp1">
 										<i class="far fa-user-circle"></i> ${invite_by}
 									</div>
-									<div class="${text_class} nowrap">
+									<div class="${text_class} nowarp">
 										<i class="far fa-calendar-check"></i> ${invite_date}
 									</div>
 								</li>
@@ -445,7 +451,7 @@ function buildRegistration() {
                     if(invite_status == 1) {
                         if(approve_status == 0) {
                             mockup += `
-                                <div class="nowrap">
+                                <div class="nowarp">
                                     <button type="button" class="btn btn-circle btn-green" onclick="approveRegistration(${join_id}, ${student_id}, 'Y')">
                                         <i class="fas fa-check"></i>
                                     </button>
@@ -476,7 +482,7 @@ function buildRegistration() {
                                         <div class="${text_class} line-clamp1">
                                             <i class="far fa-user-circle"></i> ${approve_by}
                                         </div>
-                                        <div class="${text_class} nowrap">
+                                        <div class="${text_class} nowarp">
                                             <i class="far fa-calendar-check"></i> ${approve_date}
                                         </div>
                                     </li>
@@ -488,6 +494,26 @@ function buildRegistration() {
                 }
             },{ 
                 "targets": 9,
+                "data": "payment_date",
+                "render": function (data,type,row,meta) {	
+					let payment_date = row['payment_date'] || "";
+                    let payment_attach_file = row['payment_attach_file'] || "";
+                    let payment_by = row['payment_by'] || 0;
+                    let mockup = "";
+                    if(payment_date) {
+                        mockup += `
+                            <button type="button" class="btn btn-orange" onclick="viewPayment('${payment_attach_file}');">View</button>
+                            <p class="text-green" style="margin-top: 15px;"><i class="fas fa-check"></i> <span lang="en">Attachment included</span></p>
+                            <div class="text-green nowarp"><i class="far fa-user-circle"></i> ${payment_by}</div>
+                            <div class="text-green nowarp"><i class="far fa-calendar-check"></i> ${payment_date}</div>
+                        `;
+                    } else {
+                        mockup += `<p class="text-grey nowarp"><i class="fas fa-hourglass-half"></i> <span lang="en">Waiting for payment</span></p>`;
+                    }
+					return mockup;
+                }
+            },{ 
+                "targets": 10,
                 "data": "payment_status",
                 "render": function (data,type,row,meta) {	
 					let payment_status = row['payment_status'] || "-";
@@ -500,7 +526,7 @@ function buildRegistration() {
                     if(approve_status == 1) {
                         if(payment_status == 0) {
                             mockup += `
-                                <div class="nowrap">
+                                <div class="nowarp">
                                     <button type="button" class="btn btn-circle btn-green" onclick="paymentRegistration(${join_id}, ${student_id}, 'Y')">
                                         <i class="fas fa-check"></i>
                                     </button>
@@ -531,7 +557,7 @@ function buildRegistration() {
                                         <div class="${text_class} line-clamp1">
                                             <i class="far fa-user-circle"></i> ${payment_status_by}
                                         </div>
-                                        <div class="${text_class} nowrap">
+                                        <div class="${text_class} nowarp">
                                             <i class="far fa-calendar-check"></i> ${payment_status_date}
                                         </div>
                                     </li>
@@ -542,12 +568,12 @@ function buildRegistration() {
 					return mockup;
                 }
             },{ 
-                "targets": 10,
+                "targets": 11,
                 "render": function (data,type,row,meta) {	
 					return ``;
                 }
             },{ 
-                "targets": 11,
+                "targets": 12,
                 "data": "join_id",
                 "className": "text-center",
                 "render": function (data,type,row,meta) {	
@@ -559,51 +585,51 @@ function buildRegistration() {
                     `;
                 }
             },{ 
-                "targets": 12,
+                "targets": 13,
                 "data": "student_firstname_en",
                 "visible": false,
             },{ 
-                "targets": 13,
+                "targets": 14,
                 "data": "student_lastname_en",
                 "visible": false,
             },{ 
-                "targets": 14,
+                "targets": 15,
                 "data": "student_firstname_th",
                 "visible": false,
             },{ 
-                "targets": 15,
+                "targets": 16,
                 "data": "student_lastname_th",
                 "visible": false,
             },{ 
-                "targets": 16,
+                "targets": 17,
                 "data": "student_nickname_en",
                 "visible": false,
             },{ 
-                "targets": 17,
+                "targets": 18,
                 "data": "student_nickname_th",
                 "visible": false,
             },{ 
-                "targets": 18,
+                "targets": 19,
                 "data": "student_mobile",
                 "visible": false,
             },{ 
-                "targets": 19,
+                "targets": 20,
                 "data": "student_email",
                 "visible": false,
             },{ 
-                "targets": 20,
+                "targets": 21,
                 "data": "student_idcard",
                 "visible": false,
             },{ 
-                "targets": 21,
+                "targets": 22,
                 "data": "student_passport",
                 "visible": false,
             },{ 
-                "targets": 22,
+                "targets": 23,
                 "data": "student_company",
                 "visible": false,
             },{ 
-                "targets": 23,
+                "targets": 24,
                 "data": "student_position",
                 "visible": false,
             }]
@@ -635,6 +661,24 @@ function buildRegistration() {
             }
         });
     }
+}
+function viewPayment(fileUrl) {
+    $(".systemModal").modal();
+    $(".systemModal .modal-header").html(`<h5 class="modal-title" lang="en">View Payment</h5>`);
+    const ext = fileUrl.split('.').pop().toLowerCase();
+    let content = '';
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+        content = `<img src="${fileUrl}" alt="Preview" class="img-fluid" style="max-width:100%; height:auto;">`;
+    } else if (ext === 'pdf') {
+        const gviewUrl = "https://docs.google.com/gview?embedded=true&url=" + encodeURIComponent(fileUrl);
+        content = `<iframe src="${gviewUrl}" width="100%" height="500px" style="border:none;"></iframe>`;
+    }
+    $(".systemModal .modal-body").html(content);
+    $(".systemModal .modal-footer").html(`
+        <div class="text-center">
+            <button type="button" class="btn btn-default" data-dismiss="modal" lang="en">Close</button>
+        </div>
+    `);
 }
 function exportStudent() {
     $(".systemModal").modal();
