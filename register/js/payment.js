@@ -270,6 +270,7 @@ function buildPaymentContainer() {
                 </div>
             `;
             $("#paymentForm").html(payment_html);
+            $(".logout").attr("href", "/actions/logout.php");
             renderTickets(ticket_data, result.ticket_selected);
             if (payment_attach_file) {
                 $("#payment_slip").attr("data-default-file", payment_attach_file);
