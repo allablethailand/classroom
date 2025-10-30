@@ -332,6 +332,29 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             margin-bottom: 30px;
         }
 
+        .logout-btn-section {
+            background: #e4405f;
+            color: #fff;
+            border-radius: 20px;
+            border: none;
+            box-shadow: 2px 8px 25px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            width: 100%;
+        }
+
+        .logout-section-header{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .section-login-title{
+            color: #fff;
+            font-weight: 600;
+        }
+
+
         .settings-button-container {
             position: absolute;
             top: 20px;
@@ -920,7 +943,6 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="col-6 col-md-4 col-lg-3 mb-4" style="padding-bottom: 1em;">
                     <div class="image-wrapper-display">
                         <img src="<?= GetUrl($image['file_path']); ?>" 
-                            
                              alt="Company Photo" 
                              class="img-fluid rounded shadow-sm company-display-image"
                              style="width: 100%; height: 150px; object-fit: cover;">
@@ -930,8 +952,12 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             </div>
         </div>
         <?php endif; ?>
-
-    </div>
+        
+        <div class="logout-btn-section">
+            <a href="logout" class="logout-section-header">
+                <h4 class="section-login-title">ออกจากระบบ</h4>
+            </a>
+        </div>
     </div>
 
     

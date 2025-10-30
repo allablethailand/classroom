@@ -13,6 +13,8 @@ $(document).ready(function() {
             url: '/classroom/study/actions/group.php?action=toggle_student',
             type: "GET",
             success: function(data) {
+
+                console.log(data);
                var $icon = $btn.find('[data-fa-i2svg]');
                 if ($icon.attr('data-icon') === 'address-book') {
                     $icon.removeClass('fa-address-book').addClass('fa-th-large') // replace 'fa-other-icon' with your off icon class
@@ -66,15 +68,4 @@ $(document).ready(function() {
     });
 
 });
-
-
-
-
-
-// console.log(classroom_group);
-// function view_group(group_id){
-// 	event.stopPropagation();
-//     console.log("GROUP 1")
-// 	$.redirect("../views/student.php", {group_id_id: group_id, need_manage: 'view'}, 'post', '_self');
-// }
 

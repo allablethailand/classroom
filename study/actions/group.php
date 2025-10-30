@@ -40,8 +40,8 @@ if ($_GET['action'] == 'toggle_student') {
 
     $columnCourseGroup = "cs.student_id, cs.student_firstname_th, cs.student_lastname_th, cs.student_nickname_th, cs.student_gender, cs.student_image_profile, cs.student_email, cs.student_mobile";
     $tableCourseGroup = "classroom_student_join std_join
-    LEFT JOIN classroom_student cs ON std_join.student_id = cs.student_id
-    LEFT JOIN classroom_template template ON std_join.classroom_id = template.classroom_id";
+    INNER JOIN classroom_student cs ON std_join.student_id = cs.student_id
+    INNER JOIN classroom_template template ON std_join.classroom_id = template.classroom_id";
     $whereCourseGroup = "where std_join.classroom_id = '{$cur_class}'";
 
     $student_list = select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);

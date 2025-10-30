@@ -38,6 +38,17 @@ $whereCount = "where classroom_id = '{$our_class}' AND group_id = '{$our_group}'
 
 $count_total = select_data($columnCount, $tableCount, $whereCount);
 $count_student = $count_total[0]['total_student'];
+
+
+$columnTeacher  = "COUNT(teacher_id) AS total_teacher";
+$tableTeacher = "classroom_teacher_join";
+$whereTeacher = "where classroom_id = '{$our_class}'";
+
+$count_total_teacher = select_data($columnTeacher, $tableTeacher, $whereTeacher);
+$count_teacher = $count_total_teacher[0]['total_teacher'];
+
+
+$all_role = getMemberRole();
 ?>
 
 <!doctype html>
@@ -92,6 +103,11 @@ $count_student = $count_total[0]['total_student'];
             <?php foreach ($classroom_group as $group): ?>
               <li><a href="#" class="group-filter" data-group-id="<?= $group['group_id'] ?>"><?= htmlspecialchars($group['group_name']) ?></a></li>
             <?php endforeach; ?>
+            <!-- TEACHER -->
+            <!-- <i class="fas fa-chalkboard-teacher"></i> -->
+
+            <!-- STAFF -->
+            <!-- <i class="fab fa-teamspeak"></i> -->
           </ul>
         </div>
         <button class="btn btn-default blur-shadow" id="toggleStudent" style="border: none;">
@@ -109,6 +125,8 @@ $count_student = $count_total[0]['total_student'];
             ไม่พบข้อมูลกลุ่มที่คุณอยู่
           </span>
         <?php endif; ?>
+        <div id="menu"></div>
+
 
         <?php foreach ($classroom_group as $item): ?>
           <div id="rowData" class="g-4 justify-content-center mb-bs-3">
@@ -147,7 +165,7 @@ $count_student = $count_total[0]['total_student'];
                     </div>
                     <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px;">
                       <h4 class="panel-title mb-0 text-truncate d-flex-bs">อาจารย์ผู้สอน</h4>
-                      <p class="text-secondary mb-0 small text-truncate-2">สมาชิกปัจจุบัน 3 คน</p>
+                      <p class="text-secondary mb-0 small text-truncate-2"><?php echo "สมาชิกปัจจุบัน ". $count_teacher  ." คน"; ?></p>
                     </div>
                   </div>
                 </div>
@@ -156,29 +174,32 @@ $count_student = $count_total[0]['total_student'];
           </div>
         </div>
 
-        <div class="g-4 justify-content-center mb-bs-3">
-          <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
-            <a href="staff?<?= $item['group_id'] ?>" class="blur-shadow" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
-              <div class="card group-card h-100 bg-teacher rounded-small">
-                <div class="panel-heading border-0" style="padding:0;">
-                  <div class="d-flex-bs align-items-center gap-3" style="flex-wrap: wrap;">
-                    <div class="group-icon-large" style="color: #FFF; flex-shrink: 0;">
-                      <div class="circle"><i class="fas fa-user-tie" style="color:#EED8DA; font-size: 2.5rem; margin-left:15px; margin-top: 10px;"></i></div>
-                    </div>
-                    <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px;">
-                      <h4 class="panel-title mb-0 text-truncate d-flex-bs">Staff Member</h4>
-                      <p class="text-secondary mb-0 small text-truncate-2">สมาชิกปัจจุบัน 3 คน</p>
+        <?php foreach($all_role as $roles): ?>
+
+          <div class="g-4 justify-content-center mb-bs-3" >
+            <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12" style="padding-bottom: 2rem;">
+              <a href="staff?<?= $roles['position_name_th'] ?>" class="blur-shadow" style="color: #F39865; font-family: 'Kanit', sans-serif !important;">
+                <div class="card group-card h-100 bg-teacher rounded-small">
+                  <div class="panel-heading border-0" style="padding:0;">
+                    <div class="d-flex-bs align-items-center gap-3" style="flex-wrap: wrap;">
+                      <div class="group-icon-large" style="color: #FFF; flex-shrink: 0;">
+                        <div class="circle"><i class="fas fa-user-tie" style="color:#EED8DA; font-size: 2.5rem; margin-left:15px; margin-top: 10px;"></i></div>
+                      </div>
+                      <div class="flex-grow-bs-1" style="min-width: 0; padding-top: 20px;">
+                        <h4 class="panel-title mb-0 text-truncate d-flex-bs"> <?= $roles['position_name_th']; ?> </h4>
+                        <p class="text-secondary mb-0 small text-truncate-2"><?php echo "สมาชิกปัจจุบัน " . $roles['count_role'] . " คน"; ?></p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </a>
+              </a>
+            </div>
           </div>
-        </div>
+
+        <?php endforeach ?>
       </div>
     </div>
 
-    <div id="menu"></div>
   </div>
 </div>
 
