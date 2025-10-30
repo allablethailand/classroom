@@ -35,6 +35,44 @@ function getStudentGroupId($student_id) {
 //     return $result ? $result[0]['course_id'] : null;
 // }
 
+// $our_class = $student_class[0]["classroom_id"];
+
+// $columnCourseGroup  = ", ctp.classroom_information, ctp.classroom_poster, ctp.classroom_student, count(student.join_id) as classroom_register,";
+// $tableCourseGroup = "classroom_template ctp";
+// $whereCourseGroup = "LEFT JOIN classroom_group cg ON ctp.classroom_id = cg.classroom_id WHERE ctp.classroom_id = '{$our_class}'";
+
+function getAlumniClassroom($student_id){
+    $result = select_data(
+        "template.classroom_id, template.classroom_name, COUNT(student.join_id) as classroom_register, classroom_student, COUNT(cg.group_id) AS group_count, template.classroom_information, template.classroom_poster",
+        "classroom_template template",
+        "LEFT JOIN classroom_group cg ON cg.classroom_id = template.classroom_id 
+        LEFT JOIN classroom_student_join student ON student.classroom_id = template.classroom_id 
+        WHERE student.status = 0 AND student.student_id = '{$student_id}'"
+    );
+
+
+    return !empty($result) ? $result : [];
+}
+
+ // SELECT 
+        //     template.classroom_id,
+        //     template.classroom_name,
+        //     concat(date_format(template.classroom_start, '%Y/%m/%d %H:%i'),' - ',date_format(template.classroom_end, '%Y/%m/%d %H:%i')) as classroom_date,
+        //     classroom_student,
+        //     classroom_type as classroom_mode,
+        //     count(student.join_id) as classroom_register,
+        //     date_format(template.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
+        //     CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
+        //     template.classroom_poster,
+        //     template.classroom_key,
+        //     '' as classroom_link,
+        //     template.classroom_promote
+        // FROM 
+        //     classroom_template template
+        
+        // WHERE 
+        //     template.comp_id = '{$_SESSION['comp_id']}' and template.status = 0
+
 function getStudentClassroomList($student_id) {
    // Adjusted SQL condition to separate JOIN and WHERE clauses if needed
     $result = select_data(
@@ -88,6 +126,8 @@ function getStudentClassroomGroupCount($group_id, $classroom_id)
     return !empty($result) ? $result : [];
 }
 
+
+
 function getTeacherList()
 {
     $result = select_data("ct.teacher_id,
@@ -123,5 +163,17 @@ function getStaffMemberlist($classroom_id)
     
     return !empty($result) ? $result : [];
 }
+
+function getMemberRole()
+{
+    $result = select_data("position_name_en, position_name_th, COUNT(*) AS count_role",
+    "classroom_position",
+    "WHERE status = 0 GROUP BY position_name_en, position_name_th");
+
+
+
+    return !empty($result) ? $result : [];
+}
+
 
 ?>

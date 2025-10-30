@@ -91,7 +91,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                         Tue, 9 Aug, 2025
                         </span>
                         <button id="select-date-btn" type="button" class="btn btn-warning"  style="font-size: 1rem;  cursor: pointer; border-radius: 50%;">
-                            <span><i class="fas fa-pen"></i></span>
+                            <span><i class="fas fa-calendar-alt"></i></span>
                         </button>
                         <input type="text" id="hidden-date-input" style="display: none;" />
                     </div>
