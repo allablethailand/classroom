@@ -60,6 +60,8 @@ $alumni_list = getStudentClassroomList($student_id);
     <script src="/dist/js/moment-with-locales.js"></script>
     <script src="/dist/daterangepicker/v2/daterangepicker.js"></script>
     <script src="/classroom/study/js/history.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+
     
     <style>
         /* body {
@@ -449,9 +451,9 @@ $alumni_list = getStudentClassroomList($student_id);
                     </div>
                 </div>
                 <div class="main-tabs">
-                    <button class="main-tab active" onclick="switchMainTab(this, 'summarize')">Summarize</button>
-                    <button class="main-tab" onclick="switchMainTab(this, 'ongoing')">Online</button>
-                    <button class="main-tab" onclick="switchMainTab(this, 'history')">Onsite</button>
+                    <button class="main-tab active" data-lang="summarize" onclick="switchMainTab(this, 'summarize')">Summarize</button>
+                    <button class="main-tab" data-lang="online" onclick="switchMainTab(this, 'ongoing')">Online</button>
+                    <button class="main-tab" data-lang="onsite" onclick="switchMainTab(this, 'history')">Onsite</button>
                     <button class="navbox-button" id="filterBtn" style="border: 1px solid #ccc" data-toggle="modal" data-target="#bottomModal">
                         <svg class="icon-svg" viewBox="0 0 14 13">
                             <g>
@@ -465,20 +467,20 @@ $alumni_list = getStudentClassroomList($student_id);
            
                 </div>
                 <div class="filter-tabs">
-                    <button class="filter-tab active" onclick="switchFilterTab(this, 'all')">
+                    <button class="filter-tab active" data-lang="alldata" onclick="switchFilterTab(this, 'all')">
                         All
                     </button>
-                    <button class="filter-tab-present" onclick="switchFilterTab(this, 'present')">
-                        Present <span class="badge-count">0</span>
+                    <button class="filter-tab-present"  onclick="switchFilterTab(this, 'present')">
+                        <p data-lang="present" style="display: inline;">Present</p> <span class="badge-count">0</span>
                     </button>
                     <button class="filter-tab-absent" onclick="switchFilterTab(this, 'absent')">
-                        Absent <span class="badge-count">0</span>
+                         <p data-lang="absent" style="display: inline;">Absent </p> <span class="badge-count">0</span>
                     </button>
                     <button class="filter-tab-early" onclick="switchFilterTab(this, 'early')">
-                       Early <span class="badge-count">0</span>
+                       <p data-lang="early" style="display: inline;">Early </p> <span class="badge-count">0</span>
                     </button>
                     <button class="filter-tab-late" onclick="switchFilterTab(this, 'late')">
-                        Late <span class="badge-count">0</span>
+                        <p data-lang="late" style="display: inline;">Late </p> <span class="badge-count">0</span>
                     </button>
                 </div>
             </div>
@@ -494,17 +496,17 @@ $alumni_list = getStudentClassroomList($student_id);
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                    <h4 class="modal-title">Filters</h4>
+                                    <h4 class="modal-title" data-lang="filters">Filters</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <h4 class="modal-title">Start Date:</h4>
+                                    <h4 class="modal-title" data-lang="startdate">Start Date:</h4>
                                     <div class="input-group date" data-provide="datepicker">
                                         <input type="text" id="start_date" class="form-control" style="margin-top:0px !important; margin-bottom:0px !important;">
                                         <div class="input-group-addon">
                                             <span><i class="fa fa-calendar"></i></span>
                                         </div>
                                     </div>
-                                     <h4 class="modal-title" style="margin-top: 10px;">End Date:</h4>
+                                     <h4 class="modal-title" style="margin-top: 10px;" data-lang="enddate">End Date:</h4>
                                     <div class="input-group date" data-provide="datepicker">
                                         <input type="text" id="end_date" class="form-control" style="margin-top:0px !important; margin-bottom:0px !important;">
                                         <div class="input-group-addon">
@@ -514,36 +516,36 @@ $alumni_list = getStudentClassroomList($student_id);
                                     <!-- Your modal content here -->
                                     <div class="daterange-filter">
                                         <div class="" style="margin-top: 10px;">
-                                            <p>Select Range</p>
+                                            <p data-lang="selectrange">Select Range</p>
                                         </div>
                                         <div class="" style="display: flex; flex-wrap: wrap; gap: 8px;">
                                             <div class="dropdown">
                                                 <div class="filter-tag active" id="filter-date-today" data-filter="today">
-                                                    <span class="filter-text">Today</span>
+                                                    <span class="filter-text" data-lang="today">Today</span>
                                                     <span class="remove-btn">×</span>
                                                 </div>
                                             </div>
                                             <div class="dropdown">
                                                 <div class="filter-tag" id="filter-date-lastmonth" data-filter="lastmonth">
-                                                    <span class="filter-text">Last month</span>
+                                                    <span class="filter-text" data-lang="lastmonth">Last month</span>
                                                     <span class="remove-btn">×</span>
                                                 </div>
                                             </div>
                                             <div class="dropdown">
                                                 <div class="filter-tag" id="filter-date-lastweek" data-filter="lastweek">
-                                                    <span class="filter-text">Last week</span>
+                                                    <span class="filter-text" data-lang="lastweek">Last week</span>
                                                     <span class="remove-btn">×</span>
                                                 </div>
                                             </div>
                                             <div class="dropdown">
                                                 <div class="filter-tag" id="filter-date-thismonth" data-filter="thismonth">
-                                                    <span class="filter-text">This month</span>
+                                                    <span class="filter-text" data-lang="thismonth">This month</span>
                                                     <span class="remove-btn">×</span>
                                                 </div>
                                             </div>
                                             <div class="dropdown">
                                                 <div class="filter-tag" id="filter-date-thisweek" data-filter="thisweek">
-                                                    <span class="filter-text">This week</span>
+                                                    <span class="filter-text" data-lang="thisweek">This week</span>
                                                     <span class="remove-btn">×</span>
                                                 </div>
                                             </div>
@@ -551,7 +553,7 @@ $alumni_list = getStudentClassroomList($student_id);
                                     </div>
 
                                     <div class="row" style="margin-inline: 0.5rem;">
-                                        <button id="searchDateRange" class="btn btn-primary btn-block">Search Result</button>
+                                        <button id="searchDateRange" class="btn btn-primary btn-block" data-lang="searchresults">Search Result</button>
                                     </div>
                                 </div>
                             </div>

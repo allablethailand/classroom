@@ -59,6 +59,8 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
         const dateRangeFromPHP = "<?php echo htmlspecialchars($dateRange, ENT_QUOTES); ?>";
     </script>
     <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
+
 
 
 </head>
