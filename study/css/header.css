@@ -313,3 +313,14 @@
         }
 
        
+        
+.page-slide-out-right {
+  animation: slideOutRight 0.5s forwards;
+}
+
+@keyframes slideOutRight {
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}

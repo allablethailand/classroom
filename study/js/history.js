@@ -7,6 +7,9 @@ var start;
 var end;
 var default_date;
 
+// const badge = document.querySelector('.filter-tab-present .badge-count');
+// badge.textContent = '0'
+
 function applyFilter(filter) {
     let startDate, endDate;
     const now = moment();

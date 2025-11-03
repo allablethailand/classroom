@@ -28,6 +28,7 @@
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/game.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
 </head>
 
 <body>
@@ -35,7 +36,7 @@
 
     <div class="main-content">
         <div class="container-fluid" style="margin-bottom: 7rem;">
-            <h1 class="heading-1" id="mini-game-title">Mini Game</h1>
+            <h1 class="heading-1" id="mini-game-title" data-lang="minigame">Mini Game</h1>
             <div class="divider-1">
                 <span></span>
             </div>
@@ -56,7 +57,7 @@
 </defs>
 </svg>
 
-                        <h4 style="margin-top: 10px;">Quiz</h4>
+                        <h4 style="margin-top: 10px;" data-lang="quiz">Quiz</h4>
 
                     </button>
                     <button class="action-card" id="btn-memory-game">
@@ -80,7 +81,7 @@
 </defs>
 </svg>
 
-                        <h4 style="margin-top: 10px;">Guess Who</h4>
+                        <h4 style="margin-top: 10px;" data-lang="guesswho">Guess Who</h4>
                     </button>
                     <button class="action-card" id="btn-card-flip-game">
                         <svg width="64" height="64" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -96,7 +97,7 @@
 </defs>
 </svg>
 
-                        <h4 style="margin-top: 10px;">Card Flip</h4>
+                        <h4 style="margin-top: 10px;" data-lang="cardflip">Card Flip</h4>
 
                     </button>
                     <button class="action-card" id="btn-wordle-game">
@@ -119,7 +120,7 @@
                             </defs>
                         </svg>
 
-                        <h4 style="margin-top: 10px;">Wordle</h4>
+                        <h4 style="margin-top: 10px;" data-lang="wordle">Wordle</h4>
                     </button>
                 </div>
             </div>

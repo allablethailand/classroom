@@ -54,24 +54,6 @@ function getAlumniClassroom($student_id){
     return !empty($result) ? $result : [];
 }
 
- // SELECT 
-        //     template.classroom_id,
-        //     template.classroom_name,
-        //     concat(date_format(template.classroom_start, '%Y/%m/%d %H:%i'),' - ',date_format(template.classroom_end, '%Y/%m/%d %H:%i')) as classroom_date,
-        //     classroom_student,
-        //     classroom_type as classroom_mode,
-        //     count(student.join_id) as classroom_register,
-        //     date_format(template.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
-        //     CONCAT(IFNULL(i.firstname,i.firstname_th),' ',IFNULL(i.lastname,i.lastname_th)) AS emp_create,
-        //     template.classroom_poster,
-        //     template.classroom_key,
-        //     '' as classroom_link,
-        //     template.classroom_promote
-        // FROM 
-        //     classroom_template template
-        
-        // WHERE 
-        //     template.comp_id = '{$_SESSION['comp_id']}' and template.status = 0
 
 function getStudentClassroomList($student_id) {
    // Adjusted SQL condition to separate JOIN and WHERE clauses if needed
@@ -126,8 +108,6 @@ function getStudentClassroomGroupCount($group_id, $classroom_id)
     return !empty($result) ? $result : [];
 }
 
-
-
 function getTeacherList()
 {
     $result = select_data("ct.teacher_id,
@@ -171,6 +151,38 @@ function getMemberRole()
     "WHERE status = 0 GROUP BY position_name_en, position_name_th");
 
 
+
+    return !empty($result) ? $result : [];
+}
+
+function getEarlyTimeAttendanceStatus($workshop_id, $student_id)
+{
+    $result = select_data("otw.workshop_id,
+    otw.workshop_name,
+    otw.date_start,
+    otw.time_start,
+    otw.time_end,
+    otwe.emp_id,
+    otwe.stamp_in,
+    otwe.stamp_out,
+    (CASE
+        WHEN TIME(otwe.stamp_in) < otw.time_start THEN TIMEDIFF(otw.time_start, TIME(otwe.stamp_in))
+        ELSE '00:00:00'
+    END) AS early_check_in,
+    (CASE
+        WHEN TIME(otwe.stamp_in) > otw.time_start THEN TIMEDIFF(TIME(otwe.stamp_in), otw.time_start)
+        ELSE '00:00:00'
+    END) AS late_check_in,
+    (CASE
+        WHEN TIME(otwe.stamp_out) < otw.time_end THEN TIMEDIFF(otw.time_end, TIME(otwe.stamp_out))
+        ELSE '00:00:00'
+    END) AS early_check_out,
+    (CASE
+        WHEN TIME(otwe.stamp_out) > otw.time_end THEN TIMEDIFF(TIME(otwe.stamp_out), otw.time_end)
+        ELSE '00:00:00'
+    END) AS late_check_out",
+    "ot_workshop otw LEFT JOIN ot_workshop_emp otwe ON otw.workshop_id = otwe.workshop_id",
+    "WHERE otwe.emp_id = '{$student_id}' AND otwe.workshop_id = '{$workshop_id}' AND otw.status = 0 AND otwe.status = 0");
 
     return !empty($result) ? $result : [];
 }

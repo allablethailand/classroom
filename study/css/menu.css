@@ -590,3 +590,15 @@
   border: none;
   padding-inline: 0.7rem;
 }
+
+
+body.page-slide-out-left {
+  animation: slideOutLeft 0.5s forwards;
+}
+
+@keyframes slideOutLeft {
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}

@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
     $(".notification").on("click", function () {
         var isExpanded = $(this).attr("aria-expanded") === "true";
         var $menu = $(this).next(".main-notification");
