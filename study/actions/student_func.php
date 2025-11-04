@@ -150,8 +150,6 @@ function getMemberRole()
     "classroom_position",
     "WHERE status = 0 GROUP BY position_name_en, position_name_th");
 
-
-
     return !empty($result) ? $result : [];
 }
 

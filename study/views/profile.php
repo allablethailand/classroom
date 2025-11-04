@@ -123,6 +123,8 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8"
         type="text/javascript"></script>
     <script src="/classroom/study/js/profile.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
+
     <style>
         /* 🎨 UI/UX Enhancements to match the image */
         /* body {
@@ -728,14 +730,14 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <?php if (!empty($classroom_name)): ?>
                     <p class="profile-company" style="font-size: 14px;">
                         <i class="fas fa-graduation-cap" style="color: #0089ff; "></i>
-                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;">หลักสูตร:</span>
+                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;" data-lang="program">หลักสูตร:</span>
                         <span><?= $classroom_name; ?></span>
                     </p>
                 <?php endif; ?>
                 <?php if (!empty($row_all["student_company"])): ?>
                     <p class="profile-company" style="font-size: 14px;">
                         <i class="fas fa-building" style="color: #0089ff;"></i>
-                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;">บริษัท:</span>
+                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;" data-lang="company" >บริษัท:</span>
                         <span><?= $row_all["student_company"]; ?></span>
                     </p>
                 <?php endif; ?>
@@ -753,7 +755,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             <div class="contact-section-card">
                 <div class="section-header-icon">
                     <i class="fas fa-address-book" style="font-size: 25px;"></i>
-                    <h3 class="section-title" style="padding-left:10px;">ช่องทางการติดต่อ</h3>
+                    <h3 class="section-title" style="padding-left:10px;" data-lang="contactinfo">ช่องทางการติดต่อ</h3>
                 </div>
                 <div class="contact-grid">
                     <?php if (!empty($row_all['student_mobile'])): ?>
@@ -803,13 +805,13 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-user-circle" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;">ข้อมูลส่วนตัว</h3>
+                <h3 class="section-title" style="padding-left:10px;" data-lang="personalinfo">ข้อมูลส่วนตัว</h3>
             </div>
             <div class="info-grid">
                 <div class="info-item-box">
                     <i class="fas fa-birthday-cake" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px; ">วันเกิด</strong>
+                        <strong style="padding-left:10px; " data-lang="birthdate">วันเกิด</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_birth_date"]) ? date("j F Y", strtotime($row_all["student_birth_date"])) : "-"; ?></span>
                     </div>
@@ -817,7 +819,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-church" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">ศาสนา</strong>
+                        <strong style="padding-left:10px;" data-lang="religion">ศาสนา</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_religion"]) ? $row_all["student_religion"] : "-"; ?></span>
                     </div>
@@ -825,7 +827,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-tint" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">กรุ๊ปเลือด</strong>
+                        <strong style="padding-left:10px;" data-lang="bloodtype">กรุ๊ปเลือด</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_bloodgroup"]) ? $row_all["student_bloodgroup"] : "-"; ?></span>
                     </div>
@@ -836,13 +838,13 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-heartbeat" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;">ไลฟ์สไตล์</h3>
+                <h3 class="section-title" style="padding-left:10px;" data-lang="lifestyle">ไลฟ์สไตล์</h3>
             </div>
             <div class="info-grid">
                 <div class="info-item-box">
                     <i class="fas fa-star" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">งานอดิเรก</strong>
+                        <strong style="padding-left:10px;" data-lang="hobbies">งานอดิเรก</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -850,7 +852,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-music" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
+                        <strong style="padding-left:10px;" data-lang="favoritemusic">ดนตรีที่ชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -858,7 +860,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-glass-cheers" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">เครื่องดื่มที่ชื่นชอบ</strong>
+                        <strong style="padding-left:10px;" data-lang="favoritedrink">เครื่องดื่มที่ชื่นชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -866,7 +868,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-film" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">หนังที่ชอบ</strong>
+                        <strong style="padding-left:10px;" data-lang="favoritemovie">หนังที่ชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -874,7 +876,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-bullseye" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">เป้าหมาย</strong>
+                        <strong style="padding-left:10px;" data-lang="lifegoal">เป้าหมาย</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -885,7 +887,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
          <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-building" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;">บริษัท</h3>
+                <h3 class="section-title" style="padding-left:10px;" data-lang="company">บริษัท</h3>
             </div>
             <div class="row">
                 <?php if (!empty($row_all["student_company_url"])): ?>
@@ -955,7 +957,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         
         <div class="logout-btn-section">
             <a href="logout" class="logout-section-header">
-                <h4 class="section-login-title">ออกจากระบบ</h4>
+                <h4 class="section-login-title" data-lang="logout">ออกจากระบบ</h4>
             </a>
         </div>
     </div>

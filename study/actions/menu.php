@@ -54,6 +54,8 @@ if (isset($_POST) && $_POST['action'] == 'getUpcomingClass') {
                 AND course.trn_date = '{$dateSchedule}' "
     );
 
+    
+
     $now = new DateTime();
 
     foreach ($scheduleItems as $item) {

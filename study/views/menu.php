@@ -88,7 +88,7 @@ session_start();
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <h4 style="margin-top: 10px;" data-lang="classroom">CLASSROOM</h4>
+                        <h4 style="margin-top: 10px; text-transform:uppercase;" data-lang="classroom">CLASSROOM</h4>
                     </a>
 
                     <!-- Calendar -->

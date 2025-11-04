@@ -15,7 +15,7 @@ $(document).ready(function() {
             success: function(data) {
 
                 console.log(data);
-               var $icon = $btn.find('[data-fa-i2svg]');
+                var $icon = $btn.find('[data-fa-i2svg]');
                 if ($icon.attr('data-icon') === 'address-book') {
                     $icon.removeClass('fa-address-book').addClass('fa-th-large') // replace 'fa-other-icon' with your off icon class
                         .attr('data-icon', 'fa-th-large'); // without 'fa-' prefix
@@ -31,7 +31,7 @@ $(document).ready(function() {
                     students.forEach(function(row) {
                         // Set default image if empty
                         var student_pic = row.student_image_profile ? row.student_image_profile : '../../../images/default.png';
-                        var group_logo = row.group_logo ? row.group_logo : '../../../images/default.png';
+                        var group_logo = row.group_logo ? row.group_logo : '../../../images/academy_logo.png';
                         var border_color = row.group_color ? row.group_color : '#ff8c00';
 
 
@@ -58,8 +58,8 @@ $(document).ready(function() {
                 html += '</div>';
 
                 // Insert the generated HTML into the page
-                $('#menu').html(html).toggle();
                 $('#rowData').toggle();
+                $('#menu').html(html).toggle();
             },
             error: function() {
                 alert('Failed to load data.');

@@ -463,7 +463,7 @@ if ($result) {
             if ($num_rows > 0) {
                 foreach ($students as $row) {
                     $student_pic = !empty($row['student_image_profile']) ? GetUrl($row['student_image_profile']) : '../../../images/default.png';
-                    $group_logo = !empty($row['group_logo']) ? GetUrl($row['group_logo']) : '../../../images/default.png';
+                    $group_logo = !empty($row['group_logo']) ? GetUrl($row['group_logo']) : '../../../images/logo_academy.png';
                     // กำหนดสีขอบรูปภาพเริ่มต้นเป็นสีส้ม ถ้าไม่มี group_color
                     $border_color = !empty($row['group_color']) ? htmlspecialchars($row['group_color']) : '#ff8c00';
                     ?>
@@ -495,7 +495,7 @@ if ($result) {
                                 <?= !empty($row['classroom_name']) ? htmlspecialchars($row['classroom_name']) : "-"; ?>
                             </p>
                             <p class="student-details highlight-text group-name-container">
-                                <img src="<?= htmlspecialchars($group_logo); ?>" alt="Group Logo">
+                                <img src="<?= htmlspecialchars($group_logo); ?>" onerror="this.src='/images/logo_academy.png'" alt="Group Logo">
                                 <?= !empty($row['group_name']) ? htmlspecialchars($row['group_name']) : "-"; ?>
                             </p>
                             <p class="student-details">

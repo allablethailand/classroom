@@ -419,7 +419,7 @@ $alumni_list = getStudentClassroomList($student_id);
     <div class="main-content">
         <!-- Tabs Section -->
          <div class="container-fluid">
-             <h1 class="heading-1" >ประวัติการเข้าเรียน</h1>
+             <h1 class="heading-1" data-lang="classhistory">ประวัติการเข้าเรียน</h1>
              <div class="divider-1">
                  <span></span>
              </div>
@@ -435,7 +435,7 @@ $alumni_list = getStudentClassroomList($student_id);
                         </svg>
                     </button> -->
                     <div style="display: flex; align-items: center;">
-                        <p>หลักสูตร: </p>
+                        <p data-lang="program">หลักสูตร: </p>
                     </div>
                     <div class="account-picker">
                        <select class="form-control" name="classroom_id" style="border: 1.8px solid #ccc; border-radius: 10px">
