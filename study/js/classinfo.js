@@ -117,9 +117,10 @@ function renderClassCard(course, classroomId) {
 
 
   return `
+  
       <div class="col-xs-12 col-md-4 col-lg-4" onclick="redirectCurreculum('${course.course_id}', '${course.course_type}', ${classroomId})">
         <div class="container-menu" style="margin-top: 10px; padding: 2rem;">
-
+          
           <div class="flex-box-container">
             <div class="header-menu">
               <div class="small-img-banner">

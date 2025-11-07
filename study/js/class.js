@@ -78,7 +78,7 @@ function renderCourseCard(course) {
   return `
     
 <div class="row" onclick="loadClass('${course.classroom_id}')">
-        <a href="classinfo" class="container-menu" style="margin-top: 10px; padding: 2rem;">
+        <a href="classroom_detail" class="container-menu" style="margin-top: 10px; padding: 2rem;">
         <div class="flex-box-container">
           <div class="header-menu">
             <div class="img-banner">

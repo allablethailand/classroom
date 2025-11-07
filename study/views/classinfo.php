@@ -62,8 +62,8 @@ $class_id = $_GET['classroom_id'];
                 <div class="row"></div>
             </div>
         </div>
-        <!-- <span lang="en">Instructors</span> -->
     </div>
+    <!-- <span lang="en">Instructors</span> -->
     
     <?php require_once 'component/footer.php'; ?>
 

@@ -68,7 +68,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
 
     <div class="main-transparent-content">
         <div class="container-fluid">
-             <h1 class="heading-1" data-lang="dailyschedule" >กำหนดการประจำวัน</h1>
+            <h1 class="heading-1" data-lang="dailyschedule" >กำหนดการประจำวัน</h1>
             <div class="divider-1">
                 <span></span>
             </div>

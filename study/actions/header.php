@@ -11,6 +11,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
     }
     $base_include .= "/" . $exl_path[1];
 }
+
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';

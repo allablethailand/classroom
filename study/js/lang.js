@@ -39,6 +39,7 @@ const translations = {
         thismonth: "This Month",
         thisweek: "This Week",
         searchresults: "Search Results",
+        classroomdetail: "Classroom Details",
         // settings
         profilesettings: "Profile Settings",
         profilesettingsdetail: "Update personal information and photo",
@@ -72,10 +73,11 @@ const translations = {
         company: "Company:",
         notspecified: "Not Specified",
         nobioyet: "No biography yet.",
+        certificate: "Certificate:",
         // Menu
         dailyschedule: "Daily Schedule",
         courseclasses: "Course Classes",
-        classhistory: "Class Attendance History",
+        classhistory: "Attendance History",
         classroom: "Classroom",
         groupmembers: "Group Members",
         staffmembers: "Staff Members",
@@ -137,6 +139,7 @@ const translations = {
         changepassword: "เปลี่ยนรหัสผ่าน",
         selcetrange: "เลือกช่วงเวลา", // Added to match EN key (typo)
         selectrange: "เลือกช่วงเวลา",
+        classroomdetail: "รายละเอียดห้องเรียน",
         // PROFILE PAGE
         contactinfo: "ข้อมูลการติดต่อ",
         program: "หลักสูตร:",
@@ -153,6 +156,7 @@ const translations = {
         company: "บริษัท:",
         notspecified: "ไม่ระบุ",
         nobioyet: "ยังไม่มีประวัติส่วนตัว",
+        certificate: "ประกาศนียบัตร:",
         // Menu
         dailyschedule: "กำหนดการประจำวัน",
         courseclasses: "หลักสูตรชั้นเรียน",
