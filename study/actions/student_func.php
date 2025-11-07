@@ -386,6 +386,21 @@ function getCourseStudent($alumni_id){
     return $course_trn_ids;
 }
 
+function getCourseDetail($classroom_id){
+    $result = select_data(
+        "cc.course_id,
+        cc.course_type,
+        cc.course_ref_id,
+        ct.classroom_name",
+        "classroom_course cc",
+        "LEFT JOIN classroom_student_join ctj ON cc.classroom_id = ctj.classroom_id
+        LEFT JOIN classroom_template ct ON cc.classroom_id = ct.classroom_id
+        WHERE cc.classroom_id = '{$classroom_id}' AND cc.status = 0 AND ctj.status = 0"
+    );
+
+    return !empty($result) ? $result : [];
+}
+
 
 
 function getCertificateListOfStudent($student_id){

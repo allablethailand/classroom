@@ -10,7 +10,7 @@ session_start();
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
-    <title>Classroom • ORIGAMI SYSTEM</title>
+    <title>Classroom Info • ORIGAMI SYSTEM</title>
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">

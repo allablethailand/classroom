@@ -35,8 +35,7 @@
         c.trn_to_time AS course_timeend,
         c.trn_by AS course_instructor,
         DATE_FORMAT(c.trn_date, '%d/%m/%Y') AS course_date,
-        LENGTH(REPLACE(trn_by, ' ', '')) - LENGTH(REPLACE(REPLACE(trn_by, ' ', ''), ',', '')) + 1 AS trn_count_by
-        ",
+        LENGTH(REPLACE(trn_by, ' ', '')) - LENGTH(REPLACE(REPLACE(trn_by, ' ', ''), ',', '')) + 1 AS trn_count_by",
         "classroom_course AS cc JOIN ot_training_list AS c on cc.course_ref_id = c.trn_id",
         "WHERE cc.classroom_id = '{$class_id}' 
             AND cc.status = 0"

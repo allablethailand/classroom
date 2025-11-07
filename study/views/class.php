@@ -36,15 +36,15 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
 
 // var_dump($classroom_group);
 
-    $segments = ['complete', 'complete', 'complete', 'complete', 'complete', 'upcoming', 'upcoming', 'upcoming',];
-    $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming',];
-    $old_segment = '<div class="progress-container">
-                                <div class="progress-bar-new">
-                                    <?php foreach ($segments as $index => $segmentType): ?>
-                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>';
+$segments = ['complete', 'complete', 'complete', 'complete', 'complete', 'upcoming', 'upcoming', 'upcoming',];
+$segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming',];
+$old_segment = '<div class="progress-container">
+                            <div class="progress-bar-new">
+                                <?php foreach ($segments as $index => $segmentType): ?>
+                                    <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>';
     
 ?>
 
@@ -98,7 +98,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
 
             <div class="g-4 justify-content-center mb-bs-3 " style="margin-top: 2rem;">
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                    <a href="classroom_detail?classroom_id=<?php echo $item['classroom_id']; ?>" style="font-family: 'Kanit', sans-serif !important;">
+                    <a href="class_subinfo?classroom_id=<?php echo $item['classroom_id']; ?>" style="font-family: 'Kanit', sans-serif !important;">
                         <div class="card group-card h-100 bg-element-earth-two rounded-small">
                              <div class="flex-box-container">
                                 <div class="header-menu">

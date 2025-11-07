@@ -3,9 +3,9 @@
 
 /* CSS Variables */
 :root {
-  --color-primary: #2D5F5F;
+  --color-primary: #ff8c5a;
   --color-primary-50: #F0F9F9;
-  --color-primary-600: #245050;
+  --color-primary-600: #c55a2d;
   --color-secondary: #4A7C7C;
   --color-secondary-600: #305050;
   --color-background: #FAFBFC;
@@ -38,7 +38,7 @@ body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
   line-height: 1.6;
-  min-height: 100vh;
+  min-height: 130vh;
 }
 
 button { cursor: pointer; font-family: inherit; border: none; background: none; }
@@ -129,7 +129,7 @@ img { display: block; max-width: 100%; height: auto; }
 .h-10 { height: 2.5rem; }
 .h-48 { height: 12rem; }
 .h-full { height: 100%; }
-.min-h-screen { min-height: 100vh; }
+.min-h-screen { min-height: 140vh; }
 .min-w-0 { min-width: 0; }
 .max-w-6xl { max-width: 72rem; }
 .max-w-sm { max-width: 24rem; }

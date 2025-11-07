@@ -112,13 +112,9 @@
         case '/classroom/study/classinfo':
             require __DIR__.'/views/classinfo.php';
         break;
-        case '/classroom/study/classinfo/':
-        case '/classroom/study/classinfo':
-            require __DIR__.'/views/classinfo.php';
-        break;
-        case '/classroom/study/classroom_detail/':
-        case '/classroom/study/classroom_detail':
-            require __DIR__.'/views/classroom_detail.php';
+        case '/classroom/study/class_subinfo/':
+        case '/classroom/study/class_subinfo':
+            require __DIR__.'/views/class_subinfo.php';
         break;
         case '/classroom/study/history/':
         case '/classroom/study/history':
