@@ -12,6 +12,7 @@ function getStudentId() {
     return isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : null;
 }
 
+
 function getStudentClassroomId($student_id) {
     $result = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
     return $result ? $result[0]['classroom_id'] : null;

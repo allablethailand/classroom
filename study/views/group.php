@@ -15,6 +15,15 @@ define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
 require_once $base_include . '/classroom/study/actions/student_func.php';
+require_once $base_include.'/actions/func.php';
+  $fsData = getBucketMaster();
+  $filesystem_user = $fsData['fs_access_user'];
+  $filesystem_pass = $fsData['fs_access_pass'];
+  $filesystem_host = $fsData['fs_host'];
+  $filesystem_path = $fsData['fs_access_path'];
+  $filesystem_type = $fsData['fs_type'];
+  $fs_id = $fsData['fs_id'];
+setBucket($fsData);
 
 $std_id = $_SESSION['student_id'];
 
@@ -144,7 +153,7 @@ $all_role_count = $all_role[0]['count_role'];
               <div class="group-card-content">
                 <div class="group-header">
                   <div class="group-logo" style="background: linear-gradient(135deg, <?= $item['group_color'] ?>33, <?= $item['group_color'] ?>66);">
-                    <img src="<?= $item['group_logo'] ?>" alt="<?= $item['group_name'] ?>" onerror="this.src='../../../images/booth.png'">
+                    <img src="<?php echo GetUrl($item['group_logo']); ?>" alt="<?= $item['group_name'] ?>" onerror="this.src='../../../images/booth.png'">
                   </div>
                   <div class="group-head-name">
                     <h3 class="group-title"><?= $item["group_name"] ?></h3>
