@@ -1,7 +1,29 @@
 <?php
-session_start();
-require_once("../../lib/connect_sqli.php");
-global $mysqli;
+  session_start();
+    $base_include = $_SERVER['DOCUMENT_ROOT'];
+    $base_path = '';
+    if($_SERVER['HTTP_HOST'] == 'localhost'){
+       $request_uri = $_SERVER['REQUEST_URI'];
+       $exl_path = explode('/',$request_uri);
+       if(!file_exists($base_include."/dashboard.php")){
+           $base_path .= "/".$exl_path[1];
+       }
+       $base_include .= "/".$exl_path[1];
+    }
+    DEFINE('base_path', $base_path);
+    DEFINE('base_include', $base_include);
+	require_once($base_include."/lib/connect_sqli.php");
+	require_once($base_include."/actions/func.php");
+	require_once($base_include."/classroom/study/actions/student_func.php");
+
+    $fsData = getBucketMaster();
+    $filesystem_user = $fsData['fs_access_user'];
+    $filesystem_pass = $fsData['fs_access_pass'];
+    $filesystem_host = $fsData['fs_host'];
+    $filesystem_path = $fsData['fs_access_path'];
+    $filesystem_type = $fsData['fs_type'];
+    $fs_id = $fsData['fs_id'];
+	setBucket($fsData);
 
 // Get the student_id from the session
 $student_id = $_SESSION['student_id'];
@@ -88,6 +110,14 @@ while ($row_company_image = $result_company_files->fetch_assoc()) {
 $stmt_company_files->close();
 // ****************************************************
 
+// $course_id = '58';
+
+// echo $student_id;
+
+$test = getCertificateListOfStudent($student_id); // เรียกใช้ฟังก์ชันเพื่อดึงข้อมูลประกาศนียบัตร
+// FIX SOON.
+// var_dump($test);
+
 // กำหนดสีขอบรูปภาพ
 $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_all['group_color']) : '#ff8c00';
 ?>
@@ -103,8 +133,8 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="/dist/css/dataTables.bootstrap.min.css">
-    <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="/dist/css/style.css?v=<?php echo time(); ?>">
+    <!-- <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>"> -->
+    <!-- <link rel="stylesheet" href="/dist/css/style.css?v=<?php echo time(); ?>"> -->
     <link rel="stylesheet" href="/dist/css/sweetalert.css">
     <link rel="stylesheet" href="/dist/css/select2.min.css">
     <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
@@ -123,15 +153,16 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8"
         type="text/javascript"></script>
     <script src="/classroom/study/js/profile.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
+
     <style>
         /* 🎨 UI/UX Enhancements to match the image */
-        /* body {
+        body {
             background-color: #f0f2f5;
             font-family: 'Kanit', sans-serif;
             color: #333;
-            min-height: auto;
-            overflow-y: auto;
-        } */
+            min-height: 130vh;
+        }
 
         .profile-header-container {
             background: url('https://www.trandar.com//public/news_img/photo_2025-09-03_17-51-32.jpg') no-repeat center center;
@@ -655,8 +686,35 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     background: rgba(255, 255, 255, 0.4); /* ทำให้พื้นหลังสว่างขึ้นเมื่อโฮเวอร์ */
     transform: translateY(-50%) scale(1.1); /* ขยายขนาดเล็กน้อยเมื่อโฮเวอร์ */
 }
+
+.img-container {
+  position: relative;
+  width: 50px; /* or the width of the image */
+  height: 50px; /* or the height of the image */
+}
+
+.img-container img {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.center-text {
+  position: absolute;
+  top: 45%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  width: 100%;
+}
     </style>
 </head>
+
+<!-- BRONZE color: #D17840; -->
 
 <body>
     <?php require_once("component/header.php") ?>
@@ -720,7 +778,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
         </p>
     </div>
-    <div class="main-content">
+    <div class="main-content-no-bg">
             <div class="page-container main-content-container">
 
         <div class="profile-card" style="padding: 10px;">
@@ -728,14 +786,14 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <?php if (!empty($classroom_name)): ?>
                     <p class="profile-company" style="font-size: 14px;">
                         <i class="fas fa-graduation-cap" style="color: #0089ff; "></i>
-                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;">หลักสูตร:</span>
+                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;" data-lang="program">หลักสูตร:</span>
                         <span><?= $classroom_name; ?></span>
                     </p>
                 <?php endif; ?>
                 <?php if (!empty($row_all["student_company"])): ?>
                     <p class="profile-company" style="font-size: 14px;">
                         <i class="fas fa-building" style="color: #0089ff;"></i>
-                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;">บริษัท:</span>
+                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;" data-lang="company" >บริษัท:</span>
                         <span><?= $row_all["student_company"]; ?></span>
                     </p>
                 <?php endif; ?>
@@ -746,6 +804,76 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                         <span><?= $row_all["student_position"]; ?></span>
                     </p>
                 <?php endif; ?>
+                
+                <?php
+                    echo '<p class="profile-company" style="display:block; font-size:14px; width:100%;">';
+                    echo '<i class="fas fa-medal" style="color:#0089ff;"></i> ';
+                    echo '<span style="font-size:16px; font-weight:bold; padding-right:.3em;" data-lang="certificate">ประกาศนียบัตร:</span><div style="display:flex; margin-bottom:10px; gap:15px;">';
+
+                    foreach ($test as $certName => $certData) {
+                        $count = $certData['count'];
+                        $details = $certData['details'];
+                        // Sample usage of certification background image or icon based on certName or details
+                        $imgSrc = '';
+                        
+                        // Normalize certificate name to lowercase
+                        $certNameLower = strtolower($certName);
+
+                        // Extract the keyword you want to switch on, e.g., "bronze", "gold", etc.
+                        // This example assumes the keyword is the last word or you can parse accordingly.
+                        if (strpos($certNameLower, 'bronze') !== false) {
+                            $certLevel = 'bronze';
+                        } elseif (strpos($certNameLower, 'silver') !== false) {
+                            $certLevel = 'silver';
+                        } elseif (strpos($certNameLower, 'gold') !== false) {
+                            $certLevel = 'gold';
+                        } elseif (strpos($certNameLower, 'platinum') !== false) {
+                            $certLevel = 'platinum';
+                        } elseif (strpos($certNameLower, 'diamond') !== false) {
+                            $certLevel = 'diamond';
+                        } else {
+                            $certLevel = 'default';
+                        }
+
+                        switch ($certLevel) {
+                            case 'bronze':
+                                $imgSrc = '/images/certification_ball/bronze.png';
+                                $fontColor = '#D17840;';
+                                break;
+                            case 'gold':
+                                $imgSrc = '/images/certification_ball/gold.png';
+                                $fontColor = '#AD7A31;';
+                                break;
+                            case 'platinum':
+                                $imgSrc = '/images/certification_ball/platinum.png';
+                                $fontColor = '#777777;';                                
+                                break;
+                            case 'diamond':
+                                $imgSrc = '/images/certification_ball/diamond.png';
+                                $fontColor = '#DDDDDD';
+                                break;
+                            default:
+                                $imgSrc = '/images/certification_ball/default.png';
+                                $fontColor = '';
+                                break;
+                        }
+
+                        echo '<div class="img-container" style="display:flex; align-items:center;">';
+                        if ($imgSrc) {
+                            echo '<img src="' . $imgSrc . '" width="50" height="50" alt="' . htmlspecialchars($certName) . '">';
+                        }
+                        echo '<div class="center-text" style="padding-left: 10px; font-weight: bold; font-size: 20px; color: '. $fontColor. '">' . $count . '</div></div>';
+                    }
+                    echo '</p></div>';
+                    ?>
+                <!-- <p class="profile-company" style="display:block; font-size: 14px;" style="width: 100%;">
+                    <i class="fas fa-medal" style="color: #0089ff; "></i>
+                    <span style="font-size: 16px; font-weight: bold; padding-right: .3em; " data-lang="certificate">ประกาศนียบัตร:</span>
+                    <div class="img-container" style="display:flex; justify-content:center;" >
+                        <img src="/images/certification_ball/bronze.png" width="50px; height="50px;" alt="Bronze Certificate">
+                        <div class="center-text">P.</div>
+                    </div>
+                </p> -->
             </div>
         </div>
 
@@ -753,7 +881,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             <div class="contact-section-card">
                 <div class="section-header-icon">
                     <i class="fas fa-address-book" style="font-size: 25px;"></i>
-                    <h3 class="section-title" style="padding-left:10px;">ช่องทางการติดต่อ</h3>
+                    <h3 class="section-title" style="padding-left:10px;" data-lang="contactinfo">ช่องทางการติดต่อ</h3>
                 </div>
                 <div class="contact-grid">
                     <?php if (!empty($row_all['student_mobile'])): ?>
@@ -803,13 +931,13 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-user-circle" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;">ข้อมูลส่วนตัว</h3>
+                <h3 class="section-title" style="padding-left:10px;" data-lang="personalinfo">ข้อมูลส่วนตัว</h3>
             </div>
             <div class="info-grid">
                 <div class="info-item-box">
                     <i class="fas fa-birthday-cake" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px; ">วันเกิด</strong>
+                        <strong style="padding-left:10px; " data-lang="birthdate">วันเกิด</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_birth_date"]) ? date("j F Y", strtotime($row_all["student_birth_date"])) : "-"; ?></span>
                     </div>
@@ -817,7 +945,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-church" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">ศาสนา</strong>
+                        <strong style="padding-left:10px;" data-lang="religion">ศาสนา</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_religion"]) ? $row_all["student_religion"] : "-"; ?></span>
                     </div>
@@ -825,7 +953,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-tint" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">กรุ๊ปเลือด</strong>
+                        <strong style="padding-left:10px;" data-lang="bloodtype">กรุ๊ปเลือด</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_bloodgroup"]) ? $row_all["student_bloodgroup"] : "-"; ?></span>
                     </div>
@@ -836,13 +964,13 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-heartbeat" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;">ไลฟ์สไตล์</h3>
+                <h3 class="section-title" style="padding-left:10px;" data-lang="lifestyle">ไลฟ์สไตล์</h3>
             </div>
             <div class="info-grid">
                 <div class="info-item-box">
                     <i class="fas fa-star" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">งานอดิเรก</strong>
+                        <strong style="padding-left:10px;" data-lang="hobbies">งานอดิเรก</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -850,7 +978,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-music" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
+                        <strong style="padding-left:10px;" data-lang="favoritemusic">ดนตรีที่ชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -858,7 +986,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-glass-cheers" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">เครื่องดื่มที่ชื่นชอบ</strong>
+                        <strong style="padding-left:10px;" data-lang="favoritedrink">เครื่องดื่มที่ชื่นชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -866,7 +994,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-film" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">หนังที่ชอบ</strong>
+                        <strong style="padding-left:10px;" data-lang="favoritemovie">หนังที่ชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -874,7 +1002,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 <div class="info-item-box">
                     <i class="fas fa-bullseye" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">เป้าหมาย</strong>
+                        <strong style="padding-left:10px;" data-lang="lifegoal">เป้าหมาย</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : "ยังไม่ได้ระบุ"; ?></span>
                     </div>
@@ -885,7 +1013,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
          <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-building" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;">บริษัท</h3>
+                <h3 class="section-title" style="padding-left:10px;" data-lang="company">บริษัท</h3>
             </div>
             <div class="row">
                 <?php if (!empty($row_all["student_company_url"])): ?>
@@ -955,7 +1083,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         
         <div class="logout-btn-section">
             <a href="logout" class="logout-section-header">
-                <h4 class="section-login-title">ออกจากระบบ</h4>
+                <h4 class="section-login-title" data-lang="logout">ออกจากระบบ</h4>
             </a>
         </div>
     </div>

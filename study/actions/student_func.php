@@ -1,7 +1,5 @@
 <?php
 
-
-
 // iniate session start before calling this function
 function recheckUserSession() {
     if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
@@ -49,7 +47,6 @@ function getAlumniClassroom($student_id){
         LEFT JOIN classroom_student_join student ON student.classroom_id = template.classroom_id 
         WHERE student.status = 0 AND student.student_id = '{$student_id}'"
     );
-
 
     return !empty($result) ? $result : [];
 }
@@ -146,17 +143,18 @@ function getStaffMemberlist($classroom_id)
 
 function getMemberRole()
 {
-    $result = select_data("position_name_en, position_name_th, COUNT(*) AS count_role",
+    $result = select_data("position_id, position_name_en, position_name_th, COUNT(*) AS count_role",
     "classroom_position",
     "WHERE status = 0 GROUP BY position_name_en, position_name_th");
-
-
 
     return !empty($result) ? $result : [];
 }
 
 function getEarlyTimeAttendanceStatus($workshop_id, $student_id)
 {
+
+    $emp_id = getStudentEmpId($student_id);
+
     $result = select_data("otw.workshop_id,
     otw.workshop_name,
     otw.date_start,
@@ -182,9 +180,282 @@ function getEarlyTimeAttendanceStatus($workshop_id, $student_id)
         ELSE '00:00:00'
     END) AS late_check_out",
     "ot_workshop otw LEFT JOIN ot_workshop_emp otwe ON otw.workshop_id = otwe.workshop_id",
-    "WHERE otwe.emp_id = '{$student_id}' AND otwe.workshop_id = '{$workshop_id}' AND otw.status = 0 AND otwe.status = 0");
+    "WHERE otwe.emp_id = '{$emp_id}' AND otwe.workshop_id = '{$workshop_id}' AND otw.status = 0 AND otwe.status = 0");
 
     return !empty($result) ? $result : [];
+}
+
+function getEarlyTestAttendanceStatus($workshop_id, $student_id)
+{
+    $emp_id = getStudentEmpId($student_id);
+
+    $result = select_data("otw.workshop_id,
+    otw.workshop_name,
+    otw.date_start,
+    otw.time_start,
+    otw.time_end,
+    otwe.emp_id,
+    otwe.stamp_in,
+    otwe.stamp_out,
+    (CASE
+        WHEN TIME(otwe.stamp_in) < otw.time_start THEN TIMEDIFF(otw.time_start, TIME(otwe.stamp_in))
+        ELSE '00:00:00'
+    END) AS early_check_in,
+    (CASE
+        WHEN TIME(otwe.stamp_in) > otw.time_start THEN TIMEDIFF(TIME(otwe.stamp_in), otw.time_start)
+        ELSE '00:00:00'
+    END) AS late_check_in,
+    (CASE
+        WHEN TIME(otwe.stamp_out) < otw.time_end THEN TIMEDIFF(otw.time_end, TIME(otwe.stamp_out))
+        ELSE '00:00:00'
+    END) AS early_check_out,
+    (CASE
+        WHEN TIME(otwe.stamp_out) > otw.time_end THEN TIMEDIFF(TIME(otwe.stamp_out), otw.time_end)
+        ELSE '00:00:00'
+    END) AS late_check_out",
+    "ot_workshop otw LEFT JOIN ot_workshop_emp otwe ON otw.workshop_id = otwe.workshop_id",
+    "WHERE otwe.emp_id = '{$emp_id}' AND otwe.workshop_id = '{$workshop_id}' AND otw.status = 0 AND otwe.status = 0");
+
+    return !empty($result) ? $result : [];
+}
+
+function getCertificateListStudent($student_id){
+
+    $result = select_data(
+        "st.stamp_id,
+        CONCAT(COALESCE(csi.student_firstname_th, ''), ' ', COALESCE(csi.student_lastname_th, '')) AS emp_name,
+        oc.certification_name,
+        CASE 
+            WHEN oc.certification_code IS NULL AND st.certification_no IS NOT NULL THEN st.certification_no
+            WHEN oc.certification_code IS NOT NULL AND st.certification_no IS NOT NULL THEN CONCAT(st.certification_no, '-', oc.certification_code)
+            ELSE ''
+        END AS certification_no,
+        DATE_FORMAT(st.certification_date, '%Y/%m/%d %H:%i:%s') AS certification_date,
+        IFNULL(table_progress.learn_percent, 0) AS completion_percentage,
+        cfs.file_path,
+        csi.student_gender,
+        '' AS emp_avatar,
+        csj.emp_id,
+        csj.comp_id,
+        st.certification_id",
+        "ot_certification_stamp st
+        INNER JOIN classroom_student_join csj ON csj.emp_id = st.emp_id
+        INNER JOIN classroom_student csi ON csi.student_id = csj.student_id
+        LEFT JOIN classroom_file_student cfs ON cfs.student_id = csj.student_id
+        LEFT JOIN ot_certification_course oc ON oc.certification_id = st.certification_id
+        LEFT JOIN
+        (
+            SELECT 
+                emp_id,
+                ROUND(
+                    SUM(
+                        CASE
+                            WHEN topic_percent_pass IS NULL OR topic_percent_pass = '' OR topic_percent_pass = 0 THEN 
+                                CASE
+                                    WHEN learn_flag = 'Y' THEN 100
+                                    WHEN learn_flag = 'W' THEN 50
+                                    ELSE 0
+                                END
+                            WHEN topic_percent_pass > 0 THEN 
+                                CASE
+                                    WHEN learn_flag = 'Y' THEN 100
+                                    WHEN learn_flag IN ('W', 'N') OR learn_flag IS NULL THEN COALESCE(topic_percent_value, 0)
+                                    ELSE 0
+                                END
+                            ELSE 0
+                        END
+                    ) / COUNT(*), 2
+                ) AS learn_percent
+            FROM 
+                ot_learning_plan
+            WHERE 
+                status = 0
+            GROUP BY 
+                emp_id
+        ) table_progress ON table_progress.emp_id = csj.emp_id",
+        "WHERE 
+            csj.student_id = '{$student_id}' 
+            AND st.status = 0 
+            AND oc.status = 0
+        GROUP BY
+            csj.student_id, st.certification_id");
+            
+    return !empty($result) ? $result : [];
+}
+
+
+function getCertificateListByCourse($student_id, $course_id){
+   $table = "
+        SELECT 
+            st.stamp_id,
+            CONCAT(COALESCE(csi.student_firstname_th, ''), ' ', COALESCE(csi.student_lastname_th, '')) AS emp_name,
+            oc.certification_name,
+            CASE 
+                WHEN oc.certification_code IS NULL AND st.certification_no IS NOT NULL THEN st.certification_no
+                WHEN oc.certification_code IS NOT NULL AND st.certification_no IS NOT NULL THEN CONCAT(st.certification_no, '-', oc.certification_code)
+                ELSE ''
+            END AS certification_no,
+            DATE_FORMAT(st.certification_date, '%Y/%m/%d %H:%i:%s') AS certification_date,
+            IFNULL(table_progress.learn_percent, 0) AS completion_percentage,
+            cfs.file_path,
+            csi.student_gender,
+            '' AS emp_avatar,
+            csj.emp_id,
+            csj.comp_id,
+            st.certification_id
+        FROM 
+            ot_certification_stamp st
+        INNER JOIN 
+            classroom_student_join csj ON csj.emp_id = st.emp_id
+        INNER JOIN 
+            classroom_student csi ON csi.student_id = csj.student_id
+        LEFT JOIN 
+            classroom_file_student cfs ON cfs.student_id = csj.student_id
+        LEFT JOIN
+            ot_certification_course oc ON oc.certification_id = st.certification_id
+        LEFT JOIN
+        (
+            SELECT 
+                emp_id,
+                ROUND(
+                    SUM(
+                        CASE
+                            WHEN topic_percent_pass IS NULL OR topic_percent_pass = '' OR topic_percent_pass = 0 THEN 
+                                CASE
+                                    WHEN learn_flag = 'Y' THEN 100
+                                    WHEN learn_flag = 'W' THEN 50
+                                    ELSE 0
+                                END
+                            WHEN topic_percent_pass > 0 THEN 
+                                CASE
+                                    WHEN learn_flag = 'Y' THEN 100
+                                    WHEN learn_flag IN ('W', 'N') OR learn_flag IS NULL THEN COALESCE(topic_percent_value, 0)
+                                    ELSE 0
+                                END
+                            ELSE 0
+                        END
+                    ) / COUNT(*), 2
+                ) AS learn_percent
+            FROM 
+                ot_learning_plan
+            WHERE 
+                trn_id = '{$course_id}'
+                AND status = 0
+            GROUP BY 
+                emp_id
+        ) table_progress ON table_progress.emp_id = csj.emp_id
+        WHERE 
+            csj.student_id = '{$student_id}' 
+            AND st.status = 0 
+            AND oc.status = 0
+        GROUP BY 
+            csj.student_id, st.certification_id";
+    
+    return $table;
+}
+
+function getStudentEmpId($student_id){
+    $result = select_data(
+        "emp_id",
+        "classroom_student_join",
+        "WHERE student_id = '{$student_id}'"
+    );
+
+    return !empty($result) ? $result[0]['emp_id'] : null;
+}
+
+function getCourseStudent($alumni_id){
+    $result = select_data(
+        "*",
+        "classroom_course",
+        "WHERE classroom_id = '{$alumni_id}' AND status = 0"
+    );
+
+    $course_trn_ids = []; // Initialize as empty array
+
+    if (!empty($result)) {
+        foreach ($result as $row) {
+            // Append each row's course_type and course_ref_id as an associative array
+            $course_trn_ids[] = [
+                'course_type' => $row['course_type'], 
+                'course_trn' => $row['course_ref_id']
+            ];
+        }
+    }
+
+    return $course_trn_ids;
+}
+
+function getCourseDetail($classroom_id){
+    $result = select_data(
+        "cc.course_id,
+        cc.course_type,
+        cc.course_ref_id,
+        ct.classroom_name",
+        "classroom_course cc",
+        "LEFT JOIN classroom_student_join ctj ON cc.classroom_id = ctj.classroom_id
+        LEFT JOIN classroom_template ct ON cc.classroom_id = ct.classroom_id
+        WHERE cc.classroom_id = '{$classroom_id}' AND cc.status = 0 AND ctj.status = 0"
+    );
+
+    return !empty($result) ? $result : [];
+}
+
+
+
+function getCertificateListOfStudent($student_id){
+
+    $emp_id = getStudentEmpId($student_id);
+
+    $alumni_id = getStudentClassroomId($student_id);
+
+    $trn_course = getCourseStudent($alumni_id);
+
+    $course_ids = array_column($trn_course, 'course_trn'); // get course_ref_ids
+    $course_search = implode(',', $course_ids);
+    $columnCert = "cert.certification_id,
+                cert.certification_level,
+                cert.certification_name,
+                cert.certification_description,
+                cert.certification_background,
+                stamp.content_pass,
+                stamp.content_pass_val,
+                stamp.video_quality,
+                stamp.video_quality_val,
+                stamp.challenge_pass,
+                stamp.challenge_pass_val,
+                stamp.event_pass,
+                stamp.event_pass_val,
+                date_format(stamp.certification_date,'%Y/%m/%d %H:%i:%s') as certification_date,
+                stamp.certification_no,
+                cert.certification_code,
+                stamp.certification_dowload,
+                stamp.trn_id as course_id";
+    $tableCert = "ot_certification_stamp stamp";
+    $whereCert = "left join 
+                    ot_certification_course cert on cert.certification_id = stamp.certification_id 
+                where 
+                    stamp.trn_id in ($course_search) and stamp.emp_id = '{$emp_id}' and stamp.status = 0 and stamp.certification_no is not null
+                group by 
+                    cert.certification_id
+                order by 
+                    certification_level asc";
+
+    $result = select_data($columnCert,$tableCert,$whereCert);
+
+    $groupedCertificates = [];
+    foreach ($result as $cert) {
+        $name = $cert['certification_name'];
+        if (!isset($groupedCertificates[$name])) {
+            $groupedCertificates[$name] = [
+                'count' => 0,
+                'details' => $cert
+            ];
+        }
+        $groupedCertificates[$name]['count']++;
+    }
+
+    return $groupedCertificates;
 }
 
 

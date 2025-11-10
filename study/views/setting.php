@@ -121,17 +121,18 @@ if (isset($_SESSION['student_id'])) {
 ?>
 <!doctype html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
-    <title>Setting • ORIGAMI SYSTEM</title>
-    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
-    <style>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
+        <title>Setting • ORIGAMI SYSTEM</title>
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+        <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
+        <style>
         body {
             background-color: #f0f2f5;
             font-family: 'Kanit', sans-serif;
@@ -331,8 +332,6 @@ if (isset($_SESSION['student_id'])) {
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
-    <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="/classroom/study/js/lang.js?v=<?php echo time(); ?>">
     <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
 
 </head>
@@ -352,7 +351,7 @@ if (isset($_SESSION['student_id'])) {
                         </div>
                         <div class="setting-text">
                             <h4 class="title" data-lang="profilesettings">ตั้งค่าโปรไฟล์</h4>
-                            <p class="description">อัปเดตข้อมูลส่วนตัวและรูปภาพ</p>
+                            <p class="description" data-lang="profilesettingsdetail">อัปเดตข้อมูลส่วนตัวและรูปภาพ</p>
                         </div>
                         <i class="fas fa-chevron-right"></i>
                     </a>
@@ -363,7 +362,7 @@ if (isset($_SESSION['student_id'])) {
                         </div>
                         <div class="setting-text">
                             <h4 class="title" data-lang="privacysettings">ตั้งค่าความเป็นส่วนตัว</h4>
-                            <p class="description">จัดการสิทธิ์การเข้าถึงข้อมูลของคุณ</p>
+                            <p class="description" data-lang="privacysettingsdetail">จัดการสิทธิ์การเข้าถึงข้อมูลของคุณ</p>
                         </div>
                         <i class="fas fa-chevron-right"></i>
                     </a>
@@ -374,7 +373,7 @@ if (isset($_SESSION['student_id'])) {
                         </div>
                         <div class="setting-text">
                             <h4 class="title" data-lang="notificationsettings">ตั้งค่าการแจ้งเตือน</h4>
-                            <p class="description">เลือกรับการแจ้งเตือนที่คุณสนใจ</p>
+                            <p class="description" data-lang="notificationsettingsdetail">เลือกรับการแจ้งเตือนที่คุณสนใจ</p>
                         </div>
                         <i class="fas fa-chevron-right"></i>
                     </a>
@@ -385,7 +384,7 @@ if (isset($_SESSION['student_id'])) {
                         </div>
                         <div class="setting-text">
                             <h4 class="title" data-lang="generalsettings">ตั้งค่าการใช้งานโดยรวม</h4>
-                            <p class="description">ปรับแต่งการทำงานของแอปพลิเคชัน</p>
+                            <p class="description" data-lang="generalsettingsdetail">ปรับแต่งการทำงานของแอปพลิเคชัน</p>
                         </div>
                         <i class="fas fa-chevron-right"></i>
                     </a>
@@ -396,7 +395,7 @@ if (isset($_SESSION['student_id'])) {
                         </div>
                         <div class="setting-text">
                             <h4 class="title" data-lang="language">ภาษา</h4>
-                            <p class="description">เลือกภาษาที่ใช้แสดงผล</p>
+                            <p class="description" data-lang="languagedetail">เลือกภาษาที่ใช้แสดงผล</p>
                         </div>
                         <i class="fas fa-chevron-right"></i>
                     </a>
@@ -407,7 +406,7 @@ if (isset($_SESSION['student_id'])) {
                         </div>
                         <div class="setting-text">
                             <h4 class="title" data-lang="yearbook">พิมพ์หนังสือรุ่น</h4>
-                            <p class="description">จัดทำหนังสือรุ่นเพื่อเก็บเป็นที่ระลึก</p>
+                            <p class="description" data-lang="yearbookdetail">จัดทำหนังสือรุ่นเพื่อเก็บเป็นที่ระลึก</p>
                         </div>
                         <i class="fas fa-chevron-right"></i>
                     </a>
@@ -418,7 +417,7 @@ if (isset($_SESSION['student_id'])) {
                         </div>
                         <div class="setting-text">
                             <h4 class="title" data-lang="logout">ออกจากระบบ</h4>
-                            <p class="description">ลงชื่อออกจากบัญชีผู้ใช้งาน</p>
+                            <p class="description" data-lang="logoutdetail">ลงชื่อออกจากบัญชีผู้ใช้งาน</p>
                         </div>
                         <i class="fas fa-chevron-right"></i>
                     </a>

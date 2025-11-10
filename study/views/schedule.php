@@ -61,8 +61,6 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
     <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script>
     <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
 
-
-
 </head>
 
 <body>
@@ -70,7 +68,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
 
     <div class="main-transparent-content">
         <div class="container-fluid">
-             <h1 class="heading-1" >กำหนดการประจำวัน</h1>
+            <h1 class="heading-1" data-lang="dailyschedule" >กำหนดการประจำวัน</h1>
             <div class="divider-1">
                 <span></span>
             </div>

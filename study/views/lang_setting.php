@@ -119,7 +119,7 @@ session_start();
                     <span data-lang="eng">English</span>
                 </label>
             </div>
-            <div class="action-card">
+            <!-- <div class="action-card">
                 <label>
                     <input type="radio" name="language" value="CN">
                     <img src="https://flagcdn.com/w20/cn.png" alt="[translate:中文] flag" style="height: 14px; margin-right: 6px;">
@@ -139,7 +139,7 @@ session_start();
                     <img src="https://flagcdn.com/w20/kr.png" alt="[translate:한국어] flag" style="height: 14px; margin-right: 6px;">
                     <span data-lang="korea">한국어</span>
                 </label>
-            </div>
+            </div> -->
         </div>
     </div>
     <?php require_once 'component/footer.php'; ?>
