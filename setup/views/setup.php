@@ -29,6 +29,7 @@
 <script src="/js/clipboard.min.js"></script>
 <script src="/node_modules/clipboard/dist/clipboard.min.js"></script>
 <script src="/classroom/setup/js/setup.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script src="/classroom/setup/js/position.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/setup/js/payment.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 <body>
@@ -36,7 +37,11 @@
 <div class="container-fluid">
     <div class="row">
         <div class="row-overflow">
-            <a href=".setup_tab" class="active get-setup" data-page="payment" data-toggle="tab">
+            <a href=".setup_tab" class="active get-setup" data-page="position" data-toggle="tab">
+                <i class="fas fa-briefcase"></i>
+                <span lang="en">Position</span>
+            </a>
+            <a href=".setup_tab" class= get-setup" data-page="payment" data-toggle="tab">
                 <i class="fas fa-money-check"></i>
                 <span lang="en">Payment</span>
             </a>

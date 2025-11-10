@@ -1,7 +1,7 @@
 $(document).ready(function () {
   loadClass(classroomId);
 
-  console.log(classroomId);
+  console.log("CLASS", classroomId);
 });
 
 function loadClass(classroomId) {
@@ -110,13 +110,9 @@ function renderClassCard(course, classroomId) {
       </div>`;
   }
 
-  // <div class="avatar-counter" style="width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
-  // </div>
-
-
-
 
   return `
+  
       <div class="col-xs-12 col-md-4 col-lg-4" onclick="redirectCurreculum('${course.course_id}', '${course.course_type}', ${classroomId})">
         <div class="container-menu" style="margin-top: 10px; padding: 2rem;">
 
@@ -159,6 +155,8 @@ function renderClassCard(course, classroomId) {
 
   `;
 }
+
+// อันนี้ใส่หน้า classinfo.js
 function redirectCurreculum(course_id, course_type, classroomId) {
   let new_path = course_type + "_" + course_id;
   let url = `/classroom/study/redirect.php?id=${window.btoa(
@@ -166,3 +164,44 @@ function redirectCurreculum(course_id, course_type, classroomId) {
   )}&cid=${window.btoa(classroomId)}`;
   window.open(url, "_self");
 }
+
+
+// <div class="col-xs-12 col-md-4 col-lg-4" onclick="redirectCurreculum('${course.course_id}', '${course.course_type}', ${classroomId})">
+//         <div class="container-menu" style="margin-top: 10px; padding: 2rem;">
+
+//           <div class="flex-box-container">
+//             <div class="header-menu">
+//               <div class="small-img-banner">
+//                 ${courseCover}
+//               </div>
+//               <div class="class-menu">
+//               <span class="title-menu-sec" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;">${course.course_name}</span>
+//                 <div class="progress-section">
+//                   <div>
+//                     <div class="instructor-name">
+//                       <span><i class="fas fa-chalkboard-teacher"></i>&nbsp;</span>
+//                       <b>ผู้สอน:</b> ${courseInstr}
+//                     </div>
+//                     <div class="instructor-info" style="margin-left: 0.5rem;">
+//                     ${instructorsHtml}
+//                     </div>
+//                   </div>
+//                   <div class="location-info" style="margin-left: 0.5rem;">
+//                   <span><i class="fas fa-map"></i> &nbsp;</span> 
+//                     สถานที่:
+//                     ${courseLoca}
+//                   </div>
+//                   <div class="time-schedule-class" style="margin-left: 0.5rem;">
+//                     <span class="small-text-gray">${courseDate}</span>
+//                     <span class="small-text-gray">| ${displayTime}</span>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//             <div class="next-icon-box">
+//               <i class="fas fa-chevron-right"></i>
+//               </div>
+//           </div>
+
+//         </div>
+//       </div>

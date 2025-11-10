@@ -184,31 +184,119 @@ $notification_data = [
             border: 2px solid transparent; /* สร้าง border ซ้อนกันเพื่อความเนียน */
         }
     </style>
+    <script src="/classroom/study/js/header.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
 
-<div class="orange-header">
-    <?php if ($currentScreen == 'Menu') { ?>
+<!-- <div class="desktop-navbar">
+  <div id="sidenav-store1" class="sidenav">...</div> 
+  <div class="origami-header-dashboard">
+
+  </div>
+</div> -->
+
+
+
+
+
+<div class="desktop-navbar">
+  <aside id="sidenav-store1" class="sidenav">
+    <div>
+        <ul id="menuListContainerAdmin1" style="padding: 0px !important;" class="menu-list">
+            <li class="has-submenu">
+            <a href="menu">
+            <i class="fas fa-home"  style="margin-right: 5px;"></i>
+            <span class="menu-title" data-lang="home"> Home</span>
+            <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
+            </a>
+        </li>
+        <li class="has-submenu">
+            <a href="schedule">
+            <i class="fas fa-book-open"  style="margin-right: 5px;"></i>
+            <span class="menu-title"  data-lang="schedule"> Schedule</span>
+            <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
+            </a>
+        </li>
+        <li class="has-submenu">
+            <a href="alumni">
+            <i class="fas fa-school" style="margin-right: 5px;"></i>
+            <span class="menu-title" data-lang="alumni"> Alumni</span>
+            <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
+            </a>
+        </li>
+        <li class="has-submenu">
+            <a href="chat">
+            <i class="fas fa-robot" style="margin-right: 5px;"></i>
+            <span class="menu-title" data-lang="askai" > Ask AI</span>
+            <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
+            </a>
+        </li>
+        <li class="has-submenu">
+            <a href="class">
+            <i class="fas fa-chalkboard-teacher"  style="margin-right: 5px;"></i>
+            <span class="menu-title"  data-lang="classroom"> Classroom</span>
+            <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
+            </a>
+        </li>
+        <li class="has-submenu">
+            <a href="calendar">
+            <i class="fas fa-calendar-week"  style="margin-right: 5px;"></i>
+            <span class="menu-title"  data-lang="calendar"> Calendar</span>
+            <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
+            </a>
+        </li>
+        <li class="has-submenu">
+            <a href="history">
+            <i class="fas fa-history"  style="margin-right: 5px;"></i>
+            <span class="menu-title"  data-lang="history"> History</span>
+            <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
+            </a>
+        </li>
+        <li class="has-submenu">
+            <a href="minigame">
+            <i class="fas fa-gamepad"  style="margin-right: 5px;"></i>
+            <span class="menu-title" data-lang="minigame"> Mini Game</span>
+            <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
+            </a>
+        </li>
+        <li class="has-submenu">
+            <a href="myphoto">
+            <i class="fas fa-images"  style="margin-right: 5px;"></i>
+            <span class="menu-title" data-lang="myphoto"> My Photo</span>
+            <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
+            </a>
+        </li>
+        </ul>
+    </div>
+    </aside>
+  
+    <div class="origami-header-dashboard">
         <div class="container-topnav">
             <div class="header-topnav">
-                <div class="title-group-topnav">
-                    <span>
-                        <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
-                    </span>
-                    <div class="">
-                        <h1>Green Tech</h1>
-                        <p>Hello ! <?php echo $student_name; ?></p>
+                <div class="somebox-flex" style="display: flex;">
+                    <a class="navbar-brand-test menu-btn" id="menu-left" style="pointer-events: auto;">
+                        <img id="menu-icon" src="/images/menu/Hamberger Icon.svg" alt="Menu">
+                    </a>
+                    <div class="title-group-topnav">
+                        <div>
+                            <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                        </div>
+                        <div class="dissappear-text">
+                            <h1 style="color:black !important;">Green Tech</h1>
+                            <p style="color:black !important;">Hello ! <?php echo $student_name; ?></p>
+                        </div>
                     </div>
                 </div>
                 <div class="icons">
                     <!-- Dropdown wrapper -->
-                    <div class="dropdown" style="display: inline-block;">
+                    <div class="dropdown" style="display: inline-block; vertical-align: middle;">
                         <button class="bell-button btn btn-default dropdown-toggle" type="button" id="bellDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background: none; border: none; padding: 0;">
-                            <i class="far fa-bell" style="font-size: 20px;"></i>
+                            <img id="menu-icon" src="/images/menu/Bell.svg" alt="Noti" style="padding: 5px;">
                             <span class="notification-badge">4</span>
                         </button>
-                       <ul class="dropdown-menu centered" aria-labelledby="bellDropdown">
+
+                        <ul class="dropdown-menu centered" aria-labelledby="bellDropdown">
                             <a class="notification dropdown-toggle menu-readall text-center" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="update_notiStatus_read();">
-                               <span><i class="fas fa-check-circle"></i></span>
+                            <span><i class="fas fa-check-circle"></i></span>
                                 &nbsp; Mark all as read
                             </a>
                             <?php foreach ($notification_data as $notification): ?>
@@ -216,7 +304,7 @@ $notification_data = [
 
                                     <li>
                                         <a 
-                                        href="<?= htmlspecialchars($notification['path']) ?>" 
+                                        href="<?php echo htmlspecialchars($notification['path']) ?>" 
                                         class="<?= htmlspecialchars($notification['class']) ?>" 
                                         data-message="<?= htmlspecialchars($notification['message']) ?>"
                                         style="display:flex; align-items: center;"
@@ -226,27 +314,39 @@ $notification_data = [
                                                 alt="error" 
                                                 style="width: 30px; height: 30px; border-radius: 100%; margin-right: 10px;"
                                             >
-                                             <span style="font-weight: bolder;"><?= htmlspecialchars($notification['header']) ?>: New!</span>
+                                            <span style="font-weight: bolder;"><?= htmlspecialchars($notification['header']) ?>: New!</span>
                                             <p style="margin-left: 10%;"><?= htmlspecialchars(truncateMessage($notification['message'], 50)) ?></p>
                                         </a>
                                     </li>
                                     <li class="divider"></li>
                                 <?php endforeach; ?>
-
-                            
                         </ul>
                     </div>
-                    <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>;">
-                        <img style=" border-radius: 100%; object-fit: cover;"height="30" width="30" id="avatar_h" name="avatar_h"  title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'" >
-                    </a>
+                    <div class="dropdown" style="display: inline-block; vertical-align: middle;">
+                    <button id="profileDropdown" 
+                        class="btn dropdown-toggle" 
+                        type="button" 
+                        data-toggle="dropdown" 
+                        aria-haspopup="true" 
+                        aria-expanded="false" 
+                        style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>; padding: 0; width: 34px; height: 34px;"
+                        >
+                        <img height="30" width="30" id="avatar_h" name="avatar_h"  title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'" alt="Profile" style="width: 30px; height: 30px; border-radius: 100%;">
+                    </button>
+                    <ul class="dropdown-menu lefted" aria-labelledby="profileDropdown">
+                        <li><a href="profile">Profile</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                    </div>
                 </div>
             </div>
         </div>
-        <script>
-            // $('#bellButton').on('click', function() {
-            //     $('#notificationModal').modal('show');
-            // });
-            $(document).ready(function() {
+            <script>
+                // $('#bellButton').on('click', function() {
+                //     $('#notificationModal').modal('show');
+                // });
+                $(document).ready(function() {
                     // When dropdown item clicked, set modal message and show modal
                     $('.notification-item').on('click', function(e) {
                         e.preventDefault();
@@ -256,63 +356,212 @@ $notification_data = [
                         // Optionally, close dropdown after click
                         $('.dropdown.open .dropdown-toggle').dropdown('toggle');
                     });
+                    
+                    $('#menu-left').on('click', function() {
+                        $('#sidenav-store1, #sidenav-store2').toggleClass('open');
+                    });
+
+                    // Close sidebar and all submenus on window resize below 1024
+                    function handleResize() {
+                        if ($(window).width() < 1024) {
+                            $('#sidenav-store1, #sidenav-store2').removeClass('open');
+
+                            // Close all submenus
+                            $('.submenu-list').slideUp(200);
+                            $('.submenu-toggle i').css('transform', 'rotate(0deg)');
+                        }
+                    }
+
+                    // Run on initial load and on resize
+                    handleResize();
+                    $(window).on('resize', handleResize);
                 });
-        </script>
+            </script>
 
-    <?php
-    
-    } else {
-    ?>
-        <div class="header">
-            <button class="back-button" onclick="window.history.back();">
-                <span>
-                    <i class="fas fa-long-arrow-alt-left"></i>
-                </span>
-            </button>
-            <?php 
-            $marginClass = in_array($currentScreen, $hide_profile) ? ' add-margin-right' : '';
-            ?>
-            <h1 class="header-title<?php echo $marginClass; ?>"><?php echo $currentScreen ?></h1>
-            <?php
-            if(!in_array($currentScreen, $hide_profile)): ?>
-            <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?> ;">
-                <img style=" border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
-            </a>
-            <?php endif; ?>
-        </div>
-        <script>
-            const currentPage = window.location.pathname.split('/').pop();
-            const backButton = document.getElementsByClassName('back-button'); // or get button by other selector
-            console.log(currentPage);
-
-            backButton.onclick = function() {
-                if (currentPage === 'classroominfo') {
-                    // Redirect to class.php when on classroominfo.php
-                    window.location.href = 'class';
-                } else {
-                    // Otherwise, go back in history
-                    window.history.back();
-                }
-            };
-        </script>
-    <?php
-    }
-    ?>
-
-    <div id="notificationModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Notification</h4>
-                </div>
-                <div class="modal-body">
-                    <p>แจ้งเตือนเวอร์ชั่นปัจจุบัน คือ BETA 1.1</p>
-                    <div class="" style="text-align: right;">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">รับทราบ</button>
+        <div id="notificationModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Notification</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>แจ้งเตือนเวอร์ชั่นปัจจุบัน คือ BETA 1.1</p>
+                        <div class="" style="text-align: right;">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">รับทราบ</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<div class="mobile-navbar">
+    <div class="origami-header-dashboard">
+        <?php if ($currentScreen == 'Menu') { ?>
+            <div class="container-topnav">
+                <div class="header-topnav">
+                    <div class="somebox">
+                        <a class="navbar-brand-test menu-btn" id="menu-left" style="pointer-events: auto;">
+                            <img id="menu-icon" src="/images/menu/Hamberger Icon.svg" alt="Menu">
+                        </a>
+                        <div class="title-group-topnav">
+                            <div>
+                                <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
+                            </div>
+                            <div class="dissappear-text">
+                                <h1 style="color:black !important;">Green Tech</h1>
+                                <p style="color:black !important;">Hello ! <?php echo $student_name; ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="icons">
+                        <!-- Dropdown wrapper -->
+                        <div class="dropdown" style="display: inline-block; vertical-align: middle;">
+                            <button class="bell-button btn btn-default dropdown-toggle" type="button" id="bellDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background: none; border: none; padding: 0;">
+                                <img id="menu-icon" src="/images/menu/Bell.svg" alt="Noti" style="padding: 5px;">
+                                <span class="notification-badge">4</span>
+                            </button>
+
+                            <ul class="dropdown-menu centered" aria-labelledby="bellDropdown">
+                                <a class="notification dropdown-toggle menu-readall text-center" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="update_notiStatus_read();">
+                                <span><i class="fas fa-check-circle"></i></span>
+                                    &nbsp; Mark all as read
+                                </a>
+                                <?php foreach ($notification_data as $notification): ?>
+                                    <!-- class="<?= htmlspecialchars($notification['class']) ?>" -->
+
+                                        <li>
+                                            <a 
+                                            href="<?php echo htmlspecialchars($notification['path']) ?>" 
+                                            class="<?= htmlspecialchars($notification['class']) ?>" 
+                                            data-message="<?= htmlspecialchars($notification['message']) ?>"
+                                            style="display:flex; align-items: center;"
+                                            >
+                                                <img 
+                                                    src="<?= htmlspecialchars($notification['img']) ?>" 
+                                                    alt="error" 
+                                                    style="width: 30px; height: 30px; border-radius: 100%; margin-right: 10px;"
+                                                >
+                                                <span style="font-weight: bolder;"><?= htmlspecialchars($notification['header']) ?>: New!</span>
+                                                <p style="margin-left: 10%;"><?= htmlspecialchars(truncateMessage($notification['message'], 50)) ?></p>
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                    <?php endforeach; ?>
+                            </ul>
+                        </div>
+                        <div class="dropdown" style="display: inline-block; vertical-align: middle;">
+                        <button id="profileDropdown" 
+                            class="btn dropdown-toggle" 
+                            type="button" 
+                            data-toggle="dropdown" 
+                            aria-haspopup="true" 
+                            aria-expanded="false" 
+                            style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?>; padding: 0; width: 34px; height: 34px;"
+                            >
+                            <img height="30" width="30" id="avatar_h" name="avatar_h"  title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'" alt="Profile" style="width: 30px; height: 30px; border-radius: 100%;">
+                        </button>
+                        <ul class="dropdown-menu lefted" aria-labelledby="profileDropdown">
+                            <li><a href="profile">Profile</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/logout">Logout</a></li>
+                        </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                // $('#bellButton').on('click', function() {
+                //     $('#notificationModal').modal('show');
+                // });
+                $(document).ready(function() {
+                    // When dropdown item clicked, set modal message and show modal
+                    $('.notification-item').on('click', function(e) {
+                        e.preventDefault();
+                        var message = $(this).data('message');
+                        $('#modalMessage').text(message);
+                        $('#notificationModal').modal('show');
+                        // Optionally, close dropdown after click
+                        $('.dropdown.open .dropdown-toggle').dropdown('toggle');
+                    });
+
+                    // Close sidebar and all submenus on window resize below 1024
+                    function handleResize() {
+                        if ($(window).width() < 1024) {
+                            $('#sidenav-store1, #sidenav-store2').removeClass('open');
+
+                            // Close all submenus
+                            $('.submenu-list').slideUp(200);
+                            $('.submenu-toggle i').css('transform', 'rotate(0deg)');
+                        }
+                    }
+
+                    // Run on initial load and on resize
+                    handleResize();
+                    $(window).on('resize', handleResize);
+                });
+            </script>
+
+        <?php
+        
+        } else {
+        ?>
+            <!-- Mobile centered title -->
+            <div class="header">
+                <button class="back-button" onclick="window.history.back();">
+                    <span>
+                        <i class="fas fa-long-arrow-alt-left"></i>
+                    </span>
+                </button>
+                <?php 
+                $marginClass = in_array($currentScreen, $hide_profile) ? ' add-margin-right' : '';
+                ?>
+                <h1 class="header-title<?php echo $marginClass; ?>"><?php echo $currentScreen ?></h1>
+                <?php
+                if(!in_array($currentScreen, $hide_profile)): ?>
+                <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?> ;">
+                    <img style=" border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
+                </a>
+                <?php endif; ?>
+            </div>
+            <script>
+                const currentPage = window.location.pathname.split('/').pop();
+                const backButton = document.getElementsByClassName('back-button'); // or get button by other selector
+                console.log(currentPage);
+
+                backButton.onclick = function() {
+                    if (currentPage === 'classroominfo') {
+                        // Redirect to class.php when on classroominfo.php
+                        window.location.href = 'class';
+                    } else {
+                        // Otherwise, go back in history
+                        window.history.back();
+                    }
+                };
+            </script>
+        <?php
+        }
+        ?>
+
+        <div id="notificationModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Notification</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>แจ้งเตือนเวอร์ชั่นปัจจุบัน คือ BETA 1.1</p>
+                        <div class="" style="text-align: right;">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">รับทราบ</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

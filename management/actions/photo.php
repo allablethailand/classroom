@@ -28,6 +28,8 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
     // สำหรับ Server จริง (เช่น origami.local) ให้ปรับ base_url เป็น Path ที่ถูกต้อง
     $base_url = "http://origami.local"; 
 }
+
+// base ใหม่ ปรับด้วย
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 // ------------------------------------------------------------------------------------------------------

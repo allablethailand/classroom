@@ -407,7 +407,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php if (isset($show_consent_form) && $show_consent_form): ?>
             <?php else: ?>
             <div class="logo-container">
-                <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="VON BUNDIT Logo">
+                <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="GREEN TECH Logo">
                 <h2>เข้าสู่ระบบ</h2>
             </div>
             <p class="welcome-text">

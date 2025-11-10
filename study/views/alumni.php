@@ -1,8 +1,4 @@
 <?php
-// $class_id = isset($_GET['id']) ? $_GET['id'] :  null;
-
-// var_dump($class_id);
-// // $classroom_group = $_POST['classroom_group'];
 
 $base_include = $_SERVER['DOCUMENT_ROOT'];
 $base_path = '';
@@ -18,35 +14,27 @@ define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
 require_once $base_include . '/actions/func.php';
+require_once $base_include . '/classroom/study/actions/student_func.php';
 
 $std_id = $_SESSION['student_id'];
 
-$columnStudent  = "classroom_id";
-$tableStudent = "classroom_student_join";
-$whereStudent = "where student_id = '{$std_id}'";
+$classroom_group = getAlumniClassroom($std_id);
 
-$student_class = select_data($columnStudent, $tableStudent, $whereStudent);
+// var_dump($classroom_group);
 
-$our_class = $student_class[0]["classroom_id"];
+// $columnStudent  = "classroom_id";
+// $tableStudent = "classroom_student_join";
+// $whereStudent = "where student_id = '{$std_id}'";
 
-// var_dump($our_class);
+// $student_class = select_data($columnStudent, $tableStudent, $whereStudent);
 
+// $our_class = $student_class[0]["classroom_id"];
 
-//  $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
-// $tableGroup = "classroom_template";
-// $whereGroup = "where classroom_id = '{$std_id}'";
+// $columnCourseGroup  = "COUNT(cg.group_id) AS group_count, ctp.classroom_id, ctp.classroom_name, ctp.classroom_information, ctp.classroom_poster, ctp.classroom_student, count(student.join_id) as classroom_register,";
+// $tableCourseGroup = "classroom_template ctp";
+// $whereCourseGroup = "LEFT JOIN classroom_group cg ON ctp.classroom_id = cg.classroom_id WHERE ctp.classroom_id = '{$our_class}'";
 
-// $class_generation_id = $_POST['class_gen_id'];
-// $columnGroup  = "classroom_id, classroom_name, classroom_information, classroom_poster, classroom_student";
-// $tableGroup = "classroom_template";
-// $whereGroup = "where classroom_id = '{$our_class}'";
-// $whereGroup = "where classroom_id = '1' AND status = 0";
-
-$columnCourseGroup  = "COUNT(cg.group_id) AS group_count, ctp.classroom_id, ctp.classroom_name, ctp.classroom_information, ctp.classroom_poster, ctp.classroom_student";
-$tableCourseGroup = "classroom_template ctp";
-$whereCourseGroup = "LEFT JOIN classroom_group cg ON ctp.classroom_id = cg.classroom_id WHERE ctp.classroom_id = '{$our_class}'";
-
-$classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
+// $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
 
 // var_dump($course);
 
@@ -80,7 +68,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
     <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
     <link rel="stylesheet" href="/dist/css/jquery-ui.css">
     <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="/classroom/study/css/group.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/classroom/study/css/alumni.css?v=<?php echo time(); ?>">
     <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
     <script src="/bootstrap/3.3.6/js/jquery-2.2.3.min.js" type="text/javascript"></script>
     <script src="/dist/js/sweetalert.min.js"></script>
@@ -93,7 +81,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/alumni.js?v=<?php echo time(); ?>" type="text/javascript"></script>
-
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
 </head>
 
 <body>
@@ -103,7 +91,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
     <!-- work ON mobile screen ONLY -->
     <div class="main-transparent-content" >
         <div class="container-fluid px-4 py-2" >
-            <h1 class="heading-1" >รุ่นหลักสูตร</h1>
+            <h1 class="heading-1" data-lang="alumni">รุ่นหลักสูตร</h1>
             <div class="divider-1">
                 <span></span>
             </div>
@@ -134,8 +122,10 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
                                                 <h4 class="panel-title mb-0 text-truncate-2 d-flex-bs " style="margin-right:40px"> <?= $item["classroom_name"] ?></h4>
                                             </div>
                                             <p class="text-secondary mb-0 small text-truncate-2" >
-                                                สมาชิกปัจจุบัน <?php echo $item['classroom_student']; ?> คน
+                                                สมาชิกปัจจุบัน <?php echo $item["classroom_register"]; 
+                                                // . " / ". $item['classroom_student'];?> คน
                                             </p>
+                                            
                                         </div>
                                         <div class="flex-right-alum" style="align-content: center; text-align:center;">
                                             <!-- <p style="font-size: 9px; text-align:center;">

@@ -19,7 +19,7 @@
         case '/classroom/study/myphoto':
             require __DIR__.'/views/myphoto.php';
         break;
-         case '/classroom/study/myphoto1/':
+        case '/classroom/study/myphoto1/':
         case '/classroom/study/myphoto1':
             require __DIR__.'/views/myphoto1.py';
         break;
@@ -78,6 +78,10 @@
         case '/classroom/study/privacy_settings/':
         case '/classroom/study/privacy_settings':
             require __DIR__.'/views/privacy_settings.php';
+        break;
+        case '/classroom/study/lang_setting/':
+        case '/classroom/study/lang_setting':
+            require __DIR__.'/views/lang_setting.php';
         break;
         case '/classroom/study/setting/':
         case '/classroom/study/setting':

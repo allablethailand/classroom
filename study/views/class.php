@@ -36,15 +36,15 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
 
 // var_dump($classroom_group);
 
-    $segments = ['complete', 'complete', 'complete', 'complete', 'complete', 'upcoming', 'upcoming', 'upcoming',];
-    $segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming',];
-    $old_segment = '<div class="progress-container">
-                                <div class="progress-bar-new">
-                                    <?php foreach ($segments as $index => $segmentType): ?>
-                                        <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>';
+$segments = ['complete', 'complete', 'complete', 'complete', 'complete', 'upcoming', 'upcoming', 'upcoming',];
+$segments_two = ['complete', 'complete', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming', 'upcoming',];
+$old_segment = '<div class="progress-container">
+                            <div class="progress-bar-new">
+                                <?php foreach ($segments as $index => $segmentType): ?>
+                                    <div class="progress-segment <?php echo htmlspecialchars($segmentType); ?>"></div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>';
     
 ?>
 
@@ -81,6 +81,8 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/class.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+
 </head>
 
 
@@ -88,7 +90,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
     <?php require_once 'component/header.php'; ?>
     <div class="main-transparent-content">
         <div class="container-fluid">
-            <h1 class="heading-1">หลักสูตรชั้นเรียน</h1>
+            <h1 class="heading-1" data-lang="courseclasses">หลักสูตรชั้นเรียน</h1>
             <div class="divider-1"> 
                 <span></span>
             </div>
@@ -96,7 +98,7 @@ $classroom_group =  select_data($columnCourseGroup, $tableCourseGroup, $whereCou
 
             <div class="g-4 justify-content-center mb-bs-3 " style="margin-top: 2rem;">
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                    <a href="classinfo?classroom_id=<?php echo $item['classroom_id']; ?>" style="font-family: 'Kanit', sans-serif !important;">
+                    <a href="class_subinfo?classroom_id=<?php echo $item['classroom_id']; ?>" style="font-family: 'Kanit', sans-serif !important;">
                         <div class="card group-card h-100 bg-element-earth-two rounded-small">
                              <div class="flex-box-container">
                                 <div class="header-menu">

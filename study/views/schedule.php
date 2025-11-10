@@ -59,7 +59,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
         const dateRangeFromPHP = "<?php echo htmlspecialchars($dateRange, ENT_QUOTES); ?>";
     </script>
     <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script>
-
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
 
 </head>
 
@@ -68,7 +68,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
 
     <div class="main-transparent-content">
         <div class="container-fluid">
-             <h1 class="heading-1" >กำหนดการประจำวัน</h1>
+            <h1 class="heading-1" data-lang="dailyschedule" >กำหนดการประจำวัน</h1>
             <div class="divider-1">
                 <span></span>
             </div>
@@ -91,7 +91,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                         Tue, 9 Aug, 2025
                         </span>
                         <button id="select-date-btn" type="button" class="btn btn-warning"  style="font-size: 1rem;  cursor: pointer; border-radius: 50%;">
-                            <span><i class="fas fa-pen"></i></span>
+                            <span><i class="fas fa-calendar-alt"></i></span>
                         </button>
                         <input type="text" id="hidden-date-input" style="display: none;" />
                     </div>

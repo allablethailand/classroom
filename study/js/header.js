@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
     $(".notification").on("click", function () {
         var isExpanded = $(this).attr("aria-expanded") === "true";
         var $menu = $(this).next(".main-notification");
@@ -138,6 +139,7 @@ $(document).ready(function() {
 })
 
 
+
 function update_notiStatus_read() {
 	$('.for-notification').addClass('hidden');
 	if ($('.noti-toggle.dropdown').hasClass("open")) {	
@@ -166,4 +168,3 @@ function readNotification() {
         success: function(result) {}
     });
 }
-

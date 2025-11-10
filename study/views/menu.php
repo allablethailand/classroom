@@ -33,13 +33,13 @@ session_start();
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/menu.js?v=<?php echo time(); ?>" type="text/javascript"></script>
-
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
 </head>
 
-<body>
-    <?php require_once 'component/header.php'; ?>
+<body data-barba="wrapper">
+    <?php require_once("component/header.php") ?>
   
-    <div class="main-content">
+    <div class="main-content" data-barba="container" data-barba-namespace="home">
         <div class="container-fluid" style="margin: 0 1rem;">
             
             <div id="ongoing-class-container"></div>
@@ -48,7 +48,7 @@ session_start();
             <!-- <div id="overdue-class-container"></div> -->
 
             <div class="row">
-                <p class="menu-title">Academy Menu</p>
+                <p class="menu-title" data-lang="academymenu">Academy Menu</p>
             </div>
             <div class="row" style="margin-top: 1rem; ">
                 <div class="actions-grid">
@@ -67,7 +67,7 @@ session_start();
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <h4 style="margin-top: 10px;">SCHEDULE</h4>
+                        <h4 style="margin-top: 10px; text-transform: uppercase;" data-lang="schedule">SCHEDULE</h4>
                     </a>
 
                     <!-- Classroom -->
@@ -84,7 +84,7 @@ session_start();
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <h4 style="margin-top: 10px;">CLASSROOM</h4>
+                        <h4 style="margin-top: 10px; text-transform:uppercase;" data-lang="classroom">CLASSROOM</h4>
                     </a>
 
                     <!-- Calendar -->
@@ -100,7 +100,7 @@ session_start();
                             </defs>
                         </svg>
 
-                        <h4 style="margin-top: 10px;">CALENDAR</h4>
+                        <h4 style="margin-top: 10px;" data-lang="calendar">CALENDAR</h4>
                     </a>
 
                     <!-- History -->
@@ -116,7 +116,7 @@ session_start();
                         </linearGradient>
                         </defs>
                         </svg>
-                        <h4 style="margin-top: 10px;">HISTORY</h4>
+                        <h4 style="margin-top: 10px;" data-lang="classhistory">HISTORY</h4>
                     </a>
 
                     <!-- Mini Game -->
@@ -131,7 +131,7 @@ session_start();
                         </linearGradient>
                         </defs>
                         </svg>
-                        <h4 style="margin-top: 10px;">MINI GAME</h4>
+                        <h4 style="margin-top: 10px;"  data-lang="minigame">MINI GAME</h4>
                     </a>
 
                     <!-- My Photo -->
@@ -146,7 +146,7 @@ session_start();
                         </linearGradient>
                         </defs>
                         </svg>
-                        <h4 style="margin-top: 10px;">MY PHOTO</h4>
+                        <h4 style="margin-top: 10px;"  data-lang="myphoto">MY PHOTO</h4>
                     </a>
 
                      <!-- Coin -->

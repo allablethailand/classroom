@@ -1,6 +1,37 @@
 $(document).ready(function () {
     loadAndRenderClasses();
+//     barba.init({
+//   transitions: [
+//     {
+//       name: 'slide-left',
+//       leave(data) {
+//         return new Promise((resolve) => {
+//           // Animate slide out
+//           $('body').addClass('page-slide-out-left');
+//           $('body').on('animationend', function() {
+//             resolve();
+//           });
+//         });
+//       },
+//       enter(data) {
+//         // Remove the class after transition
+//         $('body').removeClass('page-slide-out-left');
+//       }
+//     }
+//   ]
+// });
+
+// // Your link handler (if needed)
+// $('a.action-card').on('click', function(event) {
+//   event.preventDefault();
+//   var href = $(this).attr('href');
+//   // Barba will handle the transition
+//   barba.go(href);
+// });
+
 });
+
+
 
 // Utility to format date like Tuesday, September 9, 2025
 function formatDate(dateStr) {
