@@ -277,9 +277,9 @@ $notification_data = [
                         <img id="menu-icon" src="/images/menu/Hamberger Icon.svg" alt="Menu">
                     </a>
                     <div class="title-group-topnav">
-                        <div>
+                        <a href="menu">
                             <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
-                        </div>
+                        </a>
                         <div class="dissappear-text">
                             <h1 style="color:black !important;">Green Tech</h1>
                             <p style="color:black !important;">Hello ! <?php echo $student_name; ?></p>
@@ -510,7 +510,7 @@ $notification_data = [
         ?>
             <!-- Mobile centered title -->
             <div class="header">
-                <button class="back-button" onclick="window.history.back();">
+                <button class="back-button" onclick="history.go(-1);">
                     <span>
                         <i class="fas fa-long-arrow-alt-left"></i>
                     </span>

@@ -18,17 +18,9 @@ require_once $base_include . '/classroom/study/actions/student_func.php';
 
 $std_id = $_SESSION['student_id'];
 
-$classroom_group = getStudentClassroomGroup($std_id);
+$class_id =  getStudentClassroomId($std_id);
+$classroom_group = getStudentClassroomGroup($class_id);
 
-// var_dump($classroom_group);
-
-// $teacher_group = getTeacherMember($)
-
-// $our_class = $student_class[0]["classroom_id"];
-// $our_group = $student_class[0]["group_id"];
-
-// $our_class = $classroom_group[0]["classroom_id"];
-// $our_group = $classroom_group[0]["group_id"];
 
 // $classroom_group = select_data($columnGroup, $tableGroup, $whereGroup);
 // var_dump($classroom_group["classroom_id"]);
@@ -148,18 +140,18 @@ $all_role_count = $all_role[0]['count_role'];
         <!-- Student Groups -->
         <div class="groups-container" id="rowData">
           <?php foreach ($classroom_group as $item): ?>
-            <a href="student?<?= $item['group_id'] ?>" class="group-card-modern">
+            <a href="student?group_id=<?= $item['group_id'] ?>" class="group-card-modern">
               <div class="group-card-content">
                 <div class="group-header">
                   <div class="group-logo" style="background: linear-gradient(135deg, <?= $item['group_color'] ?>33, <?= $item['group_color'] ?>66);">
-                    <img src="<?= $item['group_logo'] ?>" alt="<?= $item['group_name'] ?>">
+                    <img src="<?= $item['group_logo'] ?>" alt="<?= $item['group_name'] ?>" onerror="this.src='../../../images/booth.png'">
                   </div>
                   <div class="group-head-name">
                     <h3 class="group-title"><?= $item["group_name"] ?></h3>
                   </div>
                 </div>
               </div>
-
+              
               <div class="group-action">
                 <p class="group-description"><?= $item["group_description"] ?></p>
                 <button class="arrow-btn">

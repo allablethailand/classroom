@@ -77,7 +77,7 @@ const translations = {
         // Menu
         dailyschedule: "Daily Schedule",
         courseclasses: "Course Classes",
-        classhistory: "Attendance History",
+        classhistory: "ATTENDANCE HISTORY",
         classroom: "Classroom",
         groupmembers: "Group Members",
         staffmembers: "Staff Members",
