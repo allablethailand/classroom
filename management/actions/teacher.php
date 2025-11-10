@@ -373,7 +373,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'getEmployees') {
         e.email
     FROM m_employee e
     LEFT JOIN m_employee_info ei ON ei.emp_id = e.emp_id
-    WHERE e.comp_id = '{$_SESSION['comp_id']}' and e.emp_del is null AND e.emp_code is not null and date(ifnull(e.emp_resign_date,NOW())) >= date(NOW())
+    WHERE e.comp_id = '{$_SESSION['comp_id']}' and e.emp_del is null AND e.emp_code is not null and e.emp_code <> '' and date(ifnull(e.emp_resign_date,NOW())) >= date(NOW())
     AND e.emp_id NOT IN (SELECT teacher_ref_id FROM classroom_teacher WHERE teacher_ref_type = 'employee')";
     
     $primaryKey = 'emp_id';
