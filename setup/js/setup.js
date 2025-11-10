@@ -10,10 +10,13 @@ function initializeClassroomSetup() {
             buildPage(page);
         }
     });
-    buildPage('payment');
+    buildPage('position');
 }
 function buildPage(page) {
     switch(page) {
+        case 'position':
+            buildPositionPage();
+            break;
         case 'payment':
             buildPaymentPage();
             break;

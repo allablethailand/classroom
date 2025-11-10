@@ -182,7 +182,7 @@
             $method_cover_thumb = null;
             if ($method_cover_name && $method_cover_tmp) {
                 $strname = md5($_SESSION['comp_id'].'||'.$id);
-                $method_cover_dir = 'uploads/classroom/' . $_SESSION['comp_id'] . '/payment/';
+                $method_cover_dir = 'uploads/' . $_SESSION['comp_id'] . '/classroom/payment/';
                 $path_info = pathinfo($method_cover_name);
                 $method_cover_ext = strtolower($path_info['extension']);
                 $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif');
