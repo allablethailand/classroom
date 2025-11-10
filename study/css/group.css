@@ -639,3 +639,9 @@ html {
   text-align: right;
   margin: 0;
 }
+
+.teacher-list{
+  display: flex;
+  flex-direction: column; /* แกน Y */
+  row-gap: 1.5rem; 
+}

@@ -115,7 +115,7 @@ $all_role_count = $all_role[0]['count_role'];
                   <?php endforeach; ?>
                 </ul>
               </div>
-              <button class="icon-btn" id="toggleStudent">
+              <button class="icon-btn" id="toggleViewList">
                 <i class="fas fa-user-friends"></i>
               </button>
             </div>
@@ -170,45 +170,13 @@ $all_role_count = $all_role[0]['count_role'];
           <?php endforeach; ?>
         </div>
 
-        <div id="menu" style="display: none;">></div>
+        <div id="menu" style="display: none;"></div>
 
         <h1 class="heading-1">คณะกรรมการ</h1>
         <div class="divider-1">
           <span></span>
         </div>
-        <div class="groups-container">
-
-          <!-- Hide Teacher Card -->
-          <!-- <?php
-          if (empty($count_teacher)): ?>
-            <div class="empty-state">
-              <i class="fas fa-users empty-icon"></i>
-              <h3>ยังไม่พบข้อมูลอาจารย์ในขณะนี้</h3>
-              <p>กรุณาตรวจสอบใหม่อีกครั้ง</p>
-            </div>
-          <?php endif; ?>
-
-          <a href="teacher" class="group-card-modern teacher-card">
-            <div class="group-card-content">
-              <div class="group-header">
-                <div class="group-logo teacher-logo">
-                  <i class="fas fa-chalkboard-teacher"></i>
-                </div>
-                <div class="group-head-name">
-                  <h3 class="group-title">อาจารย์ผู้สอน</h3>
-                </div>
-              </div>
-              <div class="group-action">
-                <p class="group-description">คณะผู้สอนและที่ปรึกษา</p>
-                <button class="arrow-btn">
-                  <i class="fas fa-arrow-right"></i>
-                </button>
-              </div>
-            </div>
-          </a> -->
-          <!-- End Teacher Card -->
-          
-
+        <div class="groups-container" id="rowTeacher">
           <!-- Staff Cards -->
           <?php
           if (empty($all_role)): ?>
@@ -221,7 +189,7 @@ $all_role_count = $all_role[0]['count_role'];
 
 
           <?php foreach ($all_role as $roles): ?>
-            <a href="#" class="group-card-modern staff-card">
+            <a href="teacher" class="group-card-modern staff-card">
               <div class="group-card-content">
                 <div class="group-header">
                   <div class="group-logo staff-logo">
@@ -244,6 +212,8 @@ $all_role_count = $all_role[0]['count_role'];
             </a>
           <?php endforeach; ?>
         </div>
+        <div id="menuTeacher" style="display: none;"></div>
+
       </div>
     </div>
   </div>

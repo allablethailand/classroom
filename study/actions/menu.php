@@ -55,7 +55,6 @@ if (isset($_POST) && $_POST['action'] == 'getUpcomingClass') {
     );
 
     
-
     $now = new DateTime();
 
     foreach ($scheduleItems as $item) {

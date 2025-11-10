@@ -143,7 +143,7 @@ function getStaffMemberlist($classroom_id)
 
 function getMemberRole()
 {
-    $result = select_data("position_name_en, position_name_th, COUNT(*) AS count_role",
+    $result = select_data("position_id, position_name_en, position_name_th, COUNT(*) AS count_role",
     "classroom_position",
     "WHERE status = 0 GROUP BY position_name_en, position_name_th");
 
