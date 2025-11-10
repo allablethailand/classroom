@@ -25,12 +25,12 @@ $query_parts = [
     "INNER JOIN classroom_student_join csj ON cs.student_id = csj.student_id",
     "LEFT JOIN classroom_template ct ON csj.classroom_id = ct.classroom_id",
     "LEFT JOIN classroom_group cg ON csj.group_id = cg.group_id",
-    "WHERE csj.classroom_id = 2 AND csj.status = 0"
+    "WHERE csj.classroom_id = 2 AND csj.status = 0 AND csj.approve_status = 1"
 ];
 
 if ($selected_group_id > 0) {
     // Filter students by the selected group
-    $query_parts[] = "AND csj.group_id = $selected_group_id";
+    $query_parts[] = "AND csj.group_id = '{$selected_group_id}'";
 }
 
 // Combine the query parts and order the results
@@ -61,11 +61,11 @@ if ($result) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
     <style>
-    body {
+    /* body {
         background-color: #f0f2f5;
         font-family: 'Kanit', sans-serif;
         color: #333;
-    }
+    } */
 
     .main-container {
         max-width: 960px;

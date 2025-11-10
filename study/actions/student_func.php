@@ -84,13 +84,36 @@ function getStudentClassroomCourseAll($student_id, $classroom_id) {
     return !empty($result) ? $result : [];
 }
 
-function getStudentClassroomGroup($student_id){
+function getStudentClassroomCount($student_id) {
     $result = select_data(
-        "csj.classroom_id, csj.group_id, cg.group_name, cg.group_logo, cg.group_description,cg.group_color",
-        "classroom_student_join csj",
-        "LEFT JOIN classroom_group cg ON csj.classroom_id = cg.classroom_id 
-            AND csj.group_id = cg.group_id
-            WHERE csj.student_id = '{$student_id}'");
+        "COUNT(DISTINCT classroom_id) AS total_classrooms",
+        "classroom_student_join",
+        "WHERE student_id = '{$student_id}' AND status = 0"
+    );
+
+    return !empty($result) ? $result : [];
+}
+
+function getStudentClassroomGroup($classroom_id){
+
+    $result = select_data(
+        "cg.group_id, cg.classroom_id, cg.group_name, cg.group_logo, cg.group_description, cg.group_color",
+        "classroom_group cg",
+        "WHERE cg.classroom_id = '{$classroom_id}' AND cg.status = 0"
+    );
+    
+    // cs.student_id, cs.student_firstname_th, cs.student_lastname_th, cs.student_image_profile, cs.student_mobile, cs.student_email, cs.student_company, cs.student_position, ct.classroom_name, cg.group_name, cg.group_color, cg.group_logo
+
+    // "classroom_student cs",
+    // "INNER JOIN classroom_student_join csj ON cs.student_id = csj.student_id 
+    // LEFT JOIN classroom_template ct ON csj.classroom_id = ct.classroom_id
+    // LEFT JOIN classroom_group cg ON csj.group_id = cg.group_id
+    // WHERE csj.classroom_id = '{$classroom_id}' AND csj.status = 0")
+
+    // $result = select_data(
+    //     "csj.classroom_id, csj.group_id, cg.group_name, cg.group_logo, cg.group_description, cg.group_color",
+    //     "classroom_student_join csj",
+    //     "JOIN classroom_group cg ON csj.classroom_id = cg.classroom_id WHERE csj.classroom_id = '{$classroom_id}' AND csj.status = 0");
 
     return !empty($result) ? $result : [];
 }

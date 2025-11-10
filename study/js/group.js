@@ -24,9 +24,6 @@ $(document).ready(function() {
                         .attr('data-icon', 'address-book');
                 }
 
-                console.log(data);
-
-
                 var students = Object.values(data.student_data || {});
                 var teachers = Object.values(data.teacher_data || {});
 
@@ -74,7 +71,7 @@ $(document).ready(function() {
                         teacherHtml += '<div class="student-avatar">';
                         teacherHtml += '<img src="' + teacher_pic + '" alt="Teacher Avatar" onerror="this.src=\'../../../images/default_teacher.png\'">';
                         teacherHtml += '</div>';
-                        teacherHtml += '<div class="student-info" style="margin-left: 10px;">';
+                        teacherHtml += '<div class="student-info" style="margin-left: 10px; color: black;">';
                         teacherHtml += '<h4 class="teacher-name">' + fullName + '</h4>';
                         teacherHtml += '<div class="group-head-name">';
                         teacherHtml += '</div>';
