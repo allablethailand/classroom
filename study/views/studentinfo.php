@@ -666,7 +666,9 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
     <div class="profile-header-container" style="gap: 5px;">
         <div class="settings-button-container">
             </div>
+        
         <div class="profile-image-carousel">
+            
             <?php if (count($profile_images) > 0) : ?>
                 <div class="carousel-container">
                     <?php foreach ($profile_images as $index => $image_path) : ?>
