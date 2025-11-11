@@ -15,6 +15,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/actions/func.php';
 require_once $base_include . '/classroom/study/actions/student_func.php';
 
 $course_id = isset($_GET['course_id']) ? $_GET['course_id'] : null;
@@ -280,16 +281,19 @@ if (!empty($course_file)) {
                 <h3 class="text-lg font-semibold text-text-primary mb-4">Instructors ( <?= $course_data['trn_count_by'] ?> )</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <!-- FOREACH DATA INSIDE TRN INSTRUCTOR -->
-                    <?php foreach ($trainers_array as $index => $trainer_name) { ?>
+                    <?php foreach ($trainers_array as $index => $trainer_id) { 
+                        $img = select_data(
+                            "emp_pic,gender", "m_employee_info", "where emp_id = '{$trainer_id}'"
+                        );
+                        $avatar = GetMemberAvatar($img[0]['emp_pic'],$img[0]['gender']);
+?>
                     <!-- Attendee 1 -->
                     <div class="flex items-center space-x-3">
-                        <img src="" 
+                        <img src="<?php echo $avatar; ?>" 
                             alt="Profile photo of Sarah Johnson, Marketing Director" 
                             class="w-10 h-10 rounded-full object-cover"
                             onerror="this.src='/images/logo_academy_169x150.png'; this.onerror=null;">
                         <div>
-                            <p class="text-sm font-medium text-text-primary"><?= $trainer_name ?></p>
-                            <!-- <p class="text-xs text-text-secondary">Marketing Dir.</p> -->
                         </div>
                     </div>
                     <!-- END FOR EACH -->

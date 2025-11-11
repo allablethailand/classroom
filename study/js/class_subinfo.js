@@ -73,41 +73,45 @@ function renderClassCard(course, classroomId) {
     if (namesArray.length <= maxVisible) {
       // Show all if 3 or less
       namesArray.forEach(name => {
-        instructorsHtml += `
-          <div class="member-avatar avatar-orange" title="${name.trim()}">
-            <img src="" 
-                onerror="this.src='/images/origami-academy-logo.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
-                alt="${name.trim()}" 
-                style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill; border: 3px solid orange;">
-          </div>`;
+        instructorsHtml += ``;
+        // instructorsHtml += `
+        //   <div class="member-avatar avatar-orange" title="${name.trim()}">
+        //     <img src="" 
+        //         onerror="this.src='/images/origami-academy-logo.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
+        //         alt="${name.trim()}" 
+        //         style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill; border: 3px solid orange;">
+        //   </div>`;
       });
     } else {
       // Show only first 3
       namesArray.slice(0, maxVisible).forEach(name => {
-        instructorsHtml += `
-          <div class="member-avatar avatar-orange" title="${name.trim()}">
-            <img src="" 
-                onerror="this.src='/images/origami-academy-logo.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
-                alt="${name.trim()}" 
-                style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill; border: 3px solid orange;">
-          </div>`;
+        instructorsHtml += ``;
+        // instructorsHtml += `
+        //   <div class="member-avatar avatar-orange" title="${name.trim()}">
+        //     <img src="" 
+        //         onerror="this.src='/images/origami-academy-logo.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
+        //         alt="${name.trim()}" 
+        //         style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill; border: 3px solid orange;">
+        //   </div>`;
       });
 
       // Add count +N for the remaining
       const remainingCount = namesArray.length - maxVisible;
-      instructorsHtml += `
-        <div class="member-avatar avatar-orange" title="and ${remainingCount} more">
-          <div class="avatar-counter" style="margin-left: 1rem; width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
-            +${remainingCount}
-          </div>
-        </div>`;
+      instructorsHtml += ``;
+      // instructorsHtml += `
+      //   <div class="member-avatar avatar-orange" title="and ${remainingCount} more">
+      //     <div class="avatar-counter" style="margin-left: 1rem; width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
+      //       +${remainingCount}
+      //     </div>
+      //   </div>`;
     }
   } else {
 
-    instructorsHtml += `
-      <div class="member-avatar avatar-orange" title="more" style="display: flex;">
-        <img src="/${courseInstr}" alt="Instructor" class="instructor-photo" onerror="this.src='/images/origami-academy-logo.png'" style="border: 3px solid orange;" />
-      </div>`;
+    instructorsHtml += ``;
+    // instructorsHtml += `
+    //   <div class="member-avatar avatar-orange" title="more" style="display: flex;">
+    //     <img src="/${courseInstr}" alt="Instructor" class="instructor-photo" onerror="this.src='/images/origami-academy-logo.png'" style="border: 3px solid orange;" />
+    //   </div>`;
   }
 
   // <div class="avatar-counter" style="width: 30px; height: 30px; border-radius: 100%; background-color: #f80; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;">
@@ -131,7 +135,7 @@ function renderClassCard(course, classroomId) {
               <span class="title-menu-sec" style=" display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;">${course.course_name}</span>
                 <div class="progress-section">
                   <div>
-                    <div class="instructor-name">
+                    <div class="instructor-name hidden">
                       <span><i class="fas fa-chalkboard-teacher"></i>&nbsp;</span>
                       <b>ผู้สอน:</b> ${courseInstr}
                     </div>
