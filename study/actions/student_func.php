@@ -257,7 +257,7 @@ function getMemberRole()
 {
     $result = select_data("position_id, position_name_en, position_name_th, COUNT(*) AS count_role",
     "classroom_position",
-    "WHERE status = 0 GROUP BY position_name_en, position_name_th");
+    "WHERE status = 0 order by position_order asc GROUP BY position_name_en, position_name_th");
 
     return !empty($result) ? $result : [];
 }
