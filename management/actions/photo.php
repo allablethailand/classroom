@@ -73,7 +73,7 @@ function uploadFile($file_data, $target_sub_dir = 'classroom') {
 
 
 // ------------------------------------------------------------------------------------------------------
-// *** NEW: ฟังก์ชันสำหรับรัน Python เพื่อตรวจจับใบหน้าในรูปกลุ่มที่เพิ่งอัปโหลด (ไม่มีการแก้ไขจากเดิม)
+// *** NEW: ฟังก์ชันสำหรับรัน Python เพื่อตรวจจับใบหน้าในรูปกลุ่มที่เพิ่งอัปโหลด (มีการแก้ไขส่วนดึงรูปโปรไฟล์)
 // ------------------------------------------------------------------------------------------------------
 function runFaceDetectionBatch($mysqli, $group_photo_id, $group_db_path) {
     global $base_path;
@@ -82,34 +82,34 @@ function runFaceDetectionBatch($mysqli, $group_photo_id, $group_db_path) {
     $python_interpreter = '"C:\Program Files\Python310\python.exe"'; 
     $python_script = BASE_INCLUDE . '/classroom/management/actions/python/myphoto.py'; 
 
-    // 1. ดึงรูปโปรไฟล์ของนักเรียนทุกคน
+    // 1. ดึงรูปโปรไฟล์ของนักเรียนทุกคน (✅ แก้ไขโค้ด SQL และ Logic การดึง)
     $ref_paths_all = [];
     $student_ids = []; 
-    $sql_all_students = "SELECT DISTINCT t1.student_id, t2.file_path 
-                          FROM `classroom_student` t1
-                          JOIN `classroom_file_student` t2 ON t1.student_id = t2.student_id
-                          WHERE t2.`file_type` = 'profile_image' 
-                          AND t2.`is_deleted` = 0 
-                          ORDER BY t1.student_id, t2.file_id DESC";
-                           
+    // ดึง student_id และ student_image_profile จากตาราง classroom_student
+    $sql_all_students = "SELECT `student_id`, `student_image_profile` 
+                             FROM `classroom_student` 
+                             WHERE `student_image_profile` IS NOT NULL AND `student_image_profile` != ''";
+                             
     $result_all = $mysqli->query($sql_all_students);
     
     // Grouping file_path by student_id
     while ($row = $result_all->fetch_assoc()) {
         $student_id = $row['student_id'];
-        $db_path = $row['file_path'];
+        $db_path = $row['student_image_profile']; // ใช้คอลัมน์ student_image_profile
         
-        if (!isset($ref_paths_all[$student_id])) {
-            $ref_paths_all[$student_id] = [];
-        }
-        // Limit 5 profile images per student
-        if (count($ref_paths_all[$student_id]) < 5) {
+        // ตรวจสอบว่ามี path อยู่
+        if ($db_path) {
+            // กำหนดให้มีเพียง 1 รูปโปรไฟล์ต่อคน
+            if (!isset($ref_paths_all[$student_id])) {
+                $ref_paths_all[$student_id] = [];
+            }
             // แปลงเป็น Server Path และใช้ Backslash สำหรับ Python/Windows
             $server_path = str_replace('/', '\\', rtrim($document_root, '/\\') . '/' . ltrim($db_path, '/\\'));
-            $ref_paths_all[$student_id][] = $server_path;
-        }
-        if (!in_array($student_id, $student_ids)) {
-             $student_ids[] = $student_id;
+            $ref_paths_all[$student_id][] = $server_path; 
+            
+            if (!in_array($student_id, $student_ids)) {
+                 $student_ids[] = $student_id;
+            }
         }
     }
     
@@ -151,8 +151,8 @@ function runFaceDetectionBatch($mysqli, $group_photo_id, $group_db_path) {
             
             // ใช้ REPLACE INTO เพื่อป้องกัน Duplicate Key หากมีการรันซ้ำ
             $sql_insert_batch = "REPLACE INTO `classroom_photo_face_detection` 
-                                 (`group_photo_id`, `student_id`, `detection_date`) 
-                                 VALUES " . implode(", ", $value_parts);
+                                  (`group_photo_id`, `student_id`, `detection_date`) 
+                                  VALUES " . implode(", ", $value_parts);
 
             $mysqli->query($sql_insert_batch);
             
@@ -198,11 +198,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && is
     for ($i = 0; $i < count($files['name']); $i++) {
         // จัดรูปแบบ $files ให้อยู่ในรูปที่ฟังก์ชัน uploadFile ต้องการ
         $file_data = [
-            'name'     => $files['name'][$i],
-            'type'     => $files['type'][$i],
-            'tmp_name' => $files['tmp_name'][$i],
-            'error'    => $files['error'][$i],
-            'size'     => $files['size'][$i],
+            'name'      => $files['name'][$i],
+            'type'      => $files['type'][$i],
+            'tmp_name'  => $files['tmp_name'][$i],
+            'error'     => $files['error'][$i],
+            'size'      => $files['size'][$i],
         ];
 
         if ($file_data['error'] !== UPLOAD_ERR_OK) {
@@ -215,8 +215,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && is
         if ($db_file_path) {
             // 1. บันทึก Path ลงในตาราง classroom_photo_album_group
             $sql = "INSERT INTO `classroom_photo_album_group` 
-                     (`group_photo_path`, `description`, `emp_create`, `date_create`) 
-                     VALUES (?, ?, ?, NOW())";
+                      (`group_photo_path`, `description`, `emp_create`, `date_create`) 
+                      VALUES (?, ?, ?, NOW())";
             
             $stmt = $mysqli->prepare($sql);
             if ($stmt) {
@@ -229,8 +229,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && is
 
                     // 2. รัน Face Recognition Batch Process ทันที
                     $detection_result_msg = runFaceDetectionBatch($mysqli, $new_group_photo_id, $db_file_path);
-                    if (strpos($detection_result_msg, 'พบนักเรียน') !== false) {
-                        $total_detected++;
+                    // ตรวจสอบข้อความตอบกลับเพื่อดูว่าพบนักเรียนหรือไม่
+                    if (strpos($detection_result_msg, 'อัพโหลดสำเร็จ') !== false) {
+                         $total_detected++;
                     }
 
                 } else {
@@ -356,8 +357,8 @@ $(document).ready(function() {
                     // แสดงผลผิดพลาดด้วย Alert-danger
                     var errorHtml = '<div class="alert alert-danger"><i class="fas fa-times-circle fa-fw"></i> ' + response.message + '</div>';
                     if (response.errors && response.errors.length > 0) {
-                         // แสดงรายละเอียดข้อผิดพลาดเป็นรายการ
-                         errorHtml += '<div class="alert alert-warning" style="margin-top: 10px;"><strong>รายละเอียด:</strong><ul><li>' + response.errors.join('</li><li>') + '</li></ul></div>';
+                        // แสดงรายละเอียดข้อผิดพลาดเป็นรายการ
+                        errorHtml += '<div class="alert alert-warning" style="margin-top: 10px;"><strong>รายละเอียด:</strong><ul><li>' + response.errors.join('</li><li>') + '</li></ul></div>';
                     }
                     messageArea.html(errorHtml);
                 }
