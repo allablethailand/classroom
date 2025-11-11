@@ -18,7 +18,7 @@ require_once $base_include . '/classroom/study/actions/student_func.php';
 
 $std_id = $_SESSION['student_id'];
 
-$classroom_group = getAlumniClassroom($std_id);
+$classroom_group = getAlumniClassroomCount($std_id);
 
 // var_dump($classroom_group);
 
@@ -123,8 +123,7 @@ $classroom_group = getAlumniClassroom($std_id);
                                             </div>
                                             <!-- แก้จำนวน -->
                                             <p class="text-secondary mb-0 small text-truncate-2" >
-                                                สมาชิกปัจจุบัน <?php echo $item["classroom_register"]; 
-                                                // . " / ". $item['classroom_student'];?> คน
+                                                สมาชิกปัจจุบัน <?php echo $item["classroom_register"]; ?> คน
                                             </p>
                                             
                                         </div>

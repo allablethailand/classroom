@@ -1,10 +1,116 @@
+<?php
+
+session_start();
+$base_include = $_SERVER['DOCUMENT_ROOT'];
+$base_path = '';
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $exl_path = explode('/', $request_uri);
+    if (!file_exists($base_include . "/dashboard.php")) {
+        $base_path .= "/" . $exl_path[1];
+    }
+    $base_include .= "/" . $exl_path[1];
+}
+define('BASE_PATH', $base_path);
+define('BASE_INCLUDE', $base_include);
+require_once $base_include . '/lib/connect_sqli.php';
+// require_once $base_include . '/classroom/study/actions/student_func.php';
+
+$teacher_id = isset($_GET['teacher_id']) ? intval($_GET['teacher_id']) : 0;
+
+// var_dump($teacher_id);
+
+if ($teacher_id > 0) {
+    // Corrected SQL query to join with `classroom_teacher_join` and `classroom_group`
+    // เพื่อดึงข้อมูล group_color ตามที่ต้องการ
+    $stmt = $mysqli->prepare("SELECT cs.*, IFNULL(cs.teacher_firstname_en, cs.teacher_firstname_th) AS teacher_name_display FROM classroom_teacher cs 
+                LEFT JOIN classroom_teacher_join csj ON cs.teacher_id = csj.teacher_id
+                WHERE cs.teacher_id = ? AND cs.status = 0");
+    $stmt->bind_param("i", $teacher_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Use the variable $row_all as in profile.php
+    if ($result->num_rows > 0) {
+        $row_all = $result->fetch_assoc();
+    } else {
+        $row_all = null;
+    }
+    $stmt->close();
+} else {
+    $row_all = null;
+}
+
+// Redirect if no valid teacher is found
+if ($row_all === null) {
+    header("Location: /classroom/study/teacher/");
+    exit();
+}
+
+// // Check for contact information
+$has_contact = !empty($row_all['teacher_mobile']) || !empty($row_all['teacher_email']) || !empty($row_all['teacher_line']) || !empty($row_all['teacher_ig']) || !empty($row_all['teacher_facebook']);
+
+
+// --- ส่วนที่ดึง classroom_name ---
+// 1. ดึง classroom_id จาก classroom_teacher_join
+$sql_join = "SELECT classroom_id FROM `classroom_teacher_join` WHERE teacher_id = ?";
+$stmt_join = $mysqli->prepare($sql_join);
+$stmt_join->bind_param("i", $teacher_id);
+$stmt_join->execute();
+$result_join = $stmt_join->get_result();
+$join_data = $result_join->fetch_assoc();
+$stmt_join->close();
+
+$classroom_name = ""; // กำหนดค่าเริ่มต้นเป็นค่าว่าง
+if ($join_data && $join_data['classroom_id']) {
+    $classroom_id = $join_data['classroom_id'];
+
+    // 2. ใช้ classroom_id ดึง classroom_name จาก classroom_template
+    $sql_template = "SELECT classroom_name FROM `classroom_template` WHERE classroom_id = ?";
+    $stmt_template = $mysqli->prepare($sql_template);
+    $stmt_template->bind_param("i", $classroom_id);
+    $stmt_template->execute();
+    $result_template = $stmt_template->get_result();
+    $template_data = $result_template->fetch_assoc();
+    $stmt_template->close();
+
+    if ($template_data) {
+        $classroom_name = $template_data['classroom_name'];
+    }
+}
+
+
+// // *** ส่วนที่เพิ่มเข้ามาเพื่อดึงรูปภาพบริษัท ตามที่ร้องขอ ***
+// $company_images = []; // สร้าง array เปล่าสำหรับเก็บรูปภาพบริษัท
+// $sql_company_files = "
+//     SELECT file_id, file_path
+//     FROM classroom_teacher_company_photo
+//     WHERE teacher_id = ? AND is_deleted = 0
+//     ORDER BY file_id ASC
+// ";
+// $stmt_company_files = $mysqli->prepare($sql_company_files);
+// $stmt_company_files->bind_param("i", $teacher_id);
+// $stmt_company_files->execute();
+// $result_company_files = $stmt_company_files->get_result();
+// while ($row_company_image = $result_company_files->fetch_assoc()) {
+//     $company_images[] = $row_company_image;
+// }
+// $stmt_company_files->close();
+// // ****************************************************
+
+// // กำหนดสีขอบรูปภาพเริ่มต้นเป็นสีส้ม ถ้าไม่มี group_color
+// $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_all['group_color']) : ;
+
+?>
+
+
 <!doctype html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/images/logo_new.ico" type="image/x-icon">
-    <title>Teacher • ORIGAMI SYSTEM</title>
+    <title>Teacher Info • ORIGAMI SYSTEM</title>
     <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="/classroom/study/css/schedule.css?v=<?php echo time(); ?>">
@@ -20,7 +126,9 @@
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
-    <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <!-- <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script> -->
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+
 </head>
 <style>
     .search-container {
@@ -557,31 +665,33 @@
 </style>
 <body>
     <?php require_once("component/header.php"); ?>
-
-    
     <div class="profile-header-container" style="gap: 5px;">
         <div class="settings-button-container">
             </div>
         <div class="profile-image-carousel">
-            <?php if (count($profile_images) > 0) : ?>
-                <div class="carousel-container">
-                    <?php foreach ($profile_images as $index => $image_path) : ?>
-                        <div class="carousel-item <?= ($index === 0) ? 'active' : ''; ?>">
-                            <img src="<?= GetUrl($image_path); ?>"  onerror="this.src='/images/default.png'" alt="Profile Image <?= $index + 1; ?>" style="width:50px; height:50px; border-color: <?= $profile_border_color1; ?>;">
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <?php if (count($profile_images) > 1) : ?>
-                    <button class="carousel-nav prev">&#10094;</button>
-                    <button class="carousel-nav next">&#10095;</button>
-                <?php endif; ?>
-            <?php else : ?>
-                <div class="carousel-container">
-                <div class="carousel-item" >
-                    <img src="../../../images/default.png" alt="Profile Picture" style="width:100px; height:100px; border-color: <?= $profile_border_color1; ?>;">
-                </div>
-                </div>
-            <?php endif; ?>
+            <?php
+                $sql_images = "SELECT tea.teacher_image_profile FROM classroom_teacher_join cjoin 
+                    LEFT JOIN classroom_teacher tea ON tea.teacher_id = cjoin.teacher_id 
+                    WHERE cjoin.status = 0 AND cjoin.teacher_id = ?";
+
+                $stmt_images = $mysqli->prepare($sql_images);
+                $stmt_images->bind_param("i", $teacher_id);
+                $stmt_images->execute();
+                $result_images = $stmt_images->get_result();
+
+                echo '<div class="carousel-container">';
+                if ($row_image = $result_images->fetch_assoc()) {
+                    $profile_image = $row_image['teacher_image_profile'];   
+                    // Assuming $profile_image contains raw image binary data (BLOB)
+                    echo '<img class="profile-avatar-circle" src="' . GetUrl($profile_image) . '" onerror="this.src=\'../../../images/default.png\'" alt="Profile Image" style="border-color: #ff8c00;">';
+                } else {
+                    // Fallback to default image if none found
+                    echo '<img src="../../../images/default.png" alt="Default Profile" style="border-color: #ff8c00;">';
+                }
+                $stmt_images->close();
+                // ----------------------------------------------------
+                echo '</div>';
+                ?>
         </div>
         <h2 class="profile-name" style="
       background-color: rgba(0, 0, 0, 0.1); 
@@ -591,9 +701,9 @@
     border-radius: 15px; /* มุมโค้งมน */
     text-align: center;
     ">
-            <?= $row_all["student_firstname_th"] . " " . $row_all["student_lastname_th"]; ?>
+            <?= $row_all["teacher_firstname_th"] . " " . $row_all["teacher_lastname_th"]; ?>
         </h2>
-        <?php if (!empty($row_all["student_address"])): ?>
+        <?php if (!empty($row_all["teacher_address"])): ?>
             <p class="profile-location" style="
       background-color: rgba(0, 0, 0, 0.1); 
     
@@ -603,7 +713,7 @@
     text-align: center;
     ">
                 <i class="fas fa-map-marker-alt"></i>
-                <span><?= $row_all["student_address"]; ?></span>
+                <span><?= $row_all["teacher_address"]; ?></span>
             </p>
         <?php endif; ?>
         <p class="profile-bio" style="
@@ -614,7 +724,7 @@
     border-radius: 15px; /* มุมโค้งมน */
     text-align: center;
     ">
-            <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
+            <?= !empty($row_all["teacher_bio"]) ? $row_all["teacher_bio"] : " - "; ?>
         </p>
     </div>
 
@@ -629,18 +739,18 @@
                         <span><?= $classroom_name; ?></span>
                     </p>
                 <?php endif; ?>
-                <?php if (!empty($row_all["student_company"])): ?>
+                <?php if (!empty($row_all["teacher_company"])): ?>
                     <p class="profile-company" style="font-size: 14px; align-items: baseline;">
                         <i class="fas fa-building" style="color: #0089ff; "></i>
                         <span style="font-size: 16px; font-weight: bold; padding-right: .3em;">บริษัท:</span> <span
-                            style="text-align: left;"><?= $row_all["student_company"]; ?></span>
+                            style="text-align: left;"><?= $row_all["teacher_company"]; ?></span>
                     </p>
                 <?php endif; ?>
-                <?php if (!empty($row_all["student_position"])): ?>
+                <?php if (!empty($row_all["teacher_position"])): ?>
                     <p class="profile-position" style="font-size: 14px;">
                         <i class="fas fa-briefcase" style="color: #0089ff;"></i>
                         <span style="font-size: 16px ;font-weight: bold; padding-right: .3em;">ตำแหน่ง:</span>
-                        <span><?= $row_all["student_position"]; ?></span>
+                        <span><?= $row_all["teacher_position"]; ?></span>
                     </p>
                 <?php endif; ?>
             </div>
@@ -653,43 +763,43 @@
                     <h3 class="section-title" style="padding-left:10px;">ช่องทางการติดต่อ</h3>
                 </div>
                 <div class="contact-grid">
-                    <?php if (!empty($row_all['student_mobile'])): ?>
+                    <?php if (!empty($row_all['teacher_mobile'])): ?>
                         <div class="contact-item">
-                            <a href="tel:<?= $row_all['student_mobile']; ?>">
+                            <a href="tel:<?= $row_all['teacher_mobile']; ?>">
                                 <div class="contact-icon-circle phone"><i class="fas fa-phone"></i></div>
-                                <span><?= $row_all['student_mobile']; ?></span>
+                                <span><?= $row_all['teacher_mobile']; ?></span>
                             </a>
                         </div>
                     <?php endif; ?>
-                    <?php if (!empty($row_all['student_email'])): ?>
+                    <?php if (!empty($row_all['teacher_email'])): ?>
                         <div class="contact-item">
-                            <a href="mailto:<?= $row_all['student_email']; ?>">
+                            <a href="mailto:<?= $row_all['teacher_email']; ?>">
                                 <div class="contact-icon-circle mail"><i class="fas fa-envelope"></i></div>
-                                <span><?= $row_all['student_email']; ?></span>
+                                <span><?= $row_all['teacher_email']; ?></span>
                             </a>
                         </div>
                     <?php endif; ?>
-                    <?php if (!empty($row_all['student_line'])): ?>
+                    <?php if (!empty($row_all['teacher_line'])): ?>
                         <div class="contact-item">
-                            <a href="https://line.me/ti/p/~<?= $row_all['student_line']; ?>" target="_blank">
+                            <a href="https://line.me/ti/p/~<?= $row_all['teacher_line']; ?>" target="_blank">
                                 <div class="contact-icon-circle line"><i class="fab fa-line"></i></div>
-                                <span><?= $row_all['student_line']; ?></span>
+                                <span><?= $row_all['teacher_line']; ?></span>
                             </a>
                         </div>
                     <?php endif; ?>
-                    <?php if (!empty($row_all['student_ig'])): ?>
+                    <?php if (!empty($row_all['teacher_ig'])): ?>
                         <div class="contact-item">
-                            <a href="https://www.instagram.com/<?= $row_all['student_ig']; ?>" target="_blank">
+                            <a href="https://www.instagram.com/<?= $row_all['teacher_ig']; ?>" target="_blank">
                                 <div class="contact-icon-circle ig"><i class="fab fa-instagram"></i></div>
-                                <span><?= $row_all['student_ig']; ?></span>
+                                <span><?= $row_all['teacher_ig']; ?></span>
                             </a>
                         </div>
                     <?php endif; ?>
-                    <?php if (!empty($row_all['student_facebook'])): ?>
+                    <?php if (!empty($row_all['teacher_facebook'])): ?>
                         <div class="contact-item">
-                            <a href="https://www.facebook.com/<?= $row_all['student_facebook']; ?>" target="_blank">
+                            <a href="https://www.facebook.com/<?= $row_all['teacher_facebook']; ?>" target="_blank">
                                 <div class="contact-icon-circle fb"><i class="fab fa-facebook-f"></i></div>
-                                <span><?= $row_all['student_facebook']; ?></span>
+                                <span><?= $row_all['teacher_facebook']; ?></span>
                             </a>
                         </div>
                     <?php endif; ?>
@@ -708,7 +818,7 @@
                     <div class="info-text">
                         <strong style="padding-left:10px;">วันเกิด</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_birth_date"]) ? date("j F Y", strtotime($row_all["student_birth_date"])) : "-"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_birth_date"]) ? date("j F Y", strtotime($row_all["teacher_birth_date"])) : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -716,7 +826,7 @@
                     <div class="info-text">
                         <strong style="padding-left:10px;">ศาสนา</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_religion"]) ? $row_all["student_religion"] : "-"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_religion"]) ? $row_all["teacher_religion"] : "-"; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -724,7 +834,7 @@
                     <div class="info-text">
                         <strong style="padding-left:10px;">กรุ๊ปเลือด</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_bloodgroup"]) ? $row_all["student_bloodgroup"] : "-"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_bloodgroup"]) ? $row_all["teacher_bloodgroup"] : "-"; ?></span>
                     </div>
                 </div>
             </div>
@@ -741,7 +851,7 @@
                     <div class="info-text">
                         <strong style="padding-left:10px;">งานอดิเรก</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_hobby"]) ? $row_all["teacher_hobby"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -749,7 +859,7 @@
                     <div class="info-text">
                         <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_music"]) ? $row_all["teacher_music"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -757,7 +867,7 @@
                     <div class="info-text">
                         <strong style="padding-left:10px;">เครื่องดื่มที่ชื่นชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_drink"]) ? $row_all["teacher_drink"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -765,7 +875,7 @@
                     <div class="info-text">
                         <strong style="padding-left:10px;">หนังที่ชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_movie"]) ? $row_all["teacher_movie"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -773,7 +883,7 @@
                     <div class="info-text">
                         <strong style="padding-left:10px;">เป้าหมาย</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_goal"]) ? $row_all["teacher_goal"] : " - "; ?></span>
                     </div>
                 </div>
             </div>
@@ -785,33 +895,32 @@
                 <h3 class="section-title" style="padding-left:10px;">บริษัท</h3>
             </div>
             <div class="row">
-                <?php if (!empty($row_all["student_company_url"])): ?>
+                <?php if (!empty($row_all["teacher_company_url"])): ?>
                 <div class="col-md-6">
                     <div class="info-item-box" style="display: block; margin-bottom: 2em;">
                         <strong>URL บริษัท:</strong>
                         <span class="info-text">
-                            <a href="<?= htmlspecialchars($row_all["student_company_url"]); ?>" target="_blank"
+                            <a href="<?= htmlspecialchars($row_all["teacher_company_url"]); ?>" target="_blank"
                                 rel="noopener noreferrer">
-                                <?= htmlspecialchars($row_all["student_company_url"]); ?>
+                                <?= htmlspecialchars($row_all["teacher_company_url"]); ?>
                             </a>
                         </span>
                     </div>
                 </div>
                 <?php endif; ?>
-                <?php if (!empty($row_all["student_company_detail"])): ?>
+                <?php if (!empty($row_all["teacher_company_detail"])): ?>
                 <div class="col-md-12">
                     <div class="info-item-box" style="display: block; margin-bottom: 2em;">
                         <strong>รายละเอียดบริษัท:</strong>
                         <div class="info-text" style="white-space: pre-wrap; margin-top: 5px;">
-                            <?= htmlspecialchars($row_all["student_company_detail"]); ?>
+                            <?= htmlspecialchars($row_all["teacher_company_detail"]); ?>
                         </div>
                     </div>
                 </div>
                 <?php endif; ?>
             </div>
-
         
-        <?php if (!empty($row_all["student_company"]) && !empty($row_all["student_company_logo"])): ?>
+        <?php if (!empty($row_all["teacher_company"]) && !empty($row_all["teacher_company_logo"])): ?>
         <div class="info-grid-section">
             <div class="section-header-icon">
                 <i style="font-size: 25px;"></i>
@@ -819,7 +928,7 @@
             </div>
             <div class="row d-flex justify-content-center">
                 <div class="col-6 col-md-4 col-lg-3 text-center">
-                    <img src="<?= GetUrl($row_all["student_company_logo"]); ?>" 
+                    <img src="<?= GetUrl($row_all["teacher_company_logo"]); ?>" 
                         
                         alt="Company Logo" 
                         class="img-fluid rounded shadow-sm" 
@@ -858,3 +967,4 @@
 </body>
 
 </html>
+
