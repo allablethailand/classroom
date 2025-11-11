@@ -77,7 +77,7 @@ const translations = {
         // Menu
         dailyschedule: "Daily Schedule",
         courseclasses: "Course Classes",
-        classhistory: "Attendance History",
+        classhistory: "ATTENDANCE HISTORY",
         classroom: "Classroom",
         groupmembers: "Group Members",
         staffmembers: "Staff Members",
@@ -96,7 +96,7 @@ const translations = {
         history: "ประวัติ",
         minigame: "มินิเกม",
         myphoto: "รูปภาพของฉัน",
-        alumni: "หลักสูตร",
+        alumni: "รุุ่นหลักสูตร",
         askai: "ถาม AI",
         home: "หน้าแรก",
         quiz: "แบบทดสอบ",

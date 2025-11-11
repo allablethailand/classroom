@@ -402,7 +402,7 @@ $alumni_list = getStudentClassroomList($student_id);
             width: 2px;
             height: 60px;
             background: #e0e0e0;
-            display: block;
+            /* display: block; */
         }
 
         @media (max-width: 480px) {
@@ -416,18 +416,17 @@ $alumni_list = getStudentClassroomList($student_id);
 <body>
     <?php require_once 'component/header.php'; ?>
 
-    <div class="main-content">
+    <div class="main-transparent-content">
         <!-- Tabs Section -->
-         <div class="container-fluid">
-             <h1 class="heading-1" data-lang="classhistory">ประวัติการเข้าเรียน</h1>
-             <div class="divider-1">
-                 <span></span>
-             </div>
-         </div>
+            <div class="container-fluid">
+                <h1 class="heading-1" data-lang="classhistory">ประวัติการเข้าเรียน</h1>
+                <div class="divider-1">
+                    <span></span>
+                </div>
+            </div>
             <div class="tabs-section">
-                
                 <div class="" style="display: flex; gap: 10px;">
-                     <!-- <button class="navbox-button" id="searchBtn">
+                    <!-- <button class="navbox-button" id="searchBtn">
                         <svg class="icon-svg" viewBox="0 0 45 45" style="width:150px; height:150px;">
                             <g>
                                 <path d="M22.2356 14.7298C25.828 14.7301 28.7405 17.6431 28.7405 21.2356C28.7403 22.616 28.3079 23.8947 27.5745 24.9475L29.9329 27.3069C30.382 27.756 30.382 28.4838 29.9329 28.9329C29.4838 29.382 28.756 29.382 28.3069 28.9329L25.9475 26.5745C24.8946 27.3079 23.616 27.7404 22.2356 27.7405C18.6431 27.7405 15.7301 24.828 15.7297 21.2356C15.7297 17.6429 18.6429 14.7298 22.2356 14.7298ZM22.2356 17.0305C19.9131 17.0305 18.0305 18.9132 18.0305 21.2356C18.0309 23.5578 19.9134 25.4407 22.2356 25.4407C24.5575 25.4403 26.4403 23.5576 26.4407 21.2356C26.4407 18.9134 24.5578 17.0309 22.2356 17.0305Z" fill="#26273A" />
@@ -464,7 +463,6 @@ $alumni_list = getStudentClassroomList($student_id);
                             </g>
                         </svg>
                     </button>
-           
                 </div>
                 <div class="filter-tabs">
                     <button class="filter-tab active" data-lang="alldata" onclick="switchFilterTab(this, 'all')">
@@ -484,81 +482,79 @@ $alumni_list = getStudentClassroomList($student_id);
                     </button>
                 </div>
             </div>
-            <div class="mobile-container">
-                <div class="orders-container" id="ordersContainer">
-                    
+                <div class="mobile-container">
+                    <div class="orders-container" id="ordersContainer">
+                    </div>
                 </div>
             </div>
+            <div id="bottomModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog" style="position: fixed; bottom: 0; margin: 0; width: 100%; max-width: 100%;">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h4 class="modal-title" data-lang="filters">Filters</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h4 class="modal-title" data-lang="startdate">Start Date:</h4>
+                                            <div class="input-group date" data-provide="datepicker">
+                                                <input type="text" id="start_date" class="form-control" style="margin-top:0px !important; margin-bottom:0px !important;">
+                                                <div class="input-group-addon">
+                                                    <span><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <h4 class="modal-title" style="margin-top: 10px;" data-lang="enddate">End Date:</h4>
+                                            <div class="input-group date" data-provide="datepicker">
+                                                <input type="text" id="end_date" class="form-control" style="margin-top:0px !important; margin-bottom:0px !important;">
+                                                <div class="input-group-addon">
+                                                    <span><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <!-- Your modal content here -->
+                                            <div class="daterange-filter">
+                                                <div class="" style="margin-top: 10px;">
+                                                    <p data-lang="selectrange">Select Range</p>
+                                                </div>
+                                                <div class="" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                    <div class="dropdown">
+                                                        <div class="filter-tag active" id="filter-date-today" data-filter="today">
+                                                            <span class="filter-text" data-lang="today">Today</span>
+                                                            <span class="remove-btn">×</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="dropdown">
+                                                        <div class="filter-tag" id="filter-date-lastmonth" data-filter="lastmonth">
+                                                            <span class="filter-text" data-lang="lastmonth">Last month</span>
+                                                            <span class="remove-btn">×</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="dropdown">
+                                                        <div class="filter-tag" id="filter-date-lastweek" data-filter="lastweek">
+                                                            <span class="filter-text" data-lang="lastweek">Last week</span>
+                                                            <span class="remove-btn">×</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="dropdown">
+                                                        <div class="filter-tag" id="filter-date-thismonth" data-filter="thismonth">
+                                                            <span class="filter-text" data-lang="thismonth">This month</span>
+                                                            <span class="remove-btn">×</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="dropdown">
+                                                        <div class="filter-tag" id="filter-date-thisweek" data-filter="thisweek">
+                                                            <span class="filter-text" data-lang="thisweek">This week</span>
+                                                            <span class="remove-btn">×</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-    </div>
-    <div id="bottomModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-                        <div class="modal-dialog" style="position: fixed; bottom: 0; margin: 0; width: 100%; max-width: 100%;">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                    <h4 class="modal-title" data-lang="filters">Filters</h4>
-                                </div>
-                                <div class="modal-body">
-                                    <h4 class="modal-title" data-lang="startdate">Start Date:</h4>
-                                    <div class="input-group date" data-provide="datepicker">
-                                        <input type="text" id="start_date" class="form-control" style="margin-top:0px !important; margin-bottom:0px !important;">
-                                        <div class="input-group-addon">
-                                            <span><i class="fa fa-calendar"></i></span>
-                                        </div>
-                                    </div>
-                                     <h4 class="modal-title" style="margin-top: 10px;" data-lang="enddate">End Date:</h4>
-                                    <div class="input-group date" data-provide="datepicker">
-                                        <input type="text" id="end_date" class="form-control" style="margin-top:0px !important; margin-bottom:0px !important;">
-                                        <div class="input-group-addon">
-                                            <span><i class="fa fa-calendar"></i></span>
-                                        </div>
-                                    </div>
-                                    <!-- Your modal content here -->
-                                    <div class="daterange-filter">
-                                        <div class="" style="margin-top: 10px;">
-                                            <p data-lang="selectrange">Select Range</p>
-                                        </div>
-                                        <div class="" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                            <div class="dropdown">
-                                                <div class="filter-tag active" id="filter-date-today" data-filter="today">
-                                                    <span class="filter-text" data-lang="today">Today</span>
-                                                    <span class="remove-btn">×</span>
-                                                </div>
-                                            </div>
-                                            <div class="dropdown">
-                                                <div class="filter-tag" id="filter-date-lastmonth" data-filter="lastmonth">
-                                                    <span class="filter-text" data-lang="lastmonth">Last month</span>
-                                                    <span class="remove-btn">×</span>
-                                                </div>
-                                            </div>
-                                            <div class="dropdown">
-                                                <div class="filter-tag" id="filter-date-lastweek" data-filter="lastweek">
-                                                    <span class="filter-text" data-lang="lastweek">Last week</span>
-                                                    <span class="remove-btn">×</span>
-                                                </div>
-                                            </div>
-                                            <div class="dropdown">
-                                                <div class="filter-tag" id="filter-date-thismonth" data-filter="thismonth">
-                                                    <span class="filter-text" data-lang="thismonth">This month</span>
-                                                    <span class="remove-btn">×</span>
-                                                </div>
-                                            </div>
-                                            <div class="dropdown">
-                                                <div class="filter-tag" id="filter-date-thisweek" data-filter="thisweek">
-                                                    <span class="filter-text" data-lang="thisweek">This week</span>
-                                                    <span class="remove-btn">×</span>
-                                                </div>
+                                            <div class="row" style="margin-inline: 0.5rem;">
+                                                <button id="searchDateRange" class="btn btn-primary btn-block" data-lang="searchresults">Search Result</button>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div class="row" style="margin-inline: 0.5rem;">
-                                        <button id="searchDateRange" class="btn btn-primary btn-block" data-lang="searchresults">Search Result</button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
         
   

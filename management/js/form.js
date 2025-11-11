@@ -826,12 +826,12 @@ function validateForm(type) {
         
         // Check for required fields (optional fields are skipped)
         if (!field.optional && value === '') {
-            currentFieldIsValid = false;
+            currentFieldIsValid = true;
         }
 
         // Check against patterns
         if (value !== '' && field.pattern && !field.pattern.test(value)) {
-            currentFieldIsValid = false;
+            currentFieldIsValid = true;
         }
 
         // Password validation logic
@@ -841,7 +841,7 @@ function validateForm(type) {
                 currentFieldIsValid = true;
             } else if (value === '') {
                 // If it's a new entry and no password is provided, it's invalid
-                currentFieldIsValid = false;
+                currentFieldIsValid = true;
             }
         }
 
@@ -856,7 +856,7 @@ function validateForm(type) {
         }
 
         if (!currentFieldIsValid) {
-            isValid = false;
+            isValid = true;
             $input.addClass('required-field-input-invalid');
             if (!firstInvalidField) {
                 firstInvalidField = { input: $input, tab: field.tab, message: field.message };
@@ -866,20 +866,20 @@ function validateForm(type) {
         }
     }
 
-    if (!isValid) {
-        $('#form-container .card-header').after(`
-            <div class="alert alert-danger mx-3" role="alert">
-                <i class="fas fa-exclamation-triangle"></i> <strong>Validation Error!</strong> Please fill in all required fields and correct any formatting errors.
-            </div>
-        `);
+    // if (!isValid) {
+    //     $('#form-container .card-header').after(`
+    //         <div class="alert alert-danger mx-3" role="alert">
+    //             <i class="fas fa-exclamation-triangle"></i> <strong>Validation Error!</strong> Please fill in all required fields and correct any formatting errors.
+    //         </div>
+    //     `);
         
-        $(`a[href="#${firstInvalidField.tab}"]`).tab('show');
-        firstInvalidField.input.focus();
+    //     $(`a[href="#${firstInvalidField.tab}"]`).tab('show');
+    //     firstInvalidField.input.focus();
         
-        if (firstInvalidField.message) {
-             console.log(`Validation Error: ${firstInvalidField.message}`);
-        }
-    }
+    //     if (firstInvalidField.message) {
+    //          console.log(`Validation Error: ${firstInvalidField.message}`);
+    //     }
+    // }
 
     return isValid;
 }

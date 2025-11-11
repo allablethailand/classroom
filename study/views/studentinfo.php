@@ -81,17 +81,17 @@ if ($join_data && $join_data['classroom_id']) {
 // ---------------------------------
 
 // ส่วนที่เพิ่มเข้ามาใหม่สำหรับการดึงรูปภาพโปรไฟล์ (ใช้ student_id จาก URL)
-$profile_images = []; // สร้าง array เปล่าสำหรับเก็บรูปภาพโปรไฟล์
-$sql_images = "SELECT file_path, file_order FROM `classroom_file_student` WHERE student_id = ? AND file_type = 'profile_image' AND is_deleted = 0 ORDER BY file_order ASC LIMIT 4";
-$stmt_images = $mysqli->prepare($sql_images);
-$stmt_images->bind_param("i", $student_id);
-$stmt_images->execute();
-$result_images = $stmt_images->get_result();
+// $profile_images = []; // สร้าง array เปล่าสำหรับเก็บรูปภาพโปรไฟล์
+// $sql_images = "SELECT file_path, file_order FROM `classroom_file_student` WHERE student_id = ? AND file_type = 'profile_image' AND is_deleted = 0 ORDER BY file_order ASC LIMIT 4";
+// $stmt_images = $mysqli->prepare($sql_images);
+// $stmt_images->bind_param("i", $student_id);
+// $stmt_images->execute();
+// $result_images = $stmt_images->get_result();
 
-while ($row_image = $result_images->fetch_assoc()) {
-    $profile_images[] = $row_image['file_path'];
-}
-$stmt_images->close();
+// while ($row_image = $result_images->fetch_assoc()) {
+//     $profile_images[] = $row_image['file_path'];
+// }
+// $stmt_images->close();
 // --------------------------------------------------------------------
 
 // *** ส่วนที่เพิ่มเข้ามาเพื่อดึงรูปภาพบริษัท ตามที่ร้องขอ ***
@@ -665,9 +665,35 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
 
     <div class="profile-header-container" style="gap: 5px;">
         <div class="settings-button-container">
-            </div>
+        </div>
+        
         <div class="profile-image-carousel">
-            <?php if (count($profile_images) > 0) : ?>
+            <?php
+                $sql_images = "SELECT stu.student_image_profile FROM classroom_student_join cjoin 
+                    LEFT JOIN classroom_student stu ON stu.student_id = cjoin.student_id 
+                    WHERE cjoin.status = 0 AND cjoin.payment_status = 1 AND cjoin.student_id = ?";
+
+                $stmt_images = $mysqli->prepare($sql_images);
+                $stmt_images->bind_param("i", $student_id);
+                $stmt_images->execute();
+                $result_images = $stmt_images->get_result();
+
+                echo '<div class="carousel-container">';
+                if ($row_image = $result_images->fetch_assoc()) {
+                    $profile_image = $row_image['student_image_profile'];   
+                    // Assuming $profile_image contains raw image binary data (BLOB)
+                    echo '<img class="profile-avatar-circle" src="' . GetUrl($profile_image) . '" onerror="this.src=\'../../../images/default.png\'" alt="Profile Image" style="border-color: ' . $profile_border_color . ';">';
+                } else {
+                    // Fallback to default image if none found
+                    echo '<img src="../../../images/default.png" alt="Default Profile" style="border-color: ' . $profile_border_color . ';">';
+                }
+                $stmt_images->close();
+                // ----------------------------------------------------
+                echo '</div>';
+                ?>
+        </div>
+            
+            <!-- <?php if (count($profile_images) > 0) : ?>
                 <div class="carousel-container">
                     <?php foreach ($profile_images as $index => $image_path) : ?>
                         <div class="carousel-item <?= ($index === 0) ? 'active' : ''; ?>">
@@ -686,7 +712,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                 </div>
                 </div>
             <?php endif; ?>
-        </div>
+        </div> -->
         <h2 class="profile-name" style="
       background-color: rgba(0, 0, 0, 0.1); 
     

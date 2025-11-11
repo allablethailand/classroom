@@ -124,31 +124,33 @@ require_once $base_include . '/classroom/study/actions/student_func.php';
 if($_POST && $_POST['action'] == 'fetch_history'){
 
     $student_id = getStudentId();
+    $emp_id = getStudentEmpId($student_id);
     $hist_table = select_data(
-    "oth.olh_id, 
-    oth.olh_course_id,
-    ott.trn_subject,
-    ott.trn_by,
-    ott.trn_date, 
-    ott.trn_from_time,
-    ott.trn_to_time,
-    ott.trn_location,
-    (CASE 
-        WHEN ott.trn_type = 'inhouse' THEN 'onsite'
-        WHEN ott.trn_type = 'public' THEN 'online'
-        WHEN ott.trn_type = 'both' THEN 'hybrid'
-        WHEN ott.trn_type IS NULL THEN '-'
-        ELSE '-'
-    END) AS trn_type_description,
-    oth.olh_learning_map_id, 
-    oth.olh_topic,
-    DATE_FORMAT(oth.olh_datetime_in, '%d/%m/%Y') AS olh_date_part,
-    DATE_FORMAT(oth.olh_datetime_in, '%H:%i') AS olh_time_part,
-    oth.olh_emp, 
-    oth.olh_comp, 
-    oth.learning_device",
-    "ot_learning_history AS oth JOIN ot_training_list AS ott on oth.olh_course_id = ott.trn_id",
-    "WHERE oth.olh_emp = '{$student_id}'");
+        "oth.olh_id, 
+        oth.olh_course_id,
+        ott.trn_subject,
+        ott.trn_by,
+        ott.trn_date, 
+        ott.trn_from_time,
+        ott.trn_to_time,
+        ott.trn_location,
+        (CASE 
+            WHEN ott.trn_type = 'inhouse' THEN 'onsite'
+            WHEN ott.trn_type = 'public' THEN 'online'
+            WHEN ott.trn_type = 'both' THEN 'hybrid'
+            WHEN ott.trn_type IS NULL THEN '-'
+            ELSE '-'
+        END) AS trn_type_description,
+        oth.olh_learning_map_id, 
+        oth.olh_topic,
+        oth.olh_datetime_in,
+        DATE_FORMAT(oth.olh_datetime_in, '%d/%m/%Y') AS olh_date_part,
+        DATE_FORMAT(oth.olh_datetime_in, '%H:%i') AS olh_time_part,
+        oth.olh_emp, 
+        oth.olh_comp, 
+        oth.learning_device",
+        "ot_learning_history AS oth JOIN ot_training_list AS ott on oth.olh_course_id = ott.trn_id",
+        "WHERE oth.olh_emp = '{$emp_id}' ORDER BY olh_datetime_in DESC");
 
     echo json_encode($hist_table);
     // TO DO;
@@ -158,6 +160,7 @@ if($_POST && $_POST['action'] == 'fetch_history'){
 if ($_POST['action'] == 'searchDatePeriod'){
 
     $student_id = getStudentId();
+    $emp_id = getStudentEmpId($student_id);
     $start_date_input = $_POST['start_date']; // expected format 'DD/MM/YYYY'
     $end_date_input = $_POST['end_date']; // expected format 'DD/MM/YYYY'
 
@@ -199,7 +202,7 @@ if ($_POST['action'] == 'searchDatePeriod'){
         oth.olh_comp, 
         oth.learning_device",
         "ot_learning_history AS oth JOIN ot_training_list AS ott on oth.olh_course_id = ott.trn_id",
-        "WHERE oth.olh_emp = '{$student_id}' 
+        "WHERE oth.olh_emp = '{$emp_id}' 
         AND oth.olh_datetime_in BETWEEN '{$start_datetime}' AND '{$end_datetime}'"
     );
 

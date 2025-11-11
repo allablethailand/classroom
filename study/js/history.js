@@ -86,8 +86,9 @@ function load_history(){
                 // }
 
                 // Determine order type and icon
-
                 var dataType = order.trn_type_description === 'inhouse' || order.trn_type_description === 'both' ? 'current' : 'waiting';
+                
+                // LATE, PRESENT, EARLY, MISSED
                 
                 var iconHtml = '<img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 60px; height: 60px; border-radius: 100%;">'
 
@@ -234,7 +235,7 @@ $(document).ready(function () {
             type: 'POST',
             data: {
                 action: 'fetch_history',
-                classroom_id: classroomId,
+                // classroom_id: classroomId,
             },
             success: function (response) {
                 var result = JSON.parse(response);

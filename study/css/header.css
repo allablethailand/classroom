@@ -28,6 +28,7 @@
 #menu-icon {
   width: 40px !important;
   max-width: 40px !important;
+  cursor: pointer;
   /* height: 40px !important; */
   /* margin-top: -10px; */
 }
@@ -335,12 +336,13 @@
             display: inline-block !important;
             padding: 12px 15px !important;
             /* color: #333 !important; */
+            width: 100%;
             text-decoration: none !important;
             transition: background-color 0.2s ease;
         }
 
         .notification-item:hover {
-            background-color: #f8f9fa !important;
+            background-color: #e3e3e3 !important;
             text-decoration: none !important;
         }
 
@@ -390,6 +392,15 @@
         .view-all-notifications:hover {
             color: #ff8c5a !important;
             text-decoration: underline !important;
+        }
+
+        .notification.dropdown-toggle.menu-readall:hover{
+          background-color: #e3e3e3 !important;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+            color: rgb(255, 87, 16) !important;
+
+
         }
 
         /* Divider styling */
@@ -484,6 +495,54 @@
     padding: 10px 15px;
     font-weight: 500;
 }
+
+
+.menu-title {
+  color: #7d7c7c;
+  font-size: 1.4rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.menu-section-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.head-flex-menu {
+  display: flex;
+  justify-content: space-between;
+  width: 100%; /* Make sure container is full width */
+  align-items: center; /* Vertically center text and button */
+  margin: 0; /* Remove if row adds margin */
+  padding: 0; /* Remove if row adds padding */
+}
+
+.menu-title-button {
+  
+  font-size: 1.6rem;
+  margin: 0;
+  transition: transform 1s ease, fill 1s ease;
+  color: #999898;
+
+  /* font-weight: 500; */
+}
+
+.menu-title-button svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.3rem;
+}
+
+.menu-title-button:active {
+  fill: #646464;
+  transform: scale(1.4);
+  transition: transform 1s ease;
+}
+
+
+
 
 /* ไอคอนซ้ายในเมนู */
 .menu-list a i,

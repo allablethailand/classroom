@@ -799,7 +799,6 @@ function saveRegister() {
 }
 function handleRegisterResponse(result) {
     $(".loader").removeClass("active");
-    $(".systemModal").modal("hide");
     if (!result || typeof result !== 'object') {
         const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'th';
         const msg = (lang === 'en') ? "Invalid response from server" : "ข้อมูลจากเซิร์ฟเวอร์ไม่ถูกต้อง";

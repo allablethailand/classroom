@@ -50,6 +50,10 @@ $course_file = select_data("*", "ot_training_file", "WHERE trn_id='58' and statu
 
 // var_dump($course_file);
 
+function isHTML($string) {
+    return $string != strip_tags($string);
+}
+
 // --- Initialization ---
 $file_key_arr = [];          
 $file_path_arr = [];    
@@ -192,7 +196,7 @@ if (!empty($course_file)) {
         <div class="card mb-6">
             <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-text-primary mb-2"><?= $course_data['course_name']; ?></h2>
+                    <p class="text-2xl font-bold text-text-primary mb-2"><?= $course_data['course_name']; ?></p>
                     <div class="flex items-center text-sm text-text-secondary mb-1">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -256,9 +260,19 @@ if (!empty($course_file)) {
         <!-- Event Description Card -->
         <div class="card mb-6">
             <h3 class="text-lg font-semibold text-text-primary mb-3">Description</h3>
-            <p class="text-text-secondary leading-relaxed mb-4">
-                <?= isset($course_data['course_description']) ? $course_data['course_description'] : ' ไม่พบข้อมูล ' ?>
-            </p>
+            <?php if (isset($course_data['course_description'])): ?>
+                <?php if (isHTML($course_data['course_description'])): ?>
+                    <div class="text-text-secondary leading-relaxed mb-4">
+                        <?= $course_data['course_description'] ?>
+                    </div>
+                <?php else: ?>
+                    <p class="text-text-secondary leading-relaxed mb-4">
+                        <?= htmlspecialchars($course_data['course_description']) ?>
+                    </p>
+                <?php endif; ?>
+            <?php else: ?>
+                <p class="text-text-secondary leading-relaxed mb-4">ไม่พบข้อมูล</p>
+            <?php endif; ?>
         </div>
 
         <!-- Attendees Card -->

@@ -127,27 +127,27 @@ $notification_data = [
         "path" => "/alerts/version",
         "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
     ],
-    [
-        "header" => "System update",
-        "message" => "ระบบจะทำการอัปเดตในวันที่ 12 ตุลาคม",
-        "class" => "notification-item",
-        "path" => "/updates/system",
-        "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
-    ],
-    [
-        "header" => "Maintenance Notice",
-        "message" => "เว็บไซต์จะปิดปรับปรุงเวลา 02:00-04:00 น.",
-        "class" => "notification-item",
-        "path" => "/notices/maintenance",
-        "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
-    ],
-    [
-        "header" => "Upcoming Class",
-        "message" => "คลาสเรียนหลักสูตร GreenTech จะเริ่มในอีก 1 วัน",
-        "class" => "notification-item",
-        "path" => "/promotions/new-members",
-        "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
-    ]
+    // [
+    //     "header" => "System update",
+    //     "message" => "ระบบจะทำการอัปเดตในวันที่ 12 ตุลาคม",
+    //     "class" => "notification-item",
+    //     "path" => "/updates/system",
+    //     "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
+    // ],
+    // [
+    //     "header" => "Maintenance Notice",
+    //     "message" => "เว็บไซต์จะปิดปรับปรุงเวลา 02:00-04:00 น.",
+    //     "class" => "notification-item",
+    //     "path" => "/notices/maintenance",
+    //     "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
+    // ],
+    // [
+    //     "header" => "Upcoming Class",
+    //     "message" => "คลาสเรียนหลักสูตร GreenTech จะเริ่มในอีก 1 วัน",
+    //     "class" => "notification-item",
+    //     "path" => "/promotions/new-members",
+    //     "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
+    // ]
 ];
 
         function truncateMessage($text, $maxLength = 50) {
@@ -162,6 +162,7 @@ $notification_data = [
 
 <head>
     <link rel="stylesheet" href="/classroom/study/css/header.css?v=<?php echo time(); ?>">
+    
     <style>
         .profile-avatar-bordered {
             width: 54px;
@@ -277,9 +278,9 @@ $notification_data = [
                         <img id="menu-icon" src="/images/menu/Hamberger Icon.svg" alt="Menu">
                     </a>
                     <div class="title-group-topnav">
-                        <div>
+                        <a href="menu">
                             <img src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="error" style="width: 50px; height: 50px; border-radius: 100%;">
-                        </div>
+                        </a>
                         <div class="dissappear-text">
                             <h1 style="color:black !important;">Green Tech</h1>
                             <p style="color:black !important;">Hello ! <?php echo $student_name; ?></p>
@@ -291,9 +292,8 @@ $notification_data = [
                     <div class="dropdown" style="display: inline-block; vertical-align: middle;">
                         <button class="bell-button btn btn-default dropdown-toggle" type="button" id="bellDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background: none; border: none; padding: 0;">
                             <img id="menu-icon" src="/images/menu/Bell.svg" alt="Noti" style="padding: 5px;">
-                            <span class="notification-badge">4</span>
+                            <span class="notification-badge">1</span>
                         </button>
-
                         <ul class="dropdown-menu centered" aria-labelledby="bellDropdown">
                             <a class="notification dropdown-toggle menu-readall text-center" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="update_notiStatus_read();">
                             <span><i class="fas fa-check-circle"></i></span>
@@ -318,7 +318,7 @@ $notification_data = [
                                             <p style="margin-left: 10%;"><?= htmlspecialchars(truncateMessage($notification['message'], 50)) ?></p>
                                         </a>
                                     </li>
-                                    <li class="divider"></li>
+                                    <!-- <li class="divider"></li> -->
                                 <?php endforeach; ?>
                         </ul>
                     </div>
@@ -510,7 +510,7 @@ $notification_data = [
         ?>
             <!-- Mobile centered title -->
             <div class="header">
-                <button class="back-button" onclick="window.history.back();">
+                <button class="back-button" onclick="history.go(-1);">
                     <span>
                         <i class="fas fa-long-arrow-alt-left"></i>
                     </span>

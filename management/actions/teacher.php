@@ -367,13 +367,13 @@ if(isset($_POST['action']) && $_POST['action'] == 'getEmployees') {
     $table = "SELECT 
         e.emp_id, 
         ei.firstname_th, 
+        CONCAT(IFNULL(ei.firstname,ei.firstname_th),' ',IFNULL(ei.lastname,ei.lastname_th)) AS full_name,
         ei.lastname_th,
         ei.tel_office,
-        e.email,
-        CONCAT(ei.firstname_th, ' ', ei.lastname_th) AS full_name
+        e.email
     FROM m_employee e
     LEFT JOIN m_employee_info ei ON ei.emp_id = e.emp_id
-    WHERE e.emp_del = 0
+    WHERE e.comp_id = '{$_SESSION['comp_id']}' and e.emp_del is null AND e.emp_code is not null and e.emp_code <> '' and date(ifnull(e.emp_resign_date,NOW())) >= date(NOW())
     AND e.emp_id NOT IN (SELECT teacher_ref_id FROM classroom_teacher WHERE teacher_ref_type = 'employee')";
     
     $primaryKey = 'emp_id';
@@ -394,13 +394,11 @@ if(isset($_POST['action']) && $_POST['action'] == 'getEmployees') {
 // ส่วนที่แก้ไข: ดึงข้อมูล Customer
 if(isset($_POST['action']) && $_POST['action'] == 'getCustomers') {
     $table = "SELECT
-        cus_cont_id as cus_id,
-        CONCAT(cus_cont_name, ' ', cus_cont_surname) AS cus_name_th,
-        cus_cont_mob AS cus_tel_no,
-        cus_cont_email AS cus_email
-    FROM m_customer_contact c
-    WHERE c.cus_cont_del = 0
-    AND c.cus_cont_id NOT IN (SELECT teacher_ref_id FROM classroom_teacher WHERE teacher_ref_type = 'contact')";
+        c.cus_cont_id as cus_id,
+        CONCAT(c.cus_cont_name, ' ', c.cus_cont_surname) AS cus_name_th,
+        c.cus_cont_mob AS cus_tel_no,
+        c.cus_cont_email AS cus_email
+    FROM m_customer_contact c WHERE c.cus_cont_del is null AND c.comp_id = '{$_SESSION['comp_id']}' AND c.status = 0 AND c.cus_cont_id NOT IN (SELECT teacher_ref_id FROM classroom_teacher WHERE teacher_ref_type = 'contact')";
     
     $primaryKey = 'cus_id';
     $columns = array(

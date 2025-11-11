@@ -12,6 +12,7 @@ function getStudentId() {
     return isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : null;
 }
 
+
 function getStudentClassroomId($student_id) {
     $result = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
     return $result ? $result[0]['classroom_id'] : null;
@@ -45,7 +46,7 @@ function getAlumniClassroom($student_id){
         "classroom_template template",
         "LEFT JOIN classroom_group cg ON cg.classroom_id = template.classroom_id 
         LEFT JOIN classroom_student_join student ON student.classroom_id = template.classroom_id 
-        WHERE student.status = 0 AND student.student_id = '{$student_id}'"
+        WHERE template.status = 0 AND student.student_id = '{$student_id}'"
     );
 
     return !empty($result) ? $result : [];
@@ -84,13 +85,26 @@ function getStudentClassroomCourseAll($student_id, $classroom_id) {
     return !empty($result) ? $result : [];
 }
 
-function getStudentClassroomGroup($student_id){
+function getStudentClassroomCount($student_id) {
     $result = select_data(
-        "csj.classroom_id, csj.group_id, cg.group_name, cg.group_logo, cg.group_description,cg.group_color",
-        "classroom_student_join csj",
-        "LEFT JOIN classroom_group cg ON csj.classroom_id = cg.classroom_id 
-            AND csj.group_id = cg.group_id
-            WHERE csj.student_id = '{$student_id}'");
+        "COUNT(DISTINCT classroom_id) AS total_classrooms",
+        "classroom_student_join",
+        "WHERE student_id = '{$student_id}' AND status = 0"
+    );
+
+    return !empty($result) ? $result : [];
+}
+
+function getStudentClassroomGroup($classroom_id){
+
+    $result = select_data(
+        "cg.group_id, cg.classroom_id, cg.group_name, cg.group_logo, cg.group_description, cg.group_color, COUNT(sj.student_id) AS group_student",
+        "classroom_group cg",
+        "LEFT JOIN classroom_student_join sj on sj.group_id = cg.group_id AND sj.status = 0
+            WHERE cg.classroom_id = '{$classroom_id}' AND cg.status = 0 
+            GROUP BY cg.group_id");
+    
+    // cs.student_id, cs.student_firstname_th, cs.student_lastname_th, cs.student_image_profile, cs.student_mobile, cs.student_email, cs.student_company, cs.student_position, ct.classroom_name, cg.group_name, cg.group_color, cg.group_logo
 
     return !empty($result) ? $result : [];
 }
@@ -101,6 +115,31 @@ function getStudentClassroomGroupCount($group_id, $classroom_id)
         "COUNT(student_id) AS total_student",
         "classroom_student_join",
         "WHERE classroom_id = '{$classroom_id}' AND group_id = '{$group_id}'");
+
+    return !empty($result) ? $result : [];
+}
+
+function getTeacherByPosition($position_id) {
+        
+    $result = select_data("ct.teacher_id,
+        ct.teacher_perfix,
+        ct.teacher_firstname_en,
+        ct.teacher_lastname_en,
+        ct.teacher_firstname_th,
+        ct.teacher_lastname_th,
+        ct.teacher_nickname_en,
+        ct.teacher_nickname_th,
+        ct.teacher_idcard,
+        ct.teacher_passport,
+        ct.teacher_image_profile,
+        ct.teacher_email,
+        ct.teacher_mobile,
+        ct.teacher_address",
+        "classroom_teacher_join ctj",
+        "LEFT JOIN classroom_teacher ct ON ctj.teacher_id = ct.teacher_id
+        LEFT JOIN classroom_position cp ON ct.position_id = cp.position_id
+        WHERE ct.position_id = '{$position_id}' AND ctj.classroom_id = '2' AND cp.is_active = 0 AND cp.status = 0"
+    );
 
     return !empty($result) ? $result : [];
 }
@@ -138,6 +177,67 @@ function getStaffMemberlist($classroom_id)
     "LEFT JOIN m_employee_info empinfo ON cst.emp_id = empinfo.emp_id
     WHERE cst.classroom_id = '{$classroom_id}'");
     
+    return !empty($result) ? $result : [];
+}
+
+function getTeacherStaffCount($classroom_id) {
+    
+    $result = select_data("t.teacher_id,
+        t.teacher_image_profile,
+        t.teacher_gender,
+        CASE t.teacher_perfix
+            WHEN 0 THEN 'นาย'
+            WHEN 1 THEN 'นาง'
+            WHEN 2 THEN 'นางสาว'
+            ELSE ''
+        END AS teacher_perfix,
+        CONCAT(IFNULL(t.teacher_firstname_en,t.teacher_firstname_th),' ',IFNULL(t.teacher_lastname_en,t.teacher_lastname_th)) AS teacher_name,
+        IFNULL(p.position_name_en, p.position_name_th) AS teacher_job_position,
+        p.position_description,
+        t.teacher_company,
+        COUNT(t.position_id) AS count_position,
+        p.position_id AS staff_position_id,
+        t.teacher_position",
+        "classroom_teacher t",
+        "LEFT JOIN classroom_teacher_join j ON j.teacher_id = t.teacher_id 
+        LEFT JOIN classroom_position p ON p.position_id = t.position_id
+        WHERE j.status = 0 AND p.is_active = 0 AND j.classroom_id = '{$classroom_id}' GROUP BY p.position_id");
+
+        // IN CASE BACK UP
+        // "LEFT JOIN classroom_position p ON p.position_id = t.position_id
+        // WHERE j.status = 0 AND p.is_active = 0 AND j.classroom_id = '{$classroom_id}' GROUP BY p.position_id");
+
+    return !empty($result) ? $result : [];
+}
+
+function getStaffRole($classroom_id)
+{
+    "SELECT
+        t.teacher_id,
+        t.teacher_image_profile,
+        t.teacher_gender,
+        CASE t.teacher_perfix
+            WHEN 0 THEN 'นาย'
+            WHEN 1 THEN 'นาง'
+            WHEN 2 THEN 'นางสาว'
+            ELSE ''
+        END AS teacher_perfix,
+        CONCAT(IFNULL(t.teacher_firstname_en,t.teacher_firstname_th),' ',IFNULL(t.teacher_lastname_en,t.teacher_lastname_th)) AS teacher_name,
+        IFNULL(p.position_name_en, p.position_name_th) AS teacher_job_position,
+        t.teacher_company,
+        t.teacher_position,
+    FROM
+        classroom_teacher t
+    LEFT JOIN
+        classroom_teacher_join j ON j.teacher_id = t.teacher_id
+    LEFT JOIN
+        classroom_position p ON p.position_id = t.position_id
+    WHERE
+        j.status = 0 AND j.classroom_id = '{$classroom_id}'";
+    $result = select_data("position_id, position_name_en, position_name_th, COUNT(*) AS count_role",
+    "classroom_teacher",
+    "WHERE status = 0 GROUP BY position_name_en, position_name_th");
+
     return !empty($result) ? $result : [];
 }
 
@@ -190,31 +290,31 @@ function getEarlyTestAttendanceStatus($workshop_id, $student_id)
     $emp_id = getStudentEmpId($student_id);
 
     $result = select_data("otw.workshop_id,
-    otw.workshop_name,
-    otw.date_start,
-    otw.time_start,
-    otw.time_end,
-    otwe.emp_id,
-    otwe.stamp_in,
-    otwe.stamp_out,
-    (CASE
-        WHEN TIME(otwe.stamp_in) < otw.time_start THEN TIMEDIFF(otw.time_start, TIME(otwe.stamp_in))
-        ELSE '00:00:00'
-    END) AS early_check_in,
-    (CASE
-        WHEN TIME(otwe.stamp_in) > otw.time_start THEN TIMEDIFF(TIME(otwe.stamp_in), otw.time_start)
-        ELSE '00:00:00'
-    END) AS late_check_in,
-    (CASE
-        WHEN TIME(otwe.stamp_out) < otw.time_end THEN TIMEDIFF(otw.time_end, TIME(otwe.stamp_out))
-        ELSE '00:00:00'
-    END) AS early_check_out,
-    (CASE
-        WHEN TIME(otwe.stamp_out) > otw.time_end THEN TIMEDIFF(TIME(otwe.stamp_out), otw.time_end)
-        ELSE '00:00:00'
-    END) AS late_check_out",
-    "ot_workshop otw LEFT JOIN ot_workshop_emp otwe ON otw.workshop_id = otwe.workshop_id",
-    "WHERE otwe.emp_id = '{$emp_id}' AND otwe.workshop_id = '{$workshop_id}' AND otw.status = 0 AND otwe.status = 0");
+        otw.workshop_name,
+        otw.date_start,
+        otw.time_start,
+        otw.time_end,
+        otwe.emp_id,
+        otwe.stamp_in,
+        otwe.stamp_out,
+        (CASE
+            WHEN TIME(otwe.stamp_in) < otw.time_start THEN TIMEDIFF(otw.time_start, TIME(otwe.stamp_in))
+            ELSE '00:00:00'
+        END) AS early_check_in,
+        (CASE
+            WHEN TIME(otwe.stamp_in) > otw.time_start THEN TIMEDIFF(TIME(otwe.stamp_in), otw.time_start)
+            ELSE '00:00:00'
+        END) AS late_check_in,
+        (CASE
+            WHEN TIME(otwe.stamp_out) < otw.time_end THEN TIMEDIFF(otw.time_end, TIME(otwe.stamp_out))
+            ELSE '00:00:00'
+        END) AS early_check_out,
+        (CASE
+            WHEN TIME(otwe.stamp_out) > otw.time_end THEN TIMEDIFF(TIME(otwe.stamp_out), otw.time_end)
+            ELSE '00:00:00'
+        END) AS late_check_out",
+        "ot_workshop otw LEFT JOIN ot_workshop_emp otwe ON otw.workshop_id = otwe.workshop_id",
+        "WHERE otwe.emp_id = '{$emp_id}' AND otwe.workshop_id = '{$workshop_id}' AND otw.status = 0 AND otwe.status = 0");
 
     return !empty($result) ? $result : [];
 }
@@ -406,9 +506,7 @@ function getCourseDetail($classroom_id){
 function getCertificateListOfStudent($student_id){
 
     $emp_id = getStudentEmpId($student_id);
-
     $alumni_id = getStudentClassroomId($student_id);
-
     $trn_course = getCourseStudent($alumni_id);
 
     $course_ids = array_column($trn_course, 'course_trn'); // get course_ref_ids
