@@ -52,6 +52,18 @@ function getAlumniClassroom($student_id){
     return !empty($result) ? $result : [];
 }
 
+function getAlumniClassroomCount($student_id) {
+
+    $result = select_data(
+            "template.classroom_id, template.classroom_name, COUNT(student.join_id) as classroom_register, template.classroom_information, template.classroom_poster",
+            "classroom_template template",
+            "LEFT JOIN classroom_student_join student ON student.classroom_id = template.classroom_id 
+            WHERE template.status = 0 AND template.classroom_id = 2 GROUP BY template.classroom_id"
+        );
+
+    return !empty($result) ? $result : [];
+}
+
 
 function getStudentClassroomList($student_id) {
    // Adjusted SQL condition to separate JOIN and WHERE clauses if needed

@@ -79,8 +79,8 @@
         case '/classroom/study/privacy_settings':
             require __DIR__.'/views/privacy_settings.php';
         break;
-        case '/classroom/study/lang_setting/':
-        case '/classroom/study/lang_setting':
+        case '/classroom/study/language/':
+        case '/classroom/study/language':
             require __DIR__.'/views/lang_setting.php';
         break;
         case '/classroom/study/setting/':

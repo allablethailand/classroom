@@ -147,6 +147,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8"
         type="text/javascript"></script>
     <script src="/classroom/study/js/profile.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
     <style>
         /* 🎨 UI/UX Enhancements to match the image */
         body {
@@ -744,7 +745,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
     border-radius: 15px; /* มุมโค้งมน */
     text-align: center;
     ">
-            <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
+            <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : " - "; ?>
         </p>
     </div>
 
@@ -871,7 +872,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                     <div class="info-text">
                         <strong style="padding-left:10px;">งานอดิเรก</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -879,7 +880,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                     <div class="info-text">
                         <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -887,7 +888,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                     <div class="info-text">
                         <strong style="padding-left:10px;">เครื่องดื่มที่ชื่นชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -895,7 +896,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                     <div class="info-text">
                         <strong style="padding-left:10px;">หนังที่ชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -903,7 +904,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                     <div class="info-text">
                         <strong style="padding-left:10px;">เป้าหมาย</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : " - "; ?></span>
                     </div>
                 </div>
             </div>

@@ -239,6 +239,8 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     <script src="/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/calendar.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
+
 
 </head>
 <style>

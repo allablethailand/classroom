@@ -389,7 +389,7 @@ if (isset($_SESSION['student_id'])) {
                         <i class="fas fa-chevron-right"></i>
                     </a>
 
-                    <a href="lang_setting" class="setting-item">
+                    <a href="language" class="setting-item">
                         <div class="setting-icon">
                             <i class="fas fa-globe"></i>
                         </div>

@@ -126,7 +126,9 @@ if ($join_data && $join_data['classroom_id']) {
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
-    <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+    <!-- <script src="/classroom/study/js/schedule.js?v=<?php echo time(); ?>" type="text/javascript"></script> -->
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+
 </head>
 <style>
     .search-container {
@@ -722,7 +724,7 @@ if ($join_data && $join_data['classroom_id']) {
     border-radius: 15px; /* มุมโค้งมน */
     text-align: center;
     ">
-            <?= !empty($row_all["teacher_bio"]) ? $row_all["teacher_bio"] : "ยังไม่ได้เขียน Bio"; ?>
+            <?= !empty($row_all["teacher_bio"]) ? $row_all["teacher_bio"] : " - "; ?>
         </p>
     </div>
 
@@ -849,7 +851,7 @@ if ($join_data && $join_data['classroom_id']) {
                     <div class="info-text">
                         <strong style="padding-left:10px;">งานอดิเรก</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["teacher_hobby"]) ? $row_all["teacher_hobby"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_hobby"]) ? $row_all["teacher_hobby"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -857,7 +859,7 @@ if ($join_data && $join_data['classroom_id']) {
                     <div class="info-text">
                         <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["teacher_music"]) ? $row_all["teacher_music"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_music"]) ? $row_all["teacher_music"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -865,7 +867,7 @@ if ($join_data && $join_data['classroom_id']) {
                     <div class="info-text">
                         <strong style="padding-left:10px;">เครื่องดื่มที่ชื่นชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["teacher_drink"]) ? $row_all["teacher_drink"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_drink"]) ? $row_all["teacher_drink"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -873,7 +875,7 @@ if ($join_data && $join_data['classroom_id']) {
                     <div class="info-text">
                         <strong style="padding-left:10px;">หนังที่ชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["teacher_movie"]) ? $row_all["teacher_movie"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_movie"]) ? $row_all["teacher_movie"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -881,7 +883,7 @@ if ($join_data && $join_data['classroom_id']) {
                     <div class="info-text">
                         <strong style="padding-left:10px;">เป้าหมาย</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["teacher_goal"]) ? $row_all["teacher_goal"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_goal"]) ? $row_all["teacher_goal"] : " - "; ?></span>
                     </div>
                 </div>
             </div>
