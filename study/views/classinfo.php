@@ -15,6 +15,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/actions/func.php';
 require_once $base_include . '/classroom/study/actions/student_func.php';
 
 $course_id = isset($_GET['course_id']) ? $_GET['course_id'] : null;
@@ -32,9 +33,9 @@ $course_detail = select_data("cc.course_type,
     otl.trn_purpose AS course_description,
     otl.trn_from_time AS course_timestart,
     otl.trn_to_time AS course_timeend,
-    otl.trn_by AS course_instructor,
+    otl.trn_by_emp AS course_instructor,
     DATE_FORMAT(otl.trn_date, '%d/%m/%Y') AS course_date,
-    LENGTH(REPLACE(trn_by, ' ', '')) - LENGTH(REPLACE(REPLACE(trn_by, ' ', ''), ',', '')) + 1 AS trn_count_by",
+    LENGTH(REPLACE(trn_by_emp, ' ', '')) - LENGTH(REPLACE(REPLACE(trn_by_emp, ' ', ''), ',', '')) + 1 AS trn_count_by",
     "classroom_course AS cc JOIN ot_training_list AS otl on cc.course_ref_id = otl.trn_id",
     "WHERE otl.trn_id = '{$course_id}' AND cc.status = 0");
 
@@ -280,16 +281,19 @@ if (!empty($course_file)) {
                 <h3 class="text-lg font-semibold text-text-primary mb-4">Instructors ( <?= $course_data['trn_count_by'] ?> )</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <!-- FOREACH DATA INSIDE TRN INSTRUCTOR -->
-                    <?php foreach ($trainers_array as $index => $trainer_name) { ?>
+                    <?php foreach ($trainers_array as $index => $trainer_id) { 
+                        $img = select_data(
+                            "emp_pic,gender", "m_employee_info", "where emp_id = '{$trainer_id}'"
+                        );
+                        $avatar = GetMemberAvatar($img[0]['emp_pic'],$img[0]['gender']);
+?>
                     <!-- Attendee 1 -->
                     <div class="flex items-center space-x-3">
-                        <img src="" 
+                        <img src="<?php echo $avatar; ?>" 
                             alt="Profile photo of Sarah Johnson, Marketing Director" 
                             class="w-10 h-10 rounded-full object-cover"
                             onerror="this.src='/images/logo_academy_169x150.png'; this.onerror=null;">
                         <div>
-                            <p class="text-sm font-medium text-text-primary"><?= $trainer_name ?></p>
-                            <!-- <p class="text-xs text-text-secondary">Marketing Dir.</p> -->
                         </div>
                     </div>
                     <!-- END FOR EACH -->

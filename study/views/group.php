@@ -89,8 +89,27 @@ $all_classroles = getTeacherStaffCount($class_id);
   <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
   <script src="/classroom/study/js/group.js?v=<?php echo time(); ?>" type="text/javascript"></script>
   <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
+  <script>
+    function searchGroup() {
+            var input, filter, cards, a, i, txtValue;
+            input = document.getElementById('searchboxGroup');
+            filter = input.value.toUpperCase();
+            cards = document.getElementsByClassName('group-card-modern');
 
+            console.log(cards);
+            for (i = 0; i < cards.length; i++) {
+                a = cards[i];
+                // ค้นหาทั้งจากชื่อนักเรียนและ Student ID
+                var studentName = a.querySelector('.group-title').textContent || a.querySelector('.group-title').innerText;
 
+                if (studentName.toUpperCase().indexOf(filter) > -1 ) {
+                    cards[i].style.display = "";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+</script>
 </head>
 
 <body>
@@ -109,7 +128,7 @@ $all_classroles = getTeacherStaffCount($class_id);
         <div class="" style="display: flex; margin-left: auto;">
           <div class="header-section">
             <div class="header-actions">
-              <div class="dropdown">
+              <!-- <div class="dropdown">
                 <button type="button" class="icon-btn dropdown-toggle" data-toggle="dropdown">
                   <i class="fas fa-filter"></i>
                 </button>
@@ -119,10 +138,10 @@ $all_classroles = getTeacherStaffCount($class_id);
                     <li><a href="#" class="group-filter" data-group-id="<?= $group['group_id'] ?>"><?= htmlspecialchars($group['group_name']) ?></a></li>
                   <?php endforeach; ?>
                 </ul>
-              </div>
-              <button class="icon-btn" id="toggleViewList">
+              </div> -->
+              <!-- <button class="icon-btn" id="toggleViewList">
                 <i class="fas fa-user-friends"></i>
-              </button>
+              </button> -->
             </div>
           </div>
         </div>
@@ -132,7 +151,7 @@ $all_classroles = getTeacherStaffCount($class_id);
       <!-- Search Bar -->
       <div class="search-container" style="margin-bottom: 1.5rem;">
         <i class="fas fa-search search-icon"></i>
-        <input type="text" name="group-searchbox" class="search-input" placeholder="Search for groups...">
+        <input type="text" name="group-searchbox" class="search-input" id="searchboxGroup" onkeyup="searchGroup()" placeholder="Search for groups...">
         <button class="icon-btn search-btn">
           <i class="fas fa-search"></i>
         </button>

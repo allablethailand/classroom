@@ -435,11 +435,11 @@ if ($result) {
         <div class="modal-overlay" id="modalOverlay"></div>
 
         <div class="group-dropdown-container">
-            <button class="dropdown-button" id="dropdownBtn">
+            <!-- <button class="dropdown-button" id="dropdownBtn">
                 <i class="fas fa-book-open"></i>
                 <span>เลือกกลุ่ม</span>
                 <i class="fas fa-caret-down"></i>
-            </button>
+            </button> -->
             <div class="dropdown-content" id="groupDropdown">
                 <div class="dropdown-header">เลือกกลุ่ม</div>
                 <div class="group-list">
@@ -499,10 +499,10 @@ if ($result) {
                                 <i class="fas fa-user-graduate" style="margin-right:10px"></i>  
                                 <?= htmlspecialchars($row['student_firstname_th'] . " " . $row['student_lastname_th']); ?>
                             </h4>
-                            <p class="student-details highlight-text">
+                            <!-- <p class="student-details highlight-text">
                                 <i class="fas fa-graduation-cap" style="margin-right:10px"></i>
                                 <?= !empty($row['classroom_name']) ? htmlspecialchars($row['classroom_name']) : "-"; ?>
-                            </p>
+                            </p> -->
                             <p class="student-details highlight-text group-name-container">
                                 <img src="<?= htmlspecialchars($group_logo); ?>" onerror="this.src='/images/logo_academy.png'" alt="Group Logo">
                                 <?= !empty($row['group_name']) ? htmlspecialchars($row['group_name']) : "-"; ?>
