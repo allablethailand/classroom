@@ -1032,7 +1032,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             </div>
 
         
-        <?php if (!empty($row_all["student_company"]) && !empty($row_all["student_company_logo"])): ?>
+        <!-- <?php if (!empty($row_all["student_company"]) && !empty($row_all["student_company_logo"])): ?>
         <div class="info-grid-section">
             <div class="section-header-icon">
                 <i style="font-size: 25px;"></i>
@@ -1070,7 +1070,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             </div>
         </div>
         <?php endif; ?>
-        
+         -->
         <!-- <div class="logout-btn-section">
             <a href="logout" class="logout-section-header">
                 <h4 class="section-login-title" data-lang="logout">ออกจากระบบ</h4>

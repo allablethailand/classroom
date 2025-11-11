@@ -753,13 +753,13 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
 
         <div class="profile-card" style="padding: 10px;">
             <div class="profile-course-container">
-                <?php if (!empty($classroom_name)): ?>
+                <!-- <?php if (!empty($classroom_name)): ?>
                     <p class="profile-company" style="font-size: 14px;">
                         <i class="fas fa-graduation-cap" style="color: #0089ff;"></i>
                         <span style="font-size: 16px; font-weight: bold; padding-right: .3em;">หลักสูตร:</span>
                         <span><?= $classroom_name; ?></span>
                     </p>
-                <?php endif; ?>
+                <?php endif; ?> -->
                 <?php if (!empty($row_all["student_company"])): ?>
                     <p class="profile-company" style="font-size: 14px; align-items: baseline;">
                         <i class="fas fa-building" style="color: #0089ff; "></i>
@@ -910,7 +910,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
             </div>
         </div>
 
-        <div class="info-grid-section">
+        <!-- <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-building" style="font-size: 25px;"></i>
                 <h3 class="section-title" style="padding-left:10px;">บริษัท</h3>
@@ -980,7 +980,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                 <?php endforeach; ?>
             </div>
         </div>
-        <?php endif; ?>
+        <?php endif; ?> -->
 
     </div>
     <?php require_once("component/footer.php") ?>
