@@ -77,7 +77,7 @@
                     $teacher_pic = !empty($row['teacher_image_profile']) ? GetUrl($row['teacher_image_profile']) : '/images/default.png';
                     $border_color = '#ff8c00';
 ?>
-                    <a href="teacherinfo?id=<?= htmlspecialchars($row['teacher_id']); ?>" class="teacher-card">
+                    <a href="teacherinfo?teacher_id=<?= htmlspecialchars($row['teacher_id']); ?>" class="teacher-card">
                         <div class="teacher-avatar" style="border-color: <?= $border_color; ?>;">
                             <img src="<?= htmlspecialchars($teacher_pic); ?>" alt="Teacher Avatar" style="width:100%; height:100%;" onerror="this.src='/images/default.png'">
                         </div>
