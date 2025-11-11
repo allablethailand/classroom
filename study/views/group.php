@@ -109,7 +109,7 @@ $all_classroles = getTeacherStaffCount($class_id);
         <div class="" style="display: flex; margin-left: auto;">
           <div class="header-section">
             <div class="header-actions">
-              <div class="dropdown">
+              <!-- <div class="dropdown">
                 <button type="button" class="icon-btn dropdown-toggle" data-toggle="dropdown">
                   <i class="fas fa-filter"></i>
                 </button>
@@ -119,7 +119,7 @@ $all_classroles = getTeacherStaffCount($class_id);
                     <li><a href="#" class="group-filter" data-group-id="<?= $group['group_id'] ?>"><?= htmlspecialchars($group['group_name']) ?></a></li>
                   <?php endforeach; ?>
                 </ul>
-              </div>
+              </div> -->
               <button class="icon-btn" id="toggleViewList">
                 <i class="fas fa-user-friends"></i>
               </button>
