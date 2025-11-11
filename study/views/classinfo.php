@@ -263,11 +263,11 @@ if (!empty($course_file)) {
             <?php if (isset($course_data['course_description'])): ?>
                 <?php if (isHTML($course_data['course_description'])): ?>
                     <div class="text-text-secondary leading-relaxed mb-4">
-                        <?= $course_data['course_description'] ?>
+                        <?= htmlspecialchars_decode($course_data['course_description']) ?>
                     </div>
                 <?php else: ?>
                     <p class="text-text-secondary leading-relaxed mb-4">
-                        <?= htmlspecialchars($course_data['course_description']) ?>
+                        <?= htmlspecialchars_decode($course_data['course_description']) ?>
                     </p>
                 <?php endif; ?>
             <?php else: ?>
@@ -357,7 +357,7 @@ if (!empty($course_file)) {
                 <!-- <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                 </svg> -->
-                <span>Join this class</span>
+                <span>Learning</span>
             </button>
             
             <button class="bg-surface border border-border text-text-primary px-4 py-2 rounded-md font-medium transition-smooth hover:bg-background flex items-center justify-center space-x-2">

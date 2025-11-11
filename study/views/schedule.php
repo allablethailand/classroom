@@ -90,7 +90,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                          <span id="current-date" style="margin: 0 1rem; font-weight: bold; font-size: 1.6rem; padding-bottom: 5px">
                         Tue, 9 Aug, 2025
                         </span>
-                        <button id="select-date-btn" type="button" class="btn btn-warning"  style="font-size: 1rem;  cursor: pointer; border-radius: 50%;">
+                        <button id="select-date-btn" type="button" class="btn minimal-nav-button"  style="font-size: 1rem; margin-bottom: 5px;  cursor: pointer; border-radius: 50%;">
                             <span><i class="fas fa-calendar-alt"></i></span>
                         </button>
                         <input type="text" id="hidden-date-input" style="display: none;" />
@@ -113,7 +113,7 @@ date_default_timezone_set('Asia/Bangkok'); // or your timezone
                     <div>
                         <h2 class="featured-title"><?php echo $program_name; ?></h2>
                         <p class="featured-time"><?php echo $program_slogan; ?></p>
-                        <p><?php echo "01/10/2025 - 15/10/2025"; ?></p>
+                        <p><?php echo "16/01/2026 - 16/05/2026"; ?></p>
                     </div>
                 </div>
                 <div class="featured-decoration-1"></div>

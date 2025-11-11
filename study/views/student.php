@@ -58,10 +58,16 @@ if ($result) {
     <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/classroom/study/css/style.css?v=<?php echo time(); ?>">
     <!-- <link rel="stylesheet" href="/classroom/study/js/style.css?v=<?php echo time(); ?>"> -->
-
-
+    <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
+    <script src="/bootstrap/3.3.6/js/jquery-2.2.3.min.js" type="text/javascript"></script>
+    <script src="/dist/js/sweetalert.min.js"></script>
+    <script src="/dist/js/jquery.dataTables.min.js"></script>
+    <script src="/dist/js/dataTables.bootstrap.min.js"></script>
+    <script src="/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+    <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
+
     <style>
     /* body {
         background-color: #f0f2f5;
@@ -416,6 +422,7 @@ if ($result) {
         white-space: normal;
     }
 </style>
+
 </head>
 
 <body>

@@ -376,9 +376,9 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         }
 
         .settings-button {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #3F3F3F;
+            border: 1px solid rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             width: 45px;
             height: 45px;
@@ -391,7 +391,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         }
 
         .settings-button:hover {
-            background-color: rgba(255, 255, 255, 0.4);
+            background-color: rgba(255, 255, 255, 0.95);
             transform: scale(1.1);
         }
 
@@ -704,7 +704,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     <div class="profile-header-container" style="gap: 5px;">
         <div class="settings-button-container">
             <a href="setting" class="settings-button" title="ตั้งค่าโปรไฟล์">
-                <i class="fas fa-ellipsis-v"></i>
+                <i class="fas fa-cog"></i>
             </a>
         </div>
        <div class="profile-image-carousel">
@@ -765,7 +765,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     border-radius: 15px; /* มุมโค้งมน */
     text-align: center;
     ">
-            <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : "ยังไม่ได้เขียน Bio"; ?>
+            <?= !empty($row_all["student_bio"]) ? $row_all["student_bio"] : " - "; ?>
         </p>
     </div>
     <div class="main-content-no-bg">
@@ -962,7 +962,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                     <div class="info-text">
                         <strong style="padding-left:10px;" data-lang="hobbies">งานอดิเรก</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -970,7 +970,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                     <div class="info-text">
                         <strong style="padding-left:10px;" data-lang="favoritemusic">ดนตรีที่ชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -978,7 +978,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                     <div class="info-text">
                         <strong style="padding-left:10px;" data-lang="favoritedrink">เครื่องดื่มที่ชื่นชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -986,7 +986,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                     <div class="info-text">
                         <strong style="padding-left:10px;" data-lang="favoritemovie">หนังที่ชอบ</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">
@@ -994,7 +994,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                     <div class="info-text">
                         <strong style="padding-left:10px;" data-lang="lifegoal">เป้าหมาย</strong>
                         <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : "ยังไม่ได้ระบุ"; ?></span>
+                            style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : " - "; ?></span>
                     </div>
                 </div>
             </div>

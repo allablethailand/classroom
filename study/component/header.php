@@ -13,7 +13,6 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
-require_once $base_include . '/lib/connect_sqli.php';
 
 global $mysqli;
 // Get current directory or page identifier, example by parsing URL path
@@ -35,6 +34,9 @@ $currentScreen = preg_replace('/([a-z])info/i', '$1 info', $currentScreen);
 
 // Convert to first letter to uppercase
 $currentScreen = ucwords($currentScreen);
+// if ($currentScreen = "Lang Setting"){
+//     $currentScreen = "Language";
+// }
 
 if (!isset($_SESSION['student_id'])) {
     header("Location: /classroom/study/login");
@@ -253,7 +255,7 @@ $notification_data = [
             </a>
         </li>
         <li class="has-submenu">
-            <a href="minigame">
+            <a href="game">
             <i class="fas fa-gamepad"  style="margin-right: 5px;"></i>
             <span class="menu-title" data-lang="minigame"> Mini Game</span>
             <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
@@ -529,7 +531,7 @@ $notification_data = [
             <script>
                 const currentPage = window.location.pathname.split('/').pop();
                 const backButton = document.getElementsByClassName('back-button'); // or get button by other selector
-                console.log(currentPage);
+                // console.log(currentPage);
 
                 backButton.onclick = function() {
                     if (currentPage === 'classroominfo') {

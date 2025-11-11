@@ -113,6 +113,6 @@
     $_SESSION['emp_id'] = $emp_id;
     $_SESSION['comp_id'] = $comp_id;
     $_SESSION['classroom_id'] = $classroom_id;
-    $_SESSION['classroom_redirect'] = '/classroom/study/classinfo?classroom_id=' .$classroom_id;
+    $_SESSION['classroom_redirect'] = '/classroom/study/classinfo?course_id='.$course['course_ref_id'].'&classroom_id=' .$classroom_id.'&course_type='.$course['course_type'];
     header('Location: /academy/redirect.php?id='.$id);
 ?>
