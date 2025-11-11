@@ -53,6 +53,8 @@ $count_teacher = $count_total_teacher[0]['total_teacher'];
 
 $all_role = getMemberRole();
 $all_role_count = $all_role[0]['count_role'];
+$all_classroles = getTeacherStaffCount($class_id);
+
 ?>
 
 <!doctype html>
@@ -162,7 +164,10 @@ $all_role_count = $all_role[0]['count_role'];
               </div>
               
               <div class="group-action">
-                <p class="group-description"><?= $item["group_description"] ?></p>
+                <div class="">
+                  <p class="group-description"><?php echo $item["group_description"] ?></p>
+                  <p class="group-membercount">จำนวนสมาชิก<?php echo " ".  $item["group_student"] . " "; ?>คน</p>
+                </div>
                 <button class="arrow-btn">
                   <i class="fas fa-arrow-right"></i>
                 </button>
@@ -180,7 +185,7 @@ $all_role_count = $all_role[0]['count_role'];
         <div class="groups-container" id="rowTeacher">
           <!-- Staff Cards -->
           <?php
-          if (empty($all_role)): ?>
+          if (empty($all_classroles)): ?>
             <div class="empty-state">
               <i class="fas fa-users empty-icon"></i>
               <h3>ยังไม่พบข้อมูลคณะกรรมการในขณะนี้</h3>
@@ -189,21 +194,23 @@ $all_role_count = $all_role[0]['count_role'];
           <?php endif; ?>
 
 
-          <?php foreach ($all_role as $roles): ?>
-            <a href="teacher" class="group-card-modern staff-card">
+          <?php foreach ($all_classroles as $role): ?>
+            <a href="teacher?position_id=<?= $role['staff_position_id'] ?>" class="group-card-modern staff-card">
               <div class="group-card-content">
                 <div class="group-header">
                   <div class="group-logo staff-logo">
                     <i class="fas fa-user-tie"></i>
                   </div>
                   <div class="group-head-name">
-                    <h3 class="group-title"><?= $roles['position_name_th'] ?></h3>
+                    <h3 class="group-title"><?= $role['teacher_job_position'] ?></h3>
                   </div>
                 </div>
                 <div class="group-action">
-                  <p class="group-description">สมาชิกทีมงาน</p>
+                  <p class="group-description">
+                    <?= $role['position_description'] ?>
+                  </p>
                   <div class="" style="display: flex;">
-                    <p>จำนวนสมาชิก:  <?= $roles['count_role'] ?> คน</p>
+                    <p>จำนวนสมาชิก  <?= $role['count_position'] ?> คน</p>
                     <!-- <button class="arrow-btn">
                       <i class="fas fa-arrow-right"></i>
                     </button> -->
