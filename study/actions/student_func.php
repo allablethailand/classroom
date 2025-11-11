@@ -119,6 +119,31 @@ function getStudentClassroomGroupCount($group_id, $classroom_id)
     return !empty($result) ? $result : [];
 }
 
+function getTeacherByPosition($position_id) {
+        
+    $result = select_data("ct.teacher_id,
+        ct.teacher_perfix,
+        ct.teacher_firstname_en,
+        ct.teacher_lastname_en,
+        ct.teacher_firstname_th,
+        ct.teacher_lastname_th,
+        ct.teacher_nickname_en,
+        ct.teacher_nickname_th,
+        ct.teacher_idcard,
+        ct.teacher_passport,
+        ct.teacher_image_profile,
+        ct.teacher_email,
+        ct.teacher_mobile,
+        ct.teacher_address",
+        "classroom_teacher_join ctj",
+        "LEFT JOIN classroom_teacher ct ON ctj.teacher_id = ct.teacher_id
+        LEFT JOIN classroom_position cp ON ct.position_id = cp.position_id
+        WHERE ct.position_id = '{$position_id}' AND ctj.classroom_id = '2' AND cp.is_active = 0 AND cp.status = 0"
+    );
+
+    return !empty($result) ? $result : [];
+}
+
 function getTeacherList()
 {
     $result = select_data("ct.teacher_id,

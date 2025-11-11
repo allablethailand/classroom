@@ -13,6 +13,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 define('BASE_PATH', $base_path);
 define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/classroom/study/actions/student_func.php';
 
 // if($_POST['action'] == 'view_group') {
 //     // $page_project_id = $_POST['page_project_id'];
@@ -28,19 +29,13 @@ require_once $base_include . '/lib/connect_sqli.php';
 if ($_GET['action'] == 'toggleMember') {
 
     $student_id = $_SESSION['student_id'];
+    $alumni_id = getStudentClassroomId($student_id);
 
-    $columnStudent = "classroom_id";
-    $tableStudent = "classroom_student_join";
-    $whereStudent = "where student_id = '{$student_id}'";
-
-    $student_class = select_data($columnStudent, $tableStudent, $whereStudent);
-    $cur_class = $student_class[0]["classroom_id"];
-
-    $columnCourseGroup = "cs.student_id, cs.student_firstname_th, cs.student_lastname_th, cs.student_nickname_th, cs.student_gender, cs.student_image_profile, cs.student_email, cs.student_mobile";
-    $tableCourseGroup = "classroom_student_join std_join
-    LEFT JOIN classroom_student cs ON std_join.student_id = cs.student_id
-    LEFT JOIN classroom_template template ON std_join.classroom_id = template.classroom_id";
-    $whereCourseGroup = "where std_join.classroom_id = '{$cur_class}' AND WHERE std_join.status = 0 AND std_join.approve_status = 1";
+    $columnCourseGroup = "cs.student_id, cs.student_firstname_th, cs.student_lastname_th, cs.student_firstname_en, cs.student_lastname_en, cs.student_nickname_th, cs.student_gender, cs.student_image_profile, cs.student_email, cs.student_mobile";
+    $tableCourseGroup = "classroom_student_join std_join";
+    $whereCourseGroup = "LEFT JOIN classroom_student cs ON std_join.student_id = cs.student_id
+        LEFT JOIN classroom_template template ON std_join.classroom_id = template.classroom_id
+        WHERE std_join.classroom_id = '{$alumni_id}' AND std_join.status = 0 AND std_join.approve_status = 1";
     $student_list = select_data($columnCourseGroup, $tableCourseGroup, $whereCourseGroup);
 
     $columnTeacherGroup = "ct.teacher_id,
@@ -83,7 +78,7 @@ if ($_GET['action'] == 'toggleMember') {
     $tableTeacherGroup = "classroom_teacher ct
         LEFT JOIN classroom_teacher_join ctj ON ct.teacher_id = ctj.teacher_id
         LEFT JOIN classroom_position cp ON ct.position_id = cp.position_id";
-    $whereTeacherGroup = "where ctj.classroom_id = '{$cur_class}' AND ctj.status = 0";
+    $whereTeacherGroup = "where ctj.classroom_id = '{$cur_class}' AND ctj.status = 0 AND cp.is_active = 0";
     $teacher_list = select_data($columnTeacherGroup, $tableTeacherGroup, $whereTeacherGroup);
 
 //     function remove_numeric_keys($array) {
