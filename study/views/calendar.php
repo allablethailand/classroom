@@ -240,8 +240,6 @@ $json_students = json_encode($students_data, JSON_UNESCAPED_UNICODE);
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/calendar.js?v=<?php echo time(); ?>" type="text/javascript"></script>
     <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
-
-
 </head>
 <style>
 /* ตั้งค่า Font และพื้นหลังโดยรวมให้ดูสะอาดตา */
@@ -770,13 +768,13 @@ body {
                 </div>
                 <div class="calendar-card">
                     <div class="calendar-grid">
-                        <div class="calendar-weekday">Sun</div>
-                        <div class="calendar-weekday">Mon</div>
-                        <div class="calendar-weekday">Tue</div>
-                        <div class="calendar-weekday">Wed</div>
-                        <div class="calendar-weekday">Thu</div>
-                        <div class="calendar-weekday">Fri</div>
-                        <div class="calendar-weekday">Sat</div>
+                        <div class="calendar-weekday" data-lang="sunday">Sun</div>
+                        <div class="calendar-weekday" data-lang="monday">Mon</div>
+                        <div class="calendar-weekday" data-lang="tuesday">Tue</div>
+                        <div class="calendar-weekday" data-lang="wednesday">Wed</div>
+                        <div class="calendar-weekday" data-lang="thursday">Thu</div>
+                        <div class="calendar-weekday" data-lang="friday">Fri</div>
+                        <div class="calendar-weekday" data-lang="saturday">Sat</div>
                     </div>
                     <div class="calendar-grid" id="calendarGrid">
                     </div>
@@ -827,9 +825,11 @@ body {
     let currentDate = new Date();
     let stream;
     let currentClassId = null;
+    let lang = localStorage.getItem('lang') || 'EN';
 
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"];
+    function getMonthName(monthIndex) {
+        return translations[lang].months[monthIndex];
+    }
 
     function redirectToschedule(dateStr) {
         // Construct the URL dynamically with the dateStr
@@ -842,7 +842,7 @@ body {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
-        currentMonthYear.textContent = `${monthNames[month]} ${year + 543}`;
+        currentMonthYear.textContent = `${getMonthName(month)} ${year + 543}`;
 
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -989,7 +989,7 @@ body {
         const [year, month, day] = dateStr.split('-');
         const d = new Date(year, month - 1, day);
         const dayStr = d.getDate();
-        const monthStr = monthNames[d.getMonth()];
+        const monthStr = getMonthName(d.getMonth());
         const yearStr = d.getFullYear() + 543;
         return `${dayStr} ${monthStr} ${yearStr}`;
     }

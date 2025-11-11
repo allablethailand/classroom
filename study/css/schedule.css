@@ -567,6 +567,20 @@ html {
   box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
 }
 
+.minimal-nav-button {
+  border: none;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  /* user-select: none; */
+  flex-shrink: 0;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.08);
+}
+
 
 
 @media (min-width: 375px) {

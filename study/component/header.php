@@ -255,7 +255,7 @@ $notification_data = [
             </a>
         </li>
         <li class="has-submenu">
-            <a href="minigame">
+            <a href="game">
             <i class="fas fa-gamepad"  style="margin-right: 5px;"></i>
             <span class="menu-title" data-lang="minigame"> Mini Game</span>
             <span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>
