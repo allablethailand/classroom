@@ -63,7 +63,8 @@
             stu.student_company,
             stu.student_position,
             g.group_id,
-            g.group_name
+            g.group_name,
+            date_format(cjoin.register_date, '%Y/%m/%d %H:%i:%s') as register_date
         FROM 
             classroom_student_join cjoin
         LEFT JOIN 
@@ -99,6 +100,7 @@
             array('db' => 'student_password_key', 'dt' => 'student_password_key'),
             array('db' => 'group_id', 'dt' => 'group_id'),
             array('db' => 'group_name', 'dt' => 'group_name'),
+            array('db' => 'register_date', 'dt' => 'register_date'),
             array('db' => 'student_password', 'dt' => 'student_password','formatter' => function ($d, $row) {
                 return ($d) ? decryptToken($d, $row['student_password_key']) : '';
             }),
