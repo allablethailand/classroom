@@ -347,8 +347,11 @@ if ($stmt_name) {
                     </div>
     </div>
 <div class="container-fluid1" >
+    <div class="text-center" style="margin-top: 1rem; font-size: 10rem;">
+        <span><i class="fas fa-icons" style="margin-top: 4rem;"></i></span>
+    </div>
     
-<h1 style="font-size: 20px; padding: 2em 1em 2em 1em;">My Photo: รูปภาพที่มี <?php echo $display_name; ?></h1>
+<h1 style="font-size: 20px; padding: 0.8em" class="text-center">My Photo: รูปภาพที่มี <?php echo $display_name; ?></h1>
 
 <div class="photo-container" id="myPhotoGallery">
     <p>กำลังค้นหารูปภาพ...</p>
@@ -522,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         gallery.appendChild(albumBox);
                     });
                 } else {
-                    gallery.innerHTML = `<p>⚠️ ไม่พบรูปภาพที่มีคุณอยู่ในอัลบั้มรวม. ${data.message || ''}</p>`;
+                    gallery.innerHTML = `<p>⚠️ ขณะนี้ยังไม่พบรูปภาพที่มีคุณอยู่ในอัลบั้มรวม <br> ${data.message || ''}</p>`;
                 }
             })
             .catch(error => {

@@ -66,7 +66,7 @@ $(document).ready(function() {
                         var email = row.teacher_email ? row.teacher_email : '-';
                         var mobile = row.teacher_mobile ? row.teacher_mobile : '-';
 
-                        teacherHtml += '<a href="teacherinfo?id=' + encodeURIComponent(row.teacher_id) + '" class="student-card">';
+                        teacherHtml += '<a href="teacherinfo?teacher_id=' + encodeURIComponent(row.teacher_id) + '" class="student-card">';
                         teacherHtml += '<div class="student-avatar">';
                         teacherHtml += '<img src="' + teacher_pic + '" alt="Teacher Avatar" onerror="this.src=\'../../../images/default_teacher.png\'">';
                         teacherHtml += '</div>';

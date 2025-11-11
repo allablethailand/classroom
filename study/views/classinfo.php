@@ -32,9 +32,9 @@ $course_detail = select_data("cc.course_type,
     otl.trn_purpose AS course_description,
     otl.trn_from_time AS course_timestart,
     otl.trn_to_time AS course_timeend,
-    otl.trn_by AS course_instructor,
+    otl.trn_by_emp AS course_instructor,
     DATE_FORMAT(otl.trn_date, '%d/%m/%Y') AS course_date,
-    LENGTH(REPLACE(trn_by, ' ', '')) - LENGTH(REPLACE(REPLACE(trn_by, ' ', ''), ',', '')) + 1 AS trn_count_by",
+    LENGTH(REPLACE(trn_by_emp, ' ', '')) - LENGTH(REPLACE(REPLACE(trn_by_emp, ' ', ''), ',', '')) + 1 AS trn_count_by",
     "classroom_course AS cc JOIN ot_training_list AS otl on cc.course_ref_id = otl.trn_id",
     "WHERE otl.trn_id = '{$course_id}' AND cc.status = 0");
 

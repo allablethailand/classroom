@@ -1000,7 +1000,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             </div>
         </div>
 
-         <div class="info-grid-section">
+         <!-- <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-building" style="font-size: 25px;"></i>
                 <h3 class="section-title" style="padding-left:10px;" data-lang="company">บริษัท</h3>
@@ -1029,10 +1029,10 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                     </div>
                 </div>
                 <?php endif; ?>
-            </div>
+            </div> -->
 
         
-        <?php if (!empty($row_all["student_company"]) && !empty($row_all["student_company_logo"])): ?>
+        <!-- <?php if (!empty($row_all["student_company"]) && !empty($row_all["student_company_logo"])): ?>
         <div class="info-grid-section">
             <div class="section-header-icon">
                 <i style="font-size: 25px;"></i>
@@ -1049,6 +1049,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             </div>
         </div>
         <?php endif; ?>
+
         </div>        
         <?php if (!empty($company_images)): ?>
         <div class="info-grid-section">
@@ -1070,7 +1071,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             </div>
         </div>
         <?php endif; ?>
-        
+         -->
         <!-- <div class="logout-btn-section">
             <a href="logout" class="logout-section-header">
                 <h4 class="section-login-title" data-lang="logout">ออกจากระบบ</h4>
