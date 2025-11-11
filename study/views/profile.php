@@ -376,9 +376,9 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         }
 
         .settings-button {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #3F3F3F;
+            border: 1px solid rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             width: 45px;
             height: 45px;
@@ -391,7 +391,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         }
 
         .settings-button:hover {
-            background-color: rgba(255, 255, 255, 0.4);
+            background-color: rgba(255, 255, 255, 0.95);
             transform: scale(1.1);
         }
 
@@ -704,7 +704,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     <div class="profile-header-container" style="gap: 5px;">
         <div class="settings-button-container">
             <a href="setting" class="settings-button" title="ตั้งค่าโปรไฟล์">
-                <i class="fas fa-ellipsis-v"></i>
+                <i class="fas fa-cog"></i>
             </a>
         </div>
        <div class="profile-image-carousel">
