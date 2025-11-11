@@ -27,7 +27,6 @@ $(document).ready(function() {
                 var students = Object.values(data.student_data || {});
                 var teachers = Object.values(data.teacher_data || {});
 
-
                 var html = '<div class="student-list">';
 
                 if (students.length > 0) {
