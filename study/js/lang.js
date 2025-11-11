@@ -96,7 +96,7 @@ const translations = {
         history: "ประวัติ",
         minigame: "มินิเกม",
         myphoto: "รูปภาพของฉัน",
-        alumni: "หลักสูตร",
+        alumni: "รุุ่นหลักสูตร",
         askai: "ถาม AI",
         home: "หน้าแรก",
         quiz: "แบบทดสอบ",
