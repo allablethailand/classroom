@@ -16,10 +16,10 @@ define('BASE_INCLUDE', $base_include);
 require_once $base_include . '/lib/connect_sqli.php';
 require_once $base_include . '/classroom/study/actions/student_func.php';
 
-$teacher_list = getTeacherList();
-$teacher_count = count($teacher_list);
+$selected_position_id = isset($_GET['position_id']) ? intval($_GET['position_id']) : 0;
 
-// var_dump($teacher_list);
+$teacher_list = getTeacherByPosition($selected_position_id);
+$teacher_count = count($teacher_list);
 
 ?>
 
@@ -91,7 +91,7 @@ $teacher_count = count($teacher_list);
                 if ($teacher_count > 0) {
                     foreach ($teacher_list as $row) {
                         $teacher_pic = !empty($row['teacher_image_profile']) ? GetUrl($row['teacher_image_profile']) : '../../../images/default.png';
-                        
+
                         $border_color = '#ff8c00';
                 ?>
                         <a href="teacherinfo?id=<?= htmlspecialchars($row['teacher_id']); ?>" class="teacher-card">

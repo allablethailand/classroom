@@ -709,7 +709,6 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         </div>
        <div class="profile-image-carousel">
             <?php 
-                            
                 // --- ส่วนที่เพิ่มเข้ามาใหม่สำหรับการดึงรูปภาพโปรไฟล์ ---
                 $sql_images = "SELECT stu.student_image_profile FROM classroom_student_join cjoin 
                     LEFT JOIN classroom_student stu ON stu.student_id = cjoin.student_id 
