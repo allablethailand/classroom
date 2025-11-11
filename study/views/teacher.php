@@ -41,6 +41,25 @@
 <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
 <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
 <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>" type="text/javascript"></script>
+<script>
+    function searchTeacher() {
+            var input, filter, cards, a, i, txtValue;
+            input = document.getElementById('teacherSearch');
+            filter = input.value.toUpperCase();
+            cards = document.getElementsByClassName('teacher-card');
+            for (i = 0; i < cards.length; i++) {
+                a = cards[i];
+                // ค้นหาทั้งจากชื่อนักเรียนและ Student ID
+                var studentName = a.querySelector('.teacher-name').textContent || a.querySelector('.teacher-name').innerText;
+
+                if (studentName.toUpperCase().indexOf(filter) > -1 ) {
+                    cards[i].style.display = "";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+</script>
 
 </head>
 <style>
@@ -69,7 +88,7 @@
         <h1 class="heading-1">รายชื่ออาจารย์</h1>
         <div class="divider-1"><span></span></div>
         <div class="search-container">
-            <input type="text" id="studentSearch" onkeyup="searchStudents()" placeholder="ค้นหาอาจารย์...">
+            <input type="text" id="teacherSearch" onkeyup="searchTeacher()" placeholder="ค้นหาอาจารย์...">
         </div>
         <div class="group-list">
 <?php
