@@ -2,7 +2,6 @@
 require_once("actions/register.php");
 // ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
 require_once($base_include."/lib/connect_sqli.php");
-include_once($base_include."/login_history.php");
 session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
 global $mysqli;
 
