@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once("../../lib/connect_sqli.php");
-include_once("../../login_history.php");
 global $mysqli;
 
 // Get the selected group_id from the URL, default to 0 for all students
