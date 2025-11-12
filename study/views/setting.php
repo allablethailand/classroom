@@ -3,7 +3,6 @@
 // ใช้ไฟล์ที่จำเป็น
 require_once("actions/login.php");
 require_once($base_include."/lib/connect_sqli.php");
-include_once($base_include."/login_history.php");
 session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
 global $mysqli;
 
