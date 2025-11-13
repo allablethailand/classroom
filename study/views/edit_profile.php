@@ -143,9 +143,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $ig = $_POST['ig'] ? $_POST['ig'] : '';
         $facebook = $_POST['facebook'] ? $_POST['facebook'] : '';
         $hobby = $_POST['hobby'] ? $_POST['hobby'] : '';
-        $favorite_music = $_POST['favorite_music'] ? $_POST['favorite_music'] : '';
-        $favorite_drink = $_POST['favorite_drink'] ? $_POST['favorite_drink'] : '';
-        $favorite_movie = $_POST['favorite_movie'] ? $_POST['favorite_movie'] : '';
+        $student_music = $_POST['student_music'] ? $_POST['student_music'] : '';
+        $student_drink = $_POST['student_drink'] ? $_POST['student_drink'] : '';
+        $student_movie = $_POST['student_movie'] ? $_POST['student_movie'] : '';
         $goal = $_POST['goal'] ? $_POST['goal'] : '';
         $company = $_POST['company'] ? $_POST['company'] : '';
         $company_detail = $_POST['company_detail'] ? $_POST['company_detail'] : '';
@@ -166,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo json_encode($response);
             exit;
         }
-        $stmt->bind_param("sssssssssssssssssi", $bio, $mobile, $email, $line, $ig, $facebook, $hobby, $favorite_music, $favorite_drink, $favorite_movie, $goal, $company, $company_detail, $company_url, $position, $emp_modify, $current_datetime, $student_id);
+        $stmt->bind_param("sssssssssssssssssi", $bio, $mobile, $email, $line, $ig, $facebook, $hobby, $student_music, $student_drink, $student_movie, $goal, $company, $company_detail, $company_url, $position, $emp_modify, $current_datetime, $student_id);
         if (!$stmt->execute()) {
             $response = ['status' => 'error', 'message' => 'อัปเดตข้อมูล Text ไม่สำเร็จ: ' . $stmt->error];
         }
@@ -878,8 +878,8 @@ function find_birth($birthday, $today)
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="favorite_music">ดนตรีที่ชอบ</label>
-                                <input type="text" name="favorite_music" id="favorite_music" class="form-control-edit"
+                                <label for="student_music">ดนตรีที่ชอบ</label>
+                                <input type="text" name="student_music" id="student_music" class="form-control-edit"
                                     value="<?= $row_student["student_music"]; ?>">
                             </div>
                         </div>
@@ -887,15 +887,15 @@ function find_birth($birthday, $today)
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="favorite_drink">เครื่องดื่มที่ชื่นชอบ</label>
-                                <input type="text" name="favorite_drink" id="favorite_drink" class="form-control-edit"
+                                <label for="student_drink">เครื่องดื่มที่ชื่นชอบ</label>
+                                <input type="text" name="student_drink" id="student_drink" class="form-control-edit"
                                     value="<?= $row_student["student_drink"]; ?>">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="favorite_movie">หนังที่ชอบ</label>
-                                <input type="text" name="favorite_movie" id="favorite_movie" class="form-control-edit"
+                                <label for="student_movie">หนังที่ชอบ</label>
+                                <input type="text" name="student_movie" id="student_movie" class="form-control-edit"
                                     value="<?= $row_student["student_movie"]; ?>">
                             </div>
                         </div>

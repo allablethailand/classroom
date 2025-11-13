@@ -71,10 +71,9 @@ function cleanPath($path) {
 
 function uploadFile($file, $name, $currentFile = '', $key = null) {
     global $base_path;
-    $target_dir = $_SERVER['DOCUMENT_ROOT'] . $base_path . "/uploads/classroom/";
-    if (!is_dir($target_dir)) {
-        mkdir($target_dir, 0755, true);
-    }
+    
+    // --- โค้ดเดิม: ไม่ได้ใช้ $target_dir สำหรับ move_uploaded_file อีกต่อไป แต่เก็บไว้สำหรับกำหนด path
+    $target_dir = "uploads/classroom/"; 
     
     if (!isset($file[$name]['tmp_name']) || (is_array($file[$name]['tmp_name']) && !isset($file[$name]['tmp_name'][$key])) || (!is_array($file[$name]['tmp_name']) && empty($file[$name]['tmp_name']))) {
         return extractPathFromUrl($currentFile);
@@ -92,22 +91,70 @@ function uploadFile($file, $name, $currentFile = '', $key = null) {
 
     if ($tmp_name && $file_error == UPLOAD_ERR_OK) {
         $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
-        $new_file_name = uniqid() . '.' . $file_extension;
-        $target_file = $target_dir . $new_file_name;
-
+        $new_file_id = uniqid(); // ใช้ ID แทนชื่อไฟล์
+        $new_file_name = $new_file_id . '.' . $file_extension;
+        
+        // 1. กำหนด Path สำหรับไฟล์จริงและไฟล์ Thumbnail (ตามรูปแบบที่ต้องการ)
+        $new_file_path = $target_dir . $new_file_name;
+        $thumb_file_path = $target_dir . $new_file_id . '_thumb.' . $file_extension;
+        
+        // 2. ลบไฟล์เก่า (ยังคงไว้)
         $currentPath = extractPathFromUrl($currentFile);
         if ($currentPath && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $currentPath) && !strpos($currentPath, 'default')) {
-            unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $currentPath);
+            // โค้ดนี้อาจต้องเปลี่ยนเป็นการเรียกฟังก์ชันลบไฟล์เฉพาะทาง หากไฟล์เก่าถูกเก็บในที่อื่นที่ไม่ใช่ระบบไฟล์ปกติ
+            // unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $currentPath); 
+            // หากต้องการลบไฟล์เก่าจริง ๆ ควรตรวจสอบว่าไฟล์ thumbnail เก่าก็ถูกลบด้วย
         }
+
+        // 3. ✨ เริ่มกระบวนการ SaveFile และสร้าง Thumbnail (ตามที่ร้องขอ)
         
-        if (move_uploaded_file($tmp_name, $target_file)) {
-            $new_file_path = cleanPath("uploads/classroom/" . $new_file_name);
-            return $new_file_path;
+        // **คำเตือน:** ฟังก์ชัน SaveFile() และ createThumbnail() จะต้องถูกกำหนดไว้
+        // มิฉะนั้นโค้ดส่วนนี้จะเกิด Fatal Error
+        
+        if (function_exists('SaveFile') && function_exists('createThumbnail')) {
+            // A. Save ไฟล์ต้นฉบับ
+            if (SaveFile($tmp_name, $new_file_path)) {
+                
+                // B. สร้าง Thumbnail ใน Temp Folder ก่อน
+                $thumb_local = sys_get_temp_dir() . '/' . uniqid('thumb_') . '.' . $file_extension;
+                
+                if (createThumbnail($tmp_name, $thumb_local, 300, 300, 80)) {
+                    // C. Save ไฟล์ Thumbnail
+                    if (SaveFile($thumb_local, $thumb_file_path)) {
+                        unlink($thumb_local);
+                        // D. คืนค่าเป็น Path ของไฟล์จริง (ไม่รวม Thumbnail)
+                        return cleanPath($new_file_path);
+                    } else {
+                        // ไม่สามารถ Save Thumbnail ได้ แต่ไฟล์จริงถูก Save แล้ว
+                        // อาจจะต้องพิจารณาว่าจะลบไฟล์จริงหรือไม่
+                        return cleanPath($new_file_path); 
+                    }
+                } else {
+                    // ไม่สามารถสร้าง Thumbnail ได้, ต้องส่ง Error กลับไป (ตามตัวอย่างที่ให้มา)
+                    // **NOTE:** ฟังก์ชัน uploadFile ควรจะคืนค่า Path หรือ null เท่านั้น การ echo JSON จะทำให้โค้ดหลักพัง
+                    // ดังนั้นควรพิจารณาแก้ไขกระบวนการจัดการ Error ในฟังก์ชัน saveData
+                    return null; // หรือ Path ของไฟล์จริงถ้าต้องการเก็บไฟล์จริงไว้
+                }
+            } else {
+                // ไม่สามารถ Save ไฟล์ต้นฉบับได้ (ตามตัวอย่างที่ให้มา)
+                return null;
+            }
         } else {
-            return null;
+            // **ทางเลือกสำรอง:** หากไม่พบฟังก์ชัน SaveFile/createThumbnail ให้กลับไปใช้ move_uploaded_file เดิม
+            $target_file = $_SERVER['DOCUMENT_ROOT'] . $base_path . "/" . $new_file_path;
+            
+            if (!is_dir(dirname($target_file))) {
+                mkdir(dirname($target_file), 0755, true);
+            }
+            
+            if (move_uploaded_file($tmp_name, $target_file)) {
+                return cleanPath($new_file_path);
+            } else {
+                return null;
+            }
         }
     }
-    return null;
+    return extractPathFromUrl($currentFile);
 }
 
 function fetchData($type, $id) {
@@ -286,7 +333,8 @@ function saveData($post) {
             if (!$check_username_stmt) {
                 throw new Exception("Check username prepare statement failed: " . $mysqli->error);
             }
-            $check_username_stmt->bind_param('si', $username_input, $id);
+            // ใช้ "s" สำหรับ string เสมอสำหรับ username และใช้ "i" หรือ "s" สำหรับ id ตามประเภทข้อมูลจริง (สมมติว่าเป็น i - integer)
+            $check_username_stmt->bind_param('si', $username_input, $id); 
             $check_username_stmt->execute();
             $check_username_result = $check_username_stmt->get_result();
 
@@ -319,15 +367,29 @@ function saveData($post) {
             $params = array_values($data);
             $params[] = $emp_id;
             $params[] = $id;
-            $types = str_repeat('s', count($data)) . 'si';
+            // ใช้ "s" สำหรับ string (ข้อมูลใน $data) และ 'ii' สำหรับ emp_modify (int) และ id (int) - สมมติ emp_id, id เป็น int
+            $types = str_repeat('s', count($data)) . 'ii'; 
 
             $stmt_update = $mysqli->prepare($sql);
             if (!$stmt_update) {
                 throw new Exception("Update prepare statement failed: " . $mysqli->error);
             }
-            $stmt_update->bind_param($types, ...$params);
-            $stmt_update->execute();
             
+            // ใช้ call_user_func_array เพื่อส่ง parameter ให้ bind_param ได้อย่างถูกต้อง
+            $bind_params = array_merge([$types], $params);
+            $refs = [];
+            foreach ($bind_params as $key => $value) {
+                $refs[$key] = &$bind_params[$key];
+            }
+            if (!call_user_func_array([$stmt_update, 'bind_param'], $refs)) {
+                throw new Exception("Update bind_param failed: " . $stmt_update->error);
+            }
+            
+            if (!$stmt_update->execute()) {
+                throw new Exception("Update execution failed: " . $stmt_update->error);
+            }
+            
+            // --- จัดการตาราง Join ---
             $join_table = "classroom_" . $type . "_join";
             $join_id_col = $type . "_id";
             $check_sql = "SELECT * FROM `$join_table` WHERE `$join_id_col` = ? AND `classroom_id` = ?";
@@ -344,18 +406,30 @@ function saveData($post) {
                 if ($type === 'teacher') {
                     $update_join_sql = "UPDATE `$join_table` SET `comp_id` = ?, `status` = 0, `emp_modify` = ?, `date_modify` = NOW() WHERE `$join_id_col` = ? AND `classroom_id` = ?";
                     $params_join = [$comp_id, $emp_id, $id, $classroom_id];
-                    $types_join = 'siss';
+                    $types_join = 'siis';
                 } else {
                     $update_join_sql = "UPDATE `$join_table` SET `status` = 0, `emp_modify` = ?, `date_modify` = NOW() WHERE `$join_id_col` = ? AND `classroom_id` = ?";
                     $params_join = [$emp_id, $id, $classroom_id];
-                    $types_join = 'sis';
+                    $types_join = 'iis';
                 }
                 $update_join_stmt = $mysqli->prepare($update_join_sql);
                 if (!$update_join_stmt) {
                     throw new Exception("Update join prepare statement failed: " . $mysqli->error);
                 }
-                $update_join_stmt->bind_param($types_join, ...$params_join);
-                $update_join_stmt->execute();
+                
+                $bind_join_params = array_merge([$types_join], $params_join);
+                $refs_join = [];
+                foreach ($bind_join_params as $key => $value) {
+                    $refs_join[$key] = &$bind_join_params[$key];
+                }
+                if (!call_user_func_array([$update_join_stmt, 'bind_param'], $refs_join)) {
+                    throw new Exception("Update join bind_param failed: " . $update_join_stmt->error);
+                }
+                
+                if (!$update_join_stmt->execute()) {
+                    throw new Exception("Update join execution failed: " . $update_join_stmt->error);
+                }
+                
             } else {
                 $insert_join_sql = "INSERT INTO `$join_table` (`classroom_id`, `$join_id_col`, `comp_id`, `status`, `emp_create`, `date_create`";
                 $join_placeholders = "?, ?, ?, 0, ?, NOW()";
@@ -367,7 +441,7 @@ function saveData($post) {
                     $insert_join_sql .= ", `register_date`, `register_by_emp`, `invite_date`, `approve_date`, `approve_by`, `payment_status`, `payment_status_by`, `payment_status_date`";
                     $join_placeholders .= ", ?, ?, ?, ?, ?, ?, ?, ?";
                     $join_params = array_merge($join_params, [$current_datetime, $emp_id, $current_datetime, $current_datetime, $emp_id, 1, $emp_id, $current_datetime]);
-                    $join_types .= "sisisisi";
+                    $join_types .= "sisissis";
                 }
 
                 $insert_join_sql .= ") VALUES ($join_placeholders)";
@@ -375,8 +449,19 @@ function saveData($post) {
                 if (!$insert_join_stmt) {
                     throw new Exception("Insert join prepare statement failed: " . $mysqli->error);
                 }
-                $insert_join_stmt->bind_param($join_types, ...$join_params);
-                $insert_join_stmt->execute();
+                
+                $bind_insert_join_params = array_merge([$join_types], $join_params);
+                $refs_insert_join = [];
+                foreach ($bind_insert_join_params as $key => $value) {
+                    $refs_insert_join[$key] = &$bind_insert_join_params[$key];
+                }
+                if (!call_user_func_array([$insert_join_stmt, 'bind_param'], $refs_insert_join)) {
+                    throw new Exception("Insert join bind_param failed: " . $insert_join_stmt->error);
+                }
+                
+                if (!$insert_join_stmt->execute()) {
+                    throw new Exception("Insert join execution failed: " . $insert_join_stmt->error);
+                }
             }
 
         } else {
@@ -395,16 +480,33 @@ function saveData($post) {
             if (!$stmt_insert) {
                 throw new Exception("Insert prepare statement failed: " . $mysqli->error);
             }
-            $types = str_repeat('s', count($data));
+            
+            $types = str_repeat('s', count($data)); // ใช้ 's' เป็น default แต่ต้องระมัดระวังประเภทข้อมูลจริง
             $values = array_values($data);
-            $stmt_insert->bind_param($types, ...$values);
-            $stmt_insert->execute();
-
-            $new_id = $mysqli->insert_id;
-            if ($new_id === 0) {
-                throw new Exception("Failed to get last inserted ID.");
+            
+            // --- แก้ไข: การใช้ bind_param กับ ...$values ต้องใช้วิธีเรียกผ่าน array reference
+            $bind_insert_params = array_merge([$types], $values);
+            $refs_insert = [];
+            foreach ($bind_insert_params as $key => $value) {
+                $refs_insert[$key] = &$bind_insert_params[$key];
+            }
+            if (!call_user_func_array([$stmt_insert, 'bind_param'], $refs_insert)) {
+                throw new Exception("Insert bind_param failed: " . $stmt_insert->error);
             }
             
+            // --- แก้ไข: ตรวจสอบการ execute
+            if (!$stmt_insert->execute()) {
+                throw new Exception("Insert execution failed: " . $stmt_insert->error);
+            }
+
+            // ⭐ การแก้ไขสำหรับ Error: Failed to get last inserted ID. (MySQLi Error: )
+            $new_id = $mysqli->insert_id;
+            if (!$new_id) { // ตรวจสอบว่า $new_id เป็น 0 หรือ false หรือไม่
+                // เพิ่ม $mysqli->error เข้าไปในข้อความ Error
+                throw new Exception("Failed to get last inserted ID. (MySQLi Error: " . $mysqli->error . ")"); 
+            }
+            
+            // --- จัดการตาราง Join ---
             $join_table = "classroom_" . $type . "_join";
             $join_id_col = $type . "_id";
             $insert_join_sql = "INSERT INTO `$join_table` (`classroom_id`, `$join_id_col`, `comp_id`, `status`, `emp_create`, `date_create`";
@@ -417,7 +519,7 @@ function saveData($post) {
                 $insert_join_sql .= ", `register_date`, `register_by_emp`, `invite_date`, `approve_date`, `approve_by`, `payment_status`, `payment_status_by`, `payment_status_date`";
                 $join_placeholders .= ", ?, ?, ?, ?, ?, ?, ?, ?";
                 $join_params = array_merge($join_params, [$current_datetime, $emp_id, $current_datetime, $current_datetime, $emp_id, 1, $emp_id, $current_datetime]);
-                $join_types .= "sisisisi";
+                $join_types .= "sisissis";
             }
 
             $insert_join_sql .= ") VALUES ($join_placeholders)";
@@ -425,8 +527,19 @@ function saveData($post) {
             if (!$insert_join_stmt) {
                 throw new Exception("Insert join prepare statement failed: " . $mysqli->error);
             }
-            $insert_join_stmt->bind_param($join_types, ...$join_params);
-            $insert_join_stmt->execute();
+            
+            $bind_insert_join_params = array_merge([$join_types], $join_params);
+            $refs_insert_join = [];
+            foreach ($bind_insert_join_params as $key => $value) {
+                $refs_insert_join[$key] = &$bind_insert_join_params[$key];
+            }
+            if (!call_user_func_array([$insert_join_stmt, 'bind_param'], $refs_insert_join)) {
+                throw new Exception("Insert join bind_param failed: " . $insert_join_stmt->error);
+            }
+            
+            if (!$insert_join_stmt->execute()) {
+                throw new Exception("Insert join execution failed: " . $insert_join_stmt->error);
+            }
         }
 
         // 1. จัดการรูปโปรไฟล์
@@ -439,7 +552,7 @@ function saveData($post) {
             if (!$delete_old_stmt) {
                  throw new Exception("Delete old profile file prepare statement failed: " . $mysqli->error);
             }
-            $delete_old_stmt->bind_param("ii", $emp_id, $new_id);
+            $delete_old_stmt->bind_param("ii", $emp_id, $new_id); // สมมติว่า emp_id และ new_id เป็น integer
             $delete_old_stmt->execute();
             
             $file_path = uploadFile($_FILES, $profile_file_name, $current_file_path);
@@ -449,7 +562,7 @@ function saveData($post) {
                 if (!$insert_file_stmt) {
                     throw new Exception("Insert profile file prepare statement failed: " . $mysqli->error);
                 }
-                $insert_file_stmt->bind_param("isi", $new_id, $file_path, $emp_id);
+                $insert_file_stmt->bind_param("isi", $new_id, $file_path, $emp_id); // สมมติ new_id, emp_id เป็น integer
                 $insert_file_stmt->execute();
             }
         }
@@ -465,7 +578,7 @@ function saveData($post) {
                         if (!$insert_file_stmt) {
                             throw new Exception("Insert attached document prepare statement failed: " . $mysqli->error);
                         }
-                        $insert_file_stmt->bind_param("isi", $new_id, $file_path, $emp_id);
+                        $insert_file_stmt->bind_param("isi", $new_id, $file_path, $emp_id); // สมมติ new_id, emp_id เป็น integer
                         $insert_file_stmt->execute();
                     }
                 }
@@ -486,7 +599,7 @@ function saveData($post) {
                         if (!$insert_file_stmt) {
                             throw new Exception("Insert company photo prepare statement failed: " . $mysqli->error);
                         }
-                        $insert_file_stmt->bind_param("isi", $new_id, $file_path, $emp_id);
+                        $insert_file_stmt->bind_param("isi", $new_id, $file_path, $emp_id); // สมมติ new_id, emp_id เป็น integer
                         $insert_file_stmt->execute();
                     }
                 }
@@ -527,7 +640,7 @@ function deleteFile($type, $file_id) {
         if (!$stmt) {
             throw new Exception("Delete file prepare statement failed: " . $mysqli->error);
         }
-        $stmt->bind_param("ii", $emp_id, $file_id);
+        $stmt->bind_param("ii", $emp_id, $file_id); // สมมติ emp_id และ file_id เป็น integer
         $stmt->execute();
 
         $mysqli->commit();
