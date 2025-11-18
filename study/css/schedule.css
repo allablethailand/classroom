@@ -119,16 +119,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
 /**
  * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
  */
@@ -182,10 +172,6 @@
       line-height: 1.5;
     }
   }
-}
-
-html {
-  font-size: var(--font-size);
 }
 
 /* Custom CSS Classes for Schedule App */
@@ -244,7 +230,7 @@ html {
 
 /* Featured Class Styles */
 .featured-class {
-  background: linear-gradient(90deg, #f9a8d4 0%, #fb7185 100%);
+  background: linear-gradient(40deg,#3eb6e4 30%, #18f5ae 80%);
   border-radius: 1rem;
   padding: 1rem;
   color: white;
@@ -320,7 +306,7 @@ html {
   right: 0;
   width: 8rem;
   height: 8rem;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   margin-right: -4rem;
   margin-top: -4rem;
@@ -332,7 +318,7 @@ html {
   right: 0;
   width: 5rem;
   height: 5rem;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   margin-right: -2.5rem;
   margin-bottom: -2.5rem;
@@ -368,7 +354,7 @@ html {
 
 .schedule-time-text {
   font-size: 0.875rem;
-  color: #c084fc;
+  /* color: #c084fc; */
 }
 
 .schedule-time-bottom {
@@ -400,6 +386,11 @@ html {
   background-color: #5eead4;
 }
 
+.timeline-dot-blue {
+  background-color: #007AFF;
+}
+
+
 .timeline-dot-orange {
   background-color: #fdba74;
 }
@@ -425,6 +416,16 @@ html {
   background-color: rgba(94, 234, 212, 0.1);
 }
 
+.schedule-content-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 10px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s cubic-bezier(0, 0, 0.2, 1);
+}
+
+
+
 .schedule-content-orange {
   background-color: rgba(253, 186, 116, 0.1);
 }
@@ -438,14 +439,14 @@ html {
 
 .schedule-title {
   font-weight: 500;
-  color: #7c3aed;
+  /* color: #7c3aed; */
   margin-bottom: 0.25rem;
   font-size: 14px;
 }
 
 .schedule-duration {
   font-size: 0.875rem;
-  color: #a855f7;
+  /* color: #a855f7; */
 }
 
 .schedule-badge {
@@ -456,8 +457,8 @@ html {
 }
 
 .badge-class {
-  background-color: #e9d5ff;
-  color: #7c3aed;
+  background-color: #67a0f1ab;
+  color: #000000;
   min-width: 75px;
   text-align:center;
 }
@@ -761,3 +762,210 @@ html {
   border-radius: 0 0 12px 12px;
 }
   
+
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Bootstrap 3 doesn't have d-flex, so create equivalent */
+.d-flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.flex-start {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Margins - added specific pixel scale for Bootstrap 3 */
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.ml-64 {
+  margin-left: 64px; /* For left margin of timeline content */
+}
+
+.ml-40 {
+  margin-left: 40px; /* For left margin of timeline content */
+}
+
+.mt-0 {
+  margin-top: 0 !important;
+}
+
+.mt-15 {
+  margin-top: 15px;
+}
+
+.mt-20-lg {
+  margin-top: 20px;
+}
+
+/* Bootstrap 3 does not support responsive mt for lg, add media query */
+@media (min-width: 992px) {
+  .mt-20-lg {
+    margin-top: 0 !important;
+  }
+}
+
+/* Width 100% */
+.w-full {
+  width: 100%;
+}
+
+/* Position relative & absolute */
+.position-relative {
+  position: relative;
+}
+
+.position-absolute {
+  position: absolute;
+}
+
+
+
+/* Timeline dot */
+.timeline-dot {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  transition: all 0.15s cubic-bezier(0,0,0.2,1);
+  position: relative;
+  z-index: 10;
+}
+
+.timeline-dot.completed {
+  background-color: #00C851; /* green */
+}
+
+.timeline-dot.upcoming {
+  background-color: #007AFF; /* blue */
+}
+
+.timeline-dot.pending {
+  background-color: #FF6B35; /* orange */
+}
+
+/* Card */
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 10px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s cubic-bezier(0,0,0.2,1);
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Button primary */
+.btn-new-primary {
+  background-color: #007AFF;
+  border-color: #007AFF;
+  color: #fff;
+  /* padding: 12px 24px; */
+  padding-block: 6px;
+  border-radius: 8px;
+  font-weight: 500;
+  /* min-height: 44px; */
+  transition: background-color 150ms ease-out, box-shadow 150ms ease-out;
+  cursor: pointer;
+}
+
+.btn-new-primary:hover,
+.btn-new-primary:focus {
+  background-color: #0062CC;
+  outline: none;
+}
+
+.btn-new-primary:active {
+  transform: scale(0.98);
+  transition: transform 150ms ease-out;
+}
+
+/* Add spacing between appointments vertically */
+.space-y-24 > * + * {
+  margin-top: 24px;
+}
+
+/* Icon margin */
+.fa {
+  margin-right: 8px;
+}
+
+/* Text primary color */
+.text-primary {
+  color: #1D1D1F; /* dark grey */
+  font-weight: 600;
+}
+
+/* Text muted (Bootstrap 3 built in) overrides if needed */
+.text-muted {
+  color: #6E6E73 !important;
+  font-size: 0.875rem; /* 14px */
+}
+
+/* Small font */
+.small {
+  font-size: 0.875rem;
+}
+
+/* H4 styling */
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+/* Font weight */
+.font-semibold {
+  font-weight: 600;
+}
+
+/* Utility for margin-right on icons */
+.mr-5 {
+  margin-right: 5px;
+}
+
+.ml-5 {
+  margin-left: 5px;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+/* Utility class for pull-left and right alignment */
+.pull-left {
+  float: left !important;
+}
+
+.pull-right {
+  float: right !important;
+}
+
+/* Flexbox (not native on BS3, polyfill here) */
+.d-flex {
+  display: flex;
+}
+.align-items-center {
+  align-items: center;
+}
+.text-right {
+  text-align: right;
+}

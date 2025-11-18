@@ -278,7 +278,7 @@ if (!empty($course_file)) {
 
         <!-- Attendees Card -->
         <div class="card mb-6">
-                <h3 class="text-lg font-semibold text-text-primary mb-4">Instructors ( <?= $course_data['trn_count_by'] ?> )</h3>
+                <h3 class="text-lg font-semibold text-text-primary mb-4">Instructors ( <?= isset($course_data['trn_count_by']) ? $course_data['trn_count_by'] : 0  ?> )</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <!-- FOREACH DATA INSIDE TRN INSTRUCTOR -->
                     <?php foreach ($trainers_array as $index => $trainer_id) { 

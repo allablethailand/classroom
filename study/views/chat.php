@@ -65,56 +65,6 @@
         <div  style="display: flex;">
           <img src="" alt="" onerror="this.src='/images/origami-logo-robot.png'" class="img-rounded img-contain">
         </div>
-        <!-- <div class="robot-container">
-          <div class="robot-head">
-
-            <div class="eye eye-left">
-              <div class="eye-pupil"></div>
-            </div>
-            <div class="eye eye-right">
-              <div class="eye-pupil"></div>
-            </div>
-
-
-            <div class="mouth"></div>
-
-
-            <div class="head-detail head-detail-1"></div>
-            <div class="head-detail head-detail-2"></div>
-          </div>
-
-
-          <div class="robot-body">
-
-            <div class="chest-panel">
-              <div class="gear gear-1"></div>
-              <div class="gear gear-2"></div>
-              <div class="status-light status-light-1"></div>
-              <div class="status-light status-light-2"></div>
-              <div class="status-light status-light-3"></div>
-            </div>
-
-
-            <div class="arm arm-left">
-              <div class="hand hand-left"></div>
-            </div>
-            <div class="arm arm-right">
-              <div class="hand hand-right"></div>
-            </div>
-          </div>
-
-
-          <div class="robot-legs">
-            <div class="leg leg-left">
-              <div class="foot foot-left"></div>
-            </div>
-            <div class="leg leg-right">
-              <div class="foot foot-right"></div>
-            </div>
-          </div>
-        </div> -->
-
-
       </div>
     </div>
   </div>

@@ -34,7 +34,7 @@
 <body>
     <?php require_once 'component/header.php'; ?>
 
-    <div class="main-content">
+    <div class="main-content col-md-10">
         <div class="container-fluid" style="margin-bottom: 7rem;">
             <h1 class="heading-1" id="mini-game-title" data-lang="minigame">Mini Game</h1>
             <div class="divider-1">

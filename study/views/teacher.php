@@ -16,6 +16,25 @@
     require_once $base_include . '/classroom/study/actions/student_func.php';
     $selected_position_id = isset($_GET['position_id']) ? intval($_GET['position_id']) : 0;
     $teacher_list = getTeacherByPosition($selected_position_id);
+    // $techerRole = getTeacherPositionName($selected_position_id);
+
+    $role_result = select_data("position_id,
+        position_name_th,
+        position_name_en,
+        position_cover,
+        position_description",
+        "classroom_position ",
+        "WHERE position_id = '{$selected_position_id}' AND is_active = '0' AND status = '0'"
+    );
+    
+
+    // var_dump($result[0]);
+
+    // var_dump($selected_position_id);
+
+
+    // var_dump($teacherRole);
+
     $teacher_count = count($teacher_list);
 ?>
 <!doctype html>
@@ -85,7 +104,7 @@
 <?php require_once("component/header.php"); ?>
 <div class="main-transparent-content">
     <div class="container-fluid">
-        <h1 class="heading-1">รายชื่ออาจารย์</h1>
+        <h1 class="heading-1">รายชื่อสมาชิกในกลุ่ม <?php echo " - " . $role_result[0]['position_name_th']; ?> </h1>
         <div class="divider-1"><span></span></div>
         <div class="search-container">
             <input type="text" id="teacherSearch" onkeyup="searchTeacher()" placeholder="ค้นหาอาจารย์...">
