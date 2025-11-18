@@ -849,8 +849,8 @@ function find_birth($birthday, $today)
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="ig">ig</label>
-                                <input type="text" name="ig" id="ig" class="form-control-edit"
+                                <label for="instagram">Instagram</label>
+                                <input type="text" name="instagram" id="instagram" class="form-control-edit"
                                     value="<?= $row_student['student_ig']; ?>">
                             </div>
                         </div>
@@ -858,7 +858,7 @@ function find_birth($birthday, $today)
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="facebook">facebook</label>
+                                <label for="facebook">Facebook</label>
                                 <input type="text" name="facebook" id="facebook" class="form-control-edit"
                                     value="<?= $row_student['student_facebook']; ?>">
                             </div>

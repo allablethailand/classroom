@@ -88,7 +88,7 @@ $old_segment = '<div class="progress-container">
 
 <body>
     <?php require_once 'component/header.php'; ?>
-    <div class="main-transparent-content">
+    <div class="main-content">
         <div class="container-fluid">
             <h1 class="heading-1" data-lang="courseclasses">หลักสูตรชั้นเรียน</h1>
             <div class="divider-1"> 

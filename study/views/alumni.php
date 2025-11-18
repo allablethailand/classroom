@@ -89,7 +89,7 @@ $classroom_group = getAlumniClassroomCount($std_id);
     <?php require_once 'component/header.php'; ?>
 
     <!-- work ON mobile screen ONLY -->
-    <div class="main-transparent-content" >
+    <div class="main-transparent-content col-md-10" >
         <div class="container-fluid px-4 py-2" >
             <h1 class="heading-1" data-lang="alumni">รุ่นหลักสูตร</h1>
             <div class="divider-1">

@@ -781,8 +781,7 @@ body {
         <span></span>
     </div>
     
-    <div class="desktop-flex-wrapper">
-        
+    <div class="desktop-flex-wrapper ">
         <div class="schedule-right-panel">
             <div class="schedule-container">
                 

@@ -62,6 +62,7 @@ const translations = {
         program: "Program:",
         personalinfo: "Personal Information",
         birthdate: "Birthdate:",
+        biography: "Bio",
         religion: "Religion:",
         bloodtype: "Blood Type:",
         hobbies: "Hobbies:",
@@ -74,6 +75,7 @@ const translations = {
         notspecified: "Not Specified",
         nobioyet: "No biography yet.",
         certificate: "Certificate:",
+        foodallergy: "Food Allergies",
         // Menu
         dailyschedule: "Daily Schedule",
         courseclasses: "Course Classes",
@@ -154,6 +156,7 @@ const translations = {
         program: "หลักสูตร:",
         personalinfo: "ข้อมูลส่วนบุคคล",
         birthdate: "วันเกิด:",
+        bui: "ชีวประวัติ",
         religion: "ศาสนา:",
         bloodtype: "กรุ๊ปเลือด:",
         hobbies: "งานอดิเรก:",
@@ -166,6 +169,7 @@ const translations = {
         notspecified: "ไม่ระบุ",
         nobioyet: "ยังไม่มีประวัติส่วนตัว",
         certificate: "ประกาศนียบัตร:",
+        foodallergy: "อาหารที่แพ้",
         // Menu
         dailyschedule: "กำหนดการประจำวัน",
         courseclasses: "หลักสูตรชั้นเรียน",
