@@ -305,8 +305,9 @@ function saveData($post) {
             $type . '_drink' => isset($post[$type . '_drink']) ? $post[$type . '_drink'] : null,
             $type . '_movie' => isset($post[$type . '_movie']) ? $post[$type . '_movie'] : null,
             $type . '_goal' => isset($post[$type . '_goal']) ? $post[$type . '_goal'] : null,
-            $type . '_religion' => isset($post[$type . '_religion']) ? $post[$type . '_religion'] : null,
-            $type . '_bloodgroup' => isset($post[$type . '_bloodgroup']) ? $post[$type . '_bloodgroup'] : null,
+            // $type . '_religion' => isset($post[$type . '_religion']) ? $post[$type . '_religion'] : null,
+            // $type . '_bloodgroup' => isset($post[$type . '_bloodgroup']) ? $post[$type . '_bloodgroup'] : null,
+            $type . '_allergy' => isset($post[$type . '_allergy']) ? $post[$type . '_allergy'] : null,
             
             // --- เพิ่มคอลัมน์ใหม่สำหรับข้อมูลบริษัท ---
             $type . '_company_detail' => isset($post[$type . '_company_detail']) ? $post[$type . '_company_detail'] : null,
