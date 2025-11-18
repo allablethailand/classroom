@@ -258,13 +258,10 @@
                                             </div>
                                         </div>
                                         <div class="form-group g-4 row" style="margin-bottom:4.5em;">
-                                            <div class="col-sm-6">
-                                                <label for="${type}_religion" class="control-label"><i class="fas fa-hand-holding-heart" style="color: #ecc379; margin-right: 5px;"></i> Religion </label>
-                                                <input type="text" name="${type}_religion" id="${type}_religion" class="form-control" style="padding: 2rem 1rem;">
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <label for="${type}_bloodgroup" class="control-label"><i class="" style="color: #6c757d; margin-right: 5px;"></i> Blood Group </label>
-                                                <input type="text" name="${type}_bloodgroup" id="${type}_bloodgroup" class="form-control" style="padding: 2rem 1rem;">
+                                            
+                                             <div class="col-sm-6">
+                                                <label for="${type}_allergy" class="control-label"><i class="" style="color: #6c757d; margin-right: 5px;"></i> Food allergies </label>
+                                                <input type="text" name="${type}_allergy" id="${type}_allergy" class="form-control" style="padding: 2rem 1rem;">
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -733,8 +730,9 @@ function loadData(type, id) {
                     $(`#${type}_experience`).val(data[`${type}_experience`]);
                     $(`#${type}_company`).val(data[`${type}_company`]);
                     $(`#${type}_position`).val(data[`${type}_position`]);
-                    $(`#${type}_religion`).val(data[`${type}_religion`]);
-                    $(`#${type}_bloodgroup`).val(data[`${type}_bloodgroup`]);
+                    // $(`#${type}_religion`).val(data[`${type}_religion`]);
+                    // $(`#${type}_bloodgroup`).val(data[`${type}_bloodgroup`]);
+                    $(`#${type}_allergy`).val(data[`${type}_allergy`]);
                     // ✨ เพิ่มโค้ดใหม่ตรงนี้
 // Company fields
 $(`#${type}_company_detail`).val(data[`${type}_company_detail`]);
