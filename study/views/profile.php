@@ -697,29 +697,47 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         </div>
        <div class="profile-image-carousel">
             <?php 
-                // --- ส่วนที่เพิ่มเข้ามาใหม่สำหรับการดึงรูปภาพโปรไฟล์ ---
-                $sql_images = "SELECT stu.student_image_profile FROM classroom_student_join cjoin 
-                    LEFT JOIN classroom_student stu ON stu.student_id = cjoin.student_id 
-                    WHERE cjoin.status = 0 AND cjoin.payment_status = 1 AND cjoin.student_id = ?";
+                // --- ส่วนที่แก้ไข: ดึงรูปภาพโปรไฟล์จากตาราง classroom_file_student ---
+                // ใช้ตัวแปร $student_id ที่ควรถูกกำหนดไว้ก่อนหน้านี้ในโค้ด
+                $sql_images = "SELECT file_path FROM classroom_file_student 
+                               WHERE student_id = ? 
+                                 AND file_type = 'profile_image' 
+                                 AND file_status = 1 
+                                 AND is_deleted = 0 
+                               ORDER BY date_create DESC 
+                               LIMIT 1"; // จำกัดให้ดึงแค่รูปเดียวล่าสุด (ถ้ามีหลายรูป)
 
                 $stmt_images = $mysqli->prepare($sql_images);
-                $stmt_images->bind_param("i", $student_id);
-                $stmt_images->execute();
-                $result_images = $stmt_images->get_result();
+                // ตรวจสอบว่า $student_id ถูกกำหนดและเป็น integer ก่อน bind
+                if (isset($student_id)) {
+                    $stmt_images->bind_param("i", $student_id);
+                    $stmt_images->execute();
+                    $result_images = $stmt_images->get_result();
 
-                echo '<div class="carousel-container">';
-                if ($row_image = $result_images->fetch_assoc()) {
-                    $profile_image = $row_image['student_image_profile'];   
-                    // Assuming $profile_image contains raw image binary data (BLOB)
-                    echo '<img class="profile-avatar-circle" src="' . GetUrl($profile_image) . '" onerror="this.src=\'../../../images/default.png\'" alt="Profile Image" style="border-color: ' . $profile_border_color . ';">';
+                    echo '<div class="carousel-container">';
+                    
+                    if ($row_image = $result_images->fetch_assoc()) {
+                        // $profile_image จะเก็บค่า file_path ซึ่งเป็นเส้นทางของไฟล์
+                        $profile_path = $row_image['file_path'];   
+                        // สมมติว่า GetUrl() เป็นฟังก์ชันที่แปลง path ให้เป็น URL ที่ใช้งานได้
+                        echo '<img class="profile-avatar-circle" src="' . GetUrl($profile_path) . '" onerror="this.src=\'../../../images/default.png\'" alt="Profile Image" style="border-color: ' . $profile_border_color . ';">';
+                    } else {
+                        // Fallback to default image if none found
+                        echo '<img src="../../../images/default.png" alt="Default Profile" style="border-color: ' . $profile_border_color . ';">';
+                    }
+                    
+                    $stmt_images->close();
+                    echo '</div>';
                 } else {
-                    // Fallback to default image if none found
-                    echo '<img src="../../../images/default.png" alt="Default Profile" style="border-color: ' . $profile_border_color . ';">';
+                    // กรณีที่ $student_id ไม่ได้ถูกกำหนด
+                    echo '<div class="carousel-container">';
+                    echo '<img src="../../../images/default.png" alt="Error: Student ID not set" style="border-color: ' . $profile_border_color . ';">';
+                    echo '</div>';
+                    // สามารถเพิ่มการจัดการข้อผิดพลาดอื่น ๆ ได้ตามต้องการ
                 }
-                $stmt_images->close();
                 // ----------------------------------------------------
-                echo '</div>';
             ?>
+        
 
         </div>
         <h2 class="profile-name" style="
