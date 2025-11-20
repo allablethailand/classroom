@@ -1,18 +1,29 @@
 <?php
-session_start();
-$base_include = $_SERVER['DOCUMENT_ROOT'];
-$base_path = '';
-if ($_SERVER['HTTP_HOST'] == 'localhost') {
-    $request_uri = $_SERVER['REQUEST_URI'];
-    $exl_path = explode('/', $request_uri);
-    if (!file_exists($base_include . "/dashboard.php")) {
-        $base_path .= "/" . $exl_path[1];
+  session_start();
+    $base_include = $_SERVER['DOCUMENT_ROOT'];
+    $base_path = '';
+    if($_SERVER['HTTP_HOST'] == 'localhost'){
+       $request_uri = $_SERVER['REQUEST_URI'];
+       $exl_path = explode('/',$request_uri);
+       if(!file_exists($base_include."/dashboard.php")){
+           $base_path .= "/".$exl_path[1];
+       }
+       $base_include .= "/".$exl_path[1];
     }
-    $base_include .= "/" . $exl_path[1];
-}
-define('BASE_PATH', $base_path);
-define('BASE_INCLUDE', $base_include);
-require_once $base_include . '/lib/connect_sqli.php';
+    DEFINE('base_path', $base_path);
+    DEFINE('base_include', $base_include);
+	require_once($base_include."/lib/connect_sqli.php");
+	require_once($base_include."/actions/func.php");
+	require_once($base_include."/classroom/study/actions/student_func.php");
+
+    $fsData = getBucketMaster();
+    $filesystem_user = $fsData['fs_access_user'];
+    $filesystem_pass = $fsData['fs_access_pass'];
+    $filesystem_host = $fsData['fs_host'];
+    $filesystem_path = $fsData['fs_access_path'];
+    $filesystem_type = $fsData['fs_type'];
+    $fs_id = $fsData['fs_id'];
+	setBucket($fsData);
 
 global $mysqli;
 // Get current directory or page identifier, example by parsing URL path
