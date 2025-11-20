@@ -139,20 +139,7 @@ function uploadFile($file, $name, $currentFile = '', $key = null) {
                 // ไม่สามารถ Save ไฟล์ต้นฉบับได้ (ตามตัวอย่างที่ให้มา)
                 return null;
             }
-        } else {
-            // **ทางเลือกสำรอง:** หากไม่พบฟังก์ชัน SaveFile/createThumbnail ให้กลับไปใช้ move_uploaded_file เดิม
-            $target_file = $_SERVER['DOCUMENT_ROOT'] . $base_path . "/" . $new_file_path;
-            
-            if (!is_dir(dirname($target_file))) {
-                mkdir(dirname($target_file), 0755, true);
-            }
-            
-            if (move_uploaded_file($tmp_name, $target_file)) {
-                return cleanPath($new_file_path);
-            } else {
-                return null;
-            }
-        }
+        } 
     }
     return extractPathFromUrl($currentFile);
 }
