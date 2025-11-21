@@ -3,6 +3,49 @@ session_start();
 require_once("../../lib/connect_sqli.php");
 global $mysqli;
 
+// --- ฟังก์ชันช่วยเหลือสำหรับดึงรูปโปรไฟล์ใหม่ ---
+/**
+ * ดึง file_path ของรูปโปรไฟล์หลักของนักเรียน
+ * โดยใช้เงื่อนไข: file_path = 'profile_image', file_status = 1, is_deleted = 0
+ *
+ * @param mysqli $mysqli วัตถุการเชื่อมต่อ MySQLi
+ * @param int $student_id ID ของนักเรียน
+ * @return string URL รูปภาพ (file_path) หรือค่าว่างถ้าไม่พบ
+ */
+function getStudentProfileImage($mysqli, $student_id) {
+    // ใช้ prepared statement เพื่อป้องกัน SQL Injection
+    $stmt = $mysqli->prepare("
+        SELECT file_path
+        FROM classroom_file_student
+        WHERE student_id = ?
+        AND file_type = 'profile_image'
+        AND file_status = 1
+        AND is_deleted = 0
+        LIMIT 1
+    ");
+    // ตรวจสอบการเตรียม statement
+    if ($stmt === false) {
+        // อาจจะต้องจัดการข้อผิดพลาดตรงนี้
+        return '';
+    }
+    
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        // ส่งคืน file_path ซึ่งควรจะเป็น URL
+        return $row['file_path']; 
+    }
+    
+    $stmt->close();
+    return ''; // คืนค่าว่างถ้าไม่พบ
+}
+// --------------------------------------------------
+
+
 // Get the selected group_id from the URL, default to 0 for all students
 $selected_group_id = isset($_GET['group_id']) ? intval($_GET['group_id']) : 0;
 
@@ -16,10 +59,9 @@ if ($groups_result) {
 }
 
 // --- 2. Build the query to fetch students and their course name and GROUP NAME ---
-// เพิ่ม group_color เข้ามาใน SELECT statement
-// เพิ่ม group_logo เข้ามาใน SELECT statement
+// *** ลบ student_image_profile ออกจาก SELECT statement ***
 $query_parts = [
-    "SELECT cs.student_id, cs.student_firstname_th, cs.student_lastname_th, cs.student_image_profile, cs.student_mobile, cs.student_email, cs.student_company, cs.student_position, ct.classroom_name, cg.group_name, cg.group_color, cg.group_logo",
+    "SELECT cs.student_id, cs.student_firstname_th, cs.student_lastname_th, cs.student_mobile, cs.student_email, cs.student_company, cs.student_position, ct.classroom_name, cg.group_name, cg.group_color, cg.group_logo",
     "FROM classroom_student cs",
     "INNER JOIN classroom_student_join csj ON cs.student_id = csj.student_id",
     "LEFT JOIN classroom_template ct ON csj.classroom_id = ct.classroom_id",
@@ -467,66 +509,67 @@ if ($result) {
         </div>
 
         <div class="student-list">
-            <?php
-            if ($num_rows > 0) {
-                foreach ($students as $row) {
-                    $student_pic = !empty($row['student_image_profile']) ? GetUrl($row['student_image_profile']) : '../../../images/default.png';
-                    $group_logo = !empty($row['group_logo']) ? GetUrl($row['group_logo']) : '../../../images/logo_academy.png';
-                    // กำหนดสีขอบรูปภาพเริ่มต้นเป็นสีส้ม ถ้าไม่มี group_color
-                    $border_color = !empty($row['group_color']) ? htmlspecialchars($row['group_color']) : '#ff8c00';
-                    ?>
-                    <a href="studentinfo?id=<?= htmlspecialchars($row['student_id']); ?>" class="student-card">
-                        <p class="student-id-display">
-                            ID: <?= htmlspecialchars($row['student_id']); ?>
-                        </p>
+    <?php
+    if ($num_rows > 0) {
+        foreach ($students as $row) {
+            // *** ส่วนที่แก้ไข: ดึงรูปโปรไฟล์จากตาราง classroom_file_student โดยเรียกใช้ฟังก์ชัน ***
+            $profile_path = getStudentProfileImage($mysqli, $row['student_id']);
+            
+            // ใช้ GetUrl สำหรับ file_path ที่ดึงมาใหม่ ถ้ามีค่า
+            $student_pic = !empty($profile_path) ? GetUrl($profile_path) : '../../../images/default.png';
 
-                        <div class="student-avatar" style="border-color: <?= $border_color; ?>;">
-                            <img src="<?= htmlspecialchars($student_pic); ?>" alt="Student Avatar"
-                                onerror="this.src='../../../images/default.png'">
-                        </div>
-
-                        <div class="student-info">
-                           
-                            <div class="company-name-container" style="margin-bottom: 10px;">
-                                    <span class="company-name-label">บริษัท:</span>
-                                    <p class="company-name">
-                                        <?= !empty($row['student_company']) ? htmlspecialchars($row['student_company']) : "-"; ?>
-                                    </p>
-                            </div>
-                            
-                            <h4 class="student-name">
-                                <i class="fas fa-user-graduate" style="margin-right:10px"></i>  
-                                <?= htmlspecialchars($row['student_firstname_th'] . " " . $row['student_lastname_th']); ?>
-                            </h4>
-                            <!-- <p class="student-details highlight-text">
-                                <i class="fas fa-graduation-cap" style="margin-right:10px"></i>
-                                <?= !empty($row['classroom_name']) ? htmlspecialchars($row['classroom_name']) : "-"; ?>
-                            </p> -->
-                            <p class="student-details highlight-text group-name-container">
-                                <img src="<?= htmlspecialchars($group_logo); ?>" onerror="this.src='/images/logo_academy.png'" alt="Group Logo">
-                                <?= !empty($row['group_name']) ? htmlspecialchars($row['group_name']) : "-"; ?>
-                            </p>
-                            <p class="student-details">
-                                <i class="fas fa-briefcase" style="margin-right:10px"></i>
-                                <?= !empty($row['student_position']) ? htmlspecialchars($row['student_position']) : "-"; ?>
-                            </p>
-                            <p class="student-details">
-                                <i class="fas fa-phone" style="margin-right:10px"></i>
-                                <?= !empty($row['student_mobile']) ? htmlspecialchars($row['student_mobile']) : "-"; ?>
-                            </p>
-                            <p class="student-details">
-                                <i class="fas fa-envelope" style="margin-right:10px"></i>
-                                <?= !empty($row['student_email']) ? htmlspecialchars($row['student_email']) : "-"; ?>
-                            </p>
-                        </div>
-                    </a>
-                    <?php
-                }
-            } else {
-                echo "<p style='text-align: center; color: #888;'>ไม่พบข้อมูลนักเรียนในกลุ่มนี้</p>";
-            }
+            // โค้ดเดิมสำหรับ group_logo และ group_color
+            $group_logo = !empty($row['group_logo']) ? GetUrl($row['group_logo']) : '../../../images/logo_academy.png';
+            $border_color = !empty($row['group_color']) ? htmlspecialchars($row['group_color']) : '#ff8c00';
             ?>
-        </div>
+            <a href="studentinfo?id=<?= htmlspecialchars($row['student_id']); ?>" class="student-card">
+                <p class="student-id-display">
+                    ID: <?= htmlspecialchars($row['student_id']); ?>
+                </p>
+
+                <div class="student-avatar" style="border-color: <?= $border_color; ?>;">
+                    <img src="<?= htmlspecialchars($student_pic); ?>" alt="Student Avatar"
+                        onerror="this.src='../../../images/default.png'">
+                </div>
+
+                <div class="student-info">
+                    
+                    <div class="company-name-container" style="margin-bottom: 10px;">
+                        <span class="company-name-label">บริษัท:</span>
+                        <p class="company-name">
+                            <?= !empty($row['student_company']) ? htmlspecialchars($row['student_company']) : "-"; ?>
+                        </p>
+                    </div>
+                    
+                    <h4 class="student-name">
+                        <i class="fas fa-user-graduate" style="margin-right:10px"></i>  
+                        <?= htmlspecialchars($row['student_firstname_th'] . " " . $row['student_lastname_th']); ?>
+                    </h4>
+                    <p class="student-details highlight-text group-name-container">
+                        <img src="<?= htmlspecialchars($group_logo); ?>" onerror="this.src='/images/logo_academy.png'" alt="Group Logo">
+                        <?= !empty($row['group_name']) ? htmlspecialchars($row['group_name']) : "-"; ?>
+                    </p>
+                    <p class="student-details">
+                        <i class="fas fa-briefcase" style="margin-right:10px"></i>
+                        <?= !empty($row['student_position']) ? htmlspecialchars($row['student_position']) : "-"; ?>
+                    </p>
+                    <p class="student-details">
+                        <i class="fas fa-phone" style="margin-right:10px"></i>
+                        <?= !empty($row['student_mobile']) ? htmlspecialchars($row['student_mobile']) : "-"; ?>
+                    </p>
+                    <p class="student-details">
+                        <i class="fas fa-envelope" style="margin-right:10px"></i>
+                        <?= !empty($row['student_email']) ? htmlspecialchars($row['student_email']) : "-"; ?>
+                    </p>
+                </div>
+            </a>
+            <?php
+        }
+    } else {
+        echo "<p style='text-align: center; color: #888;'>ไม่พบข้อมูลนักเรียนในกลุ่มนี้</p>";
+    }
+    ?>
+</div>
     </div>
     <?php
     require_once("component/footer.php")

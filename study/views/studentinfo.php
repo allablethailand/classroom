@@ -80,18 +80,25 @@ if ($join_data && $join_data['classroom_id']) {
 }
 // ---------------------------------
 
-// ส่วนที่เพิ่มเข้ามาใหม่สำหรับการดึงรูปภาพโปรไฟล์ (ใช้ student_id จาก URL)
-// $profile_images = []; // สร้าง array เปล่าสำหรับเก็บรูปภาพโปรไฟล์
-// $sql_images = "SELECT file_path, file_order FROM `classroom_file_student` WHERE student_id = ? AND file_type = 'profile_image' AND is_deleted = 0 ORDER BY file_order ASC LIMIT 4";
-// $stmt_images = $mysqli->prepare($sql_images);
-// $stmt_images->bind_param("i", $student_id);
-// $stmt_images->execute();
-// $result_images = $stmt_images->get_result();
+// *** ส่วนที่แก้ไข: ดึงรูปภาพโปรไฟล์จาก classroom_file_student ตามเงื่อนไขที่ร้องขอ ***
+$profile_images = []; // สร้าง array สำหรับเก็บรูปภาพโปรไฟล์
+$sql_images = "SELECT `file_id`, `student_id`, `file_path`, `file_type`, `file_status`, `file_order` 
+               FROM `classroom_file_student` 
+               WHERE `student_id` = ? 
+               AND `file_type` = 'profile_image' 
+               AND `file_status` = 1 
+               AND `is_deleted` = 0 
+               ORDER BY file_order ASC"; // เพิ่ม file_type, file_status และ file_order เพื่อให้สอดคล้องกับตัวอย่างโค้ดและตรรกะทั่วไป
 
-// while ($row_image = $result_images->fetch_assoc()) {
-//     $profile_images[] = $row_image['file_path'];
-// }
-// $stmt_images->close();
+$stmt_images = $mysqli->prepare($sql_images);
+$stmt_images->bind_param("i", $student_id);
+$stmt_images->execute();
+$result_images = $stmt_images->get_result();
+
+while ($row_image = $result_images->fetch_assoc()) {
+    $profile_images[] = $row_image; // เก็บข้อมูลทั้งหมดที่จำเป็น (file_id, file_path, file_status ฯลฯ)
+}
+$stmt_images->close();
 // --------------------------------------------------------------------
 
 // *** ส่วนที่เพิ่มเข้ามาเพื่อดึงรูปภาพบริษัท ตามที่ร้องขอ ***
@@ -670,50 +677,40 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
         
         <div class="profile-image-carousel">
             <?php
-                $sql_images = "SELECT stu.student_image_profile FROM classroom_student_join cjoin 
-                    LEFT JOIN classroom_student stu ON stu.student_id = cjoin.student_id 
-                    WHERE cjoin.status = 0 AND cjoin.payment_status = 1 AND cjoin.student_id = ?";
-
-                $stmt_images = $mysqli->prepare($sql_images);
-                $stmt_images->bind_param("i", $student_id);
-                $stmt_images->execute();
-                $result_images = $stmt_images->get_result();
+                // *** ส่วนที่แก้ไข: ลบโค้ดเดิมที่ดึงรูปภาพหลักจาก classroom_student_join และเปลี่ยนมาใช้ $profile_images ที่ดึงมาจาก classroom_file_student แทน ***
 
                 echo '<div class="carousel-container">';
-                if ($row_image = $result_images->fetch_assoc()) {
-                    $profile_image = $row_image['student_image_profile'];   
-                    // Assuming $profile_image contains raw image binary data (BLOB)
-                    echo '<img class="profile-avatar-circle" src="' . GetUrl($profile_image) . '" onerror="this.src=\'../../../images/default.png\'" alt="Profile Image" style="border-color: ' . $profile_border_color . ';">';
+                
+                // ตรวจสอบว่ามีรูปภาพที่ดึงมาหรือไม่
+                if (count($profile_images) > 0) {
+                    // วนลูปเพื่อแสดงรูปภาพโปรไฟล์
+                    foreach ($profile_images as $index => $image) {
+                        // $file_url = GetUrl($image['file_path']); // ต้องมีฟังก์ชัน GetUrl() ในโค้ด
+                        $file_url = GetUrl($image['file_path']); // ใช้ file_path จาก classroom_file_student
+                        $is_main = $image['file_status'] == 1; // ใช้ file_status จาก classroom_file_student เพื่อเช็คว่าเป็นรูปหลักหรือไม่
+
+                        // แสดงรูปภาพหลัก (file_status = 1) หรือรูปอื่นๆ ที่ดึงมา
+                        echo '<div class="carousel-item ' . ($is_main ? 'active' : '') . '">';
+                        echo '<img class="profile-avatar-circle ' . ($is_main ? 'is-main' : '') . '" 
+                                   src="' . $file_url . '" 
+                                   onerror="this.src=\'../../../images/default.png\'" 
+                                   alt="Profile Image ' . ($index + 1) . '" 
+                                   style="border-color: ' . $profile_border_color1 . ';">';
+                        echo '</div>';
+                    }
                 } else {
                     // Fallback to default image if none found
-                    echo '<img src="../../../images/default.png" alt="Default Profile" style="border-color: ' . $profile_border_color . ';">';
+                    echo '<div class="carousel-item active" >';
+                    echo '<img class="profile-avatar-circle" 
+                               src="../../../images/default.png" 
+                               alt="Default Profile" 
+                               style="border-color: ' . $profile_border_color1 . ';">';
+                    echo '</div>';
                 }
-                $stmt_images->close();
-                // ----------------------------------------------------
+
                 echo '</div>';
-                ?>
+            ?>
         </div>
-            
-            <!-- <?php if (count($profile_images) > 0) : ?>
-                <div class="carousel-container">
-                    <?php foreach ($profile_images as $index => $image_path) : ?>
-                        <div class="carousel-item <?= ($index === 0) ? 'active' : ''; ?>">
-                            <img src="<?= GetUrl($image_path); ?>"  onerror="this.src='/images/default.png'" alt="Profile Image <?= $index + 1; ?>" style="border-color: <?= $profile_border_color1; ?>;">
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <?php if (count($profile_images) > 1) : ?>
-                    <button class="carousel-nav prev">&#10094;</button>
-                    <button class="carousel-nav next">&#10095;</button>
-                <?php endif; ?>
-            <?php else : ?>
-                <div class="carousel-container">
-                <div class="carousel-item" >
-                    <img src="../../../images/default.png" alt="Profile Picture" style="border-color: <?= $profile_border_color1; ?>;">
-                </div>
-                </div>
-            <?php endif; ?>
-        </div> -->
         <h2 class="profile-name" style="
       background-color: rgba(0, 0, 0, 0.1); 
     
