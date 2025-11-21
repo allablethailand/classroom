@@ -162,7 +162,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
 
         .profile-avatar-circle {
             width: 170px;
-            /* height: 120px; */
+            height: 170px;
             border-radius: 50%;
             border: 5px solid #fff;
             /* ขอบสีขาวเริ่มต้น */
