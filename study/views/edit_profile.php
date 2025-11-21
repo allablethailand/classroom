@@ -616,6 +616,13 @@ function find_birth($birthday, $today)
             opacity: 1;
         }
 
+        .company-image-item:hover .image-overlay2 {
+            opacity: 1;
+        }
+
+        .company-logo-item:hover .image-overlay2 {
+            opacity: 1;
+        }
         
 
         .overlay-actions {
@@ -699,6 +706,19 @@ function find_birth($birthday, $today)
                 border: 4px solid #ddd;
                 transition: all 0.3s ease;
             }
+           .image-overlay2 {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
         }
 
         /* .image-preview-container {
@@ -821,6 +841,174 @@ function find_birth($birthday, $today)
             display: block;
             margin: 0 auto 20px;
         }
+           /* Modern Upload Zone Styles */
+    .upload-zone {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 40px 20px;
+        text-align: center;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .upload-zone:hover {
+        border-color: #ff8800;
+        background: #fff5eb;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 136, 0, 0.1);
+    }
+
+    .upload-zone.dragover {
+        border-color: #ff8800;
+        background: #fff5eb;
+        border-style: solid;
+    }
+
+    .upload-zone .upload-icon {
+        font-size: 48px;
+        color: #ff8800;
+        margin-bottom: 16px;
+    }
+
+    .upload-zone .upload-text {
+        font-size: 16px;
+        color: #374151;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    .upload-zone .upload-hint {
+        font-size: 14px;
+        color: #9ca3af;
+    }
+
+    .upload-zone input[type="file"] {
+        display: none;
+    }
+
+    /* Image Preview with Overlay */
+    .image-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    .image-wrapper img {
+        width: 100%;
+        height: 200px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .image-wrapper:hover img {
+        transform: scale(1.05);
+    }
+
+    /* Image Preview with Overlay */
+    .image-wrapperprofile {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    .image-wrapperprofile img {
+        width: 100%;
+        /* height: 200px; */
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .image-wrapperprofile:hover img {
+        transform: scale(1.05);
+    }
+
+    .image-overlay1 {
+        position: absolute;
+        top: 50px;
+        left: 35%;
+        /* right: 50%; */
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .image-overlay2 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 2em;
+    border-radius: 50%;
+}
+
+    .image-wrapper:hover .image-overlay1 {
+        opacity: 1;
+    }
+
+    .image-wrapper:hover .image-overlay2 {
+        opacity: 1;
+    }
+
+
+    .overlay-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .overlay-btn {
+        background: white;
+        color: #374151;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 16px;
+    }
+
+    .overlay-btn:hover {
+        background: #ff8800;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .btn-save-changes {
+        background: linear-gradient(135deg, #ff8800 0%, #ff6600 100%);
+        color: white;
+        border: none;
+        padding: 12px 40px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(255, 136, 0, 0.3);
+    }
+
+    .btn-save-changes:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 136, 0, 0.4);
+    }
     </style>
     <title>Profile • ORIGAMI SYSTEM</title>
 </head>
@@ -853,7 +1041,7 @@ function find_birth($birthday, $today)
                                     data-file-id="<?= htmlspecialchars($image['file_id']); ?>"
                                     data-file-path="<?= htmlspecialchars($image['file_path']); ?>"
                                     data-file-index="<?= $index; ?>">
-                                    <div class="image-wrapper">
+                                    <div class="image-wrapperprofile">
                                         <img src="<?= $file_url; ?>" onerror="this.src='/images/default.png'"
                                             alt="Profile Image <?= $index + 1; ?>"
                                             class="profile-image <?= $is_main ? 'is-main' : ''; ?>">
@@ -1051,73 +1239,78 @@ function find_birth($birthday, $today)
                 </div>
 
                 <hr class="my-4">
-                <h5 class="card-title">โลโก้บริษัท 🖼️</h5>
-                <div class="row" id="company-logo-container">
-                    <div class="col-md-3 mb-4 company-logo-item" data-file-id="0" data-file-index="logo">
-                        <div class="image-wrapper">
-                            <?php if (!empty($row_student["student_company_logo"])): ?>
-                                <img src="<?= GetUrl($row_student["student_company_logo"]); ?>"
-                                    alt="Company Logo" class="company-logo img-thumbnail">
-                                <div class="image-overlay1">
-                                    <div class="overlay-actions">
-                                        <button type="button" class="overlay-btn btn-delete-image-logo" title="ลบโลโก้">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                        <label for="replace-company-logo" class="overlay-btn" title="เปลี่ยนโลโก้">
-                                            <i class="fas fa-exchange-alt"></i>
-                                        </label>
-                                    </div>
-                                </div>
-                                <input type="file" id="replace-company-logo" class="file-input-handler d-none"
-                                    data-file-type="company_logo">
-                            <?php else: ?>
-                                <div class="company-add-placeholder logo-placeholder">
-                                    <i class="fas fa-plus-circle fa-2x text-muted"></i>
-                                    <span class="text-muted">เพิ่มโลโก้</span>
-                                    <input type="file" class="file-input-handler d-none" data-file-type="company_logo"
-                                        id="add-company-logo">
-                                    <label for="add-company-logo" class="stretched-link"></label>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+<h5 class="card-title">โลโก้บริษัท 🖼️</h5>
+<div class="row" id="company-logo-container">
+    <div class="col-md-12 mb-4 company-logo-item" data-file-id="0" data-file-index="logo">
+        <div class="image-wrapper">
+            <?php if (!empty($row_student["student_company_logo"])): ?>
+                <img src="<?= GetUrl($row_student["student_company_logo"]); ?>"
+                    alt="Company Logo" class="company-logo img-thumbnail">
+                <div class="image-overlay2">
+                    <div class="overlay-actions">
+                        <button type="button" class="overlay-btn btn-delete-image-logo" title="ลบโลโก้">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        <label for="replace-company-logo" class="overlay-btn" title="เปลี่ยนโลโก้">
+                            <i class="fas fa-exchange-alt"></i>
+                        </label>
                     </div>
                 </div>
+                <input type="file" id="replace-company-logo" class="file-input-handler"
+                    data-file-type="company_logo" accept="image/*">
+            <?php else: ?>
+                <div class="upload-zone" onclick="document.getElementById('add-company-logo').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">คลิกเพื่อเพิ่มโลโก้บริษัท</div>
+                    <div class="upload-hint">หรือลากไฟล์มาวางที่นี่</div>
+                    <input type="file" class="file-input-handler" data-file-type="company_logo"
+                        id="add-company-logo" accept="image/*">
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
 
-                <hr class="my-4">
-                <h5 class="card-title">รูปภาพบริษัท 📸</h5>
-                <div class="row" id="company-photos-container">
-                    <?php if (!empty($company_images)): ?>
-                        <?php foreach ($company_images as $index => $image): ?>
-                            <div class="col-md-3 mb-4 company-image-item" data-file-id="<?= $image['file_id']; ?>"
-                                data-file-index="<?= $index; ?>">
-                                <div class="image-wrapper">
-                                    <img src="<?= GetUrl($image['file_path']); ?>"
-                                        alt="Company Photo" class="company-image img-thumbnail">
-                                </div>
-                                <div class="image-overlay1">
-                                    <div class="overlay-actions">
-                                        <button type="button" class="overlay-btn btn-delete-image-company" title="ลบรูปภาพ">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                    <div class="col-md-3 mb-4 company-image-item" data-file-index="<?= count($company_images); ?>">
-                        <div class="image-wrapper company-add-placeholder">
-                            <i class="fas fa-plus-circle fa-2x text-muted"></i>
-                            <span class="text-muted">เพิ่มรูปภาพ</span>
-                            <input type="file" class="file-input-handler d-none" data-file-type="company_photo"
-                                id="add-company-file">
-                            <label for="add-company-file" class="stretched-link"></label>
+<hr class="my-4">
+<h5 class="card-title">รูปภาพบริษัท 📸</h5>
+<div class="row" id="company-photos-container">
+    <?php if (!empty($company_images)): ?>
+        <?php foreach ($company_images as $index => $image): ?>
+            <div class="col-md-3 mb-4 company-image-item" data-file-id="<?= $image['file_id']; ?>"
+                data-file-index="<?= $index; ?>">
+                <div class="image-wrapper">
+                    <img src="<?= GetUrl($image['file_path']); ?>"
+                        alt="Company Photo" class="company-image img-thumbnail">
+                    <div class="image-overlay2">
+                        <div class="overlay-actions">
+                            <button type="button" class="overlay-btn btn-delete-image-company" title="ลบรูปภาพ">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="text-center">
-                    <button type="button" name="submit_edit_profile" class="btn-save-changes"
-                        id="saveBtn">บันทึกการเปลี่ยนแปลง</button>
-                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+    <div class="col-md-3 mb-4 company-image-item" data-file-index="<?= count($company_images); ?>">
+        <div class="upload-zone" onclick="document.getElementById('add-company-file').click()">
+            <div class="upload-icon">
+                <i class="fas fa-images"></i>
+            </div>
+            <div class="upload-text">เพิ่มรูปภาพ</div>
+            <div class="upload-hint">คลิกหรือลากไฟล์</div>
+            <input type="file" class="file-input-handler" data-file-type="company_photo"
+                id="add-company-file" accept="image/*">
+        </div>
+    </div>
+</div>
+
+<div class="text-center">
+    <button type="button" name="submit_edit_profile" class="btn-save-changes"
+        id="saveBtn">บันทึกการเปลี่ยนแปลง</button>
+</div>
             </form>
         </div>
     </div>
@@ -1125,243 +1318,221 @@ function find_birth($birthday, $today)
     <?php require_once("component/footer.php") ?>
 
     <script type="text/javascript">
-        $(document).ready(function () {
-            // Function to handle the file upload and preview
-            function handleFileSelect(event) {
-                const fileInput = event.target;
-                const file = fileInput.files[0];
-                if (!file) { return; }
+    $(document).ready(function () {
+        // Drag and Drop functionality
+        $('.upload-zone').on('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).addClass('dragover');
+        });
 
-                const parentItem = $(fileInput).closest('.profile-image-item, .company-image-item, .company-logo-item');
-                const fileId = parentItem.data('file-id') || '';
-                const fileIndex = parentItem.data('file-index');
-                const fileType = $(fileInput).data('file-type') || 'profile_image';
-                
-                // สำหรับโลโก้บริษัท (company_logo) จะใช้ replace เสมอถ้ามีการเลือกไฟล์ เพราะมีได้แค่รูปเดียว
-                const isCompanyLogo = fileType === 'company_logo';
-                const fileAction = isCompanyLogo ? 'replace' : (fileId ? 'replace' : 'add'); 
+        $('.upload-zone').on('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).removeClass('dragover');
+        });
 
-                const fileFormData = new FormData();
-                fileFormData.append('update_type', 'file');
-                fileFormData.append('file_action', fileAction);
-                fileFormData.append('file_type', fileType);
-                
-                // company_logo ไม่ได้ใช้ file_id ในการอัปเดต แต่ยังคงต้องส่งไป
-                if (fileAction === 'replace' && fileType !== 'company_logo') {
-                    fileFormData.append('file_id', fileId);
-                }
-                fileFormData.append('file_index', fileIndex);
-                fileFormData.append(`file_upload[${fileIndex}]`, file);
+        $('.upload-zone').on('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).removeClass('dragover');
+            
+            const files = e.originalEvent.dataTransfer.files;
+            if (files.length > 0) {
+                const input = $(this).find('input[type="file"]')[0];
+                input.files = files;
+                $(input).trigger('change');
+            }
+        });
 
-                $.ajax({
-                    url: window.location.href,
-                    type: "POST",
-                    data: fileFormData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'JSON',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            if (fileAction === 'add' && response.file_id) {
-                                parentItem.data('file-id', response.file_id);
-                            }
-                            swal({ title: "อัปโหลดสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
-                        } else {
-                            swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
+        // Function to handle the file upload and preview
+        function handleFileSelect(event) {
+            const fileInput = event.target;
+            const file = fileInput.files[0];
+            if (!file) { return; }
+
+            const parentItem = $(fileInput).closest('.profile-image-item, .company-image-item, .company-logo-item');
+            const fileId = parentItem.data('file-id') || '';
+            const fileIndex = parentItem.data('file-index');
+            const fileType = $(fileInput).data('file-type') || 'profile_image';
+            
+            const isCompanyLogo = fileType === 'company_logo';
+            const fileAction = isCompanyLogo ? 'replace' : (fileId ? 'replace' : 'add'); 
+
+            const fileFormData = new FormData();
+            fileFormData.append('update_type', 'file');
+            fileFormData.append('file_action', fileAction);
+            fileFormData.append('file_type', fileType);
+            
+            if (fileAction === 'replace' && fileType !== 'company_logo') {
+                fileFormData.append('file_id', fileId);
+            }
+            fileFormData.append('file_index', fileIndex);
+            fileFormData.append(`file_upload[${fileIndex}]`, file);
+
+            $.ajax({
+                url: window.location.href,
+                type: "POST",
+                data: fileFormData,
+                processData: false,
+                contentType: false,
+                dataType: 'JSON',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        if (fileAction === 'add' && response.file_id) {
+                            parentItem.data('file-id', response.file_id);
                         }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.error("AJAX Error:", textStatus, errorThrown);
-                        swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์เพื่ออัปโหลดไฟล์ได้", type: "error" });
+                        swal({ title: "อัปโหลดสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
+                    } else {
+                        swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
                     }
-                });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX Error:", textStatus, errorThrown);
+                    swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์เพื่ออัปโหลดไฟล์ได้", type: "error" });
+                }
+            });
 
-                // Real-time Preview
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const isCompanyPhoto = fileType === 'company_photo';
-                    const isProfileImage = fileType === 'profile_image';
-                    const imageClass = isCompanyPhoto ? 'company-image' : (isCompanyLogo ? 'company-logo' : 'profile-image');
+            // Real-time Preview
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const isCompanyPhoto = fileType === 'company_photo';
+                const isProfileImage = fileType === 'profile_image';
+                const imageClass = isCompanyPhoto ? 'company-image' : (isCompanyLogo ? 'company-logo' : 'profile-image');
 
-                    if (fileAction === 'add') {
-                        // For Company Photo / Profile Image (add new)
-                        const isCompany = isCompanyPhoto;
-                        const newId = new Date().getTime(); // Temporary unique ID
-                        const newItem = $('<div>').addClass('col-md-3 mb-4 ' + (isCompany ? 'company-image-item' : 'profile-image-item')).attr('data-file-index', newId).attr('data-file-id', newId);
+                if (fileAction === 'add') {
+                    const isCompany = isCompanyPhoto;
+                    const newId = new Date().getTime();
+                    const newItem = $('<div>').addClass('col-md-3 mb-4 ' + (isCompany ? 'company-image-item' : 'profile-image-item')).attr('data-file-index', newId).attr('data-file-id', newId);
 
-                        const imageWrapper = $('<div>').addClass('image-wrapper');
-                        const newImage = $('<img>').attr({
-                            src: e.target.result,
-                            alt: 'Preview Image',
-                            class: imageClass + ' img-thumbnail'
-                        });
-                        imageWrapper.append(newImage);
+                    const imageWrapper = $('<div>').addClass('image-wrapper');
+                    const newImage = $('<img>').attr({
+                        src: e.target.result,
+                        alt: 'Preview Image',
+                        class: imageClass + ' img-thumbnail'
+                    });
+                    imageWrapper.append(newImage);
 
-                        const newOverlay = `
-                            <div class="image-overlay">
+                    const newOverlay = `
+                        <div class="image-overlay1">
+                            <div class="overlay-actions">
+                                <button type="button" class="overlay-btn btn-delete-image${isCompany ? '-company' : ''}" title="ลบรูปภาพ">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                                <label for="replace-file-${newId}" class="overlay-btn" title="เปลี่ยนรูปภาพ">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </label>
+                                <input type="file" id="replace-file-${newId}" class="file-input-handler" data-file-type="${fileType}" accept="image/*">
+                                ${isProfileImage ? `
+                                <button type="button" class="overlay-btn btn-set-main" title="ตั้งเป็นรูปหลัก">
+                                    <i class="fas fa-star"></i>
+                                </button>` : ''}
+                            </div>
+                        </div>`;
+                    newItem.append(imageWrapper).append(newOverlay);
+
+                    const placeholder = parentItem.find('.upload-zone').closest('.col-md-3');
+                    newItem.insertBefore(placeholder);
+                } else if (isCompanyLogo) {
+                    const hasLogoPlaceholder = parentItem.find('.upload-zone').length > 0;
+                    if (hasLogoPlaceholder) {
+                        const newLogoHtml = `
+                            <img src="${e.target.result}" alt="Company Logo" class="company-logo img-thumbnail">
+                            <div class="image-overlay1">
                                 <div class="overlay-actions">
-                                    <button type="button" class="overlay-btn btn-delete-image${isCompany ? '-company' : ''}" title="ลบรูปภาพ">
+                                    <button type="button" class="overlay-btn btn-delete-image-logo" title="ลบโลโก้">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
-                                    <label for="replace-file-${newId}" class="overlay-btn" title="เปลี่ยนรูปภาพ">
+                                    <label for="replace-company-logo" class="overlay-btn" title="เปลี่ยนโลโก้">
                                         <i class="fas fa-exchange-alt"></i>
                                     </label>
-                                    <input type="file" id="replace-file-${newId}" class="file-input-handler d-none" data-file-type="${fileType}">
-                                    ${isProfileImage ? `
-                                    <button type="button" class="overlay-btn btn-set-main" title="ตั้งเป็นรูปหลัก">
-                                        <i class="fas fa-star"></i>
-                                    </button>` : ''}
                                 </div>
-                            </div>`;
-                        newItem.append(imageWrapper).append(newOverlay);
-
-                        // Insert the new item before the placeholder
-                        const placeholder = parentItem.find('.profile-image-placeholder, .company-add-placeholder').closest('.col-md-3');
-                        newItem.insertBefore(placeholder);
-                    } else if (isCompanyLogo) {
-                        // Handle Company Logo (replace/add)
-                        const hasLogoPlaceholder = parentItem.find('.logo-placeholder').length > 0;
-                        if (hasLogoPlaceholder) {
-                             // If currently placeholder, replace it with new image structure
-                             const newLogoHtml = `
-                                <img src="${e.target.result}" alt="Company Logo" class="company-logo img-thumbnail">
-                                <div class="image-overlay1">
-                                    <div class="overlay-actions">
-                                        <button type="button" class="overlay-btn btn-delete-image-logo" title="ลบโลโก้">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                        <label for="replace-company-logo" class="overlay-btn" title="เปลี่ยนโลโก้">
-                                            <i class="fas fa-exchange-alt"></i>
-                                        </label>
-                                    </div>
-                                </div>
-                                <input type="file" id="replace-company-logo" class="file-input-handler d-none" data-file-type="company_logo">
-                            `;
-                            parentItem.find('.image-wrapper').html(newLogoHtml);
-                        } else {
-                            // Replace existing logo image
-                            parentItem.find('.company-logo').attr('src', e.target.result).show();
-                        }
-                    } else if (fileAction === 'replace') {
-                        // Replace existing image (Profile/Company Photo)
-                        parentItem.find('.' + imageClass).attr('src', e.target.result).show();
+                            </div>
+                            <input type="file" id="replace-company-logo" class="file-input-handler" data-file-type="company_logo" accept="image/*">
+                        `;
+                        parentItem.find('.image-wrapper').html(newLogoHtml);
+                    } else {
+                        parentItem.find('.company-logo').attr('src', e.target.result).show();
                     }
-                };
-                reader.readAsDataURL(file);
-            }
-
-            $(document).on('change', '.file-input-handler', handleFileSelect);
-
-            // Handle Save Action (for text data only)
-            $("#saveBtn").on("click", function (e) {
-                e.preventDefault();
-                const formData = new FormData($("#editProfileForm")[0]);
-                formData.append('update_type', 'text');
-
-                $.ajax({
-                    url: window.location.href,
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'JSON',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            swal({ title: "บันทึกสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
-                        } else {
-                            swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
-                        }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.error("AJAX Error:", textStatus, errorThrown);
-                        swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้", type: "error" });
-                    }
-                });
-            });
-
-            // Handle Delete Profile Image
-            $(document).on('click', '.btn-delete-image', function () {
-                const parentItem = $(this).closest('.profile-image-item');
-                const fileId = parentItem.data('file-id');
-                deleteFile(fileId, 'profile_image');
-            });
-
-            // Handle Delete Company Image (is_deleted = 1)
-            $(document).on('click', '.btn-delete-image-company', function () {
-                const parentItem = $(this).closest('.company-image-item');
-                const fileId = parentItem.data('file-id');
-                deleteFile(fileId, 'company_photo');
-            });
-
-            // Handle Delete Company Logo (set student_company_logo = NULL)
-            $(document).on('click', '.btn-delete-image-logo', function () {
-                const parentItem = $(this).closest('.company-logo-item');
-                deleteFile(null, 'company_logo'); // fileId เป็น null เพราะอ้างอิงจาก student_id ในตาราง student
-            });
-
-
-            function deleteFile(fileId, fileType) {
-                if (!fileId && fileType !== 'company_logo') {
-                    swal({ title: "ข้อผิดพลาด", text: "ไม่พบข้อมูลรูปภาพที่ต้องการลบ", type: "error" });
-                    return;
+                } else if (fileAction === 'replace') {
+                    parentItem.find('.' + imageClass).attr('src', e.target.result).show();
                 }
-                
-                const deleteText = (fileType === 'company_logo') ? "โลโก้บริษัทจะถูกลบออก" : "รูปภาพจะถูกลบออกจากรายการ";
-                const confirmTitle = (fileType === 'company_logo') ? "ยืนยันการลบโลโก้บริษัท?" : "ยืนยันการลบรูปภาพ?";
+            };
+            reader.readAsDataURL(file);
+        }
 
-                swal({
-                    title: confirmTitle,
-                    text: deleteText,
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "ใช่, ลบเลย",
-                    cancelButtonText: "ยกเลิก",
-                    closeOnConfirm: false
-                }, function () {
-                    const formData = new FormData();
-                    formData.append('update_type', 'file');
-                    formData.append('file_action', 'delete');
-                    formData.append('file_type', fileType);
-                    if (fileId) {
-                        formData.append('file_id', fileId);
+        $(document).on('change', '.file-input-handler', handleFileSelect);
+
+        // Handle Save Action
+        $("#saveBtn").on("click", function (e) {
+            e.preventDefault();
+            const formData = new FormData($("#editProfileForm")[0]);
+            formData.append('update_type', 'text');
+
+            $.ajax({
+                url: window.location.href,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'JSON',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        swal({ title: "บันทึกสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
+                    } else {
+                        swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
                     }
-                    // company_logo ไม่ต้องใช้ file_id
-
-                    $.ajax({
-                        url: window.location.href,
-                        type: "POST",
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        dataType: 'JSON',
-                        success: function (response) {
-                            if (response.status === 'success') {
-                                swal({ title: "ลบสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
-                            } else {
-                                swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
-                            }
-                        },
-                        error: function () {
-                            swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถลบรูปภาพได้", type: "error" });
-                        }
-                    });
-                });
-            }
-
-            // Handle Set Main Image (เฉพาะรูปโปรไฟล์)
-            $(document).on('click', '.btn-set-main', function () {
-                const parentItem = $(this).closest('.profile-image-item');
-                const fileId = parentItem.data('file-id');
-                if (!fileId) {
-                    swal({ title: "ข้อผิดพลาด", text: "ไม่พบข้อมูลรูปภาพที่ต้องการตั้งเป็นรูปหลัก", type: "error" });
-                    return;
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX Error:", textStatus, errorThrown);
+                    swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้", type: "error" });
                 }
+            });
+        });
 
+        // Delete handlers
+        $(document).on('click', '.btn-delete-image', function () {
+            const parentItem = $(this).closest('.profile-image-item');
+            const fileId = parentItem.data('file-id');
+            deleteFile(fileId, 'profile_image');
+        });
+
+        $(document).on('click', '.btn-delete-image-company', function () {
+            const parentItem = $(this).closest('.company-image-item');
+            const fileId = parentItem.data('file-id');
+            deleteFile(fileId, 'company_photo');
+        });
+
+        $(document).on('click', '.btn-delete-image-logo', function () {
+            deleteFile(null, 'company_logo');
+        });
+
+        function deleteFile(fileId, fileType) {
+            if (!fileId && fileType !== 'company_logo') {
+                swal({ title: "ข้อผิดพลาด", text: "ไม่พบข้อมูลรูปภาพที่ต้องการลบ", type: "error" });
+                return;
+            }
+            
+            const deleteText = (fileType === 'company_logo') ? "โลโก้บริษัทจะถูกลบออก" : "รูปภาพจะถูกลบออกจากรายการ";
+            const confirmTitle = (fileType === 'company_logo') ? "ยืนยันการลบโลโก้บริษัท?" : "ยืนยันการลบรูปภาพ?";
+
+            swal({
+                title: confirmTitle,
+                text: deleteText,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "ใช่, ลบเลย",
+                cancelButtonText: "ยกเลิก",
+                closeOnConfirm: false
+            }, function () {
                 const formData = new FormData();
                 formData.append('update_type', 'file');
-                formData.append('file_action', 'set_main');
-                formData.append('file_id', fileId);
+                formData.append('file_action', 'delete');
+                formData.append('file_type', fileType);
+                if (fileId) {
+                    formData.append('file_id', fileId);
+                }
 
                 $.ajax({
                     url: window.location.href,
@@ -1372,18 +1543,53 @@ function find_birth($birthday, $today)
                     dataType: 'JSON',
                     success: function (response) {
                         if (response.status === 'success') {
-                            swal({ title: "ตั้งค่าสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
+                            swal({ title: "ลบสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
                         } else {
                             swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
                         }
                     },
                     error: function () {
-                        swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถตั้งค่ารูปหลักได้", type: "error" });
+                        swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถลบรูปภาพได้", type: "error" });
                     }
                 });
             });
+        }
+
+        // Set Main Image
+        $(document).on('click', '.btn-set-main', function () {
+            const parentItem = $(this).closest('.profile-image-item');
+            const fileId = parentItem.data('file-id');
+            if (!fileId) {
+                swal({ title: "ข้อผิดพลาด", text: "ไม่พบข้อมูลรูปภาพที่ต้องการตั้งเป็นรูปหลัก", type: "error" });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('update_type', 'file');
+            formData.append('file_action', 'set_main');
+            formData.append('file_id', fileId);
+
+            $.ajax({
+                url: window.location.href,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'JSON',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        swal({ title: "ตั้งค่าสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
+                    } else {
+                        swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
+                    }
+                },
+                error: function () {
+                    swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถตั้งค่ารูปหลักได้", type: "error" });
+                }
+            });
         });
-    </script>
+    });
+</script>
 </body>
 
 </html>
