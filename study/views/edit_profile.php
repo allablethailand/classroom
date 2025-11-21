@@ -921,7 +921,7 @@ function find_birth($birthday, $today)
     .image-wrapperprofile img {
         width: 100%;
         /* height: 200px; */
-        object-fit: contain;
+        object-fit: cover;
         transition: transform 0.3s ease;
     }
 
