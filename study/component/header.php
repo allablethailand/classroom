@@ -535,7 +535,7 @@ $notification_data = [
                 <?php
                 if(!in_array($currentScreen, $hide_profile)): ?>
                 <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?> ;">
-                    <img style=" border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
+                    <img style="height: 30px; border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
                 </a>
                 <?php endif; ?>
             </div>

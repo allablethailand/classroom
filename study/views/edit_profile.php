@@ -683,7 +683,7 @@ function find_birth($birthday, $today)
             .profile-image-item,
             .profile-image-placeholder,
             .image-preview-container {
-                width: 170px;
+                width: 120px;
                 /* ลดขนาดวงกลมให้เล็กลง */
                 height: 120px;
             }
