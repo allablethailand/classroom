@@ -170,6 +170,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             margin-bottom: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: border-color 0.3s ease;
+            object-fit: cover;
             /* เพิ่ม transition สำหรับการเปลี่ยนสีขอบ */
         }
 
