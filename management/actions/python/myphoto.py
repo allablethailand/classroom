@@ -5,9 +5,10 @@ import os
 import json
 import sys
 import traceback 
-import logging # NEW: ใช้สำหรับ Logging
+import logging
 
 # ตั้งค่า Logging (แทนการใช้ print เพื่อป้องกันข้อมูลรั่วไหล)
+# **ไม่ต้องเปลี่ยนโค้ดนี้** เพราะ PHP ได้ดาวน์โหลดไฟล์มาที่ Local Temp Path แล้ว
 logging.basicConfig(level=logging.ERROR, filename='face_detection_error.log', 
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -32,6 +33,7 @@ def process_face_recognition(data):
         
         # ----------------------------------------------------
         # 1. โหลด reference ของนักเรียนทุกคนและสร้าง embedding
+        #    (Path ที่ได้มาคือ Local Temp Path แล้ว)
         # ----------------------------------------------------
         total_embeddings = 0
         for student_id_str, ref_paths in all_students_ref_paths.items():
@@ -39,14 +41,18 @@ def process_face_recognition(data):
             student_embeddings[student_id] = []
 
             for path in ref_paths:
-                # NEW: ใช้ os.path.normpath เพื่อปรับ Path ให้เข้ากับ OS (Linux/Windows)
+                # Path เป็น Local Temp Path ที่ดาวน์โหลดจาก PHP มาแล้ว
                 normalized_path = os.path.normpath(path) 
                 
                 if not os.path.exists(normalized_path):
+                    # จะไม่เกิดขึ้นถ้า PHP ดาวน์โหลดสำเร็จ
+                    logging.error(f"Ref File Not Found: {normalized_path}")
                     continue 
 
+                # ✅ cv2.imread() สามารถอ่านไฟล์จาก Local Path ได้
                 img = cv2.imread(normalized_path, cv2.IMREAD_COLOR) 
                 if img is None:
+                    logging.error(f"Failed to load Ref Image: {normalized_path}")
                     continue
 
                 faces = app.get(img)
@@ -60,12 +66,13 @@ def process_face_recognition(data):
         
         if total_embeddings == 0:
              return {
-                "status": "error", 
-                "message": "ไม่พบใบหน้าใดๆ ในรูปโปรไฟล์อ้างอิงของนักเรียน"
-            } 
+                 "status": "error", 
+                 "message": "ไม่พบใบหน้าใดๆ ในรูปโปรไฟล์อ้างอิงของนักเรียน"
+             } 
 
         # ----------------------------------------------------
         # 2. ตรวจสอบในรูปกลุ่มเดียวที่เพิ่งอัปโหลด
+        #    (Path ที่ได้มาคือ Local Temp Path แล้ว)
         # ----------------------------------------------------
         
         normalized_group_path = os.path.normpath(group_path)
@@ -73,7 +80,7 @@ def process_face_recognition(data):
         if not group_path or not os.path.exists(normalized_group_path):
             return {
                 "status": "error", 
-                "message": "ไม่พบไฟล์รูปภาพกลุ่มที่ต้องการตรวจจับ (Path ผิดพลาด)"
+                "message": "ไม่พบไฟล์รูปภาพกลุ่มที่ต้องการตรวจจับ (Local Temp Path ผิดพลาด)"
             }
             
         group_img = cv2.imread(normalized_group_path, cv2.IMREAD_COLOR)

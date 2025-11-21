@@ -683,7 +683,7 @@ function find_birth($birthday, $today)
             .profile-image-item,
             .profile-image-placeholder,
             .image-preview-container {
-                width: 120px;
+                width: 170px;
                 /* ลดขนาดวงกลมให้เล็กลง */
                 height: 120px;
             }
@@ -1317,278 +1317,164 @@ function find_birth($birthday, $today)
 </div>
     <?php require_once("component/footer.php") ?>
 
-    <script type="text/javascript">
-    $(document).ready(function () {
-        // Drag and Drop functionality
-        $('.upload-zone').on('dragover', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            $(this).addClass('dragover');
-        });
+    <script>
+// ข้อมูลรูปภาพที่ดึงมาจาก API (ใช้เก็บข้อมูล Event ทั้งหมดไว้ในตัวแปรนี้)
+let allGroupedPhotos = {}; 
+// NEW: ตัวแปรสำหรับเก็บชื่อ Event และวันที่สร้าง เพื่อใช้ในการเรียงอัลบั้ม
+let eventCreationDates = {}; 
 
-        $('.upload-zone').on('dragleave', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            $(this).removeClass('dragover');
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    const gallery = document.getElementById('myPhotoGallery');
+    const studentId = "<?php echo $student_id; ?>";
+    // ❌ REMOVE: ลบตัวแปร getUrlPrefix ออก เพราะ Full URL มาจาก PHP แล้ว
+    // const getUrlPrefix = "<?php echo $geturl_prefix; ?>"; 
+    const modalTitleSpan = document.querySelector('#albumModalLabel span');
+    const modalGallery = document.getElementById('modalGallery');
 
-        $('.upload-zone').on('drop', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            $(this).removeClass('dragover');
-            
-            const files = e.originalEvent.dataTransfer.files;
-            if (files.length > 0) {
-                const input = $(this).find('input[type="file"]')[0];
-                input.files = files;
-                $(input).trigger('change');
-            }
-        });
+    // ฟังก์ชันสำหรับจัดการการดาวน์โหลด
+    function downloadPhoto(photoUrl, originalFilename) {
+        const a = document.createElement('a');
+        a.href = photoUrl;
+        a.download = originalFilename; 
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
 
-        // Function to handle the file upload and preview
-        function handleFileSelect(event) {
-            const fileInput = event.target;
-            const file = fileInput.files[0];
-            if (!file) { return; }
-
-            const parentItem = $(fileInput).closest('.profile-image-item, .company-image-item, .company-logo-item');
-            const fileId = parentItem.data('file-id') || '';
-            const fileIndex = parentItem.data('file-index');
-            const fileType = $(fileInput).data('file-type') || 'profile_image';
-            
-            const isCompanyLogo = fileType === 'company_logo';
-            const fileAction = isCompanyLogo ? 'replace' : (fileId ? 'replace' : 'add'); 
-
-            const fileFormData = new FormData();
-            fileFormData.append('update_type', 'file');
-            fileFormData.append('file_action', fileAction);
-            fileFormData.append('file_type', fileType);
-            
-            if (fileAction === 'replace' && fileType !== 'company_logo') {
-                fileFormData.append('file_id', fileId);
-            }
-            fileFormData.append('file_index', fileIndex);
-            fileFormData.append(`file_upload[${fileIndex}]`, file);
-
-            $.ajax({
-                url: window.location.href,
-                type: "POST",
-                data: fileFormData,
-                processData: false,
-                contentType: false,
-                dataType: 'JSON',
-                success: function (response) {
-                    if (response.status === 'success') {
-                        if (fileAction === 'add' && response.file_id) {
-                            parentItem.data('file-id', response.file_id);
-                        }
-                        swal({ title: "อัปโหลดสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
-                    } else {
-                        swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.error("AJAX Error:", textStatus, errorThrown);
-                    swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์เพื่ออัปโหลดไฟล์ได้", type: "error" });
-                }
-            });
-
-            // Real-time Preview
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const isCompanyPhoto = fileType === 'company_photo';
-                const isProfileImage = fileType === 'profile_image';
-                const imageClass = isCompanyPhoto ? 'company-image' : (isCompanyLogo ? 'company-logo' : 'profile-image');
-
-                if (fileAction === 'add') {
-                    const isCompany = isCompanyPhoto;
-                    const newId = new Date().getTime();
-                    const newItem = $('<div>').addClass('col-md-3 mb-4 ' + (isCompany ? 'company-image-item' : 'profile-image-item')).attr('data-file-index', newId).attr('data-file-id', newId);
-
-                    const imageWrapper = $('<div>').addClass('image-wrapper');
-                    const newImage = $('<img>').attr({
-                        src: e.target.result,
-                        alt: 'Preview Image',
-                        class: imageClass + ' img-thumbnail'
-                    });
-                    imageWrapper.append(newImage);
-
-                    const newOverlay = `
-                        <div class="image-overlay1">
-                            <div class="overlay-actions">
-                                <button type="button" class="overlay-btn btn-delete-image${isCompany ? '-company' : ''}" title="ลบรูปภาพ">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                                <label for="replace-file-${newId}" class="overlay-btn" title="เปลี่ยนรูปภาพ">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </label>
-                                <input type="file" id="replace-file-${newId}" class="file-input-handler" data-file-type="${fileType}" accept="image/*">
-                                ${isProfileImage ? `
-                                <button type="button" class="overlay-btn btn-set-main" title="ตั้งเป็นรูปหลัก">
-                                    <i class="fas fa-star"></i>
-                                </button>` : ''}
-                            </div>
-                        </div>`;
-                    newItem.append(imageWrapper).append(newOverlay);
-
-                    const placeholder = parentItem.find('.upload-zone').closest('.col-md-3');
-                    newItem.insertBefore(placeholder);
-                } else if (isCompanyLogo) {
-                    const hasLogoPlaceholder = parentItem.find('.upload-zone').length > 0;
-                    if (hasLogoPlaceholder) {
-                        const newLogoHtml = `
-                            <img src="${e.target.result}" alt="Company Logo" class="company-logo img-thumbnail">
-                            <div class="image-overlay1">
-                                <div class="overlay-actions">
-                                    <button type="button" class="overlay-btn btn-delete-image-logo" title="ลบโลโก้">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                    <label for="replace-company-logo" class="overlay-btn" title="เปลี่ยนโลโก้">
-                                        <i class="fas fa-exchange-alt"></i>
-                                    </label>
-                                </div>
-                            </div>
-                            <input type="file" id="replace-company-logo" class="file-input-handler" data-file-type="company_logo" accept="image/*">
-                        `;
-                        parentItem.find('.image-wrapper').html(newLogoHtml);
-                    } else {
-                        parentItem.find('.company-logo').attr('src', e.target.result).show();
-                    }
-                } else if (fileAction === 'replace') {
-                    parentItem.find('.' + imageClass).attr('src', e.target.result).show();
-                }
-            };
-            reader.readAsDataURL(file);
+    // ฟังก์ชันสำหรับแสดงรูปภาพทั้งหมดใน Event ใน Modal
+    function showAlbumPhotos(eventName) {
+        modalTitleSpan.textContent = eventName;
+        modalGallery.innerHTML = '<p class="text-center">กำลังโหลด...</p>';
+        
+        const eventPhotos = allGroupedPhotos[eventName];
+        if (!eventPhotos) {
+            modalGallery.innerHTML = '<p class="text-center">ไม่พบข้อมูลรูปภาพใน Event นี้</p>';
+            return;
         }
+        
+        modalGallery.innerHTML = ''; // Clear loading message
 
-        $(document).on('change', '.file-input-handler', handleFileSelect);
+        eventPhotos.forEach(photo => {
+            // ✅ CHANGE: ใช้ photo.path ได้โดยตรง เพราะเป็น Full URL จาก PHP แล้ว
+            const full_url = photo.path; 
+            const filename = full_url.substring(full_url.lastIndexOf('/') + 1); // ใช้ full_url ในการดึงชื่อไฟล์
 
-        // Handle Save Action
-        $("#saveBtn").on("click", function (e) {
-            e.preventDefault();
-            const formData = new FormData($("#editProfileForm")[0]);
-            formData.append('update_type', 'text');
-
-            $.ajax({
-                url: window.location.href,
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                dataType: 'JSON',
-                success: function (response) {
-                    if (response.status === 'success') {
-                        swal({ title: "บันทึกสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
-                    } else {
-                        swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.error("AJAX Error:", textStatus, errorThrown);
-                    swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้", type: "error" });
-                }
-            });
-        });
-
-        // Delete handlers
-        $(document).on('click', '.btn-delete-image', function () {
-            const parentItem = $(this).closest('.profile-image-item');
-            const fileId = parentItem.data('file-id');
-            deleteFile(fileId, 'profile_image');
-        });
-
-        $(document).on('click', '.btn-delete-image-company', function () {
-            const parentItem = $(this).closest('.company-image-item');
-            const fileId = parentItem.data('file-id');
-            deleteFile(fileId, 'company_photo');
-        });
-
-        $(document).on('click', '.btn-delete-image-logo', function () {
-            deleteFile(null, 'company_logo');
-        });
-
-        function deleteFile(fileId, fileType) {
-            if (!fileId && fileType !== 'company_logo') {
-                swal({ title: "ข้อผิดพลาด", text: "ไม่พบข้อมูลรูปภาพที่ต้องการลบ", type: "error" });
-                return;
-            }
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-xs-6 col-sm-4'; 
             
-            const deleteText = (fileType === 'company_logo') ? "โลโก้บริษัทจะถูกลบออก" : "รูปภาพจะถูกลบออกจากรายการ";
-            const confirmTitle = (fileType === 'company_logo') ? "ยืนยันการลบโลโก้บริษัท?" : "ยืนยันการลบรูปภาพ?";
-
-            swal({
-                title: confirmTitle,
-                text: deleteText,
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "ใช่, ลบเลย",
-                cancelButtonText: "ยกเลิก",
-                closeOnConfirm: false
-            }, function () {
-                const formData = new FormData();
-                formData.append('update_type', 'file');
-                formData.append('file_action', 'delete');
-                formData.append('file_type', fileType);
-                if (fileId) {
-                    formData.append('file_id', fileId);
-                }
-
-                $.ajax({
-                    url: window.location.href,
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'JSON',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            swal({ title: "ลบสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
-                        } else {
-                            swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
-                        }
-                    },
-                    error: function () {
-                        swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถลบรูปภาพได้", type: "error" });
-                    }
+            // โครงสร้างสำหรับปุ่มดาวน์โหลด
+            colDiv.innerHTML = `
+                <div class="modal-photo-wrapper" >
+                    <a href="${full_url}" target="_blank" title="${filename}">
+                        <img src="${full_url}" class="img-responsive" style="width: 100%; height: 130px; object-fit: cover; border: 1px solid #ccc; border-radius: 4px;">
+                    </a>
+                    
+                    <div class="dropdown download-menu">
+                        <button class="btn btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a href="#" class="download-link"><i class="fas fa-download"></i> ดาวน์โหลด</a></li>
+                        </ul>
+                    </div>
+                    
+                    
+                </div>
+            `;
+            
+            // ผูก Event Handler ให้กับปุ่มดาวน์โหลด
+            const downloadLink = colDiv.querySelector('.download-link');
+            if (downloadLink) {
+                downloadLink.addEventListener('click', function(e) {
+                    e.preventDefault(); 
+                    e.stopPropagation(); 
+                    downloadPhoto(full_url, filename);
                 });
-            });
-        }
-
-        // Set Main Image
-        $(document).on('click', '.btn-set-main', function () {
-            const parentItem = $(this).closest('.profile-image-item');
-            const fileId = parentItem.data('file-id');
-            if (!fileId) {
-                swal({ title: "ข้อผิดพลาด", text: "ไม่พบข้อมูลรูปภาพที่ต้องการตั้งเป็นรูปหลัก", type: "error" });
-                return;
             }
-
-            const formData = new FormData();
-            formData.append('update_type', 'file');
-            formData.append('file_action', 'set_main');
-            formData.append('file_id', fileId);
-
-            $.ajax({
-                url: window.location.href,
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                dataType: 'JSON',
-                success: function (response) {
-                    if (response.status === 'success') {
-                        swal({ title: "ตั้งค่าสำเร็จ", text: response.message, type: "success" }, function () { location.reload(); });
-                    } else {
-                        swal({ title: "เกิดข้อผิดพลาด", text: response.message, type: "error" });
-                    }
-                },
-                error: function () {
-                    swal({ title: "เกิดข้อผิดพลาด", text: "ไม่สามารถตั้งค่ารูปหลักได้", type: "error" });
-                }
-            });
+            
+            modalGallery.appendChild(colDiv);
         });
-    });
+        
+        $('#albumModal').modal('show'); 
+    }
+
+    // ฟังก์ชันสำหรับเรียก PHP process และสร้าง Album View
+    function fetchMyPhotos() {
+        fetch(`actions/myphoto.php?student_id=${studentId}`)
+            .then(response => response.json())
+            .then(data => {
+                gallery.innerHTML = ''; 
+                
+                if (data.status === 'success' && data.data && data.data.length > 0) {
+                    
+                    // 1. จัดกลุ่มรูปภาพตาม Event (description) และเก็บวันที่สร้าง
+                    const groupedPhotos = data.data.reduce((acc, current) => {
+                        const eventName = current.description || 'รูปภาพที่ไม่มีชื่อ Event'; 
+                        if (!acc[eventName]) {
+                            acc[eventName] = [];
+                        }
+                        acc[eventName].push(current);
+                        // เก็บวันที่สร้างอัลบั้มเพื่อใช้เรียงลำดับในขั้นตอนถัดไป
+                        if (!eventCreationDates[eventName]) {
+                            eventCreationDates[eventName] = current.date_create;
+                        }
+                        return acc;
+                    }, {});
+                    
+                    allGroupedPhotos = groupedPhotos; 
+                    
+                    // 2. เรียงลำดับชื่อ Event ตามวันที่สร้าง (ล่าสุดก่อน)
+                    const sortedEventNames = Object.keys(groupedPhotos).sort((a, b) => {
+                        // เปรียบเทียบวันที่สร้างเป็น ISO string
+                        // b > a จะเป็นการเรียงจากใหม่ไปเก่า (DESC)
+                        return eventCreationDates[b].localeCompare(eventCreationDates[a]);
+                    });
+                    
+                    // 3. สร้าง HTML เพื่อแสดงผลเป็น Album Stack ตามลำดับที่เรียงแล้ว
+                    sortedEventNames.forEach(eventName => { 
+                        const eventPhotos = groupedPhotos[eventName];
+                        const photoCount = eventPhotos.length;
+
+                        const albumBox = document.createElement('div');
+                        albumBox.className = 'album-box';
+                        albumBox.setAttribute('data-event-name', eventName); 
+                        
+                        albumBox.addEventListener('click', function() {
+                            showAlbumPhotos(eventName);
+                        });
+
+                        let stackHtml = '';
+                        // วนลูปเพื่อใช้ 3 รูปแรกสร้างภาพซ้อน (Stack)
+                        const imagesToStack = eventPhotos.slice(0, 3).reverse(); 
+
+                        imagesToStack.forEach((photo, index) => {
+                             // ✅ CHANGE: ใช้ photo.path ได้โดยตรง
+                             const full_url = photo.path;
+                             stackHtml += `<img src="${full_url}" class="album-stack-item" alt="Stack Item ${3 - index}">`;
+                        });
+                        
+                        // โครงสร้าง Album Stack
+                        albumBox.innerHTML = `
+                            ${stackHtml}
+                            <div class="album-info">
+                                <strong>${eventName}</strong> (${photoCount} รูป)
+                            </div>
+                        `;
+
+                        gallery.appendChild(albumBox);
+                    });
+                } else {
+                    gallery.innerHTML = `<p>⚠️ ขณะนี้ยังไม่พบรูปภาพที่มีคุณอยู่ในอัลบั้มรวม <br> ${data.message || ''}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                gallery.innerHTML = '<p>❌ เกิดข้อผิดพลาดในการเชื่อมต่อ/ประมวลผล</p>';
+            });
+    }
+
+    fetchMyPhotos();
+});
 </script>
 </body>
 
