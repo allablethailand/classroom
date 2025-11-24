@@ -253,9 +253,47 @@ function saveData($post) {
         $current_card_back = isset($post[$type . '_card_back_current']) ? extractPathFromUrl($post[$type . '_card_back_current']) : '';
         $current_company_logo = isset($post[$type . '_company_logo_current']) ? extractPathFromUrl($post[$type . '_company_logo_current']) : '';
         
-        $card_front = uploadFile($_FILES, $type . '_card_front', $current_card_front);
-        $card_back = uploadFile($_FILES, $type . '_card_back', $current_card_back);
-        $company_logo = uploadFile($_FILES, $type . '_company_logo', $current_company_logo);
+        // 🚨 ส่วนที่แก้ไข: ตรวจสอบและจัดการการตั้งค่า NULL สำหรับบัตรประชาชน
+        // ถ้ามีการอัปโหลดไฟล์ใหม่ จะใช้ค่าจาก uploadFile()
+        // ถ้าไม่มีการอัปโหลดไฟล์ใหม่ แต่มีค่า current เดิม จะใช้ค่า current เดิม
+        // ถ้าไม่มีทั้งไฟล์ใหม่และค่า current (หมายถึงถูกลบ) ให้เป็น NULL
+
+        $card_front_uploaded = isset($_FILES[$type . '_card_front']) && $_FILES[$type . '_card_front']['error'] === 0;
+        $card_back_uploaded = isset($_FILES[$type . '_card_back']) && $_FILES[$type . '_card_back']['error'] === 0;
+
+        // 1. จัดการรูปด้านหน้า
+        if ($card_front_uploaded) {
+            // มีการอัปโหลดไฟล์ใหม่
+            $card_front = uploadFile($_FILES, $type . '_card_front', $current_card_front);
+        } else if (!empty($current_card_front) && isset($post[$type . '_card_front_current'])) {
+            // ไม่มีไฟล์ใหม่ แต่มีค่า current_card_front เดิม (ไม่ได้ถูกลบ)
+            $card_front = $current_card_front;
+        } else {
+            // ไม่มีไฟล์ใหม่ และไม่มีค่า current_card_front (ถูกลบโดยฟังก์ชัน removeImage บนหน้าเว็บ)
+            $card_front = null; // ⭐ ตั้งค่าเป็น NULL เพื่อบันทึกใน DB
+        }
+
+        // 2. จัดการรูปด้านหลัง
+        if ($card_back_uploaded) {
+            // มีการอัปโหลดไฟล์ใหม่
+            $card_back = uploadFile($_FILES, $type . '_card_back', $current_card_back);
+        } else if (!empty($current_card_back) && isset($post[$type . '_card_back_current'])) {
+            // ไม่มีไฟล์ใหม่ แต่มีค่า current_card_back เดิม (ไม่ได้ถูกลบ)
+            $card_back = $current_card_back;
+        } else {
+            // ไม่มีไฟล์ใหม่ และไม่มีค่า current_card_back (ถูกลบโดยฟังก์ชัน removeImage บนหน้าเว็บ)
+            $card_back = null; // ⭐ ตั้งค่าเป็น NULL เพื่อบันทึกใน DB
+        }
+        
+        // จัดการ Company Logo (ทำแบบเดียวกันหากต้องการให้สามารถลบ Company Logo ได้)
+        $company_logo_uploaded = isset($_FILES[$type . '_company_logo']) && $_FILES[$type . '_company_logo']['error'] === 0;
+        if ($company_logo_uploaded) {
+             $company_logo = uploadFile($_FILES, $type . '_company_logo', $current_company_logo);
+        } else if (!empty($current_company_logo) && isset($post[$type . '_company_logo_current'])) {
+            $company_logo = $current_company_logo;
+        } else {
+            $company_logo = null;
+        }
 
         $gender_for_db = isset($post[$type . '_gender']) ? $post[$type . '_gender'] : 'N';
         

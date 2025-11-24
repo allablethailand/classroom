@@ -30,7 +30,15 @@ if(isset($_POST) && $_POST['action'] == 'buildTeacher') {
     }
     $table = "SELECT
         t.teacher_id,
-        t.teacher_image_profile,
+        (
+            SELECT file_path 
+            FROM classroom_file_teacher 
+            WHERE teacher_id = t.teacher_id 
+              AND file_type = 'profile_image' 
+              AND is_deleted = 0
+            ORDER BY file_order ASC, file_status DESC, date_create DESC
+            LIMIT 1
+        ) AS teacher_image_profile,
         t.teacher_gender,
         CASE t.teacher_perfix
             WHEN 0 THEN 'นาย'
