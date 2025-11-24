@@ -484,7 +484,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
         // ถ้ายังไม่มีการ join ก็ให้เพิ่มข้อมูลใน classroom_student_join
         // ปรับปรุง: กำหนด invite_status = 1, approve_status = 1 และ status = 1
         $join_sql = "INSERT INTO classroom_student_join (classroom_id, student_id, comp_id, invite_status, approve_status, status, emp_create, date_create) 
-                     VALUES (?, ?, ?, 1, 1, 1, ?, ?)";
+                     VALUES (?, ?, ?, 0, 0, 0, ?, ?)";
         $join_stmt = $mysqli->prepare($join_sql);
         $join_stmt->bind_param("sssss", $classroom_id, $student_id, $comp_id, $user_id, $date_create);
         if ($join_stmt->execute()) {
@@ -614,7 +614,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
             // เพิ่มข้อมูลลงใน classroom_student_join
             // ปรับปรุง: กำหนด invite_status = 1, approve_status = 1 และ status = 1
             $join_sql = "INSERT INTO classroom_student_join (classroom_id, student_id, comp_id, invite_status, approve_status, status, emp_create, date_create) 
-                         VALUES (?, ?, ?, 1, 1, 1, ?, ?)";
+                         VALUES (?, ?, ?, 0, 0, 0, ?, ?)";
             $join_stmt = $mysqli->prepare($join_sql);
             $join_stmt->bind_param('sssss', $classroom_id, $new_student_id, $data['comp_id'], $user_id, $date_create); // ดึง comp_id จาก $data
             
