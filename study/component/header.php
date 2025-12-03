@@ -140,27 +140,6 @@ $notification_data = [
         "path" => "/alerts/version",
         "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
     ],
-    // [
-    //     "header" => "System update",
-    //     "message" => "ระบบจะทำการอัปเดตในวันที่ 12 ตุลาคม",
-    //     "class" => "notification-item",
-    //     "path" => "/updates/system",
-    //     "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
-    // ],
-    // [
-    //     "header" => "Maintenance Notice",
-    //     "message" => "เว็บไซต์จะปิดปรับปรุงเวลา 02:00-04:00 น.",
-    //     "class" => "notification-item",
-    //     "path" => "/notices/maintenance",
-    //     "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
-    // ],
-    // [
-    //     "header" => "Upcoming Class",
-    //     "message" => "คลาสเรียนหลักสูตร GreenTech จะเริ่มในอีก 1 วัน",
-    //     "class" => "notification-item",
-    //     "path" => "/promotions/new-members",
-    //     "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
-    // ]
 ];
 
         function truncateMessage($text, $maxLength = 50) {
@@ -200,16 +179,6 @@ $notification_data = [
     </style>
     <script src="/classroom/study/js/header.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
-
-<!-- <div class="desktop-navbar">
-  <div id="sidenav-store1" class="sidenav">...</div> 
-  <div class="origami-header-dashboard">
-
-  </div>
-</div> -->
-
-
-
 
 
 <div class="desktop-navbar">
@@ -349,7 +318,7 @@ $notification_data = [
                     <ul class="dropdown-menu lefted" aria-labelledby="profileDropdown">
                         <li><a href="profile">Profile</a></li>
                         <li class="divider"></li>
-                        <li><a href="/logout">Logout</a></li>
+                        <li><a href="/profile">Logout</a></li>
                     </ul>
                     </div>
                 </div>
@@ -434,7 +403,7 @@ $notification_data = [
                         <div class="dropdown" style="display: inline-block; vertical-align: middle;">
                             <button class="bell-button btn btn-default dropdown-toggle" type="button" id="bellDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background: none; border: none; padding: 0;">
                                 <img id="menu-icon" src="/images/menu/Bell.svg" alt="Noti" style="padding: 5px;">
-                                <span class="notification-badge">4</span>
+                                <span class="notification-badge">1</span>
                             </button>
 
                             <ul class="dropdown-menu centered" aria-labelledby="bellDropdown">
@@ -479,7 +448,7 @@ $notification_data = [
                         <ul class="dropdown-menu lefted" aria-labelledby="profileDropdown">
                             <li><a href="profile">Profile</a></li>
                             <li class="divider"></li>
-                            <li><a href="/logout">Logout</a></li>
+                            <li><a href="logout">Logout</a></li>
                         </ul>
                         </div>
                     </div>

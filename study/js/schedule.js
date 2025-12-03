@@ -180,9 +180,7 @@ $('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
                                 ${instructorsHtml}
                             </div>
                             <button type="button" class="btn btn-primary" style="background-color: #7936e4; border-radius: 15px;"
-                                data-toggle="modal"
-                                data-target="#scheduleModal"
-                                data-index="${key}">
+                                onclick="redirectToClassDetail('${session.course_id}')">
                                 ไปยังคลาสเรียน
                             </button>
                         </div>
@@ -318,3 +316,16 @@ function redirectCurreculum(course_id, course_type, classroom_id) {
   )}&cid=${window.btoa(classroom_id)}`;
   window.open(url, "_self");
 }
+
+function redirectToClassDetail(course_id, class_id, course_type) {
+
+  // MY DESIRE PATH:
+  // <a href="classinfo?course_id=${course.course_id}&class_id=${classroomId}&course_type=${course.course_type}" style="text-decoration: none; color: inherit;">
+
+  // classinfo?course_id=14162&class_id=2&course_type=course&class_type
+  // classroom/study/classinfo?course_id=6&class_id=2&course_type=course
+  let url = `/classroom/study/classinfo?course_id=${course_id}&class_id=${class_id}&course_type=course`
+  window.location.replace(url);
+}
+
+// href="classinfo?course_id=${course.course_id}&class_id=${classroomId}&course_type=${course.course_type}"
