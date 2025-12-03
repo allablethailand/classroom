@@ -21,8 +21,6 @@ require_once $base_include . '/classroom/study/actions/student_func.php';
 $student_id = getStudentId();
 $alumni_list = getStudentClassroomList($student_id);
 
-// var_dump($alumni_list);
-
 
 ?>
 

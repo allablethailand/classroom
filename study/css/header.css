@@ -630,6 +630,15 @@
     }
 }
 
+/* Show mobile navbar only on screens smaller than 1024px */
+.desktop-navbar {
+  display: none;
+}
+.mobile-navbar {
+  display: block;
+}
+
+
 /* Show desktop nav and sidebar only on screens wider than 1024px */
 @media (min-width: 1024px) {
   .desktop-navbar {
@@ -637,15 +646,5 @@
   }
   .mobile-navbar {
     display: none;
-  }
-}
-
-/* Show mobile navbar only on screens smaller than 1024px */
-@media (max-width: 1023px) {
-  .desktop-navbar {
-    display: none;
-  }
-  .mobile-navbar {
-    display: block;
   }
 }

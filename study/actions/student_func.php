@@ -12,7 +12,6 @@ function getStudentId() {
     return isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : null;
 }
 
-
 function getStudentClassroomId($student_id) {
     $result = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
     return $result ? $result[0]['classroom_id'] : null;
@@ -493,6 +492,17 @@ function getStudentEmpId($student_id){
 
     return !empty($result) ? $result[0]['emp_id'] : null;
 }
+
+function getStudentCompId($student_id) {
+    $result = select_data(
+        "comp_id",
+        "classroom_student_join",
+        "WHERE student_id = '{$student_id}'"
+    );
+
+    return !empty($result) ? $result[0]['comp_id'] : null;
+}
+
 
 function getCourseStudent($alumni_id){
     $result = select_data(

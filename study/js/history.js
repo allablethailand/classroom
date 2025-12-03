@@ -101,7 +101,7 @@ function load_history(){
                 <div class="order-card" data-type="${dataType}">
                     <div class="order-icon">${iconHtml}</div>
                     <div class="order-info">
-                        <span class="order-status status-${dataType}">${dataType === 'current' ? 'Current Order' : 'Awaiting Rider'}</span>
+                        <span class="order-status status-${dataType}">${dataType === 'current' ? 'Online' : 'Onsite'}</span>
                         <h3 class="order-title">${order.trn_subject || 'N/A'}</h3>
                         <span class="order-number"><i class="fas fa-building"></i>: ${capitalizeFirstLetter(order.trn_type_description) || '-'}</span>
                         <div class="order-details">

@@ -1,6 +1,28 @@
+<?php 
+session_start();
+$base_include = $_SERVER['DOCUMENT_ROOT'];
+$base_path = '';
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $exl_path = explode('/', $request_uri);
+    if (!file_exists($base_include . "/dashboard.php")) {
+        $base_path .= "/" . $exl_path[1];
+    }
+    $base_include .= "/" . $exl_path[1];
+}
+define('BASE_PATH', $base_path);
+define('BASE_INCLUDE', $base_include);
+require_once $base_include . '/lib/connect_sqli.php';
+require_once $base_include . '/classroom/study/actions/student_func.php'; 
+
+$student_id = getStudentId();
+$comp_id = getStudentCompId($student_id);
+$employee_id = getStudentEmpId($student_id);
+
+?>
+
 <!doctype html>
 <html>
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +32,7 @@
   <link href='https://fonts.googleapis.com/css?family=Kanit' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="/bootstrap/3.3.6/css/bootstrap.min.css">
   <link rel="stylesheet" href="/dist/css/dataTables.bootstrap.min.css">
-  <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>">
+  <!-- <link rel="stylesheet" href="/dist/css/origami.css?v=<?php echo time(); ?>"> -->
   <link rel="stylesheet" href="/dist/css/sweetalert.css">
   <link rel="stylesheet" href="/dist/css/select2.min.css">
   <link rel="stylesheet" href="/dist/css/select2-bootstrap.css">
@@ -29,12 +51,17 @@
   <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
   <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
   <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
+  <script src="/classroom/study/js/chat.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
+
 
 </head>
 
 <body>
   <?php
   require_once 'component/header.php'; ?>
+
+  <input type="hidden" id="emp_id" value="<?php echo $employee_id; ?>">
+  <input type="hidden" id="comp_id" value="<?php echo $comp_id; ?>">
 
   <!-- work ON mobile screen ONLY -->
   <div class="main-content">
@@ -44,29 +71,113 @@
            <span></span>
        </div>
     </div>
-    <div class="text-center space-y-8 max-w-4xl mx-auto">
-      <div class="relative mx-auto w-32 h-32 md:w-40 md:h-40 mb-8" style="margin-bottom: 1rem;">
-        <div class="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full animate-ping opacity-75"></div>
-      </div>
-      <div class="container-fluid px-4 py-2" style="margin-bottom: 1rem;">
-        <div class="space-y-4">
-          <h3 class="text-2xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent animate-pulse">
-            Origami AI is coming soon!
-          </h3>
-          <!-- <h2 class="text-2xl md:text-3xl lg:text-4xl font-semibold text-white">
-          </h2> -->
-          <p class="text-lg md:text-xl text-purple-200 max-w-2xl mx-auto leading-relaxed">
-            Get ready for an incredible experience <br>
-            that will blow your mind!
-          </p>
+
+    <div class="chat-bg-container">
+        <div class="chat-start-button" style="display: flex;">
+            <button class="start-chat-btn">
+                Start Chat <i class="fas fa-play-circle"></i>
+            </button>
         </div>
-      </div>
-      <div class="relative" >
-        <div  style="display: flex;">
-          <img src="" alt="" onerror="this.src='/images/origami-logo-robot.png'" class="img-rounded img-contain">
+        <div class="chat-text-header" style="display: none;">
+            <div class="chat-flex-header" >
+                <p>Origami AI</p>
+                <div class="">
+                    <button class="transparent-button" id="chatHistoryButton">
+                    <i class="fas fa-history"></i>
+                    </button>
+                    <button class="transparent-button" id="clearChatButton">
+                        <i class="fas fa-comment-medical"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="chat-messages" id="chatMessages" style="margin: 20px; max-height: 80vh; overflow-y: scroll; display: none;">
+            <!-- <div class="message message-user">
+                <div class="message-content">
+                    I installed a few Chrome extensions and updated Zoom.
+                </div>
+            </div>
+
+            <div class="message message-bot">
+                <div class="message-content">
+                    slow since yesterday.
+                </div>
+            </div>
+
+            <div class="message message-bot">
+                <div class="message-content">
+                    Let's troubleshoot like tech ninjas 🥷💻<br>
+                    First question: Did you install or update anything recently?
+                </div>
+            </div>
+
+            
+            <div class="message message-user">
+                <div class="message-content">
+                    Pretty full. Like, 12GB left on a 256GB SSD.
+                </div>
+            </div>
+
+            <div class="message message-bot">
+                <div class="message-wrapper">
+
+                    <div class="message-content">
+                        Chrome extensions... the usual suspects. 🕵️<br>
+                        Let's try this:<br>
+                        1. Disable unnecessary extensions<br>
+                        2. Clear browser cache<br>
+                        3. Restart your laptop<br><br>
+                        Also, how's your disk space looking?
+                    </div>
+                    <div class="message-time">10:23 AM</div>
+                    <div class="message-actions">
+                        <i class="fa fa-files-o" title="Copy"></i>
+                        <i class="fa fa-rotate-right" title="Regenerate"></i>
+                        <i class="fa fa-thumbs-o-up" title="Good response"></i>
+                        <i class="fa fa-thumbs-o-down" title="Bad response"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message message-bot">
+                <div class="message-content">
+                    Yep, your laptop's gasping for space. Try cleaning up large files or offloading to the cloud.
+                </div>
+            </div> -->
+
+            <!-- <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div> -->
+        </div>
+        <div class="chat-input-container" style="display: none;">
+                <div class="input-wrapper">
+                    <div class="input-icons">
+                        <div class="message-icon-shape">
+                            <i class="fa fa-paperclip"></i>
+                        </div>
+                        <div class="message-icon-shape">
+                            <i class="fa fa-smile-o"></i>
+                        </div>
+                        <!-- <i class="fa fa-microphone"></i> -->
+                         <div class="message-icon-shape">
+
+                             <i class="fa fa-ellipsis-h"></i>
+                         </div>
+                    </div>
+                    <input type="text" class="chat-input" placeholder="Ask anything" id="chatmessageInput" data-group="test">
+                    <button class="send-button" id="sendMessageButton">
+                        <i class="fa fa-arrow-up"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="disclaimer" style="display: none;">
+                AI can make mistakes. Please double-check responses.
+            </div>
     </div>
+   
   </div>
   <?php require_once 'component/footer.php'; ?>
 

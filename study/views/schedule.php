@@ -35,26 +35,25 @@ $classStartPeriod = date_format(date_create($classroom_info['classroom_start']),
 $classEndPeriod = date_format(date_create($classroom_info['classroom_end']), "d/m/Y");
 
 $scheduleItems = select_data(
-        "course.trn_subject AS course_name,
-			course.trn_detail AS course_detail,
-            cc.course_id AS course_id,
-            DATE_FORMAT(course.trn_date,'%Y/%m/%d') AS date_start,
-            course.trn_from_time AS time_start,
-            course.trn_to_time AS time_end,
-            course.trn_type AS course_type",
-        "ot_training_list course 
-            LEFT JOIN classroom_course cc 
-            ON course.trn_id = cc.course_ref_id",
-        "WHERE cc.classroom_id = '{$classroom_id}'
-            AND cc.status = 0 
-            ORDER BY time_start ASC");
+    "course.trn_subject AS course_name,
+        course.trn_detail AS course_detail,
+        cc.course_id AS course_id,
+        cc.course_ref_id AS course_ref_id,
+        DATE_FORMAT(course.trn_date,'%Y/%m/%d') AS date_start,
+        course.trn_from_time AS time_start,
+        course.trn_to_time AS time_end,
+        course.trn_type AS course_type",
+    "ot_training_list course 
+        LEFT JOIN classroom_course cc 
+        ON course.trn_id = cc.course_ref_id",
+    "WHERE cc.classroom_id = '{$classroom_id}'
+        AND cc.status = 0 
+        ORDER BY time_start ASC");
 
 ?>
 
-
 <!doctype html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -197,9 +196,7 @@ $scheduleItems = select_data(
                                 <!-- ${instructorsHtml} -->
                             </div>
                             <button type="button" class="btn btn-new-primary" style="border-radius: 15px;"
-                                data-toggle="modal"
-                                data-target="#scheduleModal"
-                                data-index="${key}">
+                                onclick="redirectToClassDetail('<?php echo $item['course_ref_id']; ?>', '<?php echo $classroom_id ?>', '<?php echo $item['course_type']; ?>')">
                                 ไปยังคลาสเรียน
                             </button>
                         </div>
