@@ -136,12 +136,12 @@ $('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
               for (let i = 0; i < maxVisible; i++) {
                 let instr = instructorsForSession[i];
                 instructorsHtml += `
-            <div class="member-avatar avatar-orange" title="${instr.coach_name}">
-                <img src="/${instr.coach_image}" 
-                    onerror="this.src='/images/default.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
-                    alt="${instr.coach_name}" 
-                    style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill">
-            </div>`;
+                <div class="member-avatar avatar-orange" title="${instr.coach_name}">
+                    <img src="/${instr.coach_image}" 
+                        onerror="this.src='/images/default.png'; this.style.width='30px'; this.style.height='30px'; this.style.objectFit='scale-down';" 
+                        alt="${instr.coach_name}" 
+                        style="width: 30px; height: 30px; border-radius: 100%; object-fit: fill">
+                </div>`;
               }
               // Add a count indicator for remaining instructors
               const remainingCount = instructorsForSession.length - maxVisible;
@@ -160,7 +160,6 @@ $('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
                 <div class="schedule-item">
                     <div class="schedule-time">
                         <span class="schedule-time-text">${startTime}</span>
-                        <span class="schedule-time-bottom">${endTime}</span>
                     </div>
                     <div class="schedule-timeline">
                         <div class="timeline-dot timeline-dot-purple"></div>
@@ -172,9 +171,7 @@ $('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
                                 <h3 class="schedule-title" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                     ${title}
                                 </h3>
-                                <p class="schedule-duration">${eventDate} • ${startTime}${
-              endTime ? " - " + endTime : ""
-            }</p>
+                                <p class="schedule-duration">${eventDate} • ${startTime}${endTime ? " - " + endTime : "" }</p>
                             </div>
                             <span class="schedule-badge badge-class">${category}</span>
                         </div>
@@ -183,16 +180,13 @@ $('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
                                 ${instructorsHtml}
                             </div>
                             <button type="button" class="btn btn-primary" style="background-color: #7936e4; border-radius: 15px;"
-                                data-toggle="modal"
-                                data-target="#scheduleModal"
-                                data-index="${key}">
-                                รายละเอียด
+                                onclick="redirectToClassDetail('${session.course_id}')">
+                                ไปยังคลาสเรียน
                             </button>
                         </div>
                     </div>
                 </div>
             </div>`;
-
             $("#scheduleContainer").append(html);
           });
         } else {
@@ -245,6 +239,8 @@ $('#select-date-btn').on('cancel.daterangepicker', function(ev, picker) {
 
   updateDateDisplay();
 });
+
+
 
 // Handle click on "รายละเอียด" buttons dynamically
 $(document).on("click", '.btn.btn-primary[data-toggle="modal"]', function () {
@@ -310,3 +306,26 @@ $(document).on("click", ".accept-event", function () {
     text: "คุณได้เข้าร่วมอีเว้นท์นี้เรียบร้อยแล้ว",
   });
 });
+
+
+
+function redirectCurreculum(course_id, course_type, classroom_id) {
+  let new_path = course_type + "_" + course_id;
+  let url = `/classroom/study/redirect.php?id=${window.btoa(
+    new_path
+  )}&cid=${window.btoa(classroom_id)}`;
+  window.open(url, "_self");
+}
+
+function redirectToClassDetail(course_id, class_id, course_type) {
+
+  // MY DESIRE PATH:
+  // <a href="classinfo?course_id=${course.course_id}&class_id=${classroomId}&course_type=${course.course_type}" style="text-decoration: none; color: inherit;">
+
+  // classinfo?course_id=14162&class_id=2&course_type=course&class_type
+  // classroom/study/classinfo?course_id=6&class_id=2&course_type=course
+  let url = `/classroom/study/classinfo?course_id=${course_id}&class_id=${class_id}&course_type=course`
+  window.location.replace(url);
+}
+
+// href="classinfo?course_id=${course.course_id}&class_id=${classroomId}&course_type=${course.course_type}"

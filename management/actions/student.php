@@ -23,56 +23,64 @@
     $filesystem_type = $fsData['fs_type'];
     $fs_id = $fsData['fs_id'];
     setBucket($fsData);
-    if(isset($_POST) && $_POST['action'] == 'buildStudent') {
-        $classroom_id = $_POST['classroom_id'];
-        $group_id = (isset($_POST['group_id'])) ? $_POST['group_id'] : '';
-        $build_type = (isset($_POST['build_type'])) ? $_POST['build_type'] : '';
-        $filter = "";
-        if($build_type == 'join') {
-            $group_selected = (isset($_POST['group_selected'])) ? $_POST['group_selected'] : '';
-            if($group_selected) {
-                $filter .= ($group_id) ? " and g.group_id = '{$group_selected}' " : "";
-            } else {
-                $filter .= " and cjoin.group_id is null or cjoin.group_id = '' ";
-            }
+   if(isset($_POST) && $_POST['action'] == 'buildStudent') {
+    $classroom_id = $_POST['classroom_id'];
+    $group_id = (isset($_POST['group_id'])) ? $_POST['group_id'] : '';
+    $build_type = (isset($_POST['build_type'])) ? $_POST['build_type'] : '';
+    $filter = "";
+    if($build_type == 'join') {
+        $group_selected = (isset($_POST['group_selected'])) ? $_POST['group_selected'] : '';
+        if($group_selected) {
+            $filter .= ($group_id) ? " and g.group_id = '{$group_selected}' " : "";
         } else {
-            $filter .= ($group_id) ? " and g.group_id = '{$group_id}' " : "";
+            $filter .= " and cjoin.group_id is null or cjoin.group_id = '' ";
         }
-        $table = "SELECT 
-            cjoin.join_id,
-            cjoin.student_id,
-            date_format(cjoin.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
-            stu.student_firstname_en,
-            stu.student_lastname_en,
-            stu.student_firstname_th,
-            stu.student_lastname_th,
-            stu.student_nickname_en,
-            stu.student_nickname_th,
-            stu.student_gender,
-            stu.student_idcard,
-            stu.student_passport,
-            stu.student_image_profile,
-            stu.student_email,
-            stu.student_mobile,
-            date_format(stu.student_birth_date, '%Y/%m/%d') as student_birth_date,
-            CASE WHEN stu.student_birth_date IS NULL OR stu.student_birth_date = '' THEN ''
-            ELSE CONCAT(TIMESTAMPDIFF(YEAR, stu.student_birth_date, CURDATE()), ' Yrs.') END as student_age,
-            stu.student_username,
-            stu.student_password,
-            stu.student_password_key,
-            stu.student_company,
-            stu.student_position,
-            g.group_id,
-            g.group_name,
-            date_format(cjoin.register_date, '%Y/%m/%d %H:%i:%s') as register_date
-        FROM 
-            classroom_student_join cjoin
-        LEFT JOIN 
-            classroom_student stu on stu.student_id = cjoin.student_id 
-        LEFT JOIN 
-            classroom_group g on g.group_id = cjoin.group_id
-        WHERE 
-            cjoin.classroom_id = '{$classroom_id}' and cjoin.status = 0 and cjoin.payment_status = 1 $filter";
+    } else {
+        $filter .= ($group_id) ? " and g.group_id = '{$group_id}' " : "";
+    }
+    $table = "SELECT 
+        cjoin.join_id,
+        cjoin.student_id,
+        date_format(cjoin.date_create, '%Y/%m/%d %H:%i:%s') as date_create,
+        stu.student_firstname_en,
+        stu.student_lastname_en,
+        stu.student_firstname_th,
+        stu.student_lastname_th,
+        stu.student_nickname_en,
+        stu.student_nickname_th,
+        stu.student_gender,
+        stu.student_idcard,
+        stu.student_passport,
+        (
+            SELECT file_path 
+            FROM classroom_file_student 
+            WHERE student_id = stu.student_id 
+              AND file_type = 'profile_image' 
+              AND is_deleted = 0
+            ORDER BY file_order ASC, file_status DESC
+            LIMIT 1
+        ) as student_image_profile,
+        stu.student_email,
+        stu.student_mobile,
+        date_format(stu.student_birth_date, '%Y/%m/%d') as student_birth_date,
+        CASE WHEN stu.student_birth_date IS NULL OR stu.student_birth_date = '' THEN ''
+        ELSE CONCAT(TIMESTAMPDIFF(YEAR, stu.student_birth_date, CURDATE()), ' Yrs.') END as student_age,
+        stu.student_username,
+        stu.student_password,
+        stu.student_password_key,
+        stu.student_company,
+        stu.student_position,
+        g.group_id,
+        g.group_name,
+        date_format(cjoin.register_date, '%Y/%m/%d %H:%i:%s') as register_date
+    FROM 
+        classroom_student_join cjoin
+    LEFT JOIN 
+        classroom_student stu on stu.student_id = cjoin.student_id 
+    LEFT JOIN 
+        classroom_group g on g.group_id = cjoin.group_id
+    WHERE 
+        cjoin.classroom_id = '{$classroom_id}' and cjoin.status = 0 and cjoin.payment_status = 1 $filter";
         $primaryKey = 'join_id';
         $columns = array(
             array('db' => 'join_id', 'dt' => 'join_id'),
@@ -460,7 +468,8 @@ if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
         if ($ref_type === 'employee') {
             $sql_comp = "SELECT comp_id FROM m_employee WHERE emp_id = ?";
         } elseif ($ref_type === 'contact') {
-            $sql_comp = "SELECT comp_id FROM m_customer WHERE cus_id = ?";
+            // ดึง comp_id จาก m_customer_contact
+            $sql_comp = "SELECT comp_id FROM m_customer_contact WHERE cus_cont_id = ?"; 
         }
         if (isset($sql_comp)) {
             $stmt_comp = $mysqli->prepare($sql_comp);
@@ -473,8 +482,9 @@ if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
         }
         
         // ถ้ายังไม่มีการ join ก็ให้เพิ่มข้อมูลใน classroom_student_join
-        $join_sql = "INSERT INTO classroom_student_join (classroom_id, student_id, comp_id, status, emp_create, date_create) 
-                     VALUES (?, ?, ?, 0, ?, ?)";
+        // ปรับปรุง: กำหนด invite_status = 1, approve_status = 1 และ status = 1
+        $join_sql = "INSERT INTO classroom_student_join (classroom_id, student_id, comp_id, invite_status, approve_status, status, emp_create, date_create) 
+                     VALUES (?, ?, ?, 0, 0, 0, ?, ?)";
         $join_stmt = $mysqli->prepare($join_sql);
         $join_stmt->bind_param("sssss", $classroom_id, $student_id, $comp_id, $user_id, $date_create);
         if ($join_stmt->execute()) {
@@ -503,7 +513,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
             ei.date_birth AS student_birth_date,
             ei.gender AS student_gender,
             e.comp_id,
-            ei.emp_pic AS student_image_profile,
+            ei.emp_pic AS student_image_profile, -- ดึง emp_pic
             e.emp_username AS student_username,
             '' AS student_position,
             '' AS student_company
@@ -522,7 +532,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
             -- cus_cont_gender AS student_gender,
             cus_cont_idcard AS student_idcard,
             cus_cont_date_birth AS student_birth_date,
-            cus_cont_photo AS student_image_profile
+            cus_cont_photo AS student_image_profile -- ดึง cus_cont_photo
         FROM m_customer_contact c
         WHERE c.cus_cont_id = ?";
     } else {
@@ -563,6 +573,8 @@ if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
             'date_create' => $date_create
         );
 
+        $image_path = isset($data['student_image_profile']) ? $data['student_image_profile'] : ''; // ดึง path รูป
+
         $fields = implode(", ", array_keys($insert_data));
         $placeholders = implode(", ", array_fill(0, count($insert_data), '?'));
         $insert_sql = "INSERT INTO classroom_student ($fields) VALUES ($placeholders)";
@@ -581,10 +593,30 @@ if(isset($_POST['action']) && $_POST['action'] == 'addStudentFromRef') {
         if ($insert_stmt->execute()) {
             $new_student_id = $mysqli->insert_id;
             
+            // --- เริ่ม: บันทึกรูปโปรไฟล์ลงใน classroom_file_student ---
+            if (!empty($image_path)) {
+                $file_sql = "INSERT INTO classroom_file_student (student_id, file_path, file_type, file_status, file_order, is_deleted, date_create, emp_create) 
+                             VALUES (?, ?, 'profile_image', 1, 1, 0, ?, ?)";
+                $file_stmt = $mysqli->prepare($file_sql);
+                if ($file_stmt === false) {
+                     // Log error but continue
+                     error_log("Prepare file insert failed: " . $mysqli->error);
+                } else {
+                    $file_stmt->bind_param('ssss', $new_student_id, $image_path, $date_create, $user_id);
+                    if (!$file_stmt->execute()) {
+                        error_log("Error inserting file: " . $file_stmt->error);
+                    }
+                    $file_stmt->close();
+                }
+            }
+            // --- สิ้นสุด: บันทึกรูปโปรไฟล์ลงใน classroom_file_student ---
+
             // เพิ่มข้อมูลลงใน classroom_student_join
-            $join_sql = "INSERT INTO classroom_student_join (classroom_id, student_id, comp_id, status, emp_create, date_create) VALUES (?, ?, ?, 0, ?, ?)";
+            // ปรับปรุง: กำหนด invite_status = 1, approve_status = 1 และ status = 1
+            $join_sql = "INSERT INTO classroom_student_join (classroom_id, student_id, comp_id, invite_status, approve_status, status, emp_create, date_create) 
+                         VALUES (?, ?, ?, 0, 0, 0, ?, ?)";
             $join_stmt = $mysqli->prepare($join_sql);
-            $join_stmt->bind_param('sssss', $classroom_id, $new_student_id, $data['comp_id'], $user_id, $date_create); // ดึงจาก $data
+            $join_stmt->bind_param('sssss', $classroom_id, $new_student_id, $data['comp_id'], $user_id, $date_create); // ดึง comp_id จาก $data
             
             if ($join_stmt->execute()) {
                 echo json_encode(array('status' => 'success', 'message' => 'New student added from ' . $ref_type . ' successfully.'));

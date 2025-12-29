@@ -294,14 +294,11 @@ if (isset($input['action']) && $input['action'] == 'fetch_mydata') {
                             <div class="member-avatar avatar-teal"><span>👤</span></div>
                             <div class="member-avatar avatar-orange"><span>👤</span></div>
                         </div>
-                        <button type="button" class="btn btn-primary" style="background-color: #7936e4; border-radius: 15px;"
-                            data-toggle="modal"
-                            data-target="#scheduleModal-<?= $index ?>"
-                            data-index="<?= $index ?>">
+                        <button type="button" class="btn btn-primary" style="background-color: #7936e4; border-radius: 15px;" onclick="onclick="redirectCurreculum('<?= $course_id ?>', '<?= $course_type ?>', '<?= $classroom_id ?>')">
                             รายละเอียด
                         </button>
 
-                        <div id="scheduleModal-<?= $index ?>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel">
+                        <!-- <div id="scheduleModal-<?= $index ?>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content custom-modal-color">
                                     <div class="modal-header custom-header-color">
@@ -326,7 +323,7 @@ if (isset($input['action']) && $input['action'] == 'fetch_mydata') {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
 
                         <div id="newModal-<?= $index ?>" class="modal fade" tabindex="-2" role="dialog" aria-labelledby="newModalLabel">

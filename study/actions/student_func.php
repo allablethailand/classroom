@@ -12,10 +12,14 @@ function getStudentId() {
     return isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : null;
 }
 
-
 function getStudentClassroomId($student_id) {
     $result = select_data("classroom_id", "classroom_student_join", "WHERE student_id = '{$student_id}'");
     return $result ? $result[0]['classroom_id'] : null;
+}
+
+function getStudentClassroomDetail($classroom_id) {
+    $result = select_data("*", "classroom_template", "WHERE classroom_id = '{$classroom_id}'");
+    return $result ? $result[0] : null; 
 }
 
 // function ซ้ำ
@@ -154,6 +158,19 @@ function getTeacherByPosition($position_id) {
     );
 
     return !empty($result) ? $result : [];
+}
+
+function getTeacherPositionName($position_id) {
+     $result = select_data("position_id,
+        position_name_th,
+        position_name_en,
+        position_cover,
+        position_description",
+        "classroom_position",
+        "WHERE position_id = '{$position_id}' AND is_active = '0' AND status = '0'"
+    );
+
+    return !empty($result[0]) ? $result[0] : [];
 }
 
 function getTeacherList()
@@ -475,6 +492,17 @@ function getStudentEmpId($student_id){
 
     return !empty($result) ? $result[0]['emp_id'] : null;
 }
+
+function getStudentCompId($student_id) {
+    $result = select_data(
+        "comp_id",
+        "classroom_student_join",
+        "WHERE student_id = '{$student_id}'"
+    );
+
+    return !empty($result) ? $result[0]['comp_id'] : null;
+}
+
 
 function getCourseStudent($alumni_id){
     $result = select_data(

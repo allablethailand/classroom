@@ -807,7 +807,7 @@ if ($join_data && $join_data['classroom_id']) {
             </div>
         <?php endif; ?>
 
-        <div class="info-grid-section">
+        <!-- <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-user-circle" style="font-size: 25px;"></i>
                 <h3 class="section-title" style="padding-left:10px;">ข้อมูลส่วนตัว</h3>
@@ -838,7 +838,7 @@ if ($join_data && $join_data['classroom_id']) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="info-grid-section">
             <div class="section-header-icon">
@@ -868,6 +868,14 @@ if ($join_data && $join_data['classroom_id']) {
                         <strong style="padding-left:10px;">เครื่องดื่มที่ชื่นชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["teacher_drink"]) ? $row_all["teacher_drink"] : " - "; ?></span>
+                    </div>
+                </div>
+                <div class="info-item-box">
+                    <i class="fas fa-utensils" style="font-size: 18px;"></i>
+                    <div class="info-text">
+                        <strong style="padding-left:10px;" data-lang="foodallergy">อาหารที่แพ้</strong>
+                        <span
+                            style="padding-left:10px;"><?= !empty($row_all["teacher_allergy"]) ? $row_all["teacher_allergy"] : " - "; ?></span>
                     </div>
                 </div>
                 <div class="info-item-box">

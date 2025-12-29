@@ -7,9 +7,9 @@ html,body {
     min-width: 342px;
     height: auto;
     /* display: flex; */
-    min-height: 120vh;
+    min-height: 100vh;
     /* flex-direction: column; */
-    background: linear-gradient(135deg, #f8f8fc 100%, #e8e8f0 100%);
+    /* background: linear-gradient(135deg, #f8f8fc 100%, #e8e8f0 100%); */
 }
 
 
@@ -50,14 +50,14 @@ body {
 .main-content {
   height: auto !important;
   margin-top: 10px;
-  background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%);
+  /* background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%); */
   padding-bottom: 15dvh !important; 
 }
 
 .main-content-no-bg {
   height: auto !important;
   margin-top: 10px;
-  background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%);
+  /* background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%); */
   padding-bottom: 15dvh !important; 
 }
 
@@ -115,19 +115,23 @@ body {
   .main-content {
     height: auto !important;
     margin-top: 10px;
-    background: linear-gradient(135deg, #f8f8fc 0%, #e8e8f0 100%);
     padding-bottom: 15dvh !important;
     margin-inline: 8rem;
+
   }
 
   .main-transparent-content {
     height: auto !important;
     margin-top: 10px;
     padding-bottom: 10dvh !important; 
-    margin-inline: 8rem;
-
+    margin-inline: 10rem;
+    
   }
 
+  html, body {
+    min-height: 100vh; /* override min-height on desktop */
+    height: auto;
+  }
 }
 
 /* 

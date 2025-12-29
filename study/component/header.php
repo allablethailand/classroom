@@ -1,18 +1,29 @@
 <?php
-session_start();
-$base_include = $_SERVER['DOCUMENT_ROOT'];
-$base_path = '';
-if ($_SERVER['HTTP_HOST'] == 'localhost') {
-    $request_uri = $_SERVER['REQUEST_URI'];
-    $exl_path = explode('/', $request_uri);
-    if (!file_exists($base_include . "/dashboard.php")) {
-        $base_path .= "/" . $exl_path[1];
+  session_start();
+    $base_include = $_SERVER['DOCUMENT_ROOT'];
+    $base_path = '';
+    if($_SERVER['HTTP_HOST'] == 'localhost'){
+       $request_uri = $_SERVER['REQUEST_URI'];
+       $exl_path = explode('/',$request_uri);
+       if(!file_exists($base_include."/dashboard.php")){
+           $base_path .= "/".$exl_path[1];
+       }
+       $base_include .= "/".$exl_path[1];
     }
-    $base_include .= "/" . $exl_path[1];
-}
-define('BASE_PATH', $base_path);
-define('BASE_INCLUDE', $base_include);
-require_once $base_include . '/lib/connect_sqli.php';
+    DEFINE('base_path', $base_path);
+    DEFINE('base_include', $base_include);
+	require_once($base_include."/lib/connect_sqli.php");
+	require_once($base_include."/actions/func.php");
+	require_once($base_include."/classroom/study/actions/student_func.php");
+
+    $fsData = getBucketMaster();
+    $filesystem_user = $fsData['fs_access_user'];
+    $filesystem_pass = $fsData['fs_access_pass'];
+    $filesystem_host = $fsData['fs_host'];
+    $filesystem_path = $fsData['fs_access_path'];
+    $filesystem_type = $fsData['fs_type'];
+    $fs_id = $fsData['fs_id'];
+	setBucket($fsData);
 
 global $mysqli;
 // Get current directory or page identifier, example by parsing URL path
@@ -129,27 +140,6 @@ $notification_data = [
         "path" => "/alerts/version",
         "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
     ],
-    // [
-    //     "header" => "System update",
-    //     "message" => "ระบบจะทำการอัปเดตในวันที่ 12 ตุลาคม",
-    //     "class" => "notification-item",
-    //     "path" => "/updates/system",
-    //     "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
-    // ],
-    // [
-    //     "header" => "Maintenance Notice",
-    //     "message" => "เว็บไซต์จะปิดปรับปรุงเวลา 02:00-04:00 น.",
-    //     "class" => "notification-item",
-    //     "path" => "/notices/maintenance",
-    //     "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
-    // ],
-    // [
-    //     "header" => "Upcoming Class",
-    //     "message" => "คลาสเรียนหลักสูตร GreenTech จะเริ่มในอีก 1 วัน",
-    //     "class" => "notification-item",
-    //     "path" => "/promotions/new-members",
-    //     "img" => "https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png"
-    // ]
 ];
 
         function truncateMessage($text, $maxLength = 50) {
@@ -189,16 +179,6 @@ $notification_data = [
     </style>
     <script src="/classroom/study/js/header.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
-
-<!-- <div class="desktop-navbar">
-  <div id="sidenav-store1" class="sidenav">...</div> 
-  <div class="origami-header-dashboard">
-
-  </div>
-</div> -->
-
-
-
 
 
 <div class="desktop-navbar">
@@ -338,7 +318,7 @@ $notification_data = [
                     <ul class="dropdown-menu lefted" aria-labelledby="profileDropdown">
                         <li><a href="profile">Profile</a></li>
                         <li class="divider"></li>
-                        <li><a href="/logout">Logout</a></li>
+                        <li><a href="/profile">Logout</a></li>
                     </ul>
                     </div>
                 </div>
@@ -423,7 +403,7 @@ $notification_data = [
                         <div class="dropdown" style="display: inline-block; vertical-align: middle;">
                             <button class="bell-button btn btn-default dropdown-toggle" type="button" id="bellDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background: none; border: none; padding: 0;">
                                 <img id="menu-icon" src="/images/menu/Bell.svg" alt="Noti" style="padding: 5px;">
-                                <span class="notification-badge">4</span>
+                                <span class="notification-badge">1</span>
                             </button>
 
                             <ul class="dropdown-menu centered" aria-labelledby="bellDropdown">
@@ -468,7 +448,7 @@ $notification_data = [
                         <ul class="dropdown-menu lefted" aria-labelledby="profileDropdown">
                             <li><a href="profile">Profile</a></li>
                             <li class="divider"></li>
-                            <li><a href="/logout">Logout</a></li>
+                            <li><a href="logout">Logout</a></li>
                         </ul>
                         </div>
                     </div>
@@ -524,7 +504,7 @@ $notification_data = [
                 <?php
                 if(!in_array($currentScreen, $hide_profile)): ?>
                 <a href="profile" class="" style="background-color: white; border-radius: 100%; border: 2px solid <?php echo $profile_border_color; ?> ;">
-                    <img style=" border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
+                    <img style="height: 30px; border-radius: 100%;" width="30" id="avatar_h" name="avatar_h" title="test" src="<?php echo $student_image_profile; ?>" onerror="this.src='/images/default.png'">
                 </a>
                 <?php endif; ?>
             </div>

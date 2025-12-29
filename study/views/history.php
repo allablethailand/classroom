@@ -21,8 +21,6 @@ require_once $base_include . '/classroom/study/actions/student_func.php';
 $student_id = getStudentId();
 $alumni_list = getStudentClassroomList($student_id);
 
-// var_dump($alumni_list);
-
 
 ?>
 
@@ -416,7 +414,7 @@ $alumni_list = getStudentClassroomList($student_id);
 <body>
     <?php require_once 'component/header.php'; ?>
 
-    <div class="main-transparent-content">
+    <div class="main-transparent-content col-md-10">
         <!-- Tabs Section -->
             <div class="container-fluid">
                 <h1 class="heading-1" data-lang="classhistory">ประวัติการเข้าเรียน</h1>

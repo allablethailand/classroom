@@ -39,7 +39,7 @@ session_start();
 <body data-barba="wrapper">
     <?php require_once("component/header.php") ?>
   
-    <div class="main-content" data-barba="container" data-barba-namespace="home">
+    <div class="main-content col-md-10" data-barba="container" data-barba-namespace="home">
         <div class="container-fluid" style="margin: 0 1rem;">
             
             <div id="ongoing-class-container"></div>

@@ -132,8 +132,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
     <script src="/dist/js/select2-build.min.js?v=<?php echo time(); ?>" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/all.min.js" charset="utf-8" type="text/javascript"></script>
     <script src="/dist/fontawesome-5.11.2/js/v4-shims.min.js" charset="utf-8" type="text/javascript"></script>
-    <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8"
-        type="text/javascript"></script>
+    <script src="/dist/fontawesome-5.11.2/js/fontawesome_custom.js?v=<?php echo time(); ?>" charset="utf-8" type="text/javascript"></script>
     <script src="/classroom/study/js/profile.js?v=<?php echo time(); ?>" type="text/javascript"></script>
     <script src="/classroom/study/js/lang.js?v=<?php echo time(); ?>"  type="text/javascript"></script>
 
@@ -162,8 +161,8 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         }
 
         .profile-avatar-circle {
-            width: 120px;
-            height: 120px;
+            width: 170px;
+            height: 170px;
             border-radius: 50%;
             border: 5px solid #fff;
             /* ขอบสีขาวเริ่มต้น */
@@ -171,6 +170,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             margin-bottom: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: border-color 0.3s ease;
+            object-fit: cover;
             /* เพิ่ม transition สำหรับการเปลี่ยนสีขอบ */
         }
 
@@ -266,11 +266,6 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             color: #7f8c8d;
         }
 
-        .main-content-container {
-            padding: 60px 150px;
-            position: relative;
-            top: -10px
-        }
 
         .section-title {
             font-weight: 700;
@@ -485,12 +480,7 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
                 /* ปรับลดระยะห่างระหว่างแถวและคอลัมน์ */
 
             }
-             .main-content-container {
-            padding: 50px 20px;
-            position: relative;
-            top: -10px
-        }
-
+    
             .contact-item {
                 margin: 0;
                 flex-grow: unset;
@@ -542,13 +532,13 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
             background-color: #3b5998;
         }
 
-        .info-grid-section {
+        /* .info-grid-section {
             background: #fff;
             border-radius: 20px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
             padding: 30px;
             margin-bottom: 30px;
-        }
+        } */
 
         .section-header-icon {
             display: flex;
@@ -697,11 +687,10 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
 </head>
 
 <!-- BRONZE color: #D17840; -->
-
 <body>
     <?php require_once("component/header.php") ?>
 
-    <div class="profile-header-container" style="gap: 5px;">
+    <div class="profile-header-container col-10" style="gap: 5px;">
         <div class="settings-button-container">
             <a href="setting" class="settings-button" title="ตั้งค่าโปรไฟล์">
                 <i class="fas fa-cog"></i>
@@ -709,29 +698,47 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         </div>
        <div class="profile-image-carousel">
             <?php 
-                // --- ส่วนที่เพิ่มเข้ามาใหม่สำหรับการดึงรูปภาพโปรไฟล์ ---
-                $sql_images = "SELECT stu.student_image_profile FROM classroom_student_join cjoin 
-                    LEFT JOIN classroom_student stu ON stu.student_id = cjoin.student_id 
-                    WHERE cjoin.status = 0 AND cjoin.payment_status = 1 AND cjoin.student_id = ?";
+                // --- ส่วนที่แก้ไข: ดึงรูปภาพโปรไฟล์จากตาราง classroom_file_student ---
+                // ใช้ตัวแปร $student_id ที่ควรถูกกำหนดไว้ก่อนหน้านี้ในโค้ด
+                $sql_images = "SELECT file_path FROM classroom_file_student 
+                               WHERE student_id = ? 
+                                 AND file_type = 'profile_image' 
+                                 AND file_status = 1 
+                                 AND is_deleted = 0 
+                               ORDER BY date_create DESC 
+                               LIMIT 1"; // จำกัดให้ดึงแค่รูปเดียวล่าสุด (ถ้ามีหลายรูป)
 
                 $stmt_images = $mysqli->prepare($sql_images);
-                $stmt_images->bind_param("i", $student_id);
-                $stmt_images->execute();
-                $result_images = $stmt_images->get_result();
+                // ตรวจสอบว่า $student_id ถูกกำหนดและเป็น integer ก่อน bind
+                if (isset($student_id)) {
+                    $stmt_images->bind_param("i", $student_id);
+                    $stmt_images->execute();
+                    $result_images = $stmt_images->get_result();
 
-                echo '<div class="carousel-container">';
-                if ($row_image = $result_images->fetch_assoc()) {
-                    $profile_image = $row_image['student_image_profile'];   
-                    // Assuming $profile_image contains raw image binary data (BLOB)
-                    echo '<img class="profile-avatar-circle" src="' . GetUrl($profile_image) . '" onerror="this.src=\'../../../images/default.png\'" alt="Profile Image" style="border-color: ' . $profile_border_color . ';">';
+                    echo '<div class="carousel-container">';
+                    
+                    if ($row_image = $result_images->fetch_assoc()) {
+                        // $profile_image จะเก็บค่า file_path ซึ่งเป็นเส้นทางของไฟล์
+                        $profile_path = $row_image['file_path'];   
+                        // สมมติว่า GetUrl() เป็นฟังก์ชันที่แปลง path ให้เป็น URL ที่ใช้งานได้
+                        echo '<img class="profile-avatar-circle" src="' . GetUrl($profile_path) . '" onerror="this.src=\'../../../images/default.png\'" alt="Profile Image" style="border-color: ' . $profile_border_color . ';">';
+                    } else {
+                        // Fallback to default image if none found
+                        echo '<img src="../../../images/default.png" alt="Default Profile" style="border-color: ' . $profile_border_color . ';">';
+                    }
+                    
+                    $stmt_images->close();
+                    echo '</div>';
                 } else {
-                    // Fallback to default image if none found
-                    echo '<img src="../../../images/default.png" alt="Default Profile" style="border-color: ' . $profile_border_color . ';">';
+                    // กรณีที่ $student_id ไม่ได้ถูกกำหนด
+                    echo '<div class="carousel-container">';
+                    echo '<img src="../../../images/default.png" alt="Error: Student ID not set" style="border-color: ' . $profile_border_color . ';">';
+                    echo '</div>';
+                    // สามารถเพิ่มการจัดการข้อผิดพลาดอื่น ๆ ได้ตามต้องการ
                 }
-                $stmt_images->close();
                 // ----------------------------------------------------
-                echo '</div>';
             ?>
+        
 
         </div>
         <h2 class="profile-name" style="
@@ -769,236 +776,263 @@ $profile_border_color = !empty($row_all['group_color']) ? htmlspecialchars($row_
         </p>
     </div>
     <div class="main-content-no-bg">
-            <div class="page-container main-content-container">
-
-        <div class="profile-card" style="padding: 10px;">
-            <div class="profile-course-container">
-                <?php if (!empty($classroom_name)): ?>
-                    <p class="profile-company" style="font-size: 14px;">
-                        <i class="fas fa-graduation-cap" style="color: #0089ff; "></i>
-                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;" data-lang="program">หลักสูตร:</span>
-                        <span><?= $classroom_name; ?></span>
-                    </p>
-                <?php endif; ?>
-                <?php if (!empty($row_all["student_company"])): ?>
-                    <p class="profile-company" style="font-size: 14px;">
-                        <i class="fas fa-building" style="color: #0089ff;"></i>
-                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em;" data-lang="company" >บริษัท:</span>
-                        <span><?= $row_all["student_company"]; ?></span>
-                    </p>
-                <?php endif; ?>
-                <?php if (!empty($row_all["student_position"])): ?>
-                    <p class="profile-position" style="font-size: 14px;">
-                        <i class="fas fa-briefcase" style="color: #0089ff;"></i>
-                        <span style="font-size: 16px ;font-weight: bold; padding-right: .3em;">ตำแหน่ง:</span>
-                        <span><?= $row_all["student_position"]; ?></span>
-                    </p>
-                <?php endif; ?>
-                
-                <?php
-                    echo '<p class="profile-company" style="display:block; font-size:14px; width:100%;">';
-                    echo '<i class="fas fa-medal" style="color:#0089ff;"></i> ';
-                    echo '<span style="font-size:16px; font-weight:bold; padding-right:.3em;" data-lang="certificate">ประกาศนียบัตร:</span><div style="display:flex; margin-bottom:10px; gap:15px;">';
-
-                    foreach ($test as $certName => $certData) {
-                        $count = $certData['count'];
-                        $details = $certData['details'];
-                        // Sample usage of certification background image or icon based on certName or details
-                        $imgSrc = '';
+        <div class="container">
+            <div class="row justify-content-center">
+                 <div class="col-md-10 col-md-offset-1">
+                    <div class="page-container">
                         
-                        // Normalize certificate name to lowercase
-                        $certNameLower = strtolower($certName);
+                            <div class="container">
+                                <div class="row">
+                                    <div class="contact-section-card col-md-10" style="padding: 10px; margin-top: 20px;">
+                                <div class="profile-course-container">
+                                    <!-- <?php if (!empty($classroom_name)): ?>
+                                        <p class="profile-company" style="font-size: 14px;">
+                                            <i class="fas fa-graduation-cap" style="color: #0089ff; "></i>
+                                            <span style="font-size: 16px; font-weight: bold; padding-right: .3em;" data-lang="program">หลักสูตร:</span>
+                                            <span><?= $classroom_name; ?></span>
+                                        </p>
+                                    <?php endif; ?> -->
+                                    <?php if (!empty($row_all["student_company"])): ?>
+                                        <p class="profile-company" style="font-size: 14px;">
+                                            <i class="fas fa-building" style="color: #0089ff;"></i>
+                                            <span style="font-size: 16px; font-weight: bold; padding-right: .3em;" data-lang="company" >บริษัท:</span>
+                                            <span><?= $row_all["student_company"]; ?></span>
+                                        </p>
+                                    <?php endif; ?>
+                                    <?php if (!empty($row_all["student_position"])): ?>
+                                        <p class="profile-position" style="font-size: 14px;">
+                                            <i class="fas fa-briefcase" style="color: #0089ff;"></i>
+                                            <span style="font-size: 16px ;font-weight: bold; padding-right: .3em;">ตำแหน่ง:</span>
+                                            <span><?= $row_all["student_position"]; ?></span>
+                                        </p>
+                                    <?php endif; ?>
+                                    
+                                    <?php
+                                        echo '<p class="profile-company" style="display:block; font-size:14px; width:100%;">';
+                                        echo '<i class="fas fa-medal" style="color:#0089ff;"></i> ';
+                                        echo '<span style="font-size:16px; font-weight:bold; padding-right:.3em;" data-lang="certificate">ประกาศนียบัตร:</span><div style="display:flex; margin-bottom:10px; gap:15px;">';
 
-                        // Extract the keyword you want to switch on, e.g., "bronze", "gold", etc.
-                        // This example assumes the keyword is the last word or you can parse accordingly.
-                        if (strpos($certNameLower, 'bronze') !== false) {
-                            $certLevel = 'bronze';
-                        } elseif (strpos($certNameLower, 'silver') !== false) {
-                            $certLevel = 'silver';
-                        } elseif (strpos($certNameLower, 'gold') !== false) {
-                            $certLevel = 'gold';
-                        } elseif (strpos($certNameLower, 'platinum') !== false) {
-                            $certLevel = 'platinum';
-                        } elseif (strpos($certNameLower, 'diamond') !== false) {
-                            $certLevel = 'diamond';
-                        } else {
-                            $certLevel = 'default';
-                        }
 
-                        switch ($certLevel) {
-                            case 'bronze':
-                                $imgSrc = '/images/certification_ball/bronze.png';
-                                $fontColor = '#D17840;';
-                                break;
-                            case 'gold':
-                                $imgSrc = '/images/certification_ball/gold.png';
-                                $fontColor = '#AD7A31;';
-                                break;
-                            case 'platinum':
-                                $imgSrc = '/images/certification_ball/platinum.png';
-                                $fontColor = '#777777;';                                
-                                break;
-                            case 'diamond':
-                                $imgSrc = '/images/certification_ball/diamond.png';
-                                $fontColor = '#DDDDDD';
-                                break;
-                            default:
-                                $imgSrc = '/images/certification_ball/default.png';
-                                $fontColor = '';
-                                break;
-                        }
+                                        // Code Certificate
+                                        foreach ($test as $certName => $certData) {
+                                            $count = $certData['count'];
+                                            $details = $certData['details'];
+                                            // Sample usage of certification background image or icon based on certName or details
+                                            $imgSrc = '';
+                                            
+                                            // Normalize certificate name to lowercase
+                                            $certNameLower = strtolower($certName);
 
-                        echo '<div class="img-container" style="display:flex; align-items:center;">';
-                        if ($imgSrc) {
-                            echo '<img src="' . $imgSrc . '" width="50" height="50" alt="' . htmlspecialchars($certName) . '">';
-                        }
-                        echo '<div class="center-text" style="padding-left: 10px; font-weight: bold; font-size: 20px; color: '. $fontColor. '">' . $count . '</div></div>';
-                    }
-                    echo '</p></div>';
-                    ?>
-                <!-- <p class="profile-company" style="display:block; font-size: 14px;" style="width: 100%;">
-                    <i class="fas fa-medal" style="color: #0089ff; "></i>
-                    <span style="font-size: 16px; font-weight: bold; padding-right: .3em; " data-lang="certificate">ประกาศนียบัตร:</span>
-                    <div class="img-container" style="display:flex; justify-content:center;" >
-                        <img src="/images/certification_ball/bronze.png" width="50px; height="50px;" alt="Bronze Certificate">
-                        <div class="center-text">P.</div>
-                    </div>
-                </p> -->
-            </div>
-        </div>
+                                            // Extract the keyword you want to switch on, e.g., "bronze", "gold", etc.
+                                            // This example assumes the keyword is the last word or you can parse accordingly.
+                                            if (strpos($certNameLower, 'bronze') !== false) {
+                                                $certLevel = 'bronze';
+                                            } elseif (strpos($certNameLower, 'silver') !== false) {
+                                                $certLevel = 'silver';
+                                            } elseif (strpos($certNameLower, 'gold') !== false) {
+                                                $certLevel = 'gold';
+                                            } elseif (strpos($certNameLower, 'platinum') !== false) {
+                                                $certLevel = 'platinum';
+                                            } elseif (strpos($certNameLower, 'diamond') !== false) {
+                                                $certLevel = 'diamond';
+                                            } else {
+                                                $certLevel = 'default';
+                                            }
 
-        <?php if ($has_contact): ?>
-            <div class="contact-section-card">
-                <div class="section-header-icon">
-                    <i class="fas fa-address-book" style="font-size: 25px;"></i>
-                    <h3 class="section-title" style="padding-left:10px;" data-lang="contactinfo">ช่องทางการติดต่อ</h3>
-                </div>
-                <div class="contact-grid">
-                    <?php if (!empty($row_all['student_mobile'])): ?>
-                        <div class="contact-item">
-                            <a href="tel:<?= $row_all['student_mobile']; ?>">
-                                <div class="contact-icon-circle phone"><i class="fas fa-phone"></i></div>
-                                <span><?= $row_all['student_mobile']; ?></span>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                    <?php if (!empty($row_all['student_email'])): ?>
-                        <div class="contact-item">
-                            <a href="mailto:<?= $row_all['student_email']; ?>">
-                                <div class="contact-icon-circle mail"><i class="fas fa-envelope"></i></div>
-                                <span><?= $row_all['student_email']; ?></span>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                    <?php if (!empty($row_all['student_line'])): ?>
-                        <div class="contact-item">
-                            <a href="https://line.me/ti/p/~<?= $row_all['student_line']; ?>" target="_blank">
-                                <div class="contact-icon-circle line"><i class="fab fa-line"></i></div>
-                                <span><?= $row_all['student_line']; ?></span>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                    <?php if (!empty($row_all['student_ig'])): ?>
-                        <div class="contact-item">
-                            <a href="https://www.instagram.com/<?= $row_all['student_ig']; ?>" target="_blank">
-                                <div class="contact-icon-circle ig"><i class="fab fa-instagram"></i></div>
-                                <span><?= $row_all['student_ig']; ?></span>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                    <?php if (!empty($row_all['student_facebook'])): ?>
-                        <div class="contact-item">
-                            <a href="https://www.facebook.com/<?= $row_all['student_facebook']; ?>" target="_blank">
-                                <div class="contact-icon-circle fb"><i class="fab fa-facebook-f"></i></div>
-                                <span><?= $row_all['student_facebook']; ?></span>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        <?php endif; ?>
+                                            switch ($certLevel) {
+                                                case 'bronze':
+                                                    $imgSrc = '/images/certification_ball/bronze.png';
+                                                    $fontColor = '#D17840;';
+                                                    break;
+                                                case 'gold':
+                                                    $imgSrc = '/images/certification_ball/gold.png';
+                                                    $fontColor = '#AD7A31;';
+                                                    break;
+                                                case 'platinum':
+                                                    $imgSrc = '/images/certification_ball/platinum.png';
+                                                    $fontColor = '#777777;';                                
+                                                    break;
+                                                case 'diamond':
+                                                    $imgSrc = '/images/certification_ball/diamond.png';
+                                                    $fontColor = '#DDDDDD';
+                                                    break;
+                                                default:
+                                                    $imgSrc = '/images/certification_ball/default.png';
+                                                    $fontColor = '';
+                                                    break;
+                                            }
 
-        <div class="info-grid-section">
-            <div class="section-header-icon">
-                <i class="fas fa-user-circle" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;" data-lang="personalinfo">ข้อมูลส่วนตัว</h3>
-            </div>
-            <div class="info-grid">
-                <div class="info-item-box">
-                    <i class="fas fa-birthday-cake" style="font-size: 18px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px; " data-lang="birthdate">วันเกิด</strong>
-                        <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_birth_date"]) ? date("j F Y", strtotime($row_all["student_birth_date"])) : "-"; ?></span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-church" style="font-size: 18px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;" data-lang="religion">ศาสนา</strong>
-                        <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_religion"]) ? $row_all["student_religion"] : "-"; ?></span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-tint" style="font-size: 18px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;" data-lang="bloodtype">กรุ๊ปเลือด</strong>
-                        <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_bloodgroup"]) ? $row_all["student_bloodgroup"] : "-"; ?></span>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                            echo '<div class="img-container" style="display:flex; align-items:center;">';
+                                            if ($imgSrc) {
+                                                echo '<img src="' . $imgSrc . '" width="50" height="50" alt="' . htmlspecialchars($certName) . '">';
+                                            }
+                                            echo '<div class="center-text" style="padding-left: 10px; font-weight: bold; font-size: 20px; color: '. $fontColor. '">' . $count . '</div></div>';
+                                        }
+                                        echo '</p></div>';
+                                        ?>
+                                    <!-- <p class="profile-company" style="display:block; font-size: 14px;" style="width: 100%;">
+                                        <i class="fas fa-medal" style="color: #0089ff; "></i>
+                                        <span style="font-size: 16px; font-weight: bold; padding-right: .3em; " data-lang="certificate">ประกาศนียบัตร:</span>
+                                        <div class="img-container" style="display:flex; justify-content:center;" >
+                                            <img src="/images/certification_ball/bronze.png" width="50px; height="50px;" alt="Bronze Certificate">
+                                            <div class="center-text">P.</div>
+                                        </div>
+                                    </p> -->
+                                </div>
+                            </div>
+                                </div>
+                                <div class="row">
+                                <?php if ($has_contact): ?>
+                                    <div class="contact-section-card col-md-10">
+                                        <div class="section-header-icon">
+                                            <i class="fas fa-address-book" style="font-size: 25px;"></i>
+                                            <h3 class="section-title" style="padding-left:10px;" data-lang="contactinfo">ช่องทางการติดต่อ</h3>
+                                        </div>
+                                        <div class="contact-grid">
+                                            <?php if (!empty($row_all['student_mobile'])): ?>
+                                                <div class="contact-item">
+                                                    <a href="tel:<?= $row_all['student_mobile']; ?>">
+                                                        <div class="contact-icon-circle phone"><i class="fas fa-phone"></i></div>
+                                                        <span><?= $row_all['student_mobile']; ?></span>
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if (!empty($row_all['student_email'])): ?>
+                                                <div class="contact-item">
+                                                    <a href="mailto:<?= $row_all['student_email']; ?>">
+                                                        <div class="contact-icon-circle mail"><i class="fas fa-envelope"></i></div>
+                                                        <span><?= $row_all['student_email']; ?></span>
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if (!empty($row_all['student_line'])): ?>
+                                                <div class="contact-item">
+                                                    <a href="https://line.me/ti/p/~<?= $row_all['student_line']; ?>" target="_blank">
+                                                        <div class="contact-icon-circle line"><i class="fab fa-line"></i></div>
+                                                        <span><?= $row_all['student_line']; ?></span>
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if (!empty($row_all['student_ig'])): ?>
+                                                <div class="contact-item">
+                                                    <a href="https://www.instagram.com/<?= $row_all['student_ig']; ?>" target="_blank">
+                                                        <div class="contact-icon-circle ig"><i class="fab fa-instagram"></i></div>
+                                                        <span><?= $row_all['student_ig']; ?></span>
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if (!empty($row_all['student_facebook'])): ?>
+                                                <div class="contact-item">
+                                                    <a href="https://www.facebook.com/<?= $row_all['student_facebook']; ?>" target="_blank">
+                                                        <div class="contact-icon-circle fb"><i class="fab fa-facebook-f"></i></div>
+                                                        <span><?= $row_all['student_facebook']; ?></span>
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
 
-        <div class="info-grid-section">
-            <div class="section-header-icon">
-                <i class="fas fa-heartbeat" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;" data-lang="lifestyle">ไลฟ์สไตล์</h3>
-            </div>
-            <div class="info-grid">
-                <div class="info-item-box">
-                    <i class="fas fa-star" style="font-size: 18px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;" data-lang="hobbies">งานอดิเรก</strong>
-                        <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : " - "; ?></span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-music" style="font-size: 18px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;" data-lang="favoritemusic">ดนตรีที่ชอบ</strong>
-                        <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : " - "; ?></span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-glass-cheers" style="font-size: 18px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;" data-lang="favoritedrink">เครื่องดื่มที่ชื่นชอบ</strong>
-                        <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : " - "; ?></span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-film" style="font-size: 18px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;" data-lang="favoritemovie">หนังที่ชอบ</strong>
-                        <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : " - "; ?></span>
-                    </div>
-                </div>
-                <div class="info-item-box">
-                    <i class="fas fa-bullseye" style="font-size: 18px;"></i>
-                    <div class="info-text">
-                        <strong style="padding-left:10px;" data-lang="lifegoal">เป้าหมาย</strong>
-                        <span
-                            style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : " - "; ?></span>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            </div>
+                        
+                            <div class="row">
+                                <div class="info-grid-section col-md-10">
+                                    <div class="section-header-icon">
+                                        <i class="fas fa-user-circle" style="font-size: 25px;"></i>
+                                        <h3 class="section-title" style="padding-left:10px;" data-lang="personalinfo">ข้อมูลส่วนตัว</h3>
+                                    </div>
+                                    <div class="info-grid">
+                                        <div class="info-item-box">
+                                            <i class="fas fa-birthday-cake" style="font-size: 18px;"></i>
+                                            <div class="info-text">
+                                                <strong style="padding-left:10px; " data-lang="birthdate">วันเกิด</strong>
+                                                <span
+                                                    style="padding-left:10px;"><?= !empty($row_all["student_birth_date"]) ? date("j F Y", strtotime($row_all["student_birth_date"])) : "-"; ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="info-item-box">
+                                            <i class="fas fa-church" style="font-size: 18px;"></i>
+                                            <div class="info-text">
+                                                <strong style="padding-left:10px;" data-lang="religion">ศาสนา</strong>
+                                                <span
+                                                    style="padding-left:10px;"><?= !empty($row_all["student_religion"]) ? $row_all["student_religion"] : "-"; ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="info-item-box">
+                                            <i class="fas fa-tint" style="font-size: 18px;"></i>
+                                            <div class="info-text">
+                                                <strong style="padding-left:10px;" data-lang="bloodtype">กรุ๊ปเลือด</strong>
+                                                <span
+                                                    style="padding-left:10px;"><?= !empty($row_all["student_bloodgroup"]) ? $row_all["student_bloodgroup"] : "-"; ?></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="info-grid-section col-md-10">
+                                    <div class="section-header-icon">
+                                        <i class="fas fa-heartbeat" style="font-size: 25px;"></i>
+                                        <h3 class="section-title" style="padding-left:10px;" data-lang="lifestyle">ไลฟ์สไตล์</h3>
+                                    </div>
+                                    <div class="info-grid">
+                                        <div class="info-item-box">
+                                            <i class="fas fa-star" style="font-size: 18px;"></i>
+                                            <div class="info-text">
+                                                <strong style="padding-left:10px;" data-lang="hobbies">งานอดิเรก</strong>
+                                                <span
+                                                    style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : " - "; ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="info-item-box">
+                                            <i class="fas fa-music" style="font-size: 18px;"></i>
+                                            <div class="info-text">
+                                                <strong style="padding-left:10px;" data-lang="favoritemusic">ดนตรีที่ชอบ</strong>
+                                                <span
+                                                    style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : " - "; ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="info-item-box">
+                                            <i class="fas fa-glass-cheers" style="font-size: 18px;"></i>
+                                            <div class="info-text">
+                                                <strong style="padding-left:10px;" data-lang="favoritedrink">เครื่องดื่มที่ชื่นชอบ</strong>
+                                                <span
+                                                    style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : " - "; ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="info-item-box">
+                                            <i class="fas fa-utensils" style="font-size: 18px;"></i>
+                                            <div class="info-text">
+                                                <strong style="padding-left:10px;" data-lang="foodallergy">อาหารที่แพ้</strong>
+                                                <span
+                                                    style="padding-left:10px;"><?= !empty($row_all["student_allergy"]) ? $row_all["student_allergy"] : " - "; ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="info-item-box">
+                                            <i class="fas fa-film" style="font-size: 18px;"></i>
+                                            <div class="info-text">
+                                                <strong style="padding-left:10px;" data-lang="favoritemovie">หนังที่ชอบ</strong>
+                                                <span
+                                                    style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : " - "; ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="info-item-box">
+                                            <i class="fas fa-bullseye" style="font-size: 18px;"></i>
+                                            <div class="info-text">
+                                                <strong style="padding-left:10px;" data-lang="lifegoal">เป้าหมาย</strong>
+                                                <span
+                                                    style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : " - "; ?></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
 
          <!-- <div class="info-grid-section">
             <div class="section-header-icon">

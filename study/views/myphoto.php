@@ -2,9 +2,10 @@
 session_start();
 // ตรวจสอบ session และดึง student_id
 $student_id = $_SESSION['student_id'] ? $_SESSION['student_id'] : null;
-// **ปรับปรุงตรงนี้**
-$base_url = "http://origami.local/"; // URL หลักของคุณ
-$geturl_prefix = $base_url; // ใช้ URL หลัก เนื่องจากรูปภาพอยู่ใน Root Path ของ Web Server
+
+// ❌ ลบตัวแปร $base_url และ $geturl_prefix ออก
+// $base_url = "http://origami.local/"; 
+// $geturl_prefix = $base_url;
 
 if (!$student_id) {
     // จัดการกรณีที่ไม่พบ session
@@ -65,9 +66,6 @@ if ($stmt_name) {
     }
     $stmt_name->close();
 }
-
-// $python_script = shell_exec("myphoto.py");
-// จะได้ผลลัพธ์จาก python
 
 // ------------------------------------------------------------------------------------------------------
 ?>
@@ -292,8 +290,7 @@ if ($stmt_name) {
             justify-content: center; 
         }
         }
-        .
-        /* ... (CSS ส่วนปุ่มดาวน์โหลดใน Modal คงเดิม) ... */
+        
         .modal-photo-wrapper {
             position: relative;
             margin-bottom: 10px; 
@@ -334,18 +331,63 @@ if ($stmt_name) {
             padding-right: 5px !important; /* ใช้ !important เพื่อให้แน่ใจว่า Override Bootstrap default */
             padding-bottom: 5px;
         }
+
+        .main-card {
+            background: linear-gradient(135deg, #FF9800 0%, #FF6D00 40%, #D84315 100%);
+            border-radius: 20px;
+            margin-top: 30px;
+            padding: 30px 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.08);
+
+        }
+        .logo {
+            font-size: 2.7em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: 0.2em;
+        }
+        .logo-wave {
+            display: block;
+            width: 120px;
+            margin: 20px auto 10px auto;
+            border-radius: 30px;
+        }
+        .instruction {
+            color: #fff;
+            font-size: 1.3em;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .search-btn-group {
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .search-btn-group .btn {
+            margin: 0 8px 16px 8px;
+            font-size: 1.2em;
+            width: 150px;
+        }
+        .btn-icon {
+            margin-right: 7px;
+        }
+        .help-btn {
+            background: #FF9800;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 30px;
+            font-size: 1.2em;
+            margin: 25px auto 0 auto;
+            display: block;
+        }
 </style>
 </head>
 
 <body>
     <?php require_once 'component/header.php'; ?>
-<div class="main-content">
-    <div class="container-fluid">
-        <h1 class="heading-1">My Photo</h1>
-                    <div class="divider-1"> 
-                        <span></span>
-                    </div>
-    </div>
+<div class="main-content col-sm-10">
+    
 <div class="container-fluid1" >
     <div class="text-center" style="margin-top: 1rem; font-size: 10rem;">
         <span><i class="fas fa-icons" style="margin-top: 4rem;"></i></span>
@@ -387,7 +429,7 @@ let eventCreationDates = {};
 document.addEventListener('DOMContentLoaded', function() {
     const gallery = document.getElementById('myPhotoGallery');
     const studentId = "<?php echo $student_id; ?>";
-    const getUrlPrefix = "<?php echo $geturl_prefix; ?>";
+    // ❌ ลบ const getUrlPrefix = "..."; ออก
     const modalTitleSpan = document.querySelector('#albumModalLabel span');
     const modalGallery = document.getElementById('modalGallery');
 
@@ -415,7 +457,8 @@ document.addEventListener('DOMContentLoaded', function() {
         modalGallery.innerHTML = ''; // Clear loading message
 
         eventPhotos.forEach(photo => {
-            const full_url = getUrlPrefix + photo.path; 
+            // ✅ แก้ไข: ใช้ photo.path โดยตรง เพราะเป็น Full URL แล้ว
+            const full_url = photo.path; 
             const filename = photo.path.substring(photo.path.lastIndexOf('/') + 1);
 
             const colDiv = document.createElement('div');
@@ -474,7 +517,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         acc[eventName].push(current);
                         // เก็บวันที่สร้างอัลบั้มเพื่อใช้เรียงลำดับในขั้นตอนถัดไป
-                        // ใช้ตัวแปรแยกเพื่อไม่ให้ซับซ้อน
                         if (!eventCreationDates[eventName]) {
                             eventCreationDates[eventName] = current.date_create;
                         }
@@ -509,7 +551,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         const imagesToStack = eventPhotos.slice(0, 3).reverse(); 
 
                         imagesToStack.forEach((photo, index) => {
-                             const full_url = getUrlPrefix + photo.path;
+                             // ✅ แก้ไข: ใช้ photo.path โดยตรง เพราะเป็น Full URL แล้ว
+                             const full_url = photo.path;
                              // Index 0 คือรูปที่ 3 (ล่างสุด), Index 2 คือรูปที่ 1 (บนสุด)
                              stackHtml += `<img src="${full_url}" class="album-stack-item" alt="Stack Item ${3 - index}">`;
                         });
