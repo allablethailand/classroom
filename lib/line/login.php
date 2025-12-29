@@ -15,7 +15,7 @@
     require_once $base_include.'/lib/connect_sqli.php';
     include_once(__DIR__ . "/config.php");
     include_once(__DIR__ . "/LINEHelper.php");
-    $control_page = "/control_role_alert.php";
+    $control_page = "/index.php";
     global $mysqli;
     $state = isset($_GET['state']) ? $_GET['state'] : '';
     if(!$state) {

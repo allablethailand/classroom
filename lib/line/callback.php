@@ -18,7 +18,7 @@
     include_once(__DIR__ . "/function.php");
     $code = isset($_GET['code']) ? trim($_GET['code']) : '';
     $state = isset($_GET['state']) ? trim($_GET['state']) : '';
-    $control_page = "/control_role_alert.php";
+    $control_page = "/index.php";
     if (!$code || !$state) {
         redirect($control_page);
     }

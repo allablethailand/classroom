@@ -19,7 +19,7 @@
         echo json_encode([
             'status' => 'redirect',
             'message' => 'Session expired',
-            'redirect_url' => '/control_role_alert.php'
+            'redirect_url' => '/index.php'
         ]);
         exit;
     }
