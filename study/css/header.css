@@ -190,6 +190,14 @@
     margin-right: 2.2rem; /* or whatever margin you want */
 }
 
+.margin-behind{
+  margin-right: 6px;
+}
+
+.shadow-behind{
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 
 /* Center the dropdown menu relative to the bell button */
   .dropdown-menu.centered {
@@ -500,7 +508,7 @@
   color: #7d7c7c;
   font-size: 1.4rem;
   margin: 0;
-  font-weight: 500;
+  font-weight: 300;
 }
 
 .menu-section-title {
@@ -647,4 +655,28 @@
   .mobile-navbar {
     display: none;
   }
+}
+
+/* Vertical center for all screens (Bootstrap 3 fallback) */
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+.modal-dialog-centered .modal-content {
+    width: 100%;
+}
+
+/* Full screen on mobile (Bootstrap 3 responsive breakpoint) */
+@media (max-width: 767px) {
+    .modal-mobile-full {
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        max-width: none !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
+    
 }

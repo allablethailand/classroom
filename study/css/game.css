@@ -70,6 +70,16 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.13);
 }
 
+.quiz-button {
+   background-color: white;
+   border-radius: 12px;
+  padding: 15px;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.13);
+
+}
+
 .text-up {
     margin-block: 8px;
 }
@@ -88,37 +98,42 @@
 }
 
  .option.selected {
-            background: linear-gradient(135deg, #9fa8da 0%, #ce93d8 100%);
-            border-color: transparent;
-        }
+    border-color: transparent;
+    border: 2px solid #FF9900;
+}
 
-         .option.selected .option-letter {
-            background: rgba(255, 255, 255, 0.3);
-            color: #fff;
-        }
-
-
-        .option.selected .option-text {
-            color: #fff;
-        }
+  .option.selected .option-letter {
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
 
 
-         .option.selected .radio {
-            border-color: #fff;
-            background: #fff;
-        }
+.option.selected .option-text {
+    color: #fff;
+}
 
-        .option.selected .radio::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #9fa8da;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
+input[type=radio] {
+  accent-color: orange;
+}
+
+
+.option.selected .radio {
+    border-color: #fff;
+    background: #fff;
+    color: #FF9900;
+}
+
+.option.selected .radio::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #9fa8da;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
 
 .option:hover {
@@ -131,6 +146,14 @@
     height: 20px;
     border: 2px solid #ddd;
     border-radius: 50%;
+}
+
+.btn-class-block{
+  padding: 15px;
+  background-color: white;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.13);
 }
 
 

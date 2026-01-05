@@ -1,0 +1,1579 @@
+
+/* MY PHOTO TIME BOMB */
+.myphoto-white-main-card {
+    max-width: 600px;
+    margin: 30px auto 0 auto; 
+    background: #fff;
+    border-radius: 20px;
+    margin-top: 30px;
+    padding: 30px 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.08);
+}
+
+.myphoto-white-firstmain-card {
+    max-width: 600px;
+    margin: 30px auto 0 auto; 
+    background: #666;
+    border-radius: 20px;
+    margin-top: 30px;
+    padding: 30px 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.08);
+}
+/* 
+.myphoto-list {
+    display: flex;
+    width: 100%;
+} */
+
+
+
+.myphoto-main-card {
+    max-width: 600px;
+    margin: 30px auto 0 auto; 
+    background: linear-gradient(135deg, #FF9800 0%, #FF6D00 40%, #D84315 100%);
+    border-radius: 20px;
+    margin-top: 30px;
+    padding: 30px 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.08);
+
+}
+.myphoto-logo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #777777;
+    margin-bottom: 20px;    
+    letter-spacing: 0.2em;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.myphoto-logo-white {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 10px;    
+    letter-spacing: 0.2em;
+    text-align: center;
+    margin: 0 auto;
+}
+.myphoto-text-center{
+    margin-block: 25px;
+}
+.myphoto-logo-wave {
+    display: block;
+    /* width: 120px; */
+    max-width: 240px;
+    margin: 0px auto 10px auto;
+    border-radius: 30px;
+}
+.myphoto-instruction {
+    color: #fff;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.myphoto-search-btn-group {
+    margin-bottom: 18px;
+    text-align: center;
+}
+.myphoto-search-btn-group .myphoto-btn {
+    margin: 0 8px 16px 8px;
+    font-size: 1rem;
+    width: 180px;
+}
+
+.myphoto-gallery-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+}
+
+.myphoto-btn-default{
+    border: none;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.31);
+}
+
+.myphoto-svg-container {
+    max-width: 150px;
+    display: block;
+    margin: 15px auto;
+}
+
+
+/* Mobile: row by default */
+.myphoto-gallery-btn-group > div {
+  padding: 5px; /* optional spacing around buttons */
+}
+
+.myphoto-result-white-card {
+    max-width: 800px;
+    margin: 30px auto 0 auto; 
+    background: #fefefe;
+    border-radius: 20px;
+    margin-top: 30px;
+    padding: 30px 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.08);
+}
+
+.myphoto-btn .myphoto-btn-primary{
+    border-radius: 50%;
+    padding: 5px;
+}
+
+.myphoto-loadmore-button{
+    margin-top: 15px;
+    padding: 8px;
+    border-radius: 20px;
+    padding-inline: 20px;
+    border: none;
+    background-color: #FF9800;
+    color: #fff;
+}
+
+
+.btn-block-with-radius {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background-color: #fff;
+
+}
+
+
+#btn-new-img{
+    margin-bottom: 30px;
+}
+
+.myphoto-btn-icon {
+    /* margin-right: 7px; */
+    font-size: 1.2rem;
+    border-radius: 8;
+    
+}
+
+.myphoto-search-pro-btn-icon {
+    /* margin-right: 7px; */
+    font-size: 1.2rem;
+    border-radius: 8px;
+    padding-inline: 10px ;
+    
+}
+.myphoto-help-btn {
+    background: #FF9800;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 8px 30px;
+    font-size: 1.2rem;
+    margin: 25px auto 0 auto;
+    display: block;
+}
+
+.myphoto-search-btn-icon {
+    /* margin-right: 7px; */
+    font-size: 1.1rem;
+    border-radius: 8px;
+    background-color: #ff9900;
+    color: #fff;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    padding: 5px;
+    padding-inline: 4px;
+}
+
+@media (min-width: 768px) {
+  /* Desktop: column layout */
+  /* .myphoto-gallery-btn-group {
+    flex-direction: column;
+  } */
+  .myphoto-gallery-btn-group > div {
+    padding: 5px 0;
+  }
+
+  .myphoto-header {
+        color: #fff;
+    }
+
+  
+.scanning-container {
+    margin-block: 50px;
+    position: relative;
+    display: inline-block;
+    width: 200px;
+    height: 200px;
+}
+  
+  /* .btn-block-container{
+        margin-inline: 20px;
+    } */
+
+    .btn-block-with-radius{
+        background-color: #fff;
+        width: 80%;
+    }
+    
+    .myphoto-row {
+        margin: 0 50px;
+    }
+
+    .myphoto-gallery-btn-group {
+        display: flex !important;
+        justify-content: center;
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+     .col-sm-6 {
+        float: none !important;  /* remove float */
+        display: block;
+    }
+}
+
+
+/* MYPHOTO RESULT RETURN */
+.myphoto-img-containers {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3; /* 👈 same ratio for all */
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.myphoto-img-containers img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;        /* 👈 key fix */
+  object-position: center; /* or "center top" if faces matter */
+}
+
+
+.myphoto-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+
+/* Desktop 4 column layout */
+@media (min-width: 992px) {
+    .myphoto-gallery-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+
+/* Tablet 3 column layout */
+@media (min-width: 768px) and (max-width: 991px) {
+    .myphoto-gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.myphoto-img-container {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.myphoto-scanning-preview {
+    width: 200px; 
+    height: 200px; 
+    object-fit: cover; 
+    border-radius: 50%;
+    border: 8px solid #555;
+}
+
+.myphoto-history-photo-preview {
+    width: 200px; 
+    height: 200px; 
+    object-fit: cover; 
+    border-radius: 50%;
+     /* Fake border using padding */
+    padding: 8px;
+    background: linear-gradient(
+        145deg,
+        #ffffff,
+        #dcdcdc,
+        #bfbfbf
+    );
+
+    /* 3D depth shadows */
+    box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.25),
+        0 8px 18px rgba(0, 0, 0, 0.35);
+
+    display: block;
+}
+
+
+.custom-loader-container{
+    background: #ddd;
+    position: fixed;  /* Changed from absolute for true full-page overlay */
+    width: 100%;
+    height: 100vh;    /* Fits entire viewport height dynamically */
+    z-index: 99999;
+    opacity: 0.4;
+    left: 0;
+    top: 0;           /* No offset needed for full coverage */
+}
+
+
+.custom-loader-container .myphoto-loader-spinner {
+    border: 4px solid rgba(0,0,0,0.1);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border-left-color: #1C274C;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px auto;
+    position: absolute;
+    top:45%;
+    left:45%;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.custom-modal-dialog {
+    margin: 30px 0;
+    max-width: 500px;
+    width: 90%;
+}
+
+.custom-modal-content {
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: 6px;
+    box-shadow: 0 3px 9px rgba(0,0,0,0.5);
+    outline: 0;
+}
+
+.custom-modal-header {
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+    min-height: 16.43px;
+}
+
+.custom-modal-title {
+    margin: 0;
+    line-height: 1.42857143;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.custom-modal-close {
+    float: right;
+    font-size: 21px;
+    font-weight: bold;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: 0.2;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.custom-modal-close:hover {
+    opacity: 0.5;
+}
+
+.custom-modal-body {
+    position: relative;
+    padding: 15px;
+}
+
+.custom-modal-footer {
+    padding: 15px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5;
+}
+
+.custom-modal-footer .btn + .btn {
+    margin-left: 5px;
+}
+
+
+.myphoto-image-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.myphoto-download-btn {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background: rgba(0,0,0,0.6);
+  border: none;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.myphoto-download-btn i {
+  pointer-events: none;
+}
+
+.myphoto-report-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: #dc3545; /* Bootstrap danger red */
+  border: none;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 2;
+}
+.select-checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  display: block;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.checkbox-label i {
+  font-size: 40px;
+  transition: all 0.2s ease;
+}
+
+.myphoto-btn-green {
+  color: #00654c !important;
+}
+
+.myphoto-uncheck {
+  color: #999999 !important;
+  opacity: 0.2;
+}
+
+/* Hover effect */
+.select-checkbox:hover .checkbox-label i {
+  transform: scale(1.1);
+}
+
+input[type="checkbox"]:checked + .checkbox-label i {
+  color: #007bff; /* blue color or customize */
+  opacity: 1;
+}
+
+input[type="checkbox"]:not(:checked) + .checkbox-label i {
+  opacity: 0.5; /* faded grey */
+}
+
+
+.myphoto-img-container {
+    position: relative;  /* ADD THIS - creates positioning context */
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.myphoto-scanning-glow { 
+    animation: myphoto-glowPulse 2s ease-in-out infinite; 
+    width: 200px; 
+    height: 200px; 
+    object-fit: cover; 
+    border-radius: 50%;
+    border: 8px solid #555;
+    display: block;
+}
+
+@keyframes myphoto-glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(39, 205, 247, 0.96), 0 0 10px rgba(25, 200, 245, 0.2), inset 0 0 5px rgba(25, 200, 245, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(39, 205, 247, 0.85), 0 0 15px rgba(25, 200, 245, 0.8), inset 0 0 10px rgba(25, 200, 245, 0.2);
+    }
+}
+
+.myphoto-scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 3px;
+    max-width: 300px;
+    margin: 0 auto;
+    background: linear-gradient(90deg, transparent, #00CCFF, transparent);
+    box-shadow: 0 0 15px #00CCFF, 0 0 30px rgba(0, 204, 255, 0.5);
+    animation: myphoto-scanMove 2.5s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;  /* Allows clicks through the scan line */
+}
+
+.scanning-container.scanning-active .myphoto-scan-line {
+    opacity: 1;
+}
+
+.select-checkbox input[type="checkbox"] {
+    width: 30px;
+    height: 30px;
+    filter: hue-rotate(129deg);
+}
+
+@keyframes myphoto-scanMove {
+    0% { top: 0; opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+.select-checkbox input[type="checkbox"] {
+    width: 30px;
+    height: 30px;
+    filter: hue-rotate(129deg);
+}
+
+@media (max-width: 768px) {
+    /* ADD BECASE MIN_WIDTH NOT WORKING (EVENT-TEST) */
+    .content{
+        padding-bottom: 6rem;
+    }
+    /* REMOVE SOON */
+
+    #btn-new-img-gallery{
+        margin-top: 30px;
+    }
+
+    #btn-ticket-game {
+        /* margin-top: 20px; */
+    }
+
+    #btn-gallery-upload {
+        margin-top: 30px;
+    }
+
+    .myphoto-row{
+        margin-inline: 10px;
+    }
+    .myphoto-scanning-preview {
+        margin-top: 30px;
+        width: 150px; 
+        height: 150px; 
+        object-fit: cover; 
+        border-radius: 50%;
+        border: 8px solid #555;
+    }
+
+    .myphoto-history-photo-preview {
+        margin-top: 30px;
+        width: 150px; 
+        height: 150px; 
+        object-fit: cover; 
+        border-radius: 50%;
+        padding: 6px;
+        background: linear-gradient(
+            145deg,
+            #ffffff,
+            #e1e1e1,
+            #c8c8c8
+        );
+        box-shadow:
+            inset 0 1px 3px rgba(255, 255, 255, 0.85),
+            inset 0 -2px 4px rgba(0, 0, 0, 0.25),
+            0 5px 12px rgba(0, 0, 0, 0.3);
+        display: block;
+    }
+    
+    .btn-block-with-radius {
+        display: block;
+        width: 100%;
+        border-radius: 8px;
+        background-color: #fff;
+        padding-block: 20px;
+    }
+
+    .myphoto-download-btn {
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+        background: rgba(0, 0, 0, 0.6);
+        border: none;
+        color: white;
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+
+    .myphoto-report-btn {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background: #dc3545;
+        border: none;
+        color: white;
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .select-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        filter: hue-rotate(129deg);
+    }
+}
+.myphoto-selected-orange-border {
+    border: 6px solid orange !important;
+    border-radius: 14px;
+}
+
+.myphoto-fancybox-report-btn{
+    background-color: #f00;
+    padding: 6px 10px;
+    position: absolute;
+    right: 10%;
+    bottom: 10%;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 18px;
+    box-shadow: 0 6px 15px rgb(180 128 26 / 50%);
+}
+
+.myphoto-fancybox-download-btn{
+    background-color: #ff9900;
+    padding: 6px 10px;
+    position: absolute;
+    left: 10%;
+    bottom: 10%;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 18px;
+    box-shadow: 0 6px 15px rgb(180 128 26 / 50%);
+}
+
+
+/* MINI GAME */
+.minigame-icon{
+    display: block;
+    max-width: 120px;
+    font-size: 15rem;
+    max-height: 120px;
+    margin: 0 auto;
+    padding-block: 20px;
+}
+
+/* MINI GAME */
+.minigame-icon1{
+    display: block;
+    max-width: 120px;
+    font-size: 15rem;
+    max-height: 120px;
+    margin: 0 auto;
+    padding-block: 20px;
+}
+
+/* MINI GAME CUP CODE */
+
+
+
+/* LUCKY GAME - Enhanced Styles (Mobile Responsive) */
+.luckygame-cupgame-container {
+    padding: 20px 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    position: relative;
+}
+
+.luckygame-game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.luckygame-back-btn {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid #fff;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.luckygame-back-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+}
+
+.luckygame-game-stats {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+}
+
+.luckygame-stat-item {
+    background: rgba(255,255,255,0.15);
+    padding: 20px 15px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    min-width: 120px;
+    text-align: center;
+}
+
+.luckygame-stat-number {
+    display: block;
+    font-size: clamp(1.8em, 5vw, 2.5em);
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255,215,0,0.5);
+    line-height: 1;
+}
+
+.luckygame-stat-label {
+    color: white;
+    font-size: 0.85em;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+.luckygame-game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 15px;
+    max-width: 100%;
+}
+
+.luckygame-cup-game {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: clamp(180px, 25vw, 220px);
+    margin-bottom: 35px;
+    width: 100%;
+    max-width: 400px;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+.luckygame-cup-game.luckygame-shaking * {
+    animation: luckygame-shake 0.5s infinite;
+}
+
+@keyframes luckygame-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+.luckygame-cup {
+    flex: 0 0 auto;
+    width: clamp(90px, 18vw, 120px);
+    height: 0;
+    border-left: clamp(18px, 3vw, 25px) solid transparent;
+    border-right: clamp(18px, 3vw, 25px) solid transparent;
+    border-bottom: clamp(110px, 18vw, 150px) solid #FF6B6B;
+    cursor: pointer;
+    margin: 0 clamp(5px, 2vw, 10px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+}
+
+.luckygame-cup:hover {
+    border-bottom-color: #FF8E8E;
+    transform: scale(1.03);
+}
+
+.luckygame-cup.luckygame-selected {
+    border-bottom-color: #FFD700 !important;
+    animation: luckygame-bounce 0.6s ease;
+}
+
+@keyframes luckygame-bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0) scale(1); }
+    40% { transform: translateY(-15px) scale(1.05); }
+    60% { transform: translateY(-8px) scale(1.03); }
+}
+
+.luckygame-ball {
+    position: absolute;
+    bottom: clamp(8px, 2vw, 10px);
+    width: clamp(20px, 3vw, 25px);
+    height: clamp(20px, 3vw, 25px);
+    background: radial-gradient(circle, #FFD700, #FFA500);
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255,215,0,0.8);
+    z-index: 10;
+    transition: all 0.4s ease;
+}
+
+.luckygame-game-result {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: clamp(1.1em, 4vw, 1.4em);
+    font-weight: bold;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    min-width: 140px;
+    text-align: center;
+}
+
+.luckygame-game-result.luckygame-show {
+    opacity: 1;
+    animation: luckygame-popIn 0.5s ease;
+}
+
+@keyframes luckygame-popIn {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.luckygame-play-btn {
+    background: linear-gradient(45deg, #FF6B6B, #F18C20);
+    color: white;
+    border: none;
+    padding: clamp(18px, 4vw, 22px) clamp(40px, 12vw, 60px);
+    font-size: clamp(1.1em, 4vw, 1.3em);
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(255,107,107,0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+    max-width: 300px;
+    margin-top: 10px;
+}
+
+.luckygame-play-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(255,107,107,0.5);
+}
+
+.luckygame-play-btn:active {
+    transform: translateY(0);
+}
+
+.luckygame-next-game-btn {
+    background: linear-gradient(45deg, #4ECDC4, #44A08D);
+}
+
+/* Celebration Modal */
+.luckygame-celebration-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: luckygame-modalFadeIn 0.3s ease;
+}
+
+@keyframes luckygame-modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.luckygame-modal-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: clamp(30px, 8vw, 50px);
+    border-radius: 30px;
+    text-align: center;
+    max-width: 90vw;
+    width: 500px;
+    position: relative;
+    border: 3px solid #FFD700;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    animation: luckygame-modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    margin: 20px;
+}
+
+@keyframes luckygame-modalPop {
+    0% { transform: scale(0.7) rotate(-5deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.luckygame-confetti {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-bottom: 80px solid #FFD700;
+    animation: luckygame-confettiFall 1s ease-out infinite;
+}
+
+@keyframes luckygame-confettiFall {
+    0% { transform: translateX(-50%) translateY(0) rotate(0deg); }
+    100% { transform: translateX(-50%) translateY(180px) rotate(720deg); }
+}
+
+.luckygame-modal-title {
+    color: #FFD700;
+    font-size: clamp(1.8em, 6vw, 2.5em);
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(255,215,0,0.8);
+}
+
+.luckygame-modal-text {
+    color: white;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.luckygame-prize-display {
+    background: rgba(255,255,255,0.2);
+    padding: clamp(20px, 5vw, 30px);
+    border-radius: 20px;
+    margin: 25px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: center;
+}
+
+.luckygame-prize-icon {
+    font-size: clamp(2.5em, 8vw, 4em);
+    animation: luckygame-prizeGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes luckygame-prizeGlow {
+    from { filter: drop-shadow(0 0 10px #FFD700); }
+    to { filter: drop-shadow(0 0 30px #FFD700); }
+}
+
+.luckygame-prize-text {
+    color: white;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.luckygame-claim-btn {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #333;
+    border: none;
+    padding: 18px 45px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    box-shadow: 0 10px 30px rgba(255,215,0,0.4);
+}
+
+.luckygame-claim-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(255,215,0,0.6);
+}
+
+/* Mobile Responsive Enhancements */
+@media (max-width: 768px) {
+    .luckygame-game-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .luckygame-back-btn {
+        order: 3;
+        width: 100%;
+        max-width: 250px;
+        margin-top: 10px;
+    }
+    
+    .luckygame-game-stats {
+        gap: 15px;
+        justify-content: center;
+    }
+    
+    .luckygame-stat-item {
+        min-width: 100px;
+        padding: 15px 10px;
+    }
+    
+    .luckygame-cup-game {
+        height: clamp(160px, 35vw, 200px);
+        padding: 0 5px;
+    }
+    
+    .luckygame-cup {
+        margin: 0 clamp(3px, 1.5vw, 8px);
+    }
+    
+    .luckygame-play-btn {
+        max-width: 280px;
+        margin-top: 15px;
+    }
+    
+    .luckygame-modal-content {
+        margin: 15px;
+        padding: clamp(25px, 8vw, 40px);
+    }
+}
+
+@media (max-width: 480px) {
+    .luckygame-cupgame-container {
+        padding: 15px 8px;
+    }
+    
+    .luckygame-game-stats {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .luckygame-stat-item {
+        width: 140px;
+    }
+    
+    .luckygame-cup-game {
+        height: 35vw;
+    }
+}
+
+/* NEW GAME */
+
+.racing-game-container {
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.racing-game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.racing-title {
+    font-size: 24px !important;
+}
+
+.racing-back-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.racing-game-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 15px;
+}
+
+.racing-stat-item {
+    text-align: center;
+    color: white;
+}
+
+.racing-stat-number {
+    display: block;
+    font-size: 28px;
+    font-weight: bold;
+    color: #F18C20;
+}
+
+.racing-map-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.racing-map-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #F18C20;
+    background: transparent;
+    color: white;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.racing-map-btn.active,
+.racing-map-btn:hover {
+    background: #F18C20;
+}
+
+.racing-game-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.racing-canvas {
+    border: 3px solid #F18C20;
+    border-radius: 15px;
+    background: linear-gradient(180deg, #222 0%, #111 100%);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    cursor: pointer;
+    max-width: 100%;
+    height: auto;
+}
+
+.racing-controls {
+    margin-top: 10px;
+    color: #F18C20;
+    font-size: 14px;
+    text-align: center;
+}
+
+.racing-game-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    border-radius: 15px;
+}
+
+.racing-game-over-content h2 {
+    font-size: 36px;
+    margin: 0 0 20px 0;
+    color: #ff4444;
+}
+
+.racing-restart-btn {
+    background: linear-gradient(45deg, #F18C20, #ffaa44);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(241,140,32,0.4);
+}
+
+
+/* MYPHOTO ALBUM */
+
+.myphoto-album-gl-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.myphoto-album-gl-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+}
+
+.myphoto-album-gl-thumbnail {
+    position: relative;
+    overflow: hidden;
+}
+
+.myphoto-album-gl-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+}
+
+.myphoto-album-gl-card:hover .myphoto-album-gl-overlay {
+    opacity: 1;
+}
+
+.myphoto-album-gl-overlay-btn {
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.myphoto-album-gl-overlay-btn:hover {
+    background: #fff;
+    transform: scale(1.1);
+}
+
+.myphoto-album-gl-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.myphoto-album-gl-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* MYPHOTO-NEW */
+.my-n-photo-album-action-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.my-n-photo-album-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.my-n-photo-photo-count {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.my-n-photo-selected-count {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #ff9800;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.my-n-photo-album-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.my-n-photo-btn-album {
+    flex: 1;
+    min-width: 140px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.my-n-photo-btn-album i {
+    font-size: 16px;
+}
+
+.my-n-photo-btn-primary {
+    background: #007bff;
+    color: #fff;
+}
+
+.my-n-photo-btn-primary:hover:not(:disabled) {
+    background: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+
+.my-n-photo-btn-failed {
+    background: #C62828; 
+    color: #ffffff;
+    border: 1px solid #B71C1C;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.my-n-photo-btn-failed:hover:not(:disabled) {
+
+    background: #8E0000;
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 12px rgba(142, 0, 0, 0.4);
+}
+
+
+.my-n-photo-btn-secondary {
+    background: #6c757d;
+    color: #fff;
+}
+
+.my-n-photo-btn-secondary:hover {
+    background: #545b62;
+    transform: translateY(-1px);
+}
+
+.my-n-photo-btn-success {
+    background: #28a745;
+    color: #fff;
+}
+
+.my-n-photo-btn-success:hover:not(:disabled) {
+    background: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.my-n-photo-btn-album:disabled {
+    background: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Tablet and Desktop */
+@media (min-width: 768px) {
+    .my-n-photo-album-action-bar {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .my-n-photo-album-buttons {
+        flex-wrap: nowrap;
+    }
+
+    .my-n-photo-btn-album {
+        flex: 0 1 auto;
+        white-space: nowrap;
+    }
+
+    .myphoto-result-white-card.myphoto-row {
+        margin-top: 50px;
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+    .my-n-photo-album-action-bar {
+        padding: 15px;
+    }
+
+    .my-n-photo-photo-count,
+    .my-n-photo-selected-count {
+        font-size: 14px;
+    }
+
+    .my-n-photo-btn-album {
+        font-size: 14px;
+        padding: 10px 16px;
+        min-width: 120px;
+    }
+
+    .my-n-photo-btn-album i {
+        font-size: 14px;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .my-n-photo-album-buttons {
+        flex-direction: column;
+    }
+
+    .my-n-photo-btn-album {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
+
+.myphoto-new-select-checkbox {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 5;
+}
+
+/* Hide native checkbox */
+.myphoto-new-custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Checkbox box */
+.myphoto-new-checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ff9800;
+    border-radius: 4px;
+    display: inline-block;
+    background: #fff;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+/* Checked state */
+.myphoto-new-custom-checkbox.myphoto-new-checked .myphoto-new-checkmark {
+    background: #ff9800;
+    border-color: #ff9800;
+}
+
+/* Check icon */
+.myphoto-new-custom-checkbox.myphoto-new-checked .myphoto-new-checkmark::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Disabled state */
+.myphoto-new-custom-checkbox.myphoto-new-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+
+.myphoto-loading-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.myphoto-loading-content {
+    background: #fff;
+    padding: 20px 24px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 220px;
+}
+
+
+.myphoto-loading-toast {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,.75);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    z-index: 9999;
+    pointer-events: none; /* CRITICAL */
+}
+
+
+
+.modal {
+    text-align: center;
+}
+
+.modal:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.modal-dialog {
+    display: inline-block;
+    vertical-align: middle;
+}

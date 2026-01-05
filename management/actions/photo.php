@@ -1,32 +1,27 @@
 <?php
-// photo.php - Ultra Fast Version with Pre-extracted Face Embeddings
-
-session_start();
-date_default_timezone_set('Asia/Bangkok');
-$base_include = $_SERVER['DOCUMENT_ROOT'];
-$base_path = '';
-$base_url = "http://" . $_SERVER['HTTP_HOST']; 
-
-if ($_SERVER['HTTP_HOST'] == 'localhost') {
-    $request_uri = $_SERVER['REQUEST_URI'];
-    $exl_path = explode('/', $request_uri);
-    if (!file_exists($base_include . "/dashboard.php") && isset($exl_path[1])) {
-        $base_path .= "/" . $exl_path[1];
-        $base_url .= $base_path;
+	header('Content-Type: text/html; charset=UTF-8');
+	session_start();
+    $base_include = $_SERVER['DOCUMENT_ROOT'];
+    $base_path = '';
+    if($_SERVER['HTTP_HOST'] == 'localhost'){
+       $request_uri = $_SERVER['REQUEST_URI'];
+       $exl_path = explode('/',$request_uri);
+       if(!file_exists($base_include."/dashboard.php")){
+           $base_path .= "/".$exl_path[1];
+       }
+       $base_include .= "/".$exl_path[1];
     }
-    if (isset($exl_path[1])) {
-        $base_include .= "/" . $exl_path[1];
+    DEFINE('base_path', $base_path);
+    DEFINE('base_include', $base_include);
+	require_once($base_include."/lib/connect_sqli.php");
+    if (!isset($_SESSION['emp_id'])) {
+        echo json_encode([
+            'status' => 'redirect',
+            'message' => 'Session expired',
+            'redirect_url' => '/index.php'
+        ]);
+        exit;
     }
-} else {
-    $base_url = "http://" . $_SERVER['HTTP_HOST'];
-}
-
-define('BASE_PATH', $base_path);
-define('BASE_INCLUDE', $base_include);
-require_once $base_include . '/lib/connect_sqli.php';
-
-if (function_exists('getBucketMaster') && function_exists('setBucket')) {
-    global $mysqli;
     $fsData = getBucketMaster();
     $filesystem_user = $fsData['fs_access_user'];
     $filesystem_pass = $fsData['fs_access_pass'];
@@ -34,1416 +29,1701 @@ if (function_exists('getBucketMaster') && function_exists('setBucket')) {
     $filesystem_path = $fsData['fs_access_path'];
     $filesystem_type = $fsData['fs_type'];
     $fs_id = $fsData['fs_id'];
-    setBucket($fsData);
-}
+	setBucket($fsData);
 
-// ------------------------------------------------------------------------------------------------------
-// *** Helper Functions ***
-// ------------------------------------------------------------------------------------------------------
-function extractPathFromUrl($url)
-{
-    if (strpos($url, '://') === false) {
-        return cleanPath($url);
-    }
-    $parsed_url = parse_url($url);
-    if (isset($parsed_url['path'])) {
-        $path = $parsed_url['path'];
-        $path = strtok($path, '?');
-        return cleanPath($path);
-    }
-    return '';
-}
-
-function cleanPath($path)
-{
-    return ltrim($path, '/');
-}
-
-function uploadFile_bucket($file_data, $target_sub_dir = 'classroom')
-{
-    if (!function_exists('SaveFile')) {
-        return null; 
-    }
-
-    $target_dir = "uploads/" . $target_sub_dir . "/";
-
-    if (!isset($file_data['tmp_name']) || empty($file_data['tmp_name'])) {
-        return null;
-    }
-
-    $tmp_name = $file_data['tmp_name'];
-    $file_name = $file_data['name'];
-    $file_error = $file_data['error'];
-
-    if ($tmp_name && $file_error == UPLOAD_ERR_OK) {
-        $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
-        $new_file_id = uniqid(); 
-        $new_file_name = $new_file_id . '.' . $file_extension;
-        $new_file_path = $target_dir . $new_file_name;
-
-        if (SaveFile($tmp_name, $new_file_path)) {
-            return cleanPath($new_file_path);
-        } else {
-            return null;
+    // ============ ฟังก์ชันสร้าง Default Albums (เพิ่ม Duplicates) ============
+    function ensureDefaultAlbums($classroom_id, $comp_id, $emp_id) {
+    $default_albums = [
+        'Public' => 'Images visible to everyone (auto-filtered by status)',
+        'Report' => 'Images with reports from users (auto-filtered by status)',
+        'Delete' => 'Deleted images (auto-filtered by status)',
+        'Restrict' => 'Private images not visible to users (auto-filtered by status)',
+        'Duplicates' => 'Suspected duplicate photo groups based on face recognition (auto-filtered)'
+    ];
+    
+    foreach ($default_albums as $album_name => $album_desc) {
+        $existing = select_data(
+            "classroom_id",
+            "classroom_album",
+            "where classroom_id = '{$classroom_id}' and album_name = '{$album_name}' and status = 0"
+        );
+        
+        if (!$existing || count($existing) == 0) {
+            insert_data(
+                "classroom_album",
+                "(classroom_id, comp_id, album_name, album_description, status, emp_create, date_create, emp_modify, date_modify)",
+                "('{$classroom_id}', '{$comp_id}', '{$album_name}', '{$album_desc}', 0, '{$emp_id}', NOW(), '{$emp_id}', NOW())"
+            );
         }
+    }
+}
+
+function getDefaultAlbumId($classroom_id, $album_name) {
+    $album = select_data(
+        "classroom_id",
+        "classroom_album",
+        "where classroom_id = '{$classroom_id}' and album_name = '{$album_name}' and status = 0"
+    );
+    
+    if ($album && count($album) > 0) {
+        return $album[0]['classroom_id'];
     }
     return null;
 }
 
-function GetFileContent($db_path, $save_to) {
-    if (!preg_match('/^https?:\/\//', $db_path)) {
-        if (function_exists('GetUrl')) {
-            $db_path = GetUrl($db_path);
-        }
+function isDefaultAlbum($classroom_id) {
+    $album = select_data(
+        "album_name",
+        "classroom_album",
+        "where classroom_id = '{$classroom_id}'"
+    );
+    
+    if ($album && count($album) > 0) {
+        $default_names = ['Public', 'Report', 'Delete', 'Restrict', 'Duplicates'];
+        return in_array($album[0]['album_name'], $default_names);
     }
-
-    $data = file_get_contents($db_path);
-    if ($data === false) return false;
-
-    return file_put_contents($save_to, $data) !== false;
+    return false;
+}
+    
+    // ============ ฟังก์ชันคำนวณความคล้ายของ Embeddings (Cosine Similarity) ============
+    function cosineSimilarity($vec1, $vec2) {
+    if (count($vec1) !== count($vec2)) return 0;
+    
+    $dotProduct = 0;
+    $mag1 = 0;
+    $mag2 = 0;
+    
+    for ($i = 0; $i < count($vec1); $i++) {
+        $dotProduct += $vec1[$i] * $vec2[$i];
+        $mag1 += $vec1[$i] * $vec1[$i];
+        $mag2 += $vec2[$i] * $vec2[$i];
+    }
+    
+    $mag1 = sqrt($mag1);
+    $mag2 = sqrt($mag2);
+    
+    if ($mag1 == 0 || $mag2 == 0) return 0;
+    
+    return $dotProduct / ($mag1 * $mag2);
 }
 
-function runEmbeddingGeneration($mysqli, $file_id, $file_path, $student_id)
-{
-    global $base_include;
+function calculateIoU($box1, $box2) {
+    $x1_inter = max($box1['x1'], $box2['x1']);
+    $y1_inter = max($box1['y1'], $box2['y1']);
+    $x2_inter = min($box1['x2'], $box2['x2']);
+    $y2_inter = min($box1['y2'], $box2['y2']);
     
-    $temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'fr_temp' . DIRECTORY_SEPARATOR;
-    if (!is_dir($temp_dir)) {
-        mkdir($temp_dir, 0777, true);
-    }
+    $inter_width = max(0, $x2_inter - $x1_inter);
+    $inter_height = max(0, $y2_inter - $y1_inter);
+    $inter_area = $inter_width * $inter_height;
     
-    $python_interpreter = '"C:\Program Files\Python310\python.exe"';
-    $python_script = rtrim($base_include, '/\\') . '/classroom/management/actions/python/generate_embedding.py';
+    $box1_area = ($box1['x2'] - $box1['x1']) * ($box1['y2'] - $box1['y1']);
+    $box2_area = ($box2['x2'] - $box2['x1']) * ($box2['y2'] - $box2['y1']);
     
-    $downloaded_path = null;
-    $result_message = '';
+    $union_area = $box1_area + $box2_area - $inter_area;
+    
+    if ($union_area == 0) return 0;
+    
+    return $inter_area / $union_area;
+}
 
-    try {
-        if (!function_exists('GetFileContent')) {
-            throw new Exception("Function GetFileContent is not defined.");
-        }
-        
-        $file_filename = basename($file_path);
-        $file_temp_path = $temp_dir . uniqid('emb_') . '_' . $file_filename;
-        
-        if (!GetFileContent($file_path, $file_temp_path)) {
-            throw new Exception("Cannot download profile photo from bucket: {$file_path}");
-        }
-        $downloaded_path = $file_temp_path;
-
-        $data_for_python = [
-            'file_path' => $file_temp_path,
-            'file_id' => $file_id,
-            'student_id' => $student_id,
-        ];
-
-        $json_data_string = json_encode($data_for_python, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $escaped_json_data = str_replace('"', '\"', $json_data_string);
-        $json_data_arg = "\"{$escaped_json_data}\"";
-
-        $command = "{$python_interpreter} \"{$python_script}\" {$json_data_arg} 2>&1";
-        $output = shell_exec($command);
-
-        $output_lines = explode("\n", trim($output));
-        $json_output_string = end($output_lines);
-        $python_result = json_decode($json_output_string, true);
-
-        if (json_last_error() === JSON_ERROR_NONE && $python_result) {
+function photosAreSimilar($photo1_faces, $photo2_faces, $similarity_threshold = 0.85, $iou_threshold = 0.5) {
+    if (count($photo1_faces) !== count($photo2_faces)) return ['similar' => false];  // ✅
+    if (count($photo1_faces) == 0) return ['similar' => false];  // ✅
+    
+    $face_matches = 0;
+    $total_similarity = 0;
+    
+    foreach ($photo1_faces as $face1) {
+        foreach ($photo2_faces as $face2) {
+            if ($face1['face_index'] !== $face2['face_index']) continue;
             
-            if ($python_result['status'] === 'success' && $python_result['embedding']) {
-                $embedding_json = json_encode($python_result['embedding']);
-                
-                $sql_update = "UPDATE `classroom_file_student` 
-                               SET `face_embedding_json` = ?, 
-                                   `date_modify` = NOW() 
-                               WHERE `file_id` = ?";
-                $stmt_update = $mysqli->prepare($sql_update);
-                if ($stmt_update) {
-                    $stmt_update->bind_param("si", $embedding_json, $file_id);
-                    if ($stmt_update->execute()) {
-                        $result_message = "✅ Success: บันทึก Embedding (ID: {$file_id}) สำเร็จ";
-                    } else {
-                        $result_message = "❌ DB Error: บันทึก Embedding ล้มเหลว (ID: {$file_id}): " . $stmt_update->error;
-                        error_log($result_message);
-                    }
-                    $stmt_update->close();
-                } else {
-                    $result_message = "❌ DB Prepare Error: อัปเดต Embedding ล้มเหลว: " . $mysqli->error;
-                    error_log($result_message);
-                }
-                
-            } elseif ($python_result['status'] === 'warning') {
-                $result_message = "⚠️ Warning (ID: {$file_id}): " . $python_result['message'];
-            } else {
-                $result_message = "❌ Python Error: " . ($python_result['message'] ? $python_result['message'] : $output);
-                error_log("Embedding Generation Error: " . $result_message);
-            }
-
-        } else {
-            $result_message = "❌ Python JSON Error: ไม่สามารถอ่านผลลัพธ์จาก Python ได้: " . $output;
-            error_log($result_message);
-        }
-
-    } catch (Exception $e) {
-        $result_message = "❌ PHP Process Error: ระบบจัดการไฟล์ล้มเหลว ({$e->getMessage()})";
-        error_log("Embedding Generation PHP Error: " . $e->getMessage());
-    } finally {
-        if ($downloaded_path && file_exists($downloaded_path)) {
-            unlink($downloaded_path);
-        }
-    }
-    return $result_message;
-}
-
-
-// ------------------------------------------------------------------------------------------------------
-// *** 🚀 NEW: Match Faces (Ultra Fast - ใช้ Embeddings ที่ Extract ไว้แล้ว) ***
-// ------------------------------------------------------------------------------------------------------
-function matchGroupFaces($mysqli, $group_photo_id, $classroom_id)
-{
-    global $base_include;
-    
-    $temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'fr_temp' . DIRECTORY_SEPARATOR;
-    if (!is_dir($temp_dir)) {
-        mkdir($temp_dir, 0777, true);
-    }
-    
-    $python_interpreter = '"C:\Program Files\Python310\python.exe"';
-    $python_script = rtrim($base_include, '/\\') . '/classroom/management/actions/python/myphoto.py';
-
-    try {
-        error_log("=== MATCH GROUP FACES ===");
-        error_log("Group Photo ID: {$group_photo_id}");
-        error_log("Classroom ID: {$classroom_id}");
-        
-        // 1. ดึง embeddings ของใบหน้าในรูปกลุ่ม จาก DB
-        $sql_group_faces = "SELECT `face_index`, `face_embedding_json`
-                            FROM `classroom_photo_group_faces`
-                            WHERE `group_photo_id` = ?
-                            ORDER BY `face_index` ASC";
-        
-        $stmt_gf = $mysqli->prepare($sql_group_faces);
-        $stmt_gf->bind_param("i", $group_photo_id);
-        $stmt_gf->execute();
-        $result_gf = $stmt_gf->get_result();
-        
-        $group_faces = [];
-        while ($row = $result_gf->fetch_assoc()) {
-            $group_faces[] = [
-                'face_index' => intval($row['face_index']),
-                'embedding' => json_decode($row['face_embedding_json'], true)
+            $box1 = [
+                'x1' => $face1['bbox_x1'],
+                'y1' => $face1['bbox_y1'],
+                'x2' => $face1['bbox_x2'],
+                'y2' => $face1['bbox_y2']
             ];
-        }
-        $stmt_gf->close();
-        
-        if (empty($group_faces)) {
-            return "⚠️ ไม่พบ Face Embeddings ของรูปกลุ่มนี้ใน DB";
-        }
-        
-        error_log("Loaded " . count($group_faces) . " group face embeddings from DB");
-        
-        // 2. ดึง embeddings ของนักเรียน
-        $ref_embeddings_all = [];
-
-        $sql_students = "SELECT 
-                            cfs.student_id, 
-                            cfs.face_embedding_json
-                         FROM 
-                            classroom_file_student cfs
-                         INNER JOIN 
-                            classroom_student_join csj 
-                            ON cfs.student_id = csj.student_id
-                         WHERE 
-                            csj.classroom_id = ? AND
-                            cfs.face_embedding_json IS NOT NULL AND 
-                            cfs.file_type = 'profile_image' AND 
-                            cfs.file_status = 1 AND 
-                            cfs.is_deleted = 0";
-        
-        $stmt_s = $mysqli->prepare($sql_students);
-        $stmt_s->bind_param("i", $classroom_id);
-        $stmt_s->execute();
-        $result_s = $stmt_s->get_result();
-
-        while ($row = $result_s->fetch_assoc()) {
-            $student_id = $row['student_id'];
-            $embedding_json = $row['face_embedding_json'];
-            
-            if ($embedding_json) {
-                $ref_embeddings = json_decode($embedding_json, true);
-                
-                if (json_last_error() === JSON_ERROR_NONE && is_array($ref_embeddings) && count($ref_embeddings) == 512) {
-                    if (!isset($ref_embeddings_all[$student_id])) {
-                        $ref_embeddings_all[$student_id] = [];
-                    }
-                    $ref_embeddings_all[$student_id][] = $ref_embeddings;
-                }
-            }
-        }
-        $stmt_s->close();
-        
-        if (empty($ref_embeddings_all)) {
-            return "⚠️ ไม่พบ Face Embedding ของนักเรียน กรุณากดปุ่ม 'สร้าง Face Embedding' ก่อน";
-        }
-        
-        error_log("Loaded embeddings for " . count($ref_embeddings_all) . " students");
-        
-        // 3. เตรียมข้อมูลและรัน Python (mode: match)
-        $data_for_python = [
-            'mode' => 'match',
-            'group_faces' => $group_faces,
-            'all_students_ref_embeddings' => $ref_embeddings_all,
-            'threshold' => 0.2
-        ];
-
-        $json_data_string = json_encode($data_for_python, JSON_UNESCAPED_SLASHES);
-        $json_file = $temp_dir . uniqid('match_') . '.json';
-        
-        if (file_put_contents($json_file, $json_data_string) === FALSE) {
-            throw new Exception("Cannot write JSON file");
-        }
-        
-        $command = "{$python_interpreter} \"{$python_script}\" \"{$json_file}\"";
-        
-        $output_array = [];
-        $return_var = 0;
-        exec($command, $output_array, $return_var);
-        
-        if (file_exists($json_file)) {
-            unlink($json_file);
-        }
-        
-        if ($return_var !== 0) {
-             throw new Exception("Python script failed");
-        }
-
-        if (empty($output_array)) {
-            throw new Exception("Python returned empty output");
-        }
-        
-        $json_output_string = end($output_array);
-        $python_result = json_decode($json_output_string, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception("Invalid JSON from Python");
-        }
-        
-        if ($python_result['status'] === 'success') {
-            $found_student_ids = $python_result['found_student_ids'];
-
-            if (!empty($found_student_ids)) {
-                $value_parts = [];
-                foreach ($found_student_ids as $sid) {
-                    if (is_int($sid)) {
-                        $value_parts[] = "({$classroom_id}, {$group_photo_id}, {$sid}, NOW())";
-                    }
-                }
-
-                if (!empty($value_parts)) {
-                    $sql_insert_batch = "REPLACE INTO `classroom_photo_face_detection`
-                                            (`classroom_id`, `group_photo_id`, `student_id`, `detection_date`)
-                                            VALUES " . implode(", ", $value_parts);
-
-                    if ($mysqli->query($sql_insert_batch)) {
-                        error_log("Saved " . count($value_parts) . " students to detection table");
-                        return "อัพโหลดสำเร็จ";
-                    } else {
-                        error_log("DB Insert Error: " . $mysqli->error);
-                        return "⚠️ Error: บันทึกข้อมูลลงฐานข้อมูลไม่สำเร็จ";
-                    }
-                }
-            }
-            return "ไม่พบนักเรียนคนใดในรูปกลุ่ม";
-
-        } else {
-            throw new Exception($python_result['message']);
-        }
-
-    } catch (Exception $e) {
-        error_log("Match Error: " . $e->getMessage());
-        return "⚠️ Error: {$e->getMessage()}";
-    }
-}
-
-
-// ------------------------------------------------------------------------------------------------------
-// *** 🚀 NEW: Extract Face Embeddings from Group Photo ***
-// ------------------------------------------------------------------------------------------------------
-function extractGroupFaceEmbeddings($mysqli, $group_photo_id, $group_db_path)
-{
-    global $base_include;
-    
-    $temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'fr_temp' . DIRECTORY_SEPARATOR;
-    if (!is_dir($temp_dir)) {
-        mkdir($temp_dir, 0777, true);
-    }
-    
-    $python_interpreter = '"C:\Program Files\Python310\python.exe"';
-    $python_script = rtrim($base_include, '/\\') . '/classroom/management/actions/python/myphoto.py';
-    
-    $group_temp_path = null;
-
-    try {
-        error_log("=== EXTRACT GROUP FACES ===");
-        error_log("Group Photo ID: {$group_photo_id}");
-        
-        if (!function_exists('GetFileContent')) {
-             throw new Exception("Function GetFileContent is not defined.");
-        }
-        
-        $group_filename = basename($group_db_path);
-        $group_temp_path = $temp_dir . uniqid('grp_') . '_' . $group_filename;
-        
-        if (!GetFileContent($group_db_path, $group_temp_path)) {
-             throw new Exception("Cannot download group photo: {$group_db_path}");
-        }
-        
-        // เตรียมข้อมูลสำหรับ Python (mode: extract)
-        $data_for_python = [
-            'mode' => 'extract',
-            'group_path' => $group_temp_path
-        ];
-
-        $json_data_string = json_encode($data_for_python, JSON_UNESCAPED_SLASHES);
-        $json_file = $temp_dir . uniqid('extract_') . '.json';
-        
-        if (file_put_contents($json_file, $json_data_string) === FALSE) {
-            throw new Exception("Cannot write JSON file");
-        }
-        
-        $command = "{$python_interpreter} \"{$python_script}\" \"{$json_file}\"";
-        
-        $output_array = [];
-        $return_var = 0;
-        exec($command, $output_array, $return_var);
-        
-        if (file_exists($json_file)) {
-            unlink($json_file);
-        }
-        
-        if ($return_var !== 0) {
-             throw new Exception("Python script failed with code: {$return_var}");
-        }
-
-        if (empty($output_array)) {
-            throw new Exception("Python returned empty output");
-        }
-        
-        $json_output_string = end($output_array);
-        $python_result = json_decode($json_output_string, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception("Invalid JSON from Python");
-        }
-        
-        if ($python_result['status'] === 'success') {
-            $faces = $python_result['faces'];
-            
-            error_log("Extracted " . count($faces) . " faces from group photo");
-            
-            // 🟢 บันทึก embeddings ลงตาราง classroom_photo_group_faces
-            if (!empty($faces)) {
-                $value_parts = [];
-                foreach ($faces as $face) {
-                    $face_index = intval($face['face_index']);
-                    $embedding_json = $mysqli->real_escape_string(json_encode($face['embedding']));
-                    $bbox_json = $mysqli->real_escape_string(json_encode($face['bbox']));
-                    
-                    $value_parts[] = "({$group_photo_id}, {$face_index}, '{$embedding_json}', '{$bbox_json}', NOW())";
-                }
-                
-                $sql_insert = "INSERT INTO `classroom_photo_group_faces`
-                                  (`group_photo_id`, `face_index`, `face_embedding_json`, `face_bbox`, `date_create`)
-                                  VALUES " . implode(", ", $value_parts);
-                
-                if ($mysqli->query($sql_insert)) {
-                    error_log("Saved " . count($faces) . " face embeddings to DB");
-                    return [
-                        'status' => 'success',
-                        'faces' => $faces,
-                        'message' => "Extract สำเร็จ " . count($faces) . " ใบหน้า"
-                    ];
-                } else {
-                    throw new Exception("DB Insert Error: " . $mysqli->error);
-                }
-            }
-            
-            return [
-                'status' => 'success',
-                'faces' => [],
-                'message' => "ไม่พบใบหน้าในรูป"
+            $box2 = [
+                'x1' => $face2['bbox_x1'],
+                'y1' => $face2['bbox_y1'],
+                'x2' => $face2['bbox_x2'],
+                'y2' => $face2['bbox_y2']
             ];
             
-        } else {
-            throw new Exception($python_result['message']);
+            $iou = calculateIoU($box1, $box2);
+            
+            if (is_array($face1['embedding_array']) && is_array($face2['embedding_array'])) {
+                $similarity = cosineSimilarity($face1['embedding_array'], $face2['embedding_array']);
+                
+                if ($similarity >= $similarity_threshold && $iou >= $iou_threshold) {
+                    $face_matches++;
+                    $total_similarity += $similarity;
+                }
+            }
         }
-
-    } catch (Exception $e) {
-        error_log("Extract Error: " . $e->getMessage());
+    }
+    
+    if ($face_matches == count($photo1_faces) && $face_matches > 0) {
         return [
-            'status' => 'error',
-            'message' => $e->getMessage()
+            'similar' => true,
+            'avg_similarity' => $total_similarity / $face_matches,
+            'face_matches' => $face_matches
         ];
-        
-    } finally {
-        if ($group_temp_path && file_exists($group_temp_path)) {
-            unlink($group_temp_path);
-        }
     }
+    
+    return ['similar' => false];
 }
-
-// ------------------------------------------------------------------------------------------------------
-// *** Main Upload Handler ***
-// ------------------------------------------------------------------------------------------------------
-global $mysqli;
-
-$student_id = $_SESSION['student_id'] ? $_SESSION['student_id'] : 2;
-
-$classroom_id = null;
-if (isset($_POST['classroom_id']) && !empty($_POST['classroom_id'])) {
-    $classroom_id = intval($_POST['classroom_id']);
-} elseif (isset($_GET['classroom_id']) && !empty($_GET['classroom_id'])) {
-    $classroom_id = intval($_GET['classroom_id']);
-}
-
-// ** Generate Embedding Batch **
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'generate_embedding_batch') {
-    header('Content-Type: application/json');
-    if (!$classroom_id) {
-        echo json_encode(['status' => 'error', 'message' => '❌ Error: ไม่พบ classroom_id']);
+    
+    // ============ Action: Scan for Duplicates ============
+    if(isset($_POST['action']) && $_POST['action'] == 'scanDuplicates') {
+    $classroom_id = $_POST['classroom_id'];
+    
+    $SIMILARITY_THRESHOLD = 0.85;
+    $IOU_THRESHOLD = 0.5;
+    
+    // 1. Get all photos with face embeddings
+    $photos_with_faces = select_data(
+        "DISTINCT photo_id",
+        "event_face_embedding",
+        "where classroom_id = '{$classroom_id}'"
+    );
+    
+    if (!$photos_with_faces || count($photos_with_faces) == 0) {
+        echo json_encode([
+            'status' => false,
+            'message' => 'No photos with face embeddings found'
+        ]);
         exit;
     }
-
-    $errors = [];
-    $total_processed = 0;
-    $total_embeddings_created = 0;
     
-    $sql_photos = "SELECT 
-                        cfs.file_id, 
-                        cfs.student_id,
-                        cfs.file_path
-                     FROM 
-                        classroom_file_student cfs
-                     INNER JOIN 
-                        classroom_student_join csj 
-                        ON cfs.student_id = csj.student_id
-                     WHERE 
-                        csj.classroom_id = ? AND
-                        cfs.file_type = 'profile_image' AND 
-                        cfs.file_status = 1 AND 
-                        cfs.is_deleted = 0 
-                     ORDER BY 
-                        cfs.file_id ASC 
-                     LIMIT 100";
-
-    $stmt_fetch = $mysqli->prepare($sql_photos);
-    $stmt_fetch->bind_param("i", $classroom_id);
-    $stmt_fetch->execute();
-    $result_fetch = $stmt_fetch->get_result();
-
-    while ($row = $result_fetch->fetch_assoc()) {
-        $total_processed++;
-        $result_msg = runEmbeddingGeneration($mysqli, $row['file_id'], $row['file_path'], $row['student_id']);
+    $photo_ids = array_column($photos_with_faces, 'photo_id');
+    $photo_ids_str = implode(',', $photo_ids);
+    
+    // 2. Get all valid photos (not deleted)
+    $photos = select_data(
+        "photo_id, photo_path",
+        "classroom_photo",
+        "where photo_id IN ({$photo_ids_str}) and status = 0"
+    );
+    
+    if (!$photos || count($photos) == 0) {
+        echo json_encode([
+            'status' => false,
+            'message' => 'No valid photos found'
+        ]);
+        exit;
+    }
+    
+    // 3. Build face data map
+    $photo_faces = [];
+    foreach ($photo_ids as $pid) {
+        $faces = select_data(
+            "face_id, face_index, bbox_x1, bbox_y1, bbox_x2, bbox_y2, embedding",
+            "event_face_embedding",
+            "where photo_id = '{$pid}'"
+        );
         
-        if (strpos($result_msg, '✅ Success') !== false) {
-            $total_embeddings_created++;
-        } else {
-            $errors[] = $result_msg;
+        if ($faces && count($faces) > 0) {
+            foreach ($faces as &$face) {
+                $face['embedding_array'] = json_decode($face['embedding'], true);
+            }
+            $photo_faces[$pid] = $faces;
         }
     }
-    $stmt_fetch->close();
-
+    
+    // 4. CLUSTERING ALGORITHM - Group similar photos together
+    $groups = [];
+    $assigned = []; // Track which photos are already in groups
+    
+    foreach ($photos as $i => $photo1) {
+        $photo1_id = $photo1['photo_id'];
+        
+        if (isset($assigned[$photo1_id])) continue; // Already in a group
+        if (!isset($photo_faces[$photo1_id])) continue;
+        
+        // Start new group with this photo
+        $current_group = [$photo1_id];
+        $assigned[$photo1_id] = true;
+        
+        // Find all other photos similar to photos in current group
+        $group_expanded = true;
+        while ($group_expanded) {
+            $group_expanded = false;
+            
+            foreach ($photos as $j => $photo2) {
+                $photo2_id = $photo2['photo_id'];
+                
+                if (isset($assigned[$photo2_id])) continue;
+                if (!isset($photo_faces[$photo2_id])) continue;
+                
+                // Check if photo2 is similar to ANY photo in current group
+                $is_similar_to_group = false;
+                $max_similarity = 0;
+                
+                foreach ($current_group as $group_photo_id) {
+                    if (!isset($photo_faces[$group_photo_id])) continue;
+                    
+                    $result = photosAreSimilar(
+                        $photo_faces[$group_photo_id],
+                        $photo_faces[$photo2_id],
+                        $SIMILARITY_THRESHOLD,
+                        $IOU_THRESHOLD
+                    );
+                    
+                    if ($result['similar']) {
+                        $is_similar_to_group = true;
+                        $max_similarity = max($max_similarity, $result['avg_similarity']);
+                        break; // Found match, no need to check other group members
+                    }
+                }
+                
+                if ($is_similar_to_group) {
+                    $current_group[] = $photo2_id;
+                    $assigned[$photo2_id] = true;
+                    $group_expanded = true; // Keep expanding
+                }
+            }
+        }
+        
+        // Only save groups with 2+ photos
+        if (count($current_group) >= 2) {
+            $groups[] = [
+                'photo_ids' => $current_group,
+                'photo_count' => count($current_group)
+            ];
+        }
+    }
+    
+    // 5. Save groups to database
+    $saved_groups = 0;
+    
+    foreach ($groups as $group) {
+        $photo_ids_sorted = $group['photo_ids'];
+        sort($photo_ids_sorted);
+        $group_hash = md5(implode('-', $photo_ids_sorted));
+        
+        // Check if group already exists
+        $existing = select_data(
+            "group_id",
+            "event_photo_duplicate_group",
+            "where classroom_id = '{$classroom_id}' and group_hash = '{$group_hash}'"
+        );
+        
+        if ($existing && count($existing) > 0) {
+            $group_id = $existing[0]['group_id'];
+            
+            // Update existing group
+            update_data(
+                "event_photo_duplicate_group",
+                "photo_count = '{$group['photo_count']}', 
+                 status = 1,
+                 updated_at = NOW()",
+                "group_id = '{$group_id}'"
+            );
+        } else {
+            // Create new group
+            $face_count = isset($photo_faces[$group['photo_ids'][0]]) 
+                ? count($photo_faces[$group['photo_ids'][0]]) 
+                : 0;
+            
+            $group_id = insert_data(
+                "event_photo_duplicate_group",
+                "(classroom_id, group_hash, photo_count, face_count, status, created_at, updated_at)",
+                "('{$classroom_id}', '{$group_hash}', '{$group['photo_count']}', '{$face_count}', 1, NOW(), NOW())"
+            );
+        }
+        
+        if ($group_id) {
+            // Clear old members
+            delete_data(
+                "event_photo_duplicate_member", "group_id = '{$group_id}'"
+            );
+            
+            // Insert all members
+            foreach ($group['photo_ids'] as $photo_id) {
+                insert_data(
+                    "event_photo_duplicate_member",
+                    "(group_id, photo_id, similarity_to_group, added_at)",
+                    "('{$group_id}', '{$photo_id}', 0.90, NOW())"
+                );
+            }
+            
+            $saved_groups++;
+        }
+    }
+    
     echo json_encode([
-        'status' => 'success', 
-        'message' => "ประมวลผลไป {$total_processed} รูป, สร้าง Embedding {$total_embeddings_created} รูป",
-        'processed' => $total_processed,
-        'created' => $total_embeddings_created,
-        'errors' => $errors
+        'status' => true,
+        'duplicate_groups' => $saved_groups,
+        'total_photos_in_groups' => array_sum(array_column($groups, 'photo_count'))
     ]);
     exit;
 }
 
-// ==========================================
-// API 2: อัปโหลดรูปกลุ่ม (ไม่ Extract)
-// ==========================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['group_photo']) && isset($_POST['event_name'])) {
-    if (!$classroom_id) {
-        header('Content-Type: application/json');
-        echo json_encode([
-            'status' => 'error',
-            'message' => '❌ Error: ไม่พบ classroom_id',
-            'errors' => []
-        ]);
-        exit;
-    }
+// ============================================================
+// ACTION: Get Duplicate Groups
+// ============================================================
 
-    $files = $_FILES['group_photo'];
-    $event_name = trim($_POST['event_name']);
-    $description = $event_name ? $event_name : 'No Event Description';
-
-    $total_uploaded = 0;
-    $errors = [];
-    $uploaded_group_url = '';
-    $uploaded_ids = [];
-
-    for ($i = 0; $i < count($files['name']); $i++) {
-        $file_data = [
-            'name'      => $files['name'][$i],
-            'type'      => $files['type'][$i],
-            'tmp_name'  => $files['tmp_name'][$i],
-            'error'     => $files['error'][$i],
-            'size'      => $files['size'][$i],
-        ];
-
-        if ($file_data['error'] !== UPLOAD_ERR_OK) {
-            $errors[] = "ไฟล์ '{$file_data['name']}' มีข้อผิดพลาด ({$file_data['error']})";
-            continue;
-        }
-
-        $db_file_path = uploadFile_bucket($file_data, 'classroom');
-
-        if ($db_file_path) {
-            $sql = "INSERT INTO `classroom_photo_album_group`
-                         (`classroom_id`, `group_photo_path`, `description`, `emp_create`, `date_create`)
-                         VALUES (?, ?, ?, ?, NOW())";
-
-            $stmt = $mysqli->prepare($sql);
-            if ($stmt) {
-                $stmt->bind_param("issi", $classroom_id, $db_file_path, $description, $student_id);
-                if ($stmt->execute()) {
-                    $new_group_photo_id = $mysqli->insert_id;
-                    $stmt->close();
-                    $total_uploaded++;
-                    $uploaded_ids[] = $new_group_photo_id;
-
-                    if (function_exists('GetUrl')) {
-                           $uploaded_group_url = GetUrl($db_file_path);
-                    }
-                } else {
-                    $errors[] = "บันทึก DB ไม่สำเร็จสำหรับ '{$file_data['name']}'";
-                }
-            }
-        } else {
-            $errors[] = "อัปโหลดไฟล์ '{$file_data['name']}' ไม่สำเร็จ";
-        }
-    }
-
-    header('Content-Type: application/json');
-    if ($total_uploaded > 0) {
-        echo json_encode([
-            'status' => 'success',
-            'message' => "อัปโหลดสำเร็จ {$total_uploaded} ไฟล์",
-            'errors' => $errors,
-            'uploaded_url' => $uploaded_group_url,
-            'uploaded_ids' => $uploaded_ids
-        ]);
-    } else {
-        echo json_encode([
-            'status' => 'error',
-            'message' => "❌ ไม่สามารถอัปโหลดไฟล์ใดๆ ได้",
-            'errors' => $errors
-        ]);
-    }
-    exit;
-}
-
-// ==========================================
-// API 3: ดึงรหัสใบหน้าจากรูปกลุ่มในอัลบั้มที่ระบุ
-// ==========================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'extract_album_faces') {
-    header('Content-Type: application/json');
-    $album_name = isset($_POST['album_name']) ? trim($_POST['album_name']) : '';
-
-    if (!$classroom_id || empty($album_name)) {
-        echo json_encode(['status' => 'error', 'message' => '❌ Error: ไม่พบ classroom_id หรือ album_name']);
-        exit;
-    }
-
-    $errors = [];
-    $total_processed = 0;
-    $total_extracted = 0;
-
-    // ดึงรูปทั้งหมดในอัลบั้ม
-    $sql = "SELECT group_photo_id, group_photo_path 
-            FROM classroom_photo_album_group 
-            WHERE classroom_id = ? AND description = ? AND is_deleted = 0";
+if(isset($_POST['action']) && $_POST['action'] == 'getDuplicateGroups') {
+    $classroom_id = $_POST['classroom_id'];
     
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param("is", $classroom_id, $album_name);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    while ($row = $result->fetch_assoc()) {
-        $total_processed++;
-        $extract_result = extractGroupFaceEmbeddings($mysqli, $row['group_photo_id'], $row['group_photo_path']);
-        
-        if ($extract_result['status'] === 'success') {
-            $total_extracted++;
-        } else {
-            $errors[] = "รูป ID {$row['group_photo_id']}: {$extract_result['message']}";
+    // Get all pending groups
+    $groups = select_data(
+        "g.group_id, g.photo_count, g.avg_similarity, g.face_count,
+         DATE_FORMAT(g.updated_at, '%Y/%m/%d %H:%i:%s') as updated_at",
+        "event_photo_duplicate_group g",
+        "where g.classroom_id = '{$classroom_id}' and g.status = 1
+         order by g.photo_count desc, g.updated_at desc"
+    );
+    
+    $group_data = [];
+    
+    if ($groups && count($groups) > 0) {
+        foreach ($groups as $group) {
+            // Get all active members (not deleted, photo not deleted)
+            $members = select_data(
+                "m.member_id, m.photo_id, m.similarity_to_group,
+                 p.photo_path",
+                "event_photo_duplicate_member m
+                 LEFT JOIN event_photo p ON m.photo_id = p.photo_id",
+                "where m.group_id = '{$group['group_id']}' 
+                 and m.is_deleted = 0 
+                 and p.status = 0
+                 order by m.similarity_to_group desc"
+            );
+            
+            if (!$members || count($members) < 2) {
+                // Auto-resolve groups with less than 2 photos
+                update_data(
+                    "event_photo_duplicate_group",
+                    "status = 0, updated_at = NOW()",
+                    "group_id = '{$group['group_id']}'"
+                );
+                continue;
+            }
+            
+            // Build member data
+            $member_data = [];
+            foreach ($members as $member) {
+                $path_parts = pathinfo($member['photo_path']);
+                $thumb = $path_parts['dirname'] . '/' . $path_parts['filename'] . '_thumbnail.' . $path_parts['extension'];
+                
+                $member_data[] = [
+                    'member_id' => $member['member_id'],
+                    'photo_id' => $member['photo_id'],
+                    'photo_thumb' => GetPublicUrl($thumb),
+                    'photo_full' => GetPublicUrl($member['photo_path']),
+                    'similarity' => round($member['similarity_to_group'] * 100, 2)
+                ];
+            }
+            
+            $group_data[] = [
+                'group_id' => $group['group_id'],
+                'photo_count' => count($member_data),
+                'face_count' => $group['face_count'],
+                'updated_at' => $group['updated_at'],
+                'members' => $member_data
+            ];
         }
     }
-    $stmt->close();
-
+    
     echo json_encode([
-        'status' => 'success',
-        'message' => "ประมวลผล {$total_processed} รูป, ดึงรหัสใบหน้าสำเร็จ {$total_extracted} รูป",
-        'processed' => $total_processed,
-        'extracted' => $total_extracted,
-        'errors' => $errors
+        'status' => true,
+        'groups' => $group_data
     ]);
     exit;
 }
 
-// ==========================================
-// API 4: จับคู่ใบหน้า (Match Faces)
-// ==========================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'batch_match_faces') {
-    header('Content-Type: application/json');
-    if (!$classroom_id) {
-        echo json_encode(['status' => 'error', 'message' => '❌ Error: ไม่พบ classroom_id']);
-        exit;
-    }
+// ============================================================
+// ACTION: Mark Group as Not Duplicate
+// ============================================================
 
-    $errors = [];
-    $total_processed = 0;
-    $total_detected = 0;
+if(isset($_POST['action']) && $_POST['action'] == 'markGroupNotDuplicate') {
+    $group_id = $_POST['group_id'];
     
-    // ค้นหา description ล่าสุด
-    $sql_latest_description = "SELECT `description`
-                               FROM `classroom_photo_album_group`
-                               WHERE `classroom_id` = ? AND `is_deleted` = 0
-                               ORDER BY `group_photo_id` DESC
-                               LIMIT 1";
-
-    $stmt_desc = $mysqli->prepare($sql_latest_description);
-    $stmt_desc->bind_param("i", $classroom_id);
-    $stmt_desc->execute();
-    $result_desc = $stmt_desc->get_result();
-    $latest_description = null;
-    if ($row_desc = $result_desc->fetch_assoc()) {
-        $latest_description = $row_desc['description'];
-    }
-    $stmt_desc->close();
+    update_data(
+        "event_photo_duplicate_group",
+        "status = 2, updated_at = NOW()",
+        "group_id = '{$group_id}'"
+    );
     
-    if (empty($latest_description)) {
-         echo json_encode([
-            'status' => 'success', 
-            'message' => "✅ ไม่พบชื่อ Event ล่าสุดใน Classroom นี้",
-            'processed' => 0,
-            'detected' => 0,
-            'errors' => []
-        ]);
-        exit;
-    }
-
-    // ค้นหารูปที่ต้อง Match
-    $sql_photos_to_match = "SELECT 
-                                cpag.group_photo_id
-                            FROM 
-                                classroom_photo_album_group cpag
-                            INNER JOIN 
-                                classroom_photo_group_faces cpgf 
-                                ON cpag.group_photo_id = cpgf.group_photo_id
-                            LEFT JOIN 
-                                classroom_photo_face_detection cpfd
-                                ON cpag.group_photo_id = cpfd.group_photo_id
-                            WHERE 
-                                cpag.classroom_id = ? AND
-                                cpag.description = ? AND
-                                cpfd.group_photo_id IS NULL
-                            GROUP BY
-                                cpag.group_photo_id
-                            LIMIT 100";
-
-    $stmt_fetch = $mysqli->prepare($sql_photos_to_match);
-    $stmt_fetch->bind_param("is", $classroom_id, $latest_description);
-    $stmt_fetch->execute();
-    $result_fetch = $stmt_fetch->get_result();
-
-    $ids_to_match = [];
-    while ($row = $result_fetch->fetch_assoc()) {
-        $ids_to_match[] = intval($row['group_photo_id']);
-    }
-    $stmt_fetch->close();
-    
-    if (empty($ids_to_match)) {
-        echo json_encode([
-            'status' => 'success', 
-            'message' => "✅ ไม่พบรูปกลุ่มใน Event '{$latest_description}' ที่ต้องทำการ Match",
-            'processed' => 0,
-            'detected' => 0,
-            'errors' => []
-        ]);
-        exit;
-    }
-    
-    // เริ่ม Match
-    foreach ($ids_to_match as $group_photo_id_to_match) {
-        $total_processed++;
-        $match_result = matchGroupFaces($mysqli, $group_photo_id_to_match, $classroom_id);
-        
-        if (strpos($match_result, 'อัพโหลดสำเร็จ') !== false) {
-            $total_detected++;
-        } else if (strpos($match_result, 'Error') !== false) {
-            $errors[] = "ID: {$group_photo_id_to_match} - {$match_result}";
-        }
-    }
-
     echo json_encode([
-        'status' => 'success', 
-        'message' => "ประมวลผลการ Match Event '{$latest_description}' ไป {$total_processed} รูป, ตรวจพบนักเรียน {$total_detected} รูป",
-        'processed' => $total_processed,
-        'detected' => $total_detected,
-        'errors' => $errors
+        'status' => true,
+        'message' => 'Group marked as not duplicate'
     ]);
     exit;
 }
 
-// ==========================================
-// API 5: ดึงรายการอัลบั้มทั้งหมด
-// ==========================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'fetch_albums') {
-    header('Content-Type: application/json');
+// ============================================================
+// ACTION: Delete Photo from Group
+// ============================================================
+
+if(isset($_POST['action']) && $_POST['action'] == 'deletePhotoFromGroup') {
+    $group_id = $_POST['group_id'];
+    $photo_id = $_POST['photo_id'];
     
-    // ตรวจสอบความถูกต้องของ classroom_id
-    if (!$classroom_id) {
-        echo json_encode(['status' => 'error', 'message' => '❌ Error: ไม่พบ classroom_id']);
-        exit;
+    // Delete the photo (soft delete)
+    update_data(
+        "classroom_photo",
+        "status = 1, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
+        "photo_id = '{$photo_id}'"
+    );
+    
+    // Mark as deleted in group
+    update_data(
+        "event_photo_duplicate_member",
+        "is_deleted = 1",
+        "group_id = '{$group_id}' and photo_id = '{$photo_id}'"
+    );
+    
+    // Check if group still has enough photos
+    $remaining = select_data(
+        "COUNT(*) as total",
+        "event_photo_duplicate_member m
+         LEFT JOIN event_photo p ON m.photo_id = p.photo_id",
+        "where m.group_id = '{$group_id}' and m.is_deleted = 0 and p.status = 0"
+    );
+    
+    $remaining_count = $remaining[0]['total'] ? $remaining[0]['total'] : 0;
+    
+    if ($remaining_count < 2) {
+        // Auto-resolve group
+        update_data(
+            "event_photo_duplicate_group",
+            "status = 0, updated_at = NOW()",
+            "group_id = '{$group_id}'"
+        );
     }
-
-    $sql = "SELECT 
-                MAX(cpag.group_photo_id) AS group_photo_id,
-                cpag.description AS album_name,
-                COUNT(cpag.group_photo_id) AS photo_count,
-                (SELECT COUNT(DISTINCT cpgf.group_photo_id) 
-                 FROM classroom_photo_group_faces cpgf 
-                 INNER JOIN classroom_photo_album_group cpag2 
-                 ON cpgf.group_photo_id = cpag2.group_photo_id
-                 WHERE cpag2.description = cpag.description 
-                 AND cpag2.classroom_id = ? 
-                 AND cpag2.is_deleted = 0) AS extracted_count,
-                (SELECT cpa.group_photo_path 
-                 FROM classroom_photo_album_group cpa 
-                 WHERE cpa.description = cpag.description 
-                 AND cpa.classroom_id = ? 
-                 AND cpa.is_deleted = 0 
-                 ORDER BY cpa.group_photo_id DESC LIMIT 1) AS cover_photo_path
-            FROM 
-                `classroom_photo_album_group` cpag
-            WHERE 
-                `classroom_id` = ? AND `is_deleted` = 0
-            GROUP BY 
-                cpag.description
-            ORDER BY 
-                MAX(cpag.date_create) DESC"; // <-- แก้ไขตรงนี้
-
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param("iii", $classroom_id, $classroom_id, $classroom_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
     
-    $albums = [];
-    while ($row = $result->fetch_assoc()) {
-        $cover_url = $row['cover_photo_path'] ? (function_exists('GetUrl') ? GetUrl($row['cover_photo_path']) : $row['cover_photo_path']) : '';
-        $is_extracted = $row['extracted_count'] > 0;
+    echo json_encode([
+        'status' => true,
+        'remaining_count' => $remaining_count,
+        'message' => 'Photo deleted successfully'
+    ]);
+    exit;
+}
+
+// ============================================================
+// ACTION: Delete ALL Photos in Group (Keep One)
+// ============================================================
+
+if(isset($_POST['action']) && $_POST['action'] == 'deleteGroupKeepOne') {
+    $group_id = $_POST['group_id'];
+    $keep_photo_id = $_POST['keep_photo_id'];
+    
+    // Get all members
+    $members = select_data(
+        "photo_id",
+        "event_photo_duplicate_member",
+        "where group_id = '{$group_id}' and is_deleted = 0"
+    );
+    
+    $deleted_count = 0;
+    
+    foreach ($members as $member) {
+        if ($member['photo_id'] == $keep_photo_id) continue;
         
-        $albums[] = [
-            'album_id' => $row['group_photo_id'],
-            'album_name' => htmlspecialchars($row['album_name']),
-            'photo_count' => (int)$row['photo_count'],
-            'extracted_count' => (int)$row['extracted_count'],
-            'is_extracted' => $is_extracted,
-            'cover_url' => $cover_url,
-        ];
+        // Delete photo
+        update_data(
+            "classroom_photo",
+            "status = 1, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
+            "photo_id = '{$member['photo_id']}'"
+        );
+        
+        // Mark as deleted in group
+        update_data(
+            "event_photo_duplicate_member",
+            "is_deleted = 1",
+            "group_id = '{$group_id}' and photo_id = '{$member['photo_id']}'"
+        );
+        
+        $deleted_count++;
     }
-    $stmt->close();
-
-    echo json_encode(['status' => 'success', 'albums' => $albums]);
+    
+    // Resolve group
+    update_data(
+        "event_photo_duplicate_group",
+        "status = 0, updated_at = NOW()",
+        "group_id = '{$group_id}'"
+    );
+    
+     echo json_encode([
+        'status' => true,
+        'deleted_count' => $deleted_count,
+        'message' => "Deleted {$deleted_count} photos, kept 1"
+    ]);
     exit;
 }
-
-// ==========================================
-// API 6: ดึงรูปภาพในอัลบั้ม (ไม่มีการเปลี่ยนแปลง)
-// ==========================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'fetch_album_photos') {
-    header('Content-Type: application/json');
-    $album_name = isset($_POST['album_name']) ? trim($_POST['album_name']) : '';
-
-    if (!$classroom_id || empty($album_name)) {
-        echo json_encode(['status' => 'error', 'message' => '❌ Error: ไม่พบ classroom_id หรือ album_name']);
+    
+    // ============ Action: Sync Default Albums (ไม่ต้องใช้แล้ว แต่เก็บไว้เพื่อ compatibility) ============
+    if(isset($_POST['action']) && $_POST['action'] == 'syncDefaultAlbums') {
+        $classroom_id = $_POST['classroom_id'];
+        $comp_id = $_SESSION['comp_id'];
+        $emp_id = $_SESSION['emp_id'];
+        
+        ensureDefaultAlbums($classroom_id, $comp_id, $emp_id);
+        
+        echo json_encode([
+            'status' => true,
+            'moved_count' => 0,
+            'message' => 'Default albums are now virtual - images are auto-filtered by status'
+        ]);
+        exit;
+    }
+    
+    if(isset($_POST['action']) && $_POST['action'] == 'albumData') {
+        $classroom_id = $_POST['classroom_id'];
+        $album = select_data(
+            "album_name, album_description", "classroom_album", "where classroom_id = '{$classroom_id}'"
+        );
+        echo json_encode([
+            'status' => true,
+            'album_data' => [
+                'album_name' => $album[0]['album_name'],
+                'album_description' => $album[0]['album_description']
+            ],
+        ]);
+        exit;
+    }
+    
+    if(isset($_POST['action']) && $_POST['action'] == 'deleteAlbum') {
+        $classroom_id = $_POST['classroom_id'];
+        
+        $album_check = select_data(
+            "album_name",
+            "classroom_album",
+            "where classroom_id = '{$classroom_id}'"
+        );
+        
+        if ($album_check && count($album_check) > 0) {
+            $album_name = $album_check[0]['album_name'];
+            $default_names = ['Public', 'Report', 'Delete', 'Restrict', 'Duplicates'];
+            
+            if (in_array($album_name, $default_names)) {
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'Cannot delete default album: ' . $album_name
+                ]);
+                exit;
+            }
+        }
+        
+        update_data(
+            "classroom_album", 
+            "status = 1, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()", 
+            "classroom_id = '{$classroom_id}'"
+        );
+        
+        update_data(
+            "classroom_photo",
+            "status = 1, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
+            "classroom_id = '{$classroom_id}'"
+        );
+        
+        echo json_encode([
+            'status' => true,
+        ]);
+        exit;
+    }
+    
+    if(isset($_GET['action']) && $_GET['action'] == 'saveAlbum') {
+        $classroom_id = $_POST['classroom_id'];
+        $classroom_id = $_POST['classroom_id'];
+        $album_name = escape_string($_POST['album_name']);
+        $album_description = escape_string($_POST['album_description']);
+        
+        if (!$classroom_id) {
+            $default_names = ['Public', 'Report', 'Delete', 'Restrict', 'Duplicates'];
+            if (in_array($album_name, $default_names)) {
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'Album name "' . $album_name . '" is reserved. Please use another name.'
+                ]);
+                exit;
+            }
+        }
+        
+        if($classroom_id) {
+            $album_check = select_data(
+                "album_name",
+                "classroom_album",
+                "where classroom_id = '{$classroom_id}'"
+            );
+            
+            if ($album_check && count($album_check) > 0) {
+                $current_name = $album_check[0]['album_name'];
+                $default_names = ['Public', 'Report', 'Delete', 'Restrict', 'Duplicates'];
+                
+                if (in_array($current_name, $default_names)) {
+                    echo json_encode([
+                        'status' => false,
+                        'message' => 'Cannot edit default album: ' . $current_name
+                    ]);
+                    exit;
+                }
+            }
+            
+            update_data(
+                "classroom_album", 
+                "album_name = '{$album_name}', album_description = '{$album_description}', emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()", 
+                "classroom_id = '{$classroom_id}'"
+            );
+        } else {
+            insert_data(
+                "classroom_album", 
+                "(classroom_id, comp_id, album_name, album_description, status, emp_create, date_create, emp_modify, date_modify)", 
+                "('{$classroom_id}', '{$_SESSION['comp_id']}', '{$album_name}', '{$album_description}', 0, '{$_SESSION['emp_id']}', NOW(), '{$_SESSION['emp_id']}', NOW())"
+            );
+        }
+        echo json_encode([
+            'status' => true,
+        ]);
         exit;
     }
 
-    $sql = "SELECT 
-                `group_photo_id`, 
-                `group_photo_path`, 
-                `date_create`,
-                `description`
-            FROM 
-                `classroom_photo_album_group`
-            WHERE 
-                `classroom_id` = ? AND `description` = ? AND `is_deleted` = 0
-            ORDER BY 
-                `date_create` DESC";
-
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param("is", $classroom_id, $album_name);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $photos = [];
-    while ($row = $result->fetch_assoc()) {
-        $photo_url = $row['group_photo_path'] ? (function_exists('GetUrl') ? GetUrl($row['group_photo_path']) : $row['group_photo_path']) : '';
-        $photos[] = [
-            'id' => (int)$row['group_photo_id'],
-            'url' => $photo_url,
-            'date_create' => $row['date_create'],
-        ];
-    }
-    $stmt->close();
-
-    echo json_encode(['status' => 'success', 'photos' => $photos, 'album_name' => htmlspecialchars($album_name)]);
-    exit;
-}
-// ==========================================
-// API 7: ลบรูปภาพ
-// ==========================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_photo') {
-    header('Content-Type: application/json');
-    $photo_id = isset($_POST['photo_id']) ? intval($_POST['photo_id']) : 0;
-
-    if ($photo_id <= 0) {
-        echo json_encode(['status' => 'error', 'message' => '❌ Error: ไม่พบ Photo ID ที่ถูกต้อง']);
+    if(isset($_POST['action']) && $_POST['action'] == 'restoreImage') {
+        $photo_id = $_POST['photo_id'];
+        
+        update_data(
+            "classroom_photo", 
+            "status = 0, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()", 
+            "photo_id = '{$photo_id}'"
+        );
+        
+        update_data(
+            "event_photo_queue",
+            "status = 'pending', updated_at = NOW()",
+            "photo_id = '{$photo_id}'"
+        );
+        
+        echo json_encode([
+            'status' => true,
+            'message' => 'Image restored successfully'
+        ]);
         exit;
     }
-
-    $sql = "UPDATE `classroom_photo_album_group` SET `is_deleted` = 1 WHERE `group_photo_id` = ?";
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param("i", $photo_id);
-
-    if ($stmt->execute()) {
-        $stmt->close();
-        echo json_encode(['status' => 'success', 'message' => '✅ ลบรูปภาพออกจากอัลบั้มสำเร็จ']);
+    
+    if(isset($_POST['action']) && $_POST['action'] == 'buildAlbum') {
+        $classroom_id = $_POST['classroom_id'];
+        
+        ensureDefaultAlbums($classroom_id, $_SESSION['comp_id'], $_SESSION['emp_id']);
+        
+        $albums = select_data(
+            "classroom_id, album_name, album_description, date_format(date_modify, '%Y/%m/%d %H:%i:%s') as date_modify", 
+            "classroom_album", 
+            "where classroom_id = '{$classroom_id}' and status = 0 order by 
+                CASE 
+                    WHEN album_name = 'Public' THEN 1
+                    WHEN album_name = 'Report' THEN 2
+                    WHEN album_name = 'Restrict' THEN 3
+                    WHEN album_name = 'Delete' THEN 4
+                    WHEN album_name = 'Duplicates' THEN 5
+                    ELSE 6
+                END,
+                date_modify desc"
+        );
+        
+        $album_data = [];
+        $default_names = ['Public', 'Report', 'Delete', 'Restrict', 'Duplicates'];
+        
+        foreach($albums as $album) {
+            $is_default = in_array($album['album_name'], $default_names);
+            
+            if ($is_default) {
+                if ($album['album_name'] == 'Duplicates') {
+    // นับจำนวน GROUPS ที่ยังไม่ได้ตรวจสอบ (status = 1)
+    $groups = select_data(
+        "COUNT(*) as total",
+        "event_photo_duplicate_group",
+        "where classroom_id = '{$classroom_id}' and status = 1"
+    );
+    $image_count = $groups[0]['total'] ? $groups[0]['total'] : 0;
+    
+    // ดึงรูป cover จาก group แรก
+    $first_group = select_data(
+        "g.group_id",
+        "event_photo_duplicate_group g",
+        "where g.classroom_id = '{$classroom_id}' and g.status = 1
+         order by g.updated_at desc limit 1"
+    );
+    
+    if ($first_group && count($first_group) > 0) {
+        $group_id = $first_group[0]['group_id'];
+        $first_photo = select_data(
+            "p.photo_path",
+            "event_photo_duplicate_member m
+             LEFT JOIN event_photo p ON m.photo_id = p.photo_id",
+            "where m.group_id = '{$group_id}' and m.is_deleted = 0 and p.status = 0
+             order by m.added_at asc limit 1"
+        );
+        $cover = $first_photo;
     } else {
-        $stmt->close();
-        echo json_encode(['status' => 'error', 'message' => '❌ Error: ลบรูปภาพไม่สำเร็จ: ' . $mysqli->error]);
+        $cover = null;
     }
-    exit;
-}
-
-// ==========================================
-// API 8: ลบอัลบั้ม
-// ==========================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_album') {
-    header('Content-Type: application/json');
-    $album_name = isset($_POST['album_name']) ? trim($_POST['album_name']) : '';
-
-    if (!$classroom_id || empty($album_name)) {
-        echo json_encode(['status' => 'error', 'message' => '❌ Error: ไม่พบ classroom_id หรือ album_name']);
+} else {
+                    $where_clause = "where classroom_id = '{$classroom_id}'";
+                    
+                    switch($album['album_name']) {
+                        case 'Public':
+                            $where_clause .= " and public = 0 and status = 0 and photo_id NOT IN (SELECT DISTINCT photo_id FROM event_photo_report)";
+                            break;
+                        case 'Report':
+                            $where_clause .= " and status = 0 and photo_id IN (SELECT DISTINCT photo_id FROM event_photo_report)";
+                            break;
+                        case 'Delete':
+                            $where_clause .= " and status = 1";
+                            break;
+                        case 'Restrict':
+                            $where_clause .= " and public = 1 and status = 0 and photo_id NOT IN (SELECT DISTINCT photo_id FROM event_photo_report)";
+                            break;
+                    }
+                    
+                    $image = select_data("photo_id", "classroom_photo", $where_clause);
+                    $image_count = count($image);
+                    $cover = select_data("photo_path", "classroom_photo", "{$where_clause} order by date_create asc limit 1");
+                }
+            } else {
+                $image = select_data("photo_id", "classroom_photo", "where classroom_id = '{$album['classroom_id']}' and status = 0");
+                $image_count = count($image);
+                $cover = select_data("photo_path", "classroom_photo", "where classroom_id = '{$album['classroom_id']}' and status = 0 order by date_create asc limit 1");
+            }
+            
+            $cover_image = '';
+            if($cover && count($cover) > 0) {
+                $path_parts = pathinfo($cover[0]['photo_path']);
+                $thumbnail_path = $path_parts['dirname'] . '/' . $path_parts['filename'] . '_thumbnail.' . $path_parts['extension'];
+                $cover_image = GetPublicUrl($thumbnail_path);
+            }
+            
+            $album_data[] = [
+                'classroom_id' => $album['classroom_id'],
+                'album_name' => $album['album_name'],
+                'album_description' => $album['album_description'],
+                'date_modify' => $album['date_modify'],
+                'image_count' => $image_count,
+                'cover_image' => $cover_image,
+                'is_default' => $is_default
+            ];
+        }
+        
+        echo json_encode([
+            'status' => true,
+            'album_data' => $album_data
+        ]);
+        exit;
+    }
+    
+    if(isset($_POST['action']) && $_POST['action'] == 'moveImages') {
+        $photo_ids = $_POST['photo_ids'];
+        $target_classroom_id = $_POST['target_classroom_id'];
+        
+        $moved_count = 0;
+        
+        foreach ($photo_ids as $photo_id) {
+            update_data(
+                "classroom_photo",
+                "classroom_id = '{$target_classroom_id}', emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()",
+                "photo_id = '{$photo_id}'"
+            );
+            $moved_count++;
+        }
+        
+        echo json_encode([
+            'status' => true,
+            'moved_count' => $moved_count,
+            'skipped_count' => 0
+        ]);
+        exit;
+    }
+    
+    if(isset($_POST['action']) && $_POST['action'] == 'togglePublic') {
+        $photo_id = $_POST['photo_id'];
+        $public_status = $_POST['public_status'];
+        
+        update_data(
+            "classroom_photo", 
+            "public = '{$public_status}', emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()", 
+            "photo_id = '{$photo_id}'"
+        );
+        
+        echo json_encode([
+            'status' => true,
+            'public_status' => $public_status
+        ]);
         exit;
     }
 
-    $sql = "UPDATE `classroom_photo_album_group` SET `is_deleted` = 1 WHERE `classroom_id` = ? AND `description` = ?";
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param("is", $classroom_id, $album_name);
+    if(isset($_POST['action']) && $_POST['action'] == 'getReportDetails') {
+        $photo_id = $_POST['photo_id'];
+        $classroom_id = $_POST['classroom_id'];
 
-    if ($stmt->execute()) {
-        $rows_affected = $stmt->affected_rows;
-        $stmt->close();
-        echo json_encode(['status' => 'success', 'message' => "✅ ลบอัลบั้ม '{$album_name}' และรูปภาพ {$rows_affected} รูปสำเร็จ"]);
-    } else {
-        $stmt->close();
-        echo json_encode(['status' => 'error', 'message' => '❌ Error: ลบอัลบั้มไม่สำเร็จ: ' . $mysqli->error]);
+        if (!$classroom_id || !$photo_id) {
+            echo json_encode([
+                'status' => false,
+                'message' => 'Invalid parameters'
+            ]);
+            exit;
+        }
+        
+        $photo_info = select_data(
+            "public",
+            "classroom_photo",
+            "where photo_id = '{$photo_id}'"
+        );
+        $photo_public = $photo_info[0]['public'];
+        
+        $reports = select_data(
+            "r.report_id, r.report_reason, r.user_id as member_id,
+             DATE_FORMAT(r.created_at, '%Y/%m/%d %H:%i:%s') as created_at, 
+             CONCAT(COALESCE(m.firstname, ''), ' ', COALESCE(m.lastname, '')) as full_name",
+            "event_photo_report r 
+             LEFT JOIN event_members m ON r.user_id = m.member_id",
+            "where r.photo_id = '{$photo_id}' order by r.created_at desc"
+        );
+        
+        foreach ($reports as &$report) {
+            $member_id = $report['member_id'];
+            if ($member_id) {
+                $register_data = select_data(
+                    "register_id",
+                    "event_register",
+                    "where classroom_id = '{$classroom_id}' and user_id = '{$member_id}' and status = 0 limit 1"
+                );
+                
+                if ($register_data && count($register_data) > 0) {
+                    $register_id = $register_data[0]['register_id'];
+                    $report['profile_image_url'] = guestImage($classroom_id, $register_id);
+                } else {
+                    $report['profile_image_url'] = '';
+                }
+            } else {
+                $report['profile_image_url'] = '';
+            }
+            unset($report['member_id']);
+        }
+        unset($report);
+
+        echo json_encode([
+            'status' => true,
+            'reports' => $reports,
+            'photo_public' => $photo_public
+        ]);
+        exit;
     }
-    exit;
-}
-?>
 
-<!-- ==========================================
-     HTML UI
-     ========================================== -->
+    if(isset($_POST['action']) && $_POST['action'] == 'getDownloadDetails') {
+        $photo_id = $_POST['photo_id'];
+        
+        $photo_data = select_data(
+            "classroom_id",
+            "classroom_photo",
+            "where photo_id = '{$photo_id}'"
+        );
+        
+        if (!$photo_data || count($photo_data) == 0) {
+            echo json_encode([
+                'status' => false,
+                'message' => 'Photo not found'
+            ]);
+            exit;
+        }
+        
+        $classroom_id = $photo_data[0]['classroom_id'];
 
+        $downloads = select_data(
+            "d.download_id, d.download_count, d.user_id as member_id,
+             DATE_FORMAT(d.downloaded_at, '%Y/%m/%d %H:%i:%s') as downloaded_at,
+             CONCAT(COALESCE(m.firstname, ''), ' ', COALESCE(m.lastname, '')) as full_name",
+            "event_photo_download d 
+             LEFT JOIN event_members m ON d.user_id = m.member_id",
+            "where d.photo_id = '{$photo_id}' order by d.downloaded_at desc"
+        );
+        
+        foreach ($downloads as &$dl) {
+            $member_id = $dl['member_id'];
+            if ($member_id) {
+                $register_data = select_data(
+                    "register_id",
+                    "event_register",
+                    "where classroom_id = '{$classroom_id}' and user_id = '{$member_id}' and status = 0 limit 1"
+                );
+                
+                if ($register_data && count($register_data) > 0) {
+                    $register_id = $register_data[0]['register_id'];
+                    $dl['profile_image_url'] = guestImage($classroom_id, $register_id);
+                } else {
+                    $dl['profile_image_url'] = '';
+                }
+            } else {
+                $dl['profile_image_url'] = '';
+            }
+            unset($dl['member_id']);
+        }
+        unset($dl);
 
+        echo json_encode([
+            'status' => true,
+            'downloads' => $downloads
+        ]);
+        exit;
+    }
 
-<div class="panel panel-default">
-    <div class="panel-heading" style="background-color: #4CAF50; color: white;">
-        <h4 class="panel-title"><i class="fas fa-upload fa-fw"></i> อัปโหลดรูปกลุ่ม</h4>
-    </div>
-    <div class="panel-body">
-        <form action="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>" method="POST" enctype="multipart/form-data" id="photo-upload-form">
-            
-            <input type="hidden" name="classroom_id" id="form_classroom_id" value="<?php echo $classroom_id ? $classroom_id : ''; ?>">
-            
-            <div class="form-group">
-                <label for="event_name_modal">
-                    <i class="fas fa-tag fa-fw"></i> ชื่อ Event / คำอธิบาย:
-                </label>
-                <input type="text" class="form-control" name="event_name" id="event_name_modal" maxlength="255" placeholder="เช่น กิจกรรมวันปีใหม่ 2568" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="group_photo_modal">
-                    <i class="fas fa-images fa-fw"></i> เลือกรูปภาพกลุ่ม (300+ รูปได้):
-                </label>
-                <input type="file" class="form-control" name="group_photo[]" id="group_photo_modal" accept="image/jpeg, image/png" multiple required>
-            </div>
-            
-            <button type="submit" class="btn btn-lg btn-block btn-success" id="upload-photo-btn">
-                <i class="fas fa-cloud-upload-alt fa-fw"></i> อัปโหลดรูปกลุ่ม
-            </button>
-            
-        </form>
-        <div id="upload-message-area" style="margin-top: 15px;"></div>
-    </div>
-</div>
-
-<div class="panel panel-default">
-    <div class="panel-heading" style="background-color: #3f51b5; color: white;">
-        <h4 class="panel-title"><i class="fas fa-folder fa-fw"></i> อัลบั้มรูปภาพใน Classroom</h4>
-    </div>
-    <div class="panel-body">
-        <p class="text-muted">
-            <i class="fas fa-info-circle"></i> อัลบั้มจะถูกสร้างจาก **ชื่อ Event / คำอธิบาย** ที่คุณใส่ตอนอัปโหลดรูป
-        </p>
-        <div id="album-list" class="row">
-            <p class="text-center text-muted" id="loading-albums"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดอัลบั้ม...</p>
-        </div>
-    </div>
-</div>
-
-<!-- Modal แสดงรูปภาพในอัลบั้ม -->
-<div class="modal fade" id="albumPhotoModal" tabindex="-1" role="dialog" aria-labelledby="albumPhotoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="albumPhotoModalLabel"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="text-right mb-3">
-                    <button type="button" class="btn btn-danger btn-sm" id="delete-album-btn"><i class="fas fa-trash-alt"></i> ลบอัลบั้มนี้</button>
-                </div>
-                <div id="photo-grid" class="row">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="panel panel-default">
-    <div class="panel-heading" style="background-color: #f7f7f7; color: #333;">
-        <h4 class="panel-title"><i class="fas fa-magic fa-fw"></i> การจัดการ Face Embedding ล่วงหน้า</h4>
-    </div>
-    <div class="panel-body">
-        <p class="text-muted">
-            <i class="fas fa-info-circle"></i> 🚀 <strong>เวอร์ชัน Optimized</strong>: ประมวลผลแบบ Batch เร็วขึ้นหลายเท่า รองรับ 300+ รูปพร้อมกัน
-        </p>
-        <button type="button" class="btn btn-warning btn-block" id="generate-embedding-btn">
-            <i class="fas fa-bolt fa-fw"></i> สร้าง Face Embedding สำหรับรูปโปรไฟล์ (Batch Processing)
-        </button>
-        <div id="embedding-message-area" style="margin-top: 15px;"></div>
-    </div>
-</div>
-
-<div class="panel panel-default">
-    <div class="panel-heading" style="background-color: #f7f7f7; color: #333;">
-        <h4 class="panel-title"><i class="fas fa-binoculars fa-fw"></i> จับคู่รหัสใบหน้า (Match Faces)</h4>
-    </div>
-    <div class="panel-body">
-        <p class="text-muted">
-            <i class="fas fa-info-circle"></i> ตรวจจับและจับคู่นักเรียนในรูปกลุ่มที่ดึงรหัสใบหน้าไว้แล้ว
-        </p>
-        <button type="button" class="btn btn-primary btn-block" id="match-faces-btn">
-            <i class="fas fa-eye fa-fw"></i> เริ่มการจับคู่ใบหน้า (Batch Matching)
-        </button>
-        <div id="match-message-area" style="margin-top: 15px;"></div>
-    </div>
-</div>
-
-
-
-<script>
-$(document).ready(function() {
-    var iconUpload = '<i class="fas fa-cloud-upload-alt fa-fw"></i>';
-    var iconLoading = '<i class="fas fa-spinner fa-spin fa-fw"></i>';
-    var iconMatch = '<i class="fas fa-eye fa-fw"></i>';
-    var iconExtract = '<i class="fas fa-cog fa-fw"></i>';
-    var iconBolt = '<i class="fas fa-bolt fa-fw"></i>';
-    var currentAlbumName = '';
+    if(isset($_POST['action']) && $_POST['action'] == 'buildImage') {
+    $classroom_id = $_POST['classroom_id'];
     
-    fetchAlbums();
-
-    // ==========================================
-    // ฟังก์ชัน: ดึงรายการอัลบั้ม
-    // ==========================================
-    function fetchAlbums() {
-        var classroomId = $('#form_classroom_id').val();
-        var albumList = $('#album-list');
-        albumList.html('<p class="text-center text-muted" id="loading-albums"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดอัลบั้ม...</p>');
-
-        if (!classroomId) {
-            albumList.html('<p class="text-center text-danger"><i class="fas fa-times-circle"></i> ไม่พบ Classroom ID</p>');
-            return;
-        }
-
-        $.ajax({
-            url: '<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>',
-            type: 'POST',
-            data: { action: 'fetch_albums', classroom_id: classroomId },
-            dataType: 'json',
-            success: function(response) {
-                albumList.empty();
-                if (response.status === 'success' && response.albums.length > 0) {
-                    response.albums.forEach(function(album) {
-                        var coverUrl = album.cover_url || 'https://via.placeholder.com/300x200?text=No+Photo';
-                        
-                        // สร้าง Badge แสดงสถานะ
-                        var statusBadge = album.is_extracted 
-                            ? '<span class="badge badge-success" style="background-color: #28a745;"><i class="fas fa-check-circle"></i> ดึงรหัสแล้ว</span>'
-                            : '<span class="badge badge-warning" style="background-color: #ffc107; color: #000;"><i class="fas fa-exclamation-triangle"></i> ยังไม่ดึงรหัส</span>';
-                        
-                        // สร้างปุ่ม Extract (แสดงเฉพาะอัลบั้มที่ยังไม่ได้ดึงรหัส)
-                        var extractButton = !album.is_extracted 
-                            ? `<button class="btn btn-warning btn-sm btn-block extract-album-btn" data-album-name="${album.album_name}" style="margin-top: 10px;">
-                                   <i class="fas fa-cog fa-fw"></i> ดึงรหัสใบหน้า
-                               </button>`
-                            : '';
-                        
-                        var albumHtml = `
-                            <div class="col-xs-12 col-sm-6 col-md-3" style="margin-bottom: 20px;">
-                                <div class="card album-card-wrapper" style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                    <div class="album-card" data-album-name="${album.album_name}" style="cursor: pointer;">
-                                        <div class="img-container" style="height: 150px; overflow: hidden; position: relative;">
-                                            <img src="${coverUrl}" alt="${album.album_name}" class="img-responsive" style="width: 100%; height: 100%; object-fit: cover;">
-                                            <div style="position: absolute; top: 10px; right: 10px;">
-                                                ${statusBadge}
-                                            </div>
-                                        </div>
-                                        <div class="card-body" style="padding: 15px;">
-                                            <h5 class="card-title" style="font-weight: bold; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                <i class="fas fa-folder fa-fw text-primary"></i> ${album.album_name}
-                                            </h5>
-                                            <p class="card-text text-muted" style="font-size: 0.9em; margin-bottom: 5px;">
-                                                <i class="fas fa-image fa-fw"></i> ${album.photo_count} รูป
-                                            </p>
-                                            <p class="card-text text-muted" style="font-size: 0.85em; margin-bottom: 0;">
-                                                <i class="fas fa-check-circle fa-fw"></i> ดึงรหัสแล้ว: ${album.extracted_count}/${album.photo_count}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    ${extractButton}
-                                </div>
-                            </div>
-                        `;
-                        albumList.append(albumHtml);
-                    });
-                } else {
-                    albumList.html('<p class="text-center text-muted"><i class="fas fa-box-open"></i> ไม่พบอัลบั้มใน Classroom นี้</p>');
-                }
-            },
-            error: function() {
-                albumList.html('<p class="text-center text-danger"><i class="fas fa-exclamation-triangle"></i> เกิดข้อผิดพลาดในการดึงอัลบั้ม</p>');
-            }
-        });
+    $album_info = select_data(
+        "album_name, classroom_id",
+        "classroom_album",
+        "where classroom_id = '{$classroom_id}'"
+    );
+    
+    if (!$album_info || count($album_info) == 0) {
+        echo json_encode([
+            'status' => false,
+            'message' => 'Album not found'
+        ]);
+        exit;
     }
-
-    // ==========================================
-    // คลิกที่ Card เพื่อเปิด Modal แสดงรูปภาพ
-    // ==========================================
-    $(document).on('click', '.album-card', function() {
-        currentAlbumName = $(this).data('album-name');
-        $('#albumPhotoModalLabel').text(currentAlbumName);
-        $('#photo-grid').html('<p class="text-center text-muted"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดรูปภาพ...</p>');
-        $('#albumPhotoModal').modal('show');
+    
+    $album_name = $album_info[0]['album_name'];
+    $classroom_id = $album_info[0]['classroom_id'];
+    $is_default = in_array($album_name, ['Public', 'Report', 'Delete', 'Restrict', 'Duplicates']);
+    
+    // ===== ถ้าเป็น Duplicates Album ให้ดึงรูปจากคู่ =====
+    if ($album_name == 'Duplicates') {
+        // ดึงรูปทั้งหมดที่อยู่ในคู่ duplicate
+        $duplicate_photos = select_data(
+            "DISTINCT p.photo_id, p.photo_path, p.public, p.status, p.classroom_id, 
+             DATE_FORMAT(p.date_create, '%Y/%m/%d %H:%i:%s') as date_create",
+            "event_photo_duplicate_check c
+             INNER JOIN event_photo p ON (c.photo_id_1 = p.photo_id OR c.photo_id_2 = p.photo_id)",
+            "where c.classroom_id = '{$classroom_id}' 
+             and c.is_duplicate = 1 
+             and p.status = 0
+             order by p.date_create desc"
+        );
         
-        fetchAlbumPhotos(currentAlbumName);
-    });
-
-    // ==========================================
-    // ฟังก์ชันดึงรูปภาพในอัลบั้ม
-    // ==========================================
-    function fetchAlbumPhotos(albumName) {
-        var photoGrid = $('#photo-grid');
-        var classroomId = $('#form_classroom_id').val();
-
-        $.ajax({
-            url: '<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>',
-            type: 'POST',
-            data: { action: 'fetch_album_photos', classroom_id: classroomId, album_name: albumName },
-            dataType: 'json',
-            success: function(response) {
-                photoGrid.empty();
-                if (response.status === 'success' && response.photos.length > 0) {
-                    response.photos.forEach(function(photo) {
-                        var photoHtml = `
-                            <div class="col-xs-6 col-sm-4 col-md-3 photo-item" id="photo-${photo.id}" style="margin-bottom: 15px;">
-                                <div style="position: relative; border: 1px solid #eee; border-radius: 4px; overflow: hidden;">
-                                    <img src="${photo.url}" alt="Photo ${photo.id}" class="img-responsive" style="width: 100%; height: 150px; object-fit: cover;">
-                                    <div style="position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.5); padding: 5px; border-bottom-left-radius: 4px;">
-                                        <button class="btn btn-danger btn-xs delete-photo-btn" data-photo-id="${photo.id}" title="ลบรูปนี้">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <small class="text-muted" style="display: block; margin-top: 5px; font-size: 0.8em;">${photo.date_create}</small>
-                            </div>
-                        `;
-                        photoGrid.append(photoHtml);
-                    });
-                } else {
-                    photoGrid.html('<p class="text-center text-muted"><i class="fas fa-camera"></i> ไม่มีรูปภาพในอัลบั้มนี้</p>');
-                }
-            },
-            error: function() {
-                photoGrid.html('<p class="text-center text-danger"><i class="fas fa-exclamation-triangle"></i> เกิดข้อผิดพลาดในการโหลดรูปภาพ</p>');
+        if (!$duplicate_photos || count($duplicate_photos) == 0) {
+            echo json_encode([
+                'status' => true,
+                'image_data' => [],
+                'is_default_album' => true,
+                'album_name' => 'Duplicates',
+                'is_duplicate_album' => false  // แสดงแบบปกติ
+            ]);
+            exit;
+        }
+        
+        // สร้าง image data เหมือนอัลบัมปกติ
+        $image_data = [];
+        foreach($duplicate_photos as $image) {
+            $path_parts = pathinfo($image['photo_path']);
+            $thumbnail_path = $path_parts['dirname'] . '/' . $path_parts['filename'] . '_thumbnail.' . $path_parts['extension'];
+            
+            $queue_data = select_data(
+                "status, error_msg, thumbnail_300_path", 
+                "event_photo_resize_queue", 
+                "where photo_id = '{$image['photo_id']}'"
+            );
+            
+            $queue_status = 'not_found';
+            $error_msg = '';
+            $thumbnail_300_path = '';
+            
+            if($queue_data && count($queue_data) > 0) {
+                $queue_status = $queue_data[0]['status'];
+                $error_msg = $queue_data[0]['error_msg'];
+                $thumbnail_300_path = $queue_data[0]['thumbnail_300_path'];
             }
-        });
+            
+            $report_count = select_data(
+                "COUNT(*) as total",
+                "event_photo_report",
+                "where photo_id = '{$image['photo_id']}'"
+            );
+            $total_reports = $report_count[0]['total'] ? $report_count[0]['total'] : 0;
+            
+            $download_count = select_data(
+                "SUM(download_count) as total",
+                "event_photo_download",
+                "where photo_id = '{$image['photo_id']}'"
+            );
+            $total_downloads = $download_count[0]['total'] ? $download_count[0]['total'] : 0;
+            
+            // หาว่ารูปนี้อยู่ในอัลบัมจริงไหน
+            $real_album_name = '';
+            if ($image['classroom_id']) {
+                $real_album = select_data(
+                    "album_name",
+                    "classroom_album",
+                    "where classroom_id = '{$image['classroom_id']}'"
+                );
+                if ($real_album && count($real_album) > 0) {
+                    $real_album_name = $real_album[0]['album_name'];
+                }
+            }
+            
+            // หาว่ารูปนี้มีคู่ที่ซ้ำกับใครบ้าง
+            $pair_info = select_data(
+                "c.similarity_score, c.face_match_count,
+                 CASE 
+                   WHEN c.photo_id_1 = '{$image['photo_id']}' THEN c.photo_id_2
+                   ELSE c.photo_id_1
+                 END as pair_photo_id",
+                "event_photo_duplicate_check c",
+                "where c.classroom_id = '{$classroom_id}' 
+                 and c.is_duplicate = 1
+                 and (c.photo_id_1 = '{$image['photo_id']}' OR c.photo_id_2 = '{$image['photo_id']}')"
+            );
+            
+            $similarity = 0;
+            $face_matches = 0;
+            $pair_photo_id = '';
+            if ($pair_info && count($pair_info) > 0) {
+                $similarity = round($pair_info[0]['similarity_score'] * 100, 2);
+                $face_matches = $pair_info[0]['face_match_count'];
+                $pair_photo_id = $pair_info[0]['pair_photo_id'];
+            }
+            
+            $image_data[] = [
+                'photo_id' => $image['photo_id'],
+                'photo_path' => GetPublicUrl($thumbnail_path),
+                'thumbnail_300_path' => $thumbnail_300_path ? GetPublicUrl($thumbnail_300_path) : '',
+                'public' => $image['public'],
+                'status' => $image['status'],
+                'queue_status' => $queue_status,
+                'error_msg' => $error_msg,
+                'report_count' => $total_reports,
+                'download_count' => $total_downloads,
+                'date_create' => $image['date_create'],
+                'real_album_name' => $real_album_name,
+                'similarity' => $similarity,  // เพิ่มข้อมูลความคล้าย
+                'face_matches' => $face_matches,  // เพิ่มจำนวน face ที่ตรง
+                'pair_photo_id' => $pair_photo_id  // รูปคู่
+            ];
+        }
+        
+        echo json_encode([
+            'status' => true,
+            'image_data' => $image_data,
+            'is_default_album' => true,
+            'album_name' => 'Duplicates',
+            'is_duplicate_album' => false  // แสดงแบบตารางปกติ
+        ]);
+        exit;
     }
-
-    // ==========================================
-    // ปุ่ม: ดึงรหัสใบหน้าจากอัลบั้ม
-    // ==========================================
-    $(document).on('click', '.extract-album-btn', function(e) {
-        e.stopPropagation();
-        var albumName = $(this).data('album-name');
-        var btn = $(this);
-        var classroomId = $('#form_classroom_id').val();
         
-        if (confirm(`คุณต้องการดึงรหัสใบหน้าจากรูปทั้งหมดในอัลบั้ม "${albumName}" หรือไม่?`)) {
-            btn.prop('disabled', true).html(iconLoading + ' กำลังดึงรหัสใบหน้า...');
-            
-            $.ajax({
-                url: '<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>',
-                type: 'POST',
-                data: { 
-                    action: 'extract_album_faces', 
-                    classroom_id: classroomId, 
-                    album_name: albumName 
-                },
-                dataType: 'json',
-                timeout: 300000, // 5 นาที
-                success: function(response) {
-                    if (response.status === 'success') {
-                        alert(response.message);
-                        fetchAlbums(); // โหลดอัลบั้มใหม่เพื่ออัปเดตสถานะ
-                    } else {
-                        alert('เกิดข้อผิดพลาด: ' + response.message);
-                        btn.prop('disabled', false).html(iconExtract + ' ดึงรหัสใบหน้า');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert('เกิดข้อผิดพลาดในการส่งคำขอ: ' + error);
-                    btn.prop('disabled', false).html(iconExtract + ' ดึงรหัสใบหน้า');
-                }
-            });
-        }
-    });
-
-    // ==========================================
-    // ปุ่ม: สร้าง Embedding สำหรับรูปโปรไฟล์
-    // ==========================================
-    $('#generate-embedding-btn').on('click', function(e) {
-        e.preventDefault();
-        var btn = $(this);
-        var messageArea = $('#embedding-message-area');
-        var classroomId = $('#form_classroom_id').val();
-        
-        if (!classroomId) {
-            messageArea.html('<div class="alert alert-danger"><i class="fas fa-times-circle"></i> ไม่พบ Classroom ID</div>');
-            return;
-        }
-        
-        if (confirm('คุณต้องการสร้าง Face Embedding สำหรับรูปโปรไฟล์ทั้งหมดหรือไม่?')) {
-            btn.prop('disabled', true).html(iconLoading + ' กำลังประมวลผล...');
-            messageArea.html('<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> กำลังสร้าง Embedding กรุณารอสักครู่...</div>');
-            
-            $.ajax({
-                url: '<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>',
-                type: 'POST',
-                data: { action: 'generate_embedding_batch', classroom_id: classroomId },
-                dataType: 'json',
-                timeout: 300000,
-                success: function(response) {
-                    if (response.status === 'success') {
-                        var alertHtml = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> ' + response.message + '</div>';
-                        if (response.errors && response.errors.length > 0) {
-                            alertHtml += '<div class="alert alert-warning" style="margin-top: 10px;"><strong>คำเตือน:</strong><ul><li>' + response.errors.join('</li><li>') + '</li></ul></div>';
-                        }
-                        messageArea.html(alertHtml);
-                    } else {
-                        messageArea.html('<div class="alert alert-danger"><i class="fas fa-times-circle"></i> ' + response.message + '</div>');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    messageArea.html('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> เกิดข้อผิดพลาด: ' + error + '</div>');
-                },
-                complete: function() {
-                    btn.prop('disabled', false).html(iconBolt + ' สร้าง Face Embedding สำหรับรูปโปรไฟล์ (Batch Processing)');
-                }
-            });
-        }
-    });
-
-    // ==========================================
-    // ฟอร์ม: อัปโหลดรูปกลุ่ม
-    // ==========================================
-    $('#photo-upload-form').on('submit', function(e) {
-        e.preventDefault();
-        
-        var form = $(this);
-        var formData = new FormData(form[0]);
-        var submitBtn = $('#upload-photo-btn');
-        var messageArea = $('#upload-message-area');
-        
-        submitBtn.prop('disabled', true).html(iconLoading + ' กำลังอัปโหลด...');
-        messageArea.empty();
-
-        $.ajax({
-            url: form.attr('action'),
-            type: form.attr('method'),
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            timeout: 300000,
-            success: function(response) {
-                if (response.status === 'success') {
-                    messageArea.html('<div class="alert alert-success"><i class="fas fa-check-circle fa-fw"></i> ' + response.message + '</div>');
-                    form[0].reset();
-                    fetchAlbums(); // โหลดอัลบั้มใหม่
-                } else {
-                    var errorHtml = '<div class="alert alert-danger"><i class="fas fa-times-circle fa-fw"></i> ' + response.message + '</div>';
-                    if (response.errors && response.errors.length > 0) {
-                         errorHtml += '<div class="alert alert-warning" style="margin-top: 10px;"><strong>คำเตือน:</strong><ul><li>' + response.errors.join('</li><li>') + '</li></ul></div>';
-                    }
-                    messageArea.html(errorHtml);
-                }
-            },
-            error: function(xhr, status, error) {
-                messageArea.html('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle fa-fw"></i> เกิดข้อผิดพลาด: ' + error + '</div>');
-            },
-            complete: function() {
-                submitBtn.prop('disabled', false).html(iconUpload + ' อัปโหลดรูปกลุ่ม');
+        if ($is_default) {
+            if ($album_name == 'Duplicates') {
+                // ส่งข้อมูลคู่รูปซ้ำแทน
+                echo json_encode([
+                    'status' => true,
+                    'is_default_album' => true,
+                    'album_name' => 'Duplicates',
+                    'is_duplicate_album' => true
+                ]);
+                exit;
             }
-        });
-    });
-
-    // ==========================================
-    // ปุ่ม: จับคู่ใบหน้า (Match Faces)
-    // ==========================================
-    $('#match-faces-btn').on('click', function(e) {
-        e.preventDefault();
-        var btn = $(this);
-        var messageArea = $('#match-message-area');
-        var classroomId = $('#form_classroom_id').val();
-        
-        if (!classroomId) {
-            messageArea.html('<div class="alert alert-danger"><i class="fas fa-times-circle"></i> ไม่พบ Classroom ID</div>');
-            return;
-        }
-        
-        if (confirm('คุณต้องการเริ่มจับคู่ใบหน้าในรูปกลุ่มที่ดึงรหัสแล้วหรือไม่?')) {
-            btn.prop('disabled', true).html(iconLoading + ' กำลังจับคู่ใบหน้า...');
-            messageArea.html('<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> กำลังประมวลผล กรุณารอสักครู่...</div>');
             
-            $.ajax({
-                url: '<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>',
-                type: 'POST',
-                data: { action: 'batch_match_faces', classroom_id: classroomId },
-                dataType: 'json',
-                timeout: 300000,
-                success: function(response) {
-                    if (response.status === 'success') {
-                        var alertHtml = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> ' + response.message + '</div>';
-                        if (response.errors && response.errors.length > 0) {
-                            alertHtml += '<div class="alert alert-warning" style="margin-top: 10px;"><strong>คำเตือน:</strong><ul><li>' + response.errors.join('</li><li>') + '</li></ul></div>';
-                        }
-                        messageArea.html(alertHtml);
-                    } else {
-                        messageArea.html('<div class="alert alert-danger"><i class="fas fa-times-circle"></i> ' + response.message + '</div>');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    messageArea.html('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> เกิดข้อผิดพลาด: ' + error + '</div>');
-                },
-                complete: function() {
-                    btn.prop('disabled', false).html(iconMatch + ' เริ่มการจับคู่ใบหน้า (Batch Matching)');
-                }
-            });
+            $where_clause = "where classroom_id = '{$classroom_id}'";
+            
+            switch($album_name) {
+                case 'Delete':
+                    $where_clause .= " and status = 1";
+                    break;
+                case 'Restrict':
+                    $where_clause .= " and public = 1 and status = 0";
+                    break;
+                case 'Report':
+                    $where_clause .= " and public = 0 and status = 0";
+                    $where_clause .= " and photo_id IN (SELECT DISTINCT photo_id FROM event_photo_report)";
+                    break;
+                case 'Public':
+                    $where_clause .= " and public = 0 and status = 0";
+                    $where_clause .= " and photo_id NOT IN (SELECT DISTINCT photo_id FROM event_photo_report)";
+                    break;
+            }
+        } else {
+            $where_clause = "where classroom_id = '{$classroom_id}' and status = 0";
         }
-    });
-
-    // ==========================================
-    // ลบรูปภาพเดี่ยว
-    // ==========================================
-    $(document).on('click', '.delete-photo-btn', function(e) {
-        e.stopPropagation();
-        var photoId = $(this).data('photo-id');
         
-        if (confirm('คุณต้องการลบรูปภาพนี้ออกจากอัลบั้มหรือไม่?')) {
-            $.ajax({
-                url: '<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>',
-                type: 'POST',
-                data: { action: 'delete_photo', photo_id: photoId },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        $('#photo-' + photoId).fadeOut(300, function() { 
-                            $(this).remove();
-                            fetchAlbums();
-                            if ($('#photo-grid').children('.photo-item').length === 0) {
-                                $('#photo-grid').html('<p class="text-center text-muted"><i class="fas fa-camera"></i> ไม่มีรูปภาพในอัลบั้มนี้</p>');
+        $images = select_data(
+            "photo_id, photo_path, public, status, classroom_id, date_format(date_create, '%Y/%m/%d %H:%i:%s') as date_create", 
+            "classroom_photo", 
+            "{$where_clause} order by date_create desc"
+        );
+        
+        $image_data = [];
+        foreach($images as $image) {
+            $path_parts = pathinfo($image['photo_path']);
+            $thumbnail_path = $path_parts['dirname'] . '/' . $path_parts['filename'] . '_thumbnail.' . $path_parts['extension'];
+            
+            $queue_data = select_data(
+                "status, error_msg, thumbnail_300_path", 
+                "event_photo_resize_queue", 
+                "where photo_id = '{$image['photo_id']}'"
+            );
+            
+            $queue_status = 'not_found';
+            $error_msg = '';
+            $thumbnail_300_path = '';
+            
+            if($queue_data && count($queue_data) > 0) {
+                $queue_status = $queue_data[0]['status'];
+                $error_msg = $queue_data[0]['error_msg'];
+                $thumbnail_300_path = $queue_data[0]['thumbnail_300_path'];
+            }
+            
+            $report_count = select_data(
+                "COUNT(*) as total",
+                "event_photo_report",
+                "where photo_id = '{$image['photo_id']}'"
+            );
+            $total_reports = $report_count[0]['total'] ? $report_count[0]['total'] : 0;
+            
+            $download_count = select_data(
+                "SUM(download_count) as total",
+                "event_photo_download",
+                "where photo_id = '{$image['photo_id']}'"
+            );
+            $total_downloads = $download_count[0]['total'] ? $download_count[0]['total'] : 0;
+            
+            $real_album_name = '';
+            if ($is_default && $image['classroom_id']) {
+                $real_album = select_data(
+                    "album_name",
+                    "classroom_album",
+                    "where classroom_id = '{$image['classroom_id']}'"
+                );
+                if ($real_album && count($real_album) > 0) {
+                    $real_album_name = $real_album[0]['album_name'];
+                }
+            }
+            
+            $image_data[] = [
+                'photo_id' => $image['photo_id'],
+                'photo_path' => GetPublicUrl($thumbnail_path),
+                'thumbnail_300_path' => $thumbnail_300_path ? GetPublicUrl($thumbnail_300_path) : '',
+                'public' => $image['public'],
+                'status' => $image['status'],
+                'queue_status' => $queue_status,
+                'error_msg' => $error_msg,
+                'report_count' => $total_reports,
+                'download_count' => $total_downloads,
+                'date_create' => $image['date_create'],
+                'real_album_name' => $real_album_name
+            ];
+        }
+        
+        echo json_encode([
+            'status' => true,
+            'image_data' => $image_data,
+            'is_default_album' => $is_default,
+            'album_name' => $album_name
+        ]);
+        exit;
+    }
+    
+    if(isset($_POST['action']) && $_POST['action'] == 'deleteImage') {
+        $photo_id = $_POST['photo_id'];
+        
+        update_data(
+            "classroom_photo", 
+            "status = 1, emp_modify = '{$_SESSION['emp_id']}', date_modify = NOW()", 
+            "photo_id = '{$photo_id}'"
+        );
+        
+        update_data(
+            "event_photo_queue",
+            "status = 'deleted', updated_at = NOW()",
+            "photo_id = '{$photo_id}'"
+        );
+        
+        echo json_encode([
+            'status' => true,
+            'message' => 'Image deleted successfully'
+        ]);
+        exit;
+    }
+    
+    if (isset($_POST['action']) && $_POST['action'] == 'uploadImages') {
+        $classroom_id = $_POST['classroom_id'];
+        $classroom_id = $_POST['classroom_id'];
+        $comp_id = $_SESSION['comp_id'];
+        $emp_id = $_SESSION['emp_id'];
+        
+        $MAX_FILE_SIZE = 100 * 1024 * 1024;
+        $ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'bmp'];
+        
+        $upload_dir = "uploads/{$comp_id}/events/{$classroom_id}/gallery/";
+        $errors = [];
+        $success_count = 0;
+        $detailed_errors = [];
+        
+        $event_data = select_data("comp_id", "event_template", "where id = '{$classroom_id}'");
+        $logo_temp = null;
+        $logo_error = null;
+        
+        if ($event_data && count($event_data) > 0) {
+            $event_comp_id = $event_data[0]['comp_id'];
+            $company_data = select_data("comp_logo", "m_company", "where comp_id = '{$event_comp_id}'");
+            
+            if ($company_data && count($company_data) > 0 && !empty($company_data[0]['comp_logo'])) {
+                $event_logo_url = '/' . $company_data[0]['comp_logo'];
+                $logo_file_path = $_SERVER['DOCUMENT_ROOT'] . $event_logo_url;
+                
+                if (file_exists($logo_file_path)) {
+                    $logo_temp = sys_get_temp_dir() . '/event_logo_' . md5($event_logo_url) . '.png';
+                    if (!file_exists($logo_temp)) {
+                        if (!copy($logo_file_path, $logo_temp)) {
+                            $logo_error = "Cannot copy logo file";
+                            $logo_temp = null;
+                        } else {
+                            $logo_info = @getimagesize($logo_temp);
+                            if ($logo_info === false) {
+                                @unlink($logo_temp);
+                                $logo_temp = null;
+                                $logo_error = "Logo is not valid image";
                             }
-                        });
-                        alert(response.message);
-                    } else {
-                        alert(response.message);
+                        }
                     }
-                },
-                error: function() {
-                    alert('เกิดข้อผิดพลาดในการส่งคำขอลบรูปภาพ');
+                } else {
+                    $logo_error = "Logo file not found at: {$logo_file_path}";
                 }
-            });
+            }
         }
-    });
-
-    // ==========================================
-    // ลบอัลบั้มทั้งชุด
-    // ==========================================
-    $('#delete-album-btn').on('click', function() {
-        var classroomId = $('#form_classroom_id').val();
         
-        if (!currentAlbumName) {
-            alert('ไม่พบชื่ออัลบั้มที่ต้องการลบ');
-            return;
-        }
-
-        if (confirm(`คุณต้องการลบอัลบั้ม "${currentAlbumName}" และรูปภาพทั้งหมดในอัลบั้มนี้ใช่หรือไม่?`)) {
-            $.ajax({
-                url: '<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>',
-                type: 'POST',
-                data: { action: 'delete_album', classroom_id: classroomId, album_name: currentAlbumName },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        alert(response.message);
-                        $('#albumPhotoModal').modal('hide');
-                        fetchAlbums();
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function() {
-                    alert('เกิดข้อผิดพลาดในการส่งคำขอลบอัลบั้ม');
+        foreach ($_FILES['files']['tmp_name'] as $key => $tmp_name) {
+            $file_name = $_FILES['files']['name'][$key];
+            $file_size = $_FILES['files']['size'][$key];
+            $file_error = $_FILES['files']['error'][$key];
+            
+            if ($file_error !== UPLOAD_ERR_OK) {
+                $error_messages = [
+                    UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize',
+                    UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE',
+                    UPLOAD_ERR_PARTIAL => 'File uploaded partially',
+                    UPLOAD_ERR_NO_FILE => 'No file uploaded',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Missing temp folder',
+                    UPLOAD_ERR_CANT_WRITE => 'Failed to write file',
+                    UPLOAD_ERR_EXTENSION => 'Upload stopped by extension'
+                ];
+                $errors[] = "'{$file_name}': " . ($error_messages[$file_error] ? $error_messages[$file_error] : "Unknown error {$file_error}");
+                $detailed_errors['upload_error'][] = $file_name;
+                continue;
+            }
+            
+            $path_info = pathinfo($file_name);
+            $ext = strtolower($path_info['extension']);
+            if (!in_array($ext, $ALLOWED_EXTENSIONS)) {
+                $errors[] = "'{$file_name}': Invalid extension '{$ext}'";
+                $detailed_errors['invalid_extension'][] = $file_name;
+                continue;
+            }
+            
+            if ($file_size > $MAX_FILE_SIZE) {
+                $size_mb = round($file_size / (1024 * 1024), 2);
+                $errors[] = "'{$file_name}': Too large ({$size_mb}MB)";
+                $detailed_errors['too_large'][] = $file_name;
+                continue;
+            }
+            
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime_type = finfo_file($finfo, $tmp_name);
+            finfo_close($finfo);
+            
+            $allowed_mimes = ['image/jpeg', 'image/png', 'image/bmp', 'image/x-ms-bmp'];
+            if (!in_array($mime_type, $allowed_mimes)) {
+                $errors[] = "'{$file_name}': Invalid MIME type '{$mime_type}'";
+                $detailed_errors['invalid_mime'][] = $file_name;
+                continue;
+            }
+            
+            $image_info = @getimagesize($tmp_name);
+            if ($image_info === false) {
+                $errors[] = "'{$file_name}': Not a valid image file";
+                $detailed_errors['invalid_image'][] = $file_name;
+                continue;
+            }
+            
+            $file_base_name = $path_info['filename'];
+            $clean_name = preg_replace("/[^a-zA-Z0-9\.\-\_]/", "_", $file_base_name);
+            $strname = uniqid() . "_" . $clean_name;
+            
+            // ============================================================
+            // 🆕 STEP 1: บันทึกรูปต้นฉบับ (ไม่มีลายน้ำ) ก่อน
+            // ============================================================
+            $original_no_logo = $upload_dir . $strname . '_original.' . $ext;
+            try {
+                $save_original_result = SaveFile($tmp_name, $original_no_logo);
+                
+                if (!$save_original_result) {
+                    $errors[] = "'{$file_name}': Cannot save original (no watermark) to storage";
+                    $detailed_errors['storage_save_failed'][] = $file_name;
+                    continue;
                 }
-            });
+            } catch (Exception $e) {
+                $errors[] = "'{$file_name}': Storage error (original) - {$e->getMessage()}";
+                $detailed_errors['storage_exception'][] = $file_name;
+                continue;
+            }
+            
+            // ============================================================
+            // 🆕 STEP 2: สร้างเวอร์ชันที่มีลายน้ำ
+            // ============================================================
+            $temp_with_logo = sys_get_temp_dir() . '/' . uniqid('original_logo_') . '.' . $ext;
+            if (!copy($tmp_name, $temp_with_logo)) {
+                $errors[] = "'{$file_name}': Cannot create temp file";
+                $detailed_errors['temp_copy_failed'][] = $file_name;
+                continue;
+            }
+            
+            $logo_added = false;
+            if ($logo_temp !== null && file_exists($logo_temp)) {
+                $logo_result = addEventLogoToOriginal($temp_with_logo, $logo_temp);
+                if (!$logo_result['success']) {
+                    $errors[] = "'{$file_name}': Logo not added - {$logo_result['error']} (using original)";
+                    $detailed_errors['logo_failed'][] = $file_name;
+                    copy($tmp_name, $temp_with_logo);
+                } else {
+                    $logo_added = true;
+                }
+            }
+            
+            // ============================================================
+            // 🆕 STEP 3: บันทึกเวอร์ชันที่มีลายน้ำ
+            // ============================================================
+            try {
+                $original_image = $upload_dir . $strname . '.' . $ext;
+                $save_result = SaveFile($temp_with_logo, $original_image);
+                
+                if (!$save_result) {
+                    $errors[] = "'{$file_name}': Cannot save watermarked version to storage";
+                    $detailed_errors['storage_save_failed'][] = $file_name;
+                    @unlink($temp_with_logo);
+                    continue;
+                }
+            } catch (Exception $e) {
+                $errors[] = "'{$file_name}': Storage error (watermarked) - {$e->getMessage()}";
+                $detailed_errors['storage_exception'][] = $file_name;
+                @unlink($temp_with_logo);
+                continue;
+            }
+            
+            $temp_base = sys_get_temp_dir() . "/event_originals/{$classroom_id}/";
+            if (!is_dir($temp_base)) {
+                if (!mkdir($temp_base, 0777, true)) {
+                    $errors[] = "'{$file_name}': Cannot create temp directory";
+                    $detailed_errors['temp_dir_failed'][] = $file_name;
+                    @unlink($temp_with_logo);
+                    continue;
+                }
+            }
+            
+            $temp_original_path = $temp_base . $strname . '.' . $ext;
+            if (!copy($temp_with_logo, $temp_original_path)) {
+                $errors[] = "'{$file_name}': Cannot copy to temp queue";
+                $detailed_errors['temp_queue_failed'][] = $file_name;
+                @unlink($temp_with_logo);
+                continue;
+            }
+            @chmod($temp_original_path, 0777);
+            @unlink($temp_with_logo);
+            
+            try {
+                $photo_path = escape_string($original_image);
+                $photo_name = escape_string($file_base_name);
+                
+                $photo_id = insert_data(
+                    "classroom_photo",
+                    "(classroom_id, classroom_id, comp_id, photo_name, photo_path, public, status, emp_create, date_create, emp_modify, date_modify)",
+                    "('{$classroom_id}', '{$classroom_id}', '{$comp_id}', '{$photo_name}', '{$photo_path}', 0, 0, '{$emp_id}', NOW(), '{$emp_id}', NOW())"
+                );
+                
+                if (!$photo_id) {
+                    $errors[] = "'{$file_name}': Cannot insert to database";
+                    $detailed_errors['db_insert_failed'][] = $file_name;
+                    continue;
+                }
+                
+                $temp_original_path_escaped = escape_string($temp_original_path);
+                $queue_result = insert_data(
+                    "event_photo_resize_queue",
+                    "(photo_id, classroom_id, original_path, temp_original_path, status, created_at, updated_at)",
+                    "('{$photo_id}', '{$classroom_id}', '{$photo_path}', '{$temp_original_path_escaped}', 'pending', NOW(), NOW())"
+                );
+                
+                if (!$queue_result) {
+                    $errors[] = "'{$file_name}': Cannot insert to queue";
+                    $detailed_errors['queue_insert_failed'][] = $file_name;
+                }
+                
+                $success_count++;
+                
+            } catch (Exception $e) {
+                $errors[] = "'{$file_name}': Database error - {$e->getMessage()}";
+                $detailed_errors['db_exception'][] = $file_name;
+                continue;
+            }
         }
-    });
-});
-</script>
+        
+        $error_summary = [];
+        if (!empty($detailed_errors)) {
+            foreach ($detailed_errors as $type => $files) {
+                $error_summary[] = ucfirst(str_replace('_', ' ', $type)) . ": " . count($files);
+            }
+        }
+        
+        echo json_encode([
+            'status' => true,
+            'success_count' => $success_count,
+            'total_files' => count($_FILES['files']['tmp_name']),
+            'failed_count' => count($_FILES['files']['tmp_name']) - $success_count,
+            'errors' => $errors,
+            'error_summary' => $error_summary,
+            'detailed_errors' => $detailed_errors,
+            'logo_status' => [
+                'logo_available' => ($logo_temp !== null),
+                'logo_error' => $logo_error
+            ]
+        ]);
+        exit;
+    }
+
+    function getRegisterIdFromMember($classroom_id, $member_id) {
+        $register = select_data(
+            "register_id",
+            "event_register",
+            "where id = '{$classroom_id}' and user_id = '{$member_id}' and status = 0"
+        );
+        if ($register && count($register) > 0) {
+            return $register[0]['register_id'];
+        }
+        return null;
+    }
+
+function addEventLogoToOriginal($image_path, $logo_path) {
+        try {
+            if (!file_exists($image_path)) {
+                return ['success' => false, 'error' => 'Image not found'];
+            }
+            if (!file_exists($logo_path)) {
+                return ['success' => false, 'error' => 'Logo not found'];
+            }
+            
+            if (extension_loaded('imagick')) {
+                return addLogoWithImagick($image_path, $logo_path);
+            }
+            
+            $image_info = getimagesize($image_path);
+            if ($image_info === false) {
+                return ['success' => false, 'error' => 'Invalid image'];
+            }
+            
+            $img = null;
+            switch ($image_info[2]) {
+                case IMAGETYPE_JPEG:
+                    $img = @imagecreatefromjpeg($image_path);
+                    break;
+                case IMAGETYPE_PNG:
+                    $img = @imagecreatefrompng($image_path);
+                    break;
+                case IMAGETYPE_BMP:
+                    $img = @imagecreatefrombmp($image_path);
+                    break;
+            }
+            
+            if ($img === false || $img === null) {
+                return ['success' => false, 'error' => 'Cannot create image resource'];
+            }
+            
+            // แก้ปัญหาการหมุนรูปตาม EXIF Orientation
+            $original_orientation = 1;
+            if ($image_info[2] === IMAGETYPE_JPEG && function_exists('exif_read_data')) {
+                $exif = @exif_read_data($image_path);
+                if ($exif && isset($exif['Orientation'])) {
+                    $original_orientation = $exif['Orientation'];
+                    switch ($exif['Orientation']) {
+                        case 3:
+                            $img = imagerotate($img, 180, 0);
+                            break;
+                        case 6:
+                            $img = imagerotate($img, -90, 0);
+                            break;
+                        case 8:
+                            $img = imagerotate($img, 90, 0);
+                            break;
+                    }
+                }
+            }
+            
+            $logo_info = getimagesize($logo_path);
+            if ($logo_info === false) {
+                imagedestroy($img);
+                return ['success' => false, 'error' => 'Invalid logo'];
+            }
+            
+            $logo_img = null;
+            switch ($logo_info[2]) {
+                case IMAGETYPE_JPEG:
+                    $logo_img = @imagecreatefromjpeg($logo_path);
+                    break;
+                case IMAGETYPE_PNG:
+                    $logo_img = @imagecreatefrompng($logo_path);
+                    break;
+                case IMAGETYPE_BMP:
+                    $logo_img = @imagecreatefrombmp($logo_path);
+                    break;
+            }
+            
+            if ($logo_img === false || $logo_img === null) {
+                imagedestroy($img);
+                return ['success' => false, 'error' => 'Cannot create logo resource'];
+            }
+            
+            // ========================================
+            // คำนวณขนาด logo ใหม่โดยไม่บิดเบี้ยว
+            // ========================================
+            $img_width = imagesx($img);
+            $img_height = imagesy($img);
+            
+            $logo_orig_w = imagesx($logo_img);
+            $logo_orig_h = imagesy($logo_img);
+
+            // กำหนดขนาดเป้าหมาย = 10% ของความสูงรูป
+            $target_height = $img_height * 0.1;
+            
+            // คำนวณ scale factor จากความสูง
+            $scale = $target_height / $logo_orig_h;
+            
+            // ใช้ scale เดียวกันกับทั้งกว้างและสูง (นี่คือกุญแจสำคัญ!)
+            $logo_new_w = round($logo_orig_w * $scale);
+            $logo_new_h = round($logo_orig_h * $scale);
+            
+            // ========================================
+            // สร้าง canvas ที่มีขนาดพอดีกับ logo ที่ scale แล้ว
+            // ไม่บังคับให้เป็นสี่เหลี่ยมจัตุรัส
+            // ========================================
+            $logo_resized = imagecreatetruecolor($logo_new_w, $logo_new_h);
+            
+            // รักษา transparency
+            imagealphablending($logo_resized, false);
+            imagesavealpha($logo_resized, true);
+            $transparent = imagecolorallocatealpha($logo_resized, 0, 0, 0, 127);
+            imagefill($logo_resized, 0, 0, $transparent);
+            imagealphablending($logo_resized, true);
+            
+            // ========================================
+            // Resize logo โดยใช้ scale factor เดียวกัน
+            // และ canvas ที่มีขนาดพอดี ไม่บังคับให้พอดี
+            // ========================================
+            imagecopyresampled(
+                $logo_resized,           // destination (ขนาดพอดีกับ logo)
+                $logo_img,               // source
+                0, 0,                    // dest x, y (เริ่มที่ 0,0)
+                0, 0,                    // src x, y (เริ่มที่ 0,0)
+                $logo_new_w,             // dest width (ขนาดจริงหลัง scale)
+                $logo_new_h,             // dest height (ขนาดจริงหลัง scale)
+                $logo_orig_w,            // src width (ขนาดเดิม)
+                $logo_orig_h             // src height (ขนาดเดิม)
+            );
+            
+            // วาง logo ที่มุมขวาบน
+            $margin = max(10, (int)($img_width * 0.01));
+            $pos_x = $img_width - $logo_new_w - $margin;
+            $pos_y = $margin;
+            
+            // วาง logo ลงบนรูป
+            imagealphablending($img, true);
+            imagesavealpha($img, true);
+            imagecopy($img, $logo_resized, $pos_x, $pos_y, 0, 0, $logo_new_w, $logo_new_h);
+            
+            // บันทึกรูป
+            $save_success = false;
+            switch ($image_info[2]) {
+                case IMAGETYPE_JPEG:
+                    $save_success = imagejpeg($img, $image_path, 95);
+                    break;
+                case IMAGETYPE_PNG:
+                    $save_success = imagepng($img, $image_path, 6);
+                    break;
+                case IMAGETYPE_BMP:
+                    $save_success = imagebmp($img, $image_path);
+                    break;
+            }
+            
+            imagedestroy($img);
+            imagedestroy($logo_img);
+            imagedestroy($logo_resized);
+            
+            if (!$save_success) {
+                return ['success' => false, 'error' => 'Cannot save image with logo'];
+            }
+            
+            // รีเซ็ต EXIF orientation เป็น 1
+            if ($image_info[2] === IMAGETYPE_JPEG && $original_orientation != 1) {
+                $exiftool_path = @shell_exec('which exiftool 2>/dev/null');
+                if (!empty($exiftool_path)) {
+                    $escaped_path = escapeshellarg($image_path);
+                    @shell_exec("exiftool -Orientation=1 -n -overwrite_original {$escaped_path} 2>/dev/null");
+                }
+            }
+            
+            return ['success' => true];
+            
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+    
+    function addLogoWithImagick($image_path, $logo_path) {
+        try {
+            $image = new Imagick($image_path);
+            $logo = new Imagick($logo_path);
+            
+            $image->autoOrientImage();
+            
+            $img_width = $image->getImageWidth();
+            $img_height = $image->getImageHeight();
+            
+            // ========================================
+            // คำนวณขนาด logo ใหม่โดยไม่บิดเบี้ยวด้วย Imagick
+            // ========================================
+            $logo_orig_w = $logo->getImageWidth();
+            $logo_orig_h = $logo->getImageHeight();
+            
+            // กำหนดขนาดเป้าหมาย = 10% ของความสูงรูป
+            $target_height = $img_height * 0.1;
+            
+            // คำนวณ scale factor จากความสูง
+            $scale = $target_height / $logo_orig_h;
+            
+            // ใช้ scale เดียวกันกับทั้งกว้างและสูง
+            $logo_new_w = round($logo_orig_w * $scale);
+            $logo_new_h = round($logo_orig_h * $scale);
+            
+            // Resize โดยรักษา aspect ratio
+            $logo->resizeImage($logo_new_w, $logo_new_h, Imagick::FILTER_LANCZOS, 1);
+            
+            // วาง logo ที่มุมขวาบน
+            $margin = max(10, intval($img_width * 0.01));
+            $pos_x = $img_width - $logo_new_w - $margin;
+            $pos_y = $margin;
+            
+            $image->compositeImage($logo, Imagick::COMPOSITE_OVER, $pos_x, $pos_y);
+            
+            $image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
+            $image->setImageCompressionQuality(95);
+            $image->writeImage($image_path);
+            
+            $image->clear();
+            $logo->clear();
+            
+            return ['success' => true];
+            
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => 'Imagick error: ' . $e->getMessage()];
+        }
+    }
+?>

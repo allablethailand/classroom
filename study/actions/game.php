@@ -20,63 +20,81 @@ if (isset($_POST) && $_POST['action'] == 'getQuizGame') {
     $questions = [
         [
             'text' => 'What is shown in this picture?',
-            'image' => 'images/question1.jpg',
+            'image' => 'https://picsum.photos/id/237/400/300',
             'choices' => ['A. Cat', 'B. Dog', 'C. Rabbit', 'D. Bird'],
             'correct' => 1
         ],
         [
             'text' => 'Which color is dominant?',
-            'image' => 'images/question2.jpg',
+            'image' => 'https://picsum.photos/id/1025/400/300',
             'choices' => ['A. Red', 'B. Blue', 'C. Green', 'D. Yellow'],
             'correct' => 2
         ],
         [
             'text' => 'Identify the object.',
-            'image' => 'images/question3.jpg',
+            'image' => 'https://picsum.photos/id/1/400/300',
             'choices' => ['A. Car', 'B. Boat', 'C. Plane', 'D. Train'],
             'correct' => 0
         ],
         [
             'text' => 'What is shown in this picture?',
-            'image' => 'images/question1.jpg',
+            'image' => 'https://picsum.photos/id/237/400/300',
             'choices' => ['A. Cat', 'B. Dog', 'C. Rabbit', 'D. Bird'],
             'correct' => 1
         ],
         [
             'text' => 'Which color is dominant?',
-            'image' => 'images/question2.jpg',
+            'image' => 'https://picsum.photos/id/1025/400/300',
             'choices' => ['A. Red', 'B. Blue', 'C. Green', 'D. Yellow'],
             'correct' => 2
         ],
         [
             'text' => 'Identify the object.',
-            'image' => 'images/question3.jpg',
+            'image' => 'https://picsum.photos/id/1/400/300',
             'choices' => ['A. Car', 'B. Boat', 'C. Plane', 'D. Train'],
             'correct' => 0
         ],
         [
-            'text' => 'What is shown in this picture?',
-            'image' => 'images/question1.jpg',
-            'choices' => ['A. Cat', 'B. Dog', 'C. Rabbit', 'D. Bird'],
+            'text' => 'What is the main subject?',
+            'image' => 'https://picsum.photos/id/100/400/300',
+            'choices' => ['A. Landscape', 'B. Portrait', 'C. Animal', 'D. Building'],
+            'correct' => 0
+        ],
+        [
+            'text' => 'Describe the scene.',
+            'image' => 'https://picsum.photos/id/1015/400/300',
+            'choices' => ['A. Urban', 'B. Rural', 'C. Coastal', 'D. Mountain'],
             'correct' => 1
         ],
         [
-            'text' => 'Which color is dominant?',
-            'image' => 'images/question2.jpg',
-            'choices' => ['A. Red', 'B. Blue', 'C. Green', 'D. Yellow'],
+            'text' => 'What is the weather like?',
+            'image' => 'https://picsum.photos/id/1018/400/300',
+            'choices' => ['A. Sunny', 'B. Cloudy', 'C. Rainy', 'D. Snowy'],
+            'correct' => 0
+        ],
+        [
+            'text' => 'Identify the time of day.',
+            'image' => 'https://picsum.photos/id/1035/400/300',
+            'choices' => ['A. Morning', 'B. Afternoon', 'C. Evening', 'D. Night'],
             'correct' => 2
         ],
         [
-            'text' => 'Identify the object.',
-            'image' => 'images/question3.jpg',
-            'choices' => ['A. Car', 'B. Boat', 'C. Plane', 'D. Train'],
+            'text' => 'What type of image is this?',
+            'image' => 'https://picsum.photos/id/1043/400/300',
+            'choices' => ['A. Nature', 'B. Architecture', 'C. Abstract', 'D. People'],
             'correct' => 0
         ],
         [
-            'text' => 'Identify the object.',
-            'image' => 'images/question3.jpg',
-            'choices' => ['A. Car', 'B. Boat', 'C. Plane', 'D. Train'],
-            'correct' => 0
+            'text' => 'Choose the best description.',
+            'image' => 'https://picsum.photos/id/1067/400/300',
+            'choices' => ['A. Busy', 'B. Peaceful', 'C. Dramatic', 'D. Mysterious'],
+            'correct' => 1
+        ],
+        [
+            'text' => 'Final question - describe the mood.',
+            'image' => 'https://picsum.photos/id/1074/400/300',
+            'choices' => ['A. Happy', 'B. Serene', 'C. Energetic', 'D. Melancholic'],
+            'correct' => 1
         ]
     ];
 
@@ -103,7 +121,7 @@ if (isset($_POST) && $_POST['action'] == 'getQuizGame') {
     echo json_encode($response);
 }
 
-if ($_POST['action'] == 'submitAnswer') {
+if (isset($_POST['action']) && $_POST['action'] == 'submitAnswer') {
     $questionIndex = $_POST['questionIndex'];
     $selectedAnswer = $_POST['selectedAnswer'];
 
@@ -114,7 +132,34 @@ if ($_POST['action'] == 'submitAnswer') {
     echo json_encode(['correct' => $isCorrect]);
 }
 
-
+if (isset($_POST['action']) && $_POST['action'] == 'submitQuiz') {
+    $answers = isset($_POST['answers']) ? $_POST['answers'] : [];
+    
+    // Get correct answers from questions array
+    $questions = [
+        ['correct' => 1], ['correct' => 2], ['correct' => 0], ['correct' => 0],
+        ['correct' => 1], ['correct' => 0], ['correct' => 2], ['correct' => 0],
+        ['correct' => 1], ['correct' => 1]
+    ];
+    
+    $score = 0;
+    $total = count($questions);
+    
+    foreach ($answers as $index => $selectedAnswer) {
+        if (isset($questions[$index]) && $questions[$index]['correct'] == $selectedAnswer) {
+            $score++;
+        }
+    }
+    
+    $response = [
+        'success' => true,
+        'score' => $score,
+        'total' => $total,
+        'percentage' => round(($score / $total) * 100, 2)
+    ];
+    
+    echo json_encode($response);
+}
 
 if ($_POST['action'] == 'getMemoryGame') {
     // $student_id = $_POST['student_id'];

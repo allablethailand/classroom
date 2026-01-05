@@ -68,8 +68,7 @@
 
     // var_dump($schedule_data);
 
-// require_once("actions/login.php");
-// // ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
+// require_once("actions/login.php"); ดึงไฟล์ที่จำเป็นเข้ามาใช้งาน
 
 // require_once($base_include."/lib/connect_sqli.php");
 // session_start(); // สำคัญมาก: ต้องเรียกใช้ session_start()
