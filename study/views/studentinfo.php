@@ -778,7 +778,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
             <div class="contact-section-card">
                 <div class="section-header-icon">
                     <i class="fas fa-address-book" style="font-size: 25px;"></i>
-                    <h3 class="section-title" style="padding-left:10px;">ช่องทางการติดต่อ</h3>
+                    <h3 class="section-title" style="padding-left:10px;" data-lang="contactinfo">ช่องทางการติดต่อ</h3>
                 </div>
                 <div class="contact-grid">
                     <?php if (!empty($row_all['student_mobile'])): ?>
@@ -861,13 +861,13 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
         <div class="info-grid-section">
             <div class="section-header-icon">
                 <i class="fas fa-heartbeat" style="font-size: 25px;"></i>
-                <h3 class="section-title" style="padding-left:10px;">ไลฟ์สไตล์</h3>
+                <h3 class="section-title" style="padding-left:10px;" data-lang="lifestyle">ไลฟ์สไตล์</h3>
             </div>
             <div class="info-grid">
                 <div class="info-item-box">
                     <i class="fas fa-star" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">งานอดิเรก</strong>
+                        <strong style="padding-left:10px;" data-lang="hobbies">งานอดิเรก</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_hobby"]) ? $row_all["student_hobby"] : " - "; ?></span>
                     </div>
@@ -875,7 +875,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                 <div class="info-item-box">
                     <i class="fas fa-music" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">ดนตรีที่ชอบ</strong>
+                        <strong style="padding-left:10px;" data-lang="favoritemusic">ดนตรีที่ชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_music"]) ? $row_all["student_music"] : " - "; ?></span>
                     </div>
@@ -883,7 +883,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                 <div class="info-item-box">
                     <i class="fas fa-glass-cheers" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">เครื่องดื่มที่ชื่นชอบ</strong>
+                        <strong style="padding-left:10px;" data-lang="favoritedrink">เครื่องดื่มที่ชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_drink"]) ? $row_all["student_drink"] : " - "; ?></span>
                     </div>
@@ -899,7 +899,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                 <div class="info-item-box">
                     <i class="fas fa-film" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">หนังที่ชอบ</strong>
+                        <strong style="padding-left:10px;" data-lang="favoritemovie">หนังที่ชอบ</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_movie"]) ? $row_all["student_movie"] : " - "; ?></span>
                     </div>
@@ -907,7 +907,7 @@ $profile_border_color1 = !empty($row_all['group_color']) ? htmlspecialchars($row
                 <div class="info-item-box">
                     <i class="fas fa-bullseye" style="font-size: 18px;"></i>
                     <div class="info-text">
-                        <strong style="padding-left:10px;">เป้าหมาย</strong>
+                        <strong style="padding-left:10px;" data-lang="lifegoal">เป้าหมาย</strong>
                         <span
                             style="padding-left:10px;"><?= !empty($row_all["student_goal"]) ? $row_all["student_goal"] : " - "; ?></span>
                     </div>

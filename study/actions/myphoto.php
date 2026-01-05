@@ -90,4 +90,9 @@ if (!empty($result_data)) {
 } else {
     echo json_encode(['status' => 'success', 'data' => [], 'message' => 'ไม่พบรูปภาพที่คุณถูกตรวจจับ']);
 }
+
+// NEW FILE UPLOAD
+
+
+
 ?>

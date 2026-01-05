@@ -47,6 +47,15 @@ session_start();
             <div id="other-upcoming-class-container"></div>
             <!-- <div id="overdue-class-container"></div> -->
 
+
+            <!-- <div class="row">
+                <p class="time-display">
+                    <span>Good Morning</span> 
+                    <span>Peranut!</span>
+                </p> 
+                <p style="color: rgb(153, 153, 153);">Dashboard</p>
+                <hr class="menu-separator">
+            </div> -->
             <div class="row">
                 <p class="menu-title" data-lang="academymenu">Academy Menu</p>
             </div>

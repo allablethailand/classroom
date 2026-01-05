@@ -29,38 +29,39 @@ $(document).ready(function() {
     let totalQuestions = 0;
 
     // Load questions from server via AJAX on start or navigation
+    // QUESTION SETUP
     function loadQuestion(index) {
-    $.ajax({
-        url: 'actions/game.php',
-        method: 'POST',
-        data: { 
-        action: 'getQuizGame', 
-        questionIndex: index
-        },
-        dataType: 'json',
-        success: function(response) {
-        if(response.success) {
-            totalQuestions = response.totalQuestions;
-            $('#questionText').text(response.question.text);
-            let choicesHtml = '';
-            response.question.choices.forEach((choice, i) => {
-            const checked = userAnswers[index] === i ? 'checked' : '';
-            let choiceNum = choice.split('.')[0]; // Extract number and dot
-            let choiceText = choice.substring(choice.indexOf('.') + 1).trim(); // Extract text after number and dot
-            choicesHtml += `<label class="option">
-                <input type="radio" name="answer" value="${i}" ${checked}>
-                    <span>${choiceNum}.</span> 
-                    <span style="margin-left:0.4rem;">
-                        ${choiceText}
-                    </span>
-            </label>`;
-            });
-            $('#choicesContainer').html(choicesHtml);
-            $('#questionNumber').text(`Question ${index + 1} of ${totalQuestions}`);
-            currentQuestionIndex = index;
-        }
-        }
-    });
+        $.ajax({
+            url: 'actions/game.php',
+            method: 'POST',
+            data: { 
+            action: 'getQuizGame', 
+            questionIndex: index
+            },
+            dataType: 'json',
+            success: function(response) {
+            if(response.success) {
+                totalQuestions = response.totalQuestions;
+                $('#questionText').text(response.question.text);
+                let choicesHtml = '';
+                response.question.choices.forEach((choice, i) => {
+                const checked = userAnswers[index] === i ? 'checked' : '';
+                let choiceNum = choice.split('.')[0]; // Extract number and dot
+                let choiceText = choice.substring(choice.indexOf('.') + 1).trim(); // Extract text after number and dot
+                choicesHtml += `<label class="option">
+                    <input type="radio" name="answer" value="${i}" ${checked}>
+                        <span>${choiceNum}.</span> 
+                        <span style="margin-left:0.4rem;">
+                            ${choiceText}
+                        </span>
+                </label>`;
+                });
+                $('#choicesContainer').html(choicesHtml);
+                $('#questionNumber').text(`Question ${index + 1} of ${totalQuestions}`);
+                currentQuestionIndex = index;
+            }
+            }
+        });
     }
 
     // const container = document.querySelector('.option'); // parent of .option elements
@@ -147,6 +148,9 @@ $(document).ready(function() {
 });
    let flipGameInitialized = false;
 
+
+
+    // FLIP CARD GAME CODE   
    function initFlipGame() {
     if(flipGameInitialized) return;
     flipGameInitialized = true;
