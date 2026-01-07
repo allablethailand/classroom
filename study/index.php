@@ -19,6 +19,14 @@
         case '/classroom/study/myphoto':
             require __DIR__.'/views/myphoto.php';
         break;
+        case '/classroom/study/myphoto_upload/':
+        case '/classroom/study/myphoto_upload':
+            require __DIR__.'/views/myphoto_upload.php';
+        break;
+        case '/classroom/study/myphoto_album/':
+        case '/classroom/study/myphoto_album':
+            require __DIR__.'/views/myphoto_album.php';
+        break;
         case '/classroom/study/myphoto1/':
         case '/classroom/study/myphoto1':
             require __DIR__.'/views/myphoto1.py';

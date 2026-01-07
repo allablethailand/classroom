@@ -5,7 +5,6 @@ session_start();
 ?>
 <!doctype html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,7 +37,6 @@ session_start();
 
 <body data-barba="wrapper">
     <?php require_once("component/header.php") ?>
-  
     <div class="main-content col-md-10" data-barba="container" data-barba-namespace="home">
         <div class="container-fluid" style="margin: 0 1rem;">
             
