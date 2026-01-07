@@ -154,22 +154,23 @@ $employee_id = getStudentEmpId($student_id);
         <div class="chat-input-container" style="display: none;">
                 <div class="input-wrapper">
                     <div class="input-icons">
-                        <div class="message-icon-shape">
+                        <div class="message-icon-shape-sm-show">
                             <i class="fa fa-paperclip"></i>
                         </div>
                         <div class="message-icon-shape">
                             <i class="fa fa-smile-o"></i>
                         </div>
-                        <!-- <i class="fa fa-microphone"></i> -->
                          <div class="message-icon-shape">
-
                              <i class="fa fa-ellipsis-h"></i>
                          </div>
                     </div>
                     <input type="text" class="chat-input" placeholder="Ask anything" id="chatmessageInput" data-group="test">
-                    <button class="send-button" id="sendMessageButton">
-                        <i class="fa fa-arrow-up"></i>
-                    </button>
+                    <div class="send-button" >
+
+                        <button class="send-button" id="sendMessageButton">
+                            <i class="fa fa-arrow-up"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -180,6 +181,18 @@ $employee_id = getStudentEmpId($student_id);
    
   </div>
   <?php require_once 'component/footer.php'; ?>
+
+<div class="modal fade chatHistoryModal" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h5 class="modal-title"></h5>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
 
 
 </body>
