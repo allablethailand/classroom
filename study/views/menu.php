@@ -5,7 +5,6 @@ session_start();
 ?>
 <!doctype html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,7 +37,6 @@ session_start();
 
 <body data-barba="wrapper">
     <?php require_once("component/header.php") ?>
-  
     <div class="main-content col-md-10" data-barba="container" data-barba-namespace="home">
         <div class="container-fluid" style="margin: 0 1rem;">
             
@@ -47,6 +45,15 @@ session_start();
             <div id="other-upcoming-class-container"></div>
             <!-- <div id="overdue-class-container"></div> -->
 
+
+            <!-- <div class="row">
+                <p class="time-display">
+                    <span>Good Morning</span> 
+                    <span>Peranut!</span>
+                </p> 
+                <p style="color: rgb(153, 153, 153);">Dashboard</p>
+                <hr class="menu-separator">
+            </div> -->
             <div class="row">
                 <p class="menu-title" data-lang="academymenu">Academy Menu</p>
             </div>

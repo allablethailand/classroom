@@ -258,7 +258,7 @@
         $filter .= "and emp.dept_id = '{$dept_search}'";
         $columnData = "emp.emp_id";
         $tableData = "m_employee emp";
-        $whereData = "WHERE emp.comp_id = '{$_SESSION['comp_id']}' and emp.emp_del is null and date(ifnull(emp.emp_resign_date,NOW())) >= date(NOW()) $filter group by emp.emp_id";
+        $whereData = "WHERE emp.comp_id = '{$_SESSION['comp_id']}' and emp.emp_del is null and date(ifnull(emp.emp_end_date,NOW())) >= date(NOW()) $filter group by emp.emp_id";
         $Data = select_data($columnData,$tableData,$whereData);
         echo json_encode($Data);
     }
@@ -282,7 +282,7 @@
 				LEFT JOIN 
 					m_department dept on dept.dept_id = emp.dept_id
 				WHERE 
-                emp.comp_id = '{$_SESSION['comp_id']}' and emp.emp_del is null and date(ifnull(emp.emp_resign_date,NOW())) >= date(NOW()) $filter
+                emp.comp_id = '{$_SESSION['comp_id']}' and emp.emp_del is null and date(ifnull(emp.emp_end_date,NOW())) >= date(NOW()) $filter
                 group by 
                     emp.emp_id";
 		$primaryKey = 'emp_id';
@@ -343,7 +343,7 @@
                     LEFT JOIN 
                         m_department dept on dept.dept_id = emp.dept_id
                     WHERE 
-                        emp.comp_id = '{$_SESSION['comp_id']}' and emp.emp_del is null and date(ifnull(emp.emp_resign_date,NOW())) >= date(NOW()) $filter  
+                        emp.comp_id = '{$_SESSION['comp_id']}' and emp.emp_del is null and date(ifnull(emp.emp_end_date,NOW())) >= date(NOW()) $filter  
                     group by 
                         emp.emp_id";
         $Data = select_data($columnData,$tableData,$whereData);

@@ -1,28 +1,20 @@
 <?php
-// myphoto_process.php (เปลี่ยนเป็นการดึงจากตาราง detech แทนการรัน Python และดึง Description)
-
-header('Content-Type: application/json');
-
-// ------------------------------------------------------------------------------------------------------
-// *** 1. นำเข้าโค้ด _config.php/ไฟล์ตั้งค่า ***
-// ------------------------------------------------------------------------------------------------------
-date_default_timezone_set('Asia/Bangkok');
-session_start();
+    header('Content-Type: application/json');
+    session_start();
     $base_include = $_SERVER['DOCUMENT_ROOT'];
     $base_path = '';
     if($_SERVER['HTTP_HOST'] == 'localhost'){
-       $request_uri = $_SERVER['REQUEST_URI'];
-       $exl_path = explode('/',$request_uri);
-       if(!file_exists($base_include."/dashboard.php")){
-           $base_path .= "/".$exl_path[1];
-       }
-       $base_include .= "/".$exl_path[1];
+        $request_uri = $_SERVER['REQUEST_URI'];
+        $exl_path = explode('/',$request_uri);
+        if(!file_exists($base_include."/dashboard.php")){
+            $base_path .= "/".$exl_path[1];
+        }
+        $base_include .= "/".$exl_path[1];
     }
     DEFINE('base_path', $base_path);
     DEFINE('base_include', $base_include);
-	require_once($base_include."/lib/connect_sqli.php");
-	require_once($base_include."/actions/func.php");
-	require_once($base_include."/classroom/study/actions/student_func.php");
+    require_once $base_include.'/lib/connect_sqli.php';
+    require_once $base_include . '/classroom/study/actions/student_func.php'; 
 
     $fsData = getBucketMaster();
     $filesystem_user = $fsData['fs_access_user'];
@@ -31,63 +23,111 @@ session_start();
     $filesystem_path = $fsData['fs_access_path'];
     $filesystem_type = $fsData['fs_type'];
     $fs_id = $fsData['fs_id'];
-	setBucket($fsData);
-global $mysqli;
+    setBucket($fsData);
 
-$student_id = $_SESSION['student_id'] ? $_SESSION['student_id'] : ($_GET['student_id'] ? $_GET['student_id'] : null); 
 
-if (!$student_id) {
-    echo json_encode(['status' => 'error', 'message' => 'Student ID ไม่ถูกต้อง']);
+    // $student_id = $_SESSION['student_id'] ? $_SESSION['student_id'] : ($_GET['student_id'] ? $_GET['student_id'] : null); 
+
+    // if (!$student_id) {
+    //     echo json_encode(['status' => 'error', 'message' => 'Student ID ไม่ถูกต้อง']);
+    //     exit;
+    // }
+
+
+
+    // // ----------------------------------------------------
+    // // ✅ แก้ไข: เพิ่ม t1.detection_date และปรับ ORDER BY 
+    // // ----------------------------------------------------
+    // $result_data = [];
+    // $sql = "SELECT 
+    //             t2.`group_photo_path`, 
+    //             t2.`description`, 
+    //             t2.`date_create`,
+    //             t1.`detection_date` 
+    //         FROM `classroom_photo_face_detection` t1
+    //         JOIN `classroom_photo_album_group` t2 ON t1.group_photo_id = t2.group_photo_id
+    //         WHERE t1.`student_id` = ? 
+    //         ORDER BY t2.date_create DESC, t1.detection_date DESC";
+            
+    // $stmt = $mysqli->prepare($sql);
+
+    // if ($stmt) {
+    //     $stmt->bind_param("i", $student_id);
+    //     $stmt->execute();
+    //     $result = $stmt->get_result();
+        
+    //     // ✅ NEW: ตรวจสอบและกำหนดฟังก์ชัน GetUrl
+    //     $use_get_url = function_exists('GetUrl');
+        
+    //     while ($row = $result->fetch_assoc()) {
+    //         $path = $row['group_photo_path'];
+            
+    //         // ✅ NEW: เรียก GetUrl() เพื่อแปลง Path ใน DB เป็น Full URL
+    //         if ($use_get_url) {
+    //             $path = GetUrl($path);
+    //         }
+            
+    //         $result_data[] = [
+    //             'path' => $path, // <== ตอนนี้ 'path' คือ Full URL แล้ว
+    //             'description' => $row['description'], 
+    //             'date_create' => $row['date_create'], 
+    //             'detection_date' => $row['detection_date']
+    //         ];
+    //     }
+    //     $stmt->close();
+    // }
+
+
+    // if (!empty($result_data)) {
+    //     // ส่งข้อมูลที่มีทั้ง Full URL และ Description กลับไปให้ JS
+    //     echo json_encode(['status' => 'success', 'data' => $result_data, 'message' => 'ดึงรูปภาพที่ตรวจจับไว้ล่วงหน้าสำเร็จ']); 
+    // } else {
+    //     echo json_encode(['status' => 'success', 'data' => [], 'message' => 'ไม่พบรูปภาพที่คุณถูกตรวจจับ']);
+    // }
+
+    // NEW FILE UPLOAD
+
+
+if ($_POST && $_POST['action'] == 'generate_classroom_params'){
+    $student_id = isset($_POST['student_id']) ? intval($_POST['student_id']) : 0;
+
+    if ($student_id > 0 && $student_id != '') {
+        $classroom_id = getStudentClassroomId($student_id);
+
+        $concatEncodeparams = rtrim(strtr(base64_encode($classroom_id), '+/', '-_'), '=');
+        // $concatEncodeparams = base64_encode($classroom_id);
+
+        echo json_encode([
+            'status' => true, 
+            'data' => $concatEncodeparams, 
+            'message' => 'Successfully generated parameters.']);
+        exit();
+    }
+    echo json_encode(['status' => false, 'message' => 'Invalid classroom ID.']);
     exit;
 }
 
-// ----------------------------------------------------
-// ✅ แก้ไข: เพิ่ม t1.detection_date และปรับ ORDER BY 
-// ----------------------------------------------------
-$result_data = [];
-$sql = "SELECT 
-            t2.`group_photo_path`, 
-            t2.`description`, 
-            t2.`date_create`,
-            t1.`detection_date` 
-        FROM `classroom_photo_face_detection` t1
-        JOIN `classroom_photo_album_group` t2 ON t1.group_photo_id = t2.group_photo_id
-        WHERE t1.`student_id` = ? 
-        ORDER BY t2.date_create DESC, t1.detection_date DESC";
-        
-$stmt = $mysqli->prepare($sql);
+if ($_POST && $_POST['action'] == 'get_student_embedparams'){
+    $student_id = isset($_POST['student_id']) ? intval($_POST['student_id']) : 0;
 
-if ($stmt) {
-    $stmt->bind_param("i", $student_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    // ✅ NEW: ตรวจสอบและกำหนดฟังก์ชัน GetUrl
-    $use_get_url = function_exists('GetUrl');
-    
-    while ($row = $result->fetch_assoc()) {
-        $path = $row['group_photo_path'];
-        
-        // ✅ NEW: เรียก GetUrl() เพื่อแปลง Path ใน DB เป็น Full URL
-        if ($use_get_url) {
-            $path = GetUrl($path);
+    if ($student_id > 0 && $student_id != '') {
+        $classroom_id = getStudentClassroomId($student_id);
+
+        if (!$classroom_id || $classroom_id == 0) {
+            echo json_encode(['status' => false, 'message' => 'Invalid classroom ID.']);
+            exit();
         }
-        
-        $result_data[] = [
-            'path' => $path, // <== ตอนนี้ 'path' คือ Full URL แล้ว
-            'description' => $row['description'], 
-            'date_create' => $row['date_create'], 
-            'detection_date' => $row['detection_date']
-        ];
+
+        $concatMD5params = md5($classroom_id . ']C' . $student_id);
+        echo json_encode([
+            'status' => true, 
+            'data' => $concatMD5params, 
+            'message' => 'Successfully generated parameters.']);
+        exit();
     }
-    $stmt->close();
+    echo json_encode(['status' => false, 'message' => 'Invalid classroom ID.']);
+    exit;
 }
 
 
-if (!empty($result_data)) {
-    // ส่งข้อมูลที่มีทั้ง Full URL และ Description กลับไปให้ JS
-    echo json_encode(['status' => 'success', 'data' => $result_data, 'message' => 'ดึงรูปภาพที่ตรวจจับไว้ล่วงหน้าสำเร็จ']); 
-} else {
-    echo json_encode(['status' => 'success', 'data' => [], 'message' => 'ไม่พบรูปภาพที่คุณถูกตรวจจับ']);
-}
 ?>

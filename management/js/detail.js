@@ -189,6 +189,12 @@ function buildPage(page) {
         case 'message':
             buildMessagePage();
             break;
+        case 'photo':
+            buildPhotoPage();
+            break;
+        case 'minigame':
+            buildMiniGamePage();
+            break;
         default:
             console.warn('Unknown page type:', page);
     }

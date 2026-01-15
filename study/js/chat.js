@@ -23,8 +23,8 @@ $(document).ready(function () {
             contentType: false,
             dataType: 'json',
             success: function(data) {
-                console.log("DATA", data);
-                console.log("DATA", data.status);
+                // console.log("DATA", data);
+                // console.log("DATA", data.status);
 
                 if(data.status == true){
                     $("#chatmessageInput").attr('data-group', data.group_id);
@@ -79,7 +79,7 @@ $(document).ready(function () {
             // รวมเป็นข้อความเดียว
             const dateTimeFormat = `${month}/${day}/${year} at ${formattedHour}.${minutes} ${ampm}`;
 
-            console.log(groupValue);
+            // console.log(groupValue);
 
             // Create user message container and content with jQuery
             const userMessageContainer = $('<div class="message message-user"></div>');
@@ -112,7 +112,7 @@ $(document).ready(function () {
             const typingIndicator = $('<div class="typing-indicator"><span></span><span></span><span></span></div>');
             typingIndicator.css('display', 'block');
             $('#chatMessages').append(typingIndicator);
-            console.log("MESSAGE PROCESS")
+            // console.log("MESSAGE PROCESS")
 
             setTimeout(function () {
                 const formData = new FormData();
@@ -244,7 +244,7 @@ $(document).ready(function () {
     // OPEN CHAT HISTORY MODAL
     $("#chatHistoryButton").on('click', function(e){
         e.preventDefault();
-        modalOverlay.style.display = 'flex';
+
         const formData = new FormData();
         formData.append('action', 'get_history');
 
@@ -315,7 +315,7 @@ $(document).ready(function () {
                             dataType: 'json',
                             success: function(messages) {
                                 if (!messages.data || messages.data.length === 0) {
-                                    modalOverlay.hide();
+                                    // $('.chatHistoryModal').modal('hide');                    
                                     messagesContainer.empty();
 
                                     const botMessageContainer = $('<div>').css({
@@ -363,7 +363,7 @@ $(document).ready(function () {
                                         const botAvatarURL = '/helpdesk/images/ai-logo.png';
 
                                         messagesContainer.empty();
-                                        modalOverlay.hide();
+                                        $('.chatHistoryModal').modal('hide');                    
 
                                         $.each(messages.data, function(_, msg) {
                                             let dateTimeFormat = '';
@@ -514,15 +514,25 @@ $(document).ready(function () {
                     });
 
                     $('#close-modal-btn').off('click').on('click', function() {
-                        modalOverlay.hide();
+                        $('.chatHistoryModal').modal('hide');                    
                     });
                 } else {
-                    modalContent.html('<p>No chat history found.</p>');
+
+                    // Set modal content first
+                    // $('.chatHistoryModal .modal-title').html('<p><p>!');
+                    $('.chatHistoryModal  .modal-body').html('<p>No chat history found.</p>');
+        
+                    // Then show modal
+                    $('.chatHistoryModal').modal('show');
                 }
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
-                modalContent.html('<p>Error loading chat history.</p>');
+                $('.chatHistoryModal .modal-title').html('<p>Error!</p>');
+                $('.chatHistoryModal  .modal-body').html('<p>Something Happend. No chat history found.</p>');
+        
+                    // Then show modal
+                $('.chatHistoryModal').modal('show');
             }
         });
     });

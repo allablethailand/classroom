@@ -1,3 +1,8 @@
+<?php
+
+
+?>
+
 <!doctype html>
 <html>
 
@@ -130,8 +135,8 @@
                 <form id="quizForm">
                     <div id="choicesContainer"></div>
                 </form>
-                <button id="prevBtn">Previous</button>
-                <button id="nextBtn">Next</button>
+                <button class="btn-class-block" style="margin-right: 10px;" id="prevBtn">Previous</button>
+                <button class="btn-class-block" id="nextBtn">Next</button>
             </div>
 
 
@@ -226,13 +231,13 @@
                 </div>
             </div>
 
-            <div id="wordle-game" class="game-template" style="display:none;">
-                <!-- <h2>Wordle</h2> -->
+            <!-- <div id="wordle-game" class="game-template" style="display:none;">
+                 <h2>Wordle</h2> 
                 <div id="wordle-grid"></div>
                 <input type="text" id="wordleInput" maxlength="5" placeholder="Enter 5-letter word">
                 <button id="submitWordleGuess">Submit</button>
                 <div id="wordleFeedback"></div>
-            </div>
+            </div> -->
         </div>
     </div>
 
