@@ -12,6 +12,7 @@
         $base_include .= "/".$exl_path[1];
     } 
     require_once $base_include.'/lib/connect_sqli.php';
+    global $mysqli;
     $mysqli -> query("SET group_concat_max_len = 1000000");
     $payload = json_decode(file_get_contents('php://input'), false, 512, JSON_BIGINT_AS_STRING);
     $fsData = getBucketMaster();
@@ -386,7 +387,7 @@
                     $data[] = [
                         'id' => $value['gender_id'],
                         'col' => $value['gender_desc'],
-                        'total_count' => count($classroomg_gender),
+                        'total_count' => count($classroom_gender),
                         'code' => $value['gender_id'],
                         'desc' => $value['gender_desc'],
                     ];
