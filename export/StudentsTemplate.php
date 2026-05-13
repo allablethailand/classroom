@@ -119,7 +119,7 @@
 <meta charset="UTF-8">
 <title><?php echo $classroom_name; ?> • ORIGAMI SYSTEM</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="/css/loading.css?v=<?php echo time(); ?>">
+<link rel="stylesheet" href="/public/css/loading.css?v=<?php echo time(); ?>">
 <script src="/dist/js/jquery/3.6.3/jquery.js"></script>
 <script src="/dist/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
