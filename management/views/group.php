@@ -26,7 +26,7 @@
 <script src="/dist/js/moment-with-locales.js"></script>
 <script src="/dist/daterangepicker/v2/daterangepicker.js"></script>
 <script src="/dist/js/jquery.redirect.js"></script>
-<script src="/js/clipboard.min.js"></script>
+<script src="/public/js/clipboard.min.js"></script>
 <script src="/node_modules/clipboard/dist/clipboard.min.js"></script>
 <script src="/classroom/management/lib/js/group-page.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 </head>
