@@ -26,7 +26,7 @@
 <script src="/dist/js/moment-with-locales.js"></script>
 <script src="/dist/daterangepicker/v2/daterangepicker.js"></script>
 <script src="/dist/js/jquery.redirect.js"></script>
-<script src="/js/clipboard.min.js"></script>
+<script src="/public/js/clipboard.min.js"></script>
 <script src="/node_modules/clipboard/dist/clipboard.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>

@@ -54,7 +54,7 @@
 <script src="/dist/editor/js/plugins/char_counter.min.js"></script>
 <script src="/dist/editor/js/plugins/entities.min.js"></script>
 <script src="/dist/editor/js/plugins/urls.min.js"></script>
-<script src="/js/clipboard.min.js"></script>
+<script src="/public/js/clipboard.min.js"></script>
 <script src="/node_modules/clipboard/dist/clipboard.min.js"></script>
 <script src="/classroom/management/js/detail.js?v=<?php echo time(); ?>" type="text/javascript"></script>
 <script src="/classroom/management/js/course.js?v=<?php echo time(); ?>" type="text/javascript"></script>
